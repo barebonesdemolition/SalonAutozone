@@ -1796,6 +1796,75 @@ function partFormHTML() {
       + '<textarea name="description" rows="3" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"></textarea>';
 }
 
+
+// ============ MODEL DROPDOWN - BULLETPROOF VERSION ============
+window.updateModels = function() {
+    console.log('[updateModels] Called');
+    
+    var makeSelect = document.getElementById('v-make');
+    var modelSelect = document.getElementById('v-model');
+    
+    if (!makeSelect || !modelSelect) {
+        console.error('[updateModels] v-make or v-model not found on page');
+        return;
+    }
+    
+    var make = makeSelect.value;
+    console.log('[updateModels] Selected make:', make);
+    
+    if (!make) {
+        modelSelect.innerHTML = '<option value="">Select Make First</option>';
+        return;
+    }
+    
+    // Show hardcoded fallback models INSTANTLY (no waiting)
+    var MODELS_LOOKUP = {
+        'Toyota': ['Corolla', 'Camry', 'Hilux', 'RAV4', 'Land Cruiser', 'Prado', 'Vitz', 'Yaris', 'Avensis', 'Prius', 'Highlander', 'Fortuner', 'Hiace', '4Runner', 'Tacoma'],
+        'Nissan': ['X-Trail', 'Altima', 'Sunny', 'Patrol', 'Navara', 'Qashqai', 'Juke', 'Note', 'Murano', 'Sentra', 'Pathfinder'],
+        'Honda': ['Civic', 'Accord', 'CR-V', 'Fit', 'Jazz', 'City', 'Pilot', 'HR-V', 'Odyssey', 'Stream'],
+        'Mitsubishi': ['Pajero', 'Lancer', 'Outlander', 'L200', 'ASX', 'Galant', 'Mirage'],
+        'Mazda': ['CX-5', 'CX-9', 'Mazda3', 'Mazda6', 'MX-5', 'BT-50', 'Tribute'],
+        'Suzuki': ['Swift', 'Vitara', 'Jimny', 'SX4', 'Alto', 'Celerio', 'Ertiga'],
+        'Subaru': ['Forester', 'Outback', 'Impreza', 'Legacy', 'XV', 'WRX'],
+        'Isuzu': ['D-Max', 'MU-X', 'Trooper', 'Rodeo'],
+        'Daihatsu': ['Terios', 'Sirion', 'Cuore', 'Materia'],
+        'Lexus': ['RX', 'NX', 'ES', 'IS', 'GX', 'LX', 'LS'],
+        'Hyundai': ['Tucson', 'Santa Fe', 'Elantra', 'Sonata', 'i10', 'i20', 'i30', 'Accent', 'Creta', 'Kona', 'Veloster'],
+        'Kia': ['Sportage', 'Sorento', 'Rio', 'Cerato', 'Soul', 'Seltos', 'Carnival', 'Picanto'],
+        'Mercedes-Benz': ['C-Class', 'E-Class', 'S-Class', 'GLC', 'GLE', 'GLS', 'A-Class', 'B-Class', 'ML', 'G-Class', 'Sprinter'],
+        'BMW': ['3 Series', '5 Series', '7 Series', 'X1', 'X3', 'X5', 'X6', 'X7', '1 Series'],
+        'Volkswagen': ['Golf', 'Passat', 'Tiguan', 'Polo', 'Jetta', 'Touareg', 'Amarok'],
+        'Audi': ['A3', 'A4', 'A6', 'A8', 'Q3', 'Q5', 'Q7', 'Q8'],
+        'Porsche': ['911', 'Cayenne', 'Macan', 'Panamera'],
+        'Ford': ['Focus', 'Fiesta', 'F-150', 'Ranger', 'Explorer', 'Escape', 'Mustang'],
+        'Chevrolet': ['Silverado', 'Cruze', 'Malibu', 'Equinox', 'Tahoe', 'Spark'],
+        'Jeep': ['Wrangler', 'Grand Cherokee', 'Cherokee', 'Compass'],
+        'Peugeot': ['208', '308', '3008', '5008', 'Partner'],
+        'Renault': ['Clio', 'Megane', 'Duster', 'Captur', 'Logan'],
+        'Citroen': ['C3', 'C4', 'C5', 'Berlingo'],
+        'Land Rover': ['Defender', 'Discovery', 'Range Rover', 'Range Rover Sport', 'Evoque'],
+        'Jaguar': ['XE', 'XF', 'XJ', 'F-Pace', 'E-Pace'],
+        'Volvo': ['XC40', 'XC60', 'XC90', 'S60', 'S90'],
+        'Chery': ['Tiggo 4', 'Tiggo 7', 'Tiggo 8', 'Arrizo 5'],
+        'Geely': ['Coolray', 'Azkarra', 'Tugella', 'Emgrand'],
+        'Great Wall': ['Wingle', 'Poer', 'Haval H6', 'Haval Jolion'],
+        'BYD': ['Atto 3', 'Han', 'Tang', 'Song', 'Seal'],
+        'MG': ['ZS', 'HS', 'MG5', 'MG6'],
+        'Other': ['Other']
+    };
+    
+    var models = MODELS_LOOKUP[make] || MODELS_LOOKUP['Other'];
+    var html = '<option value="">Select Model</option>';
+    for (var i = 0; i < models.length; i++) {
+        html += '<option value="' + models[i] + '">' + models[i] + '</option>';
+    }
+    html += '<option value="Other">Other (not listed)</option>';
+    modelSelect.innerHTML = html;
+    console.log('[updateModels] Populated ' + models.length + ' models for ' + make);
+};
+
+console.log('[Salon AutoZone] updateModels function loaded');
+
 </script>
 </body>
 </html>
