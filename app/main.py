@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.routers import auth, parts, listings, orders, vin, upload, ai_chat, search, imports, catalog, unified_search, inquiries, admin, identify
+from app.routers import auth, parts, listings, orders, vin, upload, ai_chat, search, imports, catalog, unified_search, inquiries, admin, identify, nhtsa
 from app.db import engine, Base
 from app.config import get_settings
 
@@ -51,6 +51,7 @@ app.include_router(catalog.router)
 app.include_router(inquiries.router)
 app.include_router(admin.router)
 app.include_router(identify.router)
+app.include_router(nhtsa.router)
 app.include_router(unified_search.router)
 app.include_router(search.router)
 
