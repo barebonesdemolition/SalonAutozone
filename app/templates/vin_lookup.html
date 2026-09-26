@@ -472,6 +472,21 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
 </head>
 <body>
 
+<!-- MODAL FOR NEW LISTINGS -->
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:white;border-radius:16px;max-width:640px;width:100%;padding:28px;position:relative;max-height:90vh;overflow-y:auto;">
+    <span onclick="closeModal()" style="position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#888;line-height:1;">&times;</span>
+    <h2 id="modal-title" style="margin-bottom:20px;color:#0b1e3a;font-size:22px;">List Item</h2>
+    <form id="listing-form" onsubmit="submitListing(event)">
+      <div id="form-fields"></div>
+      <button type="submit" style="background:#ff6b00;color:white;border:none;padding:16px;border-radius:10px;width:100%;font-weight:bold;font-size:16px;cursor:pointer;margin-top:20px;min-height:52px;">Publish Listing</button>
+      <div id="form-status" style="margin-top:15px;text-align:center;font-weight:bold;font-size:14px;"></div>
+    </form>
+  </div>
+</div>
+
+
+
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
   <symbol id="icon-brakes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10"/>
@@ -1711,6 +1726,74 @@ function closeModal() {
     }
     var statusEl = document.getElementById('form-status');
     if (statusEl) statusEl.innerHTML = '';
+}
+
+
+function vehicleFormHTML() {
+    var makesOpts = MAKES.map(function(m) { return '<option value="' + m + '">' + m + '</option>'; }).join('');
+    var yearsOpts = YEARS.map(function(y) { return '<option value="' + y + '">' + y + '</option>'; }).join('');
+    var citiesOpts = CITIES.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+    
+    return '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Car Title *</label>'
+      + '<input name="title" required placeholder="2015 Toyota Corolla" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Make *</label>'
+      + '<select name="make" id="v-make" required onchange="updateModels()" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select Make</option>' + makesOpts + '</select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Model *</label>'
+      + '<select name="model" id="v-model" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select Make First</option></select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Year *</label>'
+      + '<select name="year" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select Year</option>' + yearsOpts + '</select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Price (SLL) *</label>'
+      + '<input name="price_sll" type="number" required placeholder="150000000" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Price (USD, optional)</label>'
+      + '<input name="price_usd" type="number" placeholder="6500" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Mileage (km) *</label>'
+      + '<input name="mileage_km" type="number" required placeholder="85000" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Fuel *</label>'
+      + '<select name="fuel_type" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option></select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Transmission *</label>'
+      + '<select name="transmission" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option>Automatic</option><option>Manual</option></select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Location *</label>'
+      + '<select name="location" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select City</option>' + citiesOpts + '</select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">📱 WhatsApp Number *</label>'
+      + '<input name="contact_phone" required placeholder="+232 76 123456" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">📸 Upload Photo</label>'
+      + '<input type="file" id="vehicle-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="event.stopPropagation();">'
+      + '<input type="hidden" name="image_url" id="vehicle-image-url">'
+      + '<div id="vehicle-photo-preview" style="margin-bottom:12px;"></div>'
+      + '<button type="button" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById(\'vehicle-photo-input\').click(); return false;" style="width:100%;background:#f0f4f8;color:#0b1e3a;border:2px dashed #cbd5e0;padding:16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;font-family:inherit;margin-bottom:12px;min-height:48px;">📷 Take Photo or Upload</button>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Description</label>'
+      + '<textarea name="description" rows="3" placeholder="Duty paid, well maintained, etc." style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"></textarea>';
+}
+
+
+function partFormHTML() {
+    var catsOpts = CATS.map(function(c) { return '<option>' + c + '</option>'; }).join('');
+    var makesOpts = MAKES.map(function(m) { return '<option>' + m + '</option>'; }).join('');
+    var citiesOpts = CITIES.map(function(c) { return '<option>' + c + '</option>'; }).join('');
+    
+    return '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Part Name *</label>'
+      + '<input name="name" required placeholder="Toyota Corolla Brake Pads" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Category *</label>'
+      + '<select name="category" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select</option>' + catsOpts + '</select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Compatible Make</label>'
+      + '<select name="compatible_make" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Any</option>' + makesOpts + '</select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Price (SLL) *</label>'
+      + '<input name="price_sll" type="number" required placeholder="450000" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Stock Quantity *</label>'
+      + '<input name="stock_quantity" type="number" required value="1" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Condition *</label>'
+      + '<select name="condition" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option>New</option><option>Used</option><option>Refurbished</option></select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Location *</label>'
+      + '<select name="location" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select City</option>' + citiesOpts + '</select>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">📱 WhatsApp Number *</label>'
+      + '<input name="contact_phone" required placeholder="+232 76 123456" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">📸 Upload Photo</label>'
+      + '<input type="file" id="part-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="event.stopPropagation();">'
+      + '<input type="hidden" name="image_url" id="part-image-url">'
+      + '<div id="part-photo-preview" style="margin-bottom:12px;"></div>'
+      + '<button type="button" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById(\'part-photo-input\').click(); return false;" style="width:100%;background:#f0f4f8;color:#0b1e3a;border:2px dashed #cbd5e0;padding:16px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;font-family:inherit;margin-bottom:12px;min-height:48px;">📷 Take Photo or Upload</button>'
+      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Description</label>'
+      + '<textarea name="description" rows="3" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"></textarea>';
 }
 
 </script>
