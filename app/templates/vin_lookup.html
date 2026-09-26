@@ -1650,6 +1650,69 @@ setTimeout(function() {
     }
 }, 1000);
 
+
+// ==========================================================
+// MODAL FUNCTIONS (RESTORED)
+// ==========================================================
+
+function openModal(type) {
+    // Prevent any default behavior
+    if (typeof event !== 'undefined' && event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    var token = localStorage.getItem('token');
+    if (!token) {
+        if (confirm('Please login or register to list items. Go to login page?')) {
+            window.location.href = '/login?next=/';
+        }
+        return false;
+    }
+    
+    var modal = document.getElementById('modal-overlay');
+    if (!modal) {
+        console.error('[openModal] modal-overlay element not found');
+        alert('Error: Modal not found. Please refresh the page.');
+        return false;
+    }
+    
+    var form = document.getElementById('listing-form');
+    if (form) {
+        form.reset();
+        form.dataset.type = type;
+    }
+    
+    var statusEl = document.getElementById('form-status');
+    if (statusEl) statusEl.innerHTML = '';
+    
+    var titleEl = document.getElementById('modal-title');
+    if (titleEl) {
+        titleEl.innerText = type === 'vehicle' ? '🚗 List Your Car' : '🔧 List a Part';
+    }
+    
+    var fieldsEl = document.getElementById('form-fields');
+    if (fieldsEl) {
+        if (type === 'vehicle') {
+            fieldsEl.innerHTML = vehicleFormHTML();
+        } else {
+            fieldsEl.innerHTML = partFormHTML();
+        }
+    }
+    
+    modal.style.display = 'flex';
+    return false;
+}
+
+function closeModal() {
+    var modal = document.getElementById('modal-overlay');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    var statusEl = document.getElementById('form-status');
+    if (statusEl) statusEl.innerHTML = '';
+}
+
 </script>
 </body>
 </html>
