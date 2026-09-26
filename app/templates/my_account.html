@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>My Account - {{ app_name }}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
+.navbar{background:#0b1e3a;color:white;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.logo{font-size:18px;font-weight:900;color:#00a8e8;text-decoration:none}
+.logo span{color:#ffb800}
+.navbar a{color:white;text-decoration:none;font-size:13px;margin-left:15px}
+.container{max-width:1200px;margin:24px auto;padding:0 16px}
+.welcome{background:white;border-radius:14px;padding:20px 24px;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.welcome h1{font-size:20px;color:#0b1e3a}
+.welcome p{font-size:13px;color:#666;margin-top:4px}
+.logout-btn{background:#dc2626;color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px;min-height:44px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border-left:4px solid #00a8e8}
+.stat-label{font-size:10px;color:#888;text-transform:uppercase;font-weight:700;letter-spacing:0.5px}
+.stat-value{font-size:26px;color:#0b1e3a;font-weight:900;margin-top:4px}
+.tabs{display:flex;gap:6px;margin-bottom:16px;background:white;padding:6px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 16px;background:transparent;border:none;border-radius:8px;font-weight:600;cursor:pointer;color:#64748b;font-size:13px;white-space:nowrap;flex-shrink:0;font-family:inherit;min-height:44px}
+.tab.active{background:#0b1e3a;color:white}
+.section{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:none}
+.section.active{display:block}
+.section h2{color:#0b1e3a;font-size:18px;margin-bottom:16px}
+.listing-card{display:flex;gap:14px;padding:14px;border-bottom:1px solid #f1f5f9;align-items:center;flex-wrap:wrap;cursor:pointer;transition:background 0.15s;text-decoration:none;color:inherit}
+.listing-card:last-child{border-bottom:none}
+.listing-card:hover{background:#f8fafc}
+.listing-img{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#e0e6ed,#cbd5e0);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;background-size:cover;background-position:center}
+.listing-info{flex:1;min-width:0}
+.listing-title{font-weight:700;color:#0b1e3a;font-size:15px;margin-bottom:4px}
+.listing-price{color:#00a8e8;font-size:17px;font-weight:800;margin-bottom:4px}
+.listing-meta{font-size:12px;color:#666;display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.badge{background:#f0f4f8;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.badge.sold{background:#22c55e;color:white}
+.badge.inquiry{background:#fef3c7;color:#92400e}
+.badge.new{background:#dbeafe;color:#1e40af}
+.badge.contacted{background:#fef3c7;color:#92400e}
+.badge.quoted{background:#e0e7ff;color:#3730a3}
+.badge.ordered{background:#dcfce7;color:#166534}
+.badge.delivered{background:#22c55e;color:white}
+.badge.pending{background:#fef3c7;color:#92400e}
+.badge.lost{background:#fef2f2;color:#dc2626}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.action-btn{padding:9px 14px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px;font-family:inherit;min-height:40px}
+.view-btn{background:#00a8e8;color:white}
+.sold-btn{background:#ffb800;color:#0b1e3a}
+.delete-btn{background:#fef2f2;color:#dc2626}
+.empty{text-align:center;padding:60px 20px;color:#94a3b8}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:0.5}
+.loading{text-align:center;padding:40px;color:#00a8e8}
+@media(max-width:768px){
+  .navbar{padding:12px 16px;flex-direction:column;gap:8px;text-align:center}
+  .navbar > div{width:100%;justify-content:center;display:flex;gap:10px;flex-wrap:wrap}
+  .navbar a{margin:0;font-size:13px;padding:8px 12px;background:rgba(255,255,255,0.1);border-radius:6px}
+  .container{margin:16px auto;padding:0 12px}
+  .welcome{padding:16px 18px}
+  .welcome h1{font-size:17px}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat-value{font-size:22px}
+  .listing-card{padding:12px;gap:12px;flex-direction:row}
+  .listing-img{width:70px;height:70px}
+  .actions{width:100%;justify-content:flex-end;margin-top:8px}
+  .action-btn{flex:1}
+}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <a href="/" class="logo">Salon<span>AutoZone</span> & AutoTrader</a>
+  <div>
+    <a href="/">🏠 Home</a>
+    <a href="/vin-tool">🔍 VIN</a>
+    <a href="#" onclick="logout(event)">Logout</a>
+  </div>
+</div>
+
+<div class="container">
+  <div class="welcome">
+    <div>
+      <h1 id="greeting">Welcome back!</h1>
+      <p id="user-info">Loading...</p>
+    </div>
+  </div>
+
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-label">My Cars</div><div class="stat-value" id="stat-cars">0</div></div>
+    <div class="stat-card" style="border-left-color:#22c55e"><div class="stat-label">Cars Sold</div><div class="stat-value" id="stat-sold">0</div></div>
+    <div class="stat-card" style="border-left-color:#a855f7"><div class="stat-label">My Parts</div><div class="stat-value" id="stat-parts">0</div></div>
+    <div class="stat-card" style="border-left-color:#ff6b00"><div class="stat-label">Inquiries Received</div><div class="stat-value" id="stat-inq-rec">0</div></div>
+    <div class="stat-card" style="border-left-color:#f59e0b"><div class="stat-label">Inquiries Sent</div><div class="stat-value" id="stat-inq-sent">0</div></div>
+    <div class="stat-card" style="border-left-color:#ef4444"><div class="stat-label">Import Requests</div><div class="stat-value" id="stat-imports">0</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('cars', this)">🚗 My Cars</button>
+    <button class="tab" onclick="switchTab('parts', this)">🔧 My Parts</button>
+    <button class="tab" onclick="switchTab('inquiries', this)">💬 My Inquiries</button>
+    <button class="tab" onclick="switchTab('imports', this)">🌍 My Imports</button>
+  </div>
+
+  <div id="section-cars" class="section active">
+    <h2>My Car Listings</h2>
+    <div id="cars-list"><div class="loading">Loading...</div></div>
+  </div>
+
+  <div id="section-parts" class="section">
+    <h2>My Part Listings</h2>
+    <div id="parts-list"><div class="loading">Loading...</div></div>
+  </div>
+
+  <div id="section-inquiries" class="section">
+    <h2>My Inquiries (Sent)</h2>
+    <div id="inquiries-list"><div class="loading">Loading...</div></div>
+  </div>
+
+  <div id="section-imports" class="section">
+    <h2>My Import Requests</h2>
+    <div id="imports-list"><div class="loading">Loading...</div></div>
+  </div>
+</div>
+
+<script>
+var token = localStorage.getItem('token') || '';
+
+if (!token) {
+    window.location.href = '/login?next=/my-account';
+}
+
+function logout(e) {
+    if (e) e.preventDefault();
+    localStorage.removeItem('token');
+    localStorage.removeItem('userInfo');
+    window.location.href = '/';
+}
+
+function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/[&<>"']/g, function(c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+}
+
+function timeAgo(iso) {
+    if (!iso) return '';
+    var diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+    return new Date(iso).toLocaleDateString();
+}
+
+function authHeaders() {
+    return { 'Authorization': 'Bearer ' + token };
+}
+
+async function loadUser() {
+    try {
+        var res = await fetch('/api/auth/me', { headers: authHeaders() });
+        if (!res.ok) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+            return;
+        }
+        var u = await res.json();
+        document.getElementById('greeting').innerText = 'Welcome back, ' + u.full_name + '!';
+        document.getElementById('user-info').innerText = u.email + ' • ' + u.phone;
+        localStorage.setItem('userInfo', JSON.stringify(u));
+    } catch (e) {}
+}
+
+async function loadStats() {
+    try {
+        var res = await fetch('/api/my-account/stats', { headers: authHeaders() });
+        var d = await res.json();
+        document.getElementById('stat-cars').innerText = d.total_cars;
+        document.getElementById('stat-sold').innerText = d.cars_sold;
+        document.getElementById('stat-parts').innerText = d.total_parts;
+        document.getElementById('stat-inq-rec').innerText = d.total_inquiries_received;
+        document.getElementById('stat-inq-sent').innerText = d.total_inquiries_sent;
+        document.getElementById('stat-imports').innerText = d.total_import_requests;
+    } catch (e) {}
+}
+
+async function loadCars() {
+    var el = document.getElementById('cars-list');
+    el.innerHTML = '<div class="loading">Loading...</div>';
+    try {
+        var res = await fetch('/api/my-account/my-cars', { headers: authHeaders() });
+        var data = await res.json();
+        if (data.count === 0) {
+            el.innerHTML = '<div class="empty"><div class="empty-icon">🚗</div>You haven\'t listed any cars yet.<br><br><a href="/?action=list-car" style="color:#00a8e8;font-weight:bold;">+ List Your First Car</a></div>';
+            return;
+        }
+        el.innerHTML = data.vehicles.map(function(v) {
+            var imgStyle = v.image_url ? 'background-image:url(' + v.image_url + ');color:transparent;' : '';
+            return '<div class="listing-card" onclick="window.location.href=\\'/vehicle/' + v.id + '\\'">' +
+              '<div class="listing-img" style="' + imgStyle + '">' + (v.image_url ? '' : '🚗') + '</div>' +
+              '<div class="listing-info">' +
+                '<div class="listing-title">' + esc(v.title) + (v.is_sold ? ' <span class="badge sold">SOLD</span>' : '') + '</div>' +
+                '<div class="listing-price">SLL ' + Number(v.price_sll).toLocaleString() + '</div>' +
+                '<div class="listing-meta">' +
+                  '<span class="badge">' + v.year + '</span>' +
+                  '<span class="badge">📍 ' + esc(v.location) + '</span>' +
+                  (v.inquiry_count > 0 ? '<span class="badge inquiry">📩 ' + v.inquiry_count + ' inquiries</span>' : '') +
+                  '<span class="badge">' + timeAgo(v.created_at) + '</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="actions" onclick="event.stopPropagation();">' +
+                (v.is_sold ? '' : '<button class="action-btn sold-btn" onclick="markSold(' + v.id + ')">Mark Sold</button>') +
+                '<button class="action-btn delete-btn" onclick="deleteCar(' + v.id + ')">Delete</button>' +
+              '</div>' +
+            '</div>';
+        }).join('');
+    } catch (e) {
+        el.innerHTML = '<div class="empty">Error loading</div>';
+    }
+}
+
+async function loadParts() {
+    var el = document.getElementById('parts-list');
+    el.innerHTML = '<div class="loading">Loading...</div>';
+    try {
+        var res = await fetch('/api/my-account/my-parts', { headers: authHeaders() });
+        var data = await res.json();
+        if (data.count === 0) {
+            el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div>You haven\'t listed any parts yet.<br><br><a href="/?action=list-part" style="color:#00a8e8;font-weight:bold;">+ List Your First Part</a></div>';
+            return;
+        }
+        el.innerHTML = data.parts.map(function(p) {
+            var imgStyle = p.image_url ? 'background-image:url(' + p.image_url + ');color:transparent;' : '';
+            return '<div class="listing-card" onclick="window.location.href=\\'/part/' + p.id + '\\'">' +
+              '<div class="listing-img" style="' + imgStyle + '">' + (p.image_url ? '' : '🔧') + '</div>' +
+              '<div class="listing-info">' +
+                '<div class="listing-title">' + esc(p.name) + '</div>' +
+                '<div class="listing-price">SLL ' + Number(p.price_sll).toLocaleString() + '</div>' +
+                '<div class="listing-meta">' +
+                  '<span class="badge">' + esc(p.category) + '</span>' +
+                  '<span class="badge">📍 ' + esc(p.location) + '</span>' +
+                  '<span class="badge">Stock: ' + p.stock_quantity + '</span>' +
+                  (p.inquiry_count > 0 ? '<span class="badge inquiry">📩 ' + p.inquiry_count + '</span>' : '') +
+                '</div>' +
+              '</div>' +
+              '<div class="actions" onclick="event.stopPropagation();">' +
+                '<button class="action-btn delete-btn" onclick="deletePart(' + p.id + ')">Delete</button>' +
+              '</div>' +
+            '</div>';
+        }).join('');
+    } catch (e) {
+        el.innerHTML = '<div class="empty">Error loading</div>';
+    }
+}
+
+async function loadInquiries() {
+    var el = document.getElementById('inquiries-list');
+    el.innerHTML = '<div class="loading">Loading...</div>';
+    try {
+        var res = await fetch('/api/my-account/my-inquiries', { headers: authHeaders() });
+        var data = await res.json();
+        if (data.count === 0) {
+            el.innerHTML = '<div class="empty"><div class="empty-icon">💬</div>You haven\'t sent any inquiries yet.<br><br><a href="/" style="color:#00a8e8;font-weight:bold;">Browse listings →</a></div>';
+            return;
+        }
+        el.innerHTML = data.inquiries.map(function(i) {
+            var link = i.listing_type === 'vehicle' ? '/vehicle/' + i.listing_id : '/part/' + i.listing_id;
+            return '<div class="listing-card" onclick="window.location.href=\\'' + link + '\\'">' +
+              '<div class="listing-img">' + (i.listing_type === 'vehicle' ? '🚗' : '🔧') + '</div>' +
+              '<div class="listing-info">' +
+                '<div class="listing-title">' + esc(i.listing_title || '(listing #' + i.listing_id + ')') + '</div>' +
+                (i.buyer_message ? '<div style="font-size:13px;color:#475569;margin-top:4px;">"' + esc(i.buyer_message) + '"</div>' : '') +
+                '<div class="listing-meta">' +
+                  '<span class="badge ' + i.status + '">' + i.status + '</span>' +
+                  '<span class="badge">' + timeAgo(i.created_at) + '</span>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+        }).join('');
+    } catch (e) {
+        el.innerHTML = '<div class="empty">Error loading</div>';
+    }
+}
+
+async function loadImports() {
+    var el = document.getElementById('imports-list');
+    el.innerHTML = '<div class="loading">Loading...</div>';
+    try {
+        var res = await fetch('/api/my-account/my-import-requests', { headers: authHeaders() });
+        var data = await res.json();
+        if (data.count === 0) {
+            el.innerHTML = '<div class="empty"><div class="empty-icon">🌍</div>You haven\'t requested any imports yet.<br><br><a href="/" style="color:#00a8e8;font-weight:bold;">Request a part →</a></div>';
+            return;
+        }
+        el.innerHTML = data.requests.map(function(r) {
+            var quoteInfo = '';
+            if (r.quoted_price_sll) {
+                quoteInfo = '<div style="background:#dcfce7;padding:10px;border-radius:8px;margin-top:8px;font-size:13px;"><strong>💰 Quoted Price: SLL ' + Number(r.quoted_price_sll).toLocaleString() + '</strong>' + 
+                    (r.estimated_days ? '<br>📅 Est. delivery: ' + r.estimated_days + ' days' : '') +
+                    (r.supplier_country ? '<br>🌍 Supplier: ' + esc(r.supplier_country) : '') +
+                    '</div>';
+            }
+            return '<div class="listing-card" style="cursor:default;">' +
+              '<div class="listing-img">🌍</div>' +
+              '<div class="listing-info">' +
+                '<div class="listing-title">' + esc(r.part_name) + '</div>' +
+                '<div style="font-size:13px;color:#475569;">' + esc(r.car_make) + ' ' + esc(r.car_model) + ' (' + esc(r.car_year) + ')</div>' +
+                '<div class="listing-meta">' +
+                  '<span class="badge ' + r.status + '">' + r.status + '</span>' +
+                  (r.urgency ? '<span class="badge">' + esc(r.urgency) + '</span>' : '') +
+                  '<span class="badge">' + timeAgo(r.created_at) + '</span>' +
+                '</div>' +
+                quoteInfo +
+                (r.admin_notes ? '<div style="font-size:12px;color:#64748b;margin-top:6px;font-style:italic;">"' + esc(r.admin_notes) + '"</div>' : '') +
+              '</div>' +
+            '</div>';
+        }).join('');
+    } catch (e) {
+        el.innerHTML = '<div class="empty">Error loading</div>';
+    }
+}
+
+async function markSold(id) {
+    if (!confirm('Mark this car as sold?')) return;
+    try {
+        await fetch('/api/vehicles/' + id + '/sold', { method: 'PUT' });
+        loadCars();
+        loadStats();
+    } catch (e) {
+        alert('Failed to mark as sold');
+    }
+}
+
+async function deleteCar(id) {
+    if (!confirm('Delete this car listing permanently?')) return;
+    try {
+        var res = await fetch('/api/my-account/vehicle/' + id, { method: 'DELETE', headers: authHeaders() });
+        if (!res.ok) throw new Error();
+        loadCars();
+        loadStats();
+    } catch (e) {
+        alert('Failed to delete');
+    }
+}
+
+async function deletePart(id) {
+    if (!confirm('Delete this part listing permanently?')) return;
+    try {
+        var res = await fetch('/api/my-account/part/' + id, { method: 'DELETE', headers: authHeaders() });
+        if (!res.ok) throw new Error();
+        loadParts();
+        loadStats();
+    } catch (e) {
+        alert('Failed to delete');
+    }
+}
+
+function switchTab(tab, btn) {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    document.getElementById('section-' + tab).classList.add('active');
+    
+    if (tab === 'cars') loadCars();
+    if (tab === 'parts') loadParts();
+    if (tab === 'inquiries') loadInquiries();
+    if (tab === 'imports') loadImports();
+}
+
+// Init
+loadUser();
+loadStats();
+loadCars();
+</script>
+</body>
+</html>
