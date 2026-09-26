@@ -477,7 +477,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   <div style="background:white;border-radius:16px;max-width:640px;width:100%;padding:28px;position:relative;max-height:90vh;overflow-y:auto;">
     <span onclick="closeModal()" style="position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#888;line-height:1;">&times;</span>
     <h2 id="modal-title" style="margin-bottom:20px;color:#0b1e3a;font-size:22px;">List Item</h2>
-    <form id="listing-form" onsubmit="submitListing(event)">
+    <form id="listing-form" onsubmit="event.preventDefault(); event.stopPropagation(); submitListing(event); return false;">
       <div id="form-fields"></div>
       <button type="submit" style="background:#ff6b00;color:white;border:none;padding:16px;border-radius:10px;width:100%;font-weight:bold;font-size:16px;cursor:pointer;margin-top:20px;min-height:52px;">Publish Listing</button>
       <div id="form-status" style="margin-top:15px;text-align:center;font-weight:bold;font-size:14px;"></div>
@@ -1864,6 +1864,128 @@ window.updateModels = function() {
 };
 
 console.log('[Salon AutoZone] updateModels function loaded');
+
+
+// ============ SUBMIT LISTING - BULLETPROOF VERSION ============
+window.submitListing = async function(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    console.log('[submitListing] Called');
+    
+    var form = document.getElementById('listing-form');
+    var statusEl = document.getElementById('form-status');
+    
+    if (!form) {
+        console.error('[submitListing] form not found');
+        alert('Form not found. Please refresh the page.');
+        return false;
+    }
+    
+    if (!statusEl) {
+        console.error('[submitListing] status element not found');
+        return false;
+    }
+    
+    var type = form.dataset.type || 'vehicle';
+    console.log('[submitListing] Type:', type);
+    
+    statusEl.style.color = '#00a8e8';
+    statusEl.innerText = 'Publishing...';
+    
+    // Get token
+    var token = localStorage.getItem('token');
+    var userId = 1;
+    
+    // Try to get user ID from userInfo
+    try {
+        var userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+        if (userInfo.id) userId = userInfo.id;
+    } catch(err) {}
+    
+    // Build payload from form
+    var formData = new FormData(form);
+    var payload = {};
+    formData.forEach(function(value, key) {
+        if (value === '' || value === null || value === undefined) return;
+        // Convert numeric fields
+        if (['year', 'price_sll', 'price_usd', 'mileage_km', 'stock_quantity', 'quantity', 'budget_sll'].indexOf(key) > -1) {
+            var num = parseFloat(value);
+            if (!isNaN(num)) {
+                payload[key] = num;
+                return;
+            }
+        }
+        payload[key] = value;
+    });
+    
+    // Attach user ID
+    if (type === 'vehicle') {
+        payload.seller_id = userId;
+    } else {
+        payload.vendor_id = userId;
+    }
+    
+    console.log('[submitListing] Payload:', payload);
+    
+    // Determine API endpoint
+    var url = (type === 'vehicle') ? '/api/vehicles/' : '/api/parts/';
+    
+    try {
+        var res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (token || '')
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        console.log('[submitListing] Response status:', res.status);
+        
+        var data;
+        var responseText = await res.text();
+        try {
+            data = JSON.parse(responseText);
+        } catch (err) {
+            console.error('[submitListing] Non-JSON response:', responseText);
+            throw new Error('Server returned invalid response');
+        }
+        
+        if (!res.ok) {
+            var errMsg = data.detail || JSON.stringify(data) || 'Failed to publish';
+            if (res.status === 401) {
+                errMsg = 'Please login first (session expired)';
+            }
+            throw new Error(errMsg);
+        }
+        
+        console.log('[submitListing] Success!', data);
+        
+        statusEl.style.color = '#22c55e';
+        statusEl.innerText = '✅ Listing published successfully!';
+        
+        // Close modal and refresh
+        setTimeout(function() {
+            closeModal();
+            if (typeof doSearch === 'function') doSearch();
+            // Scroll to top to see the new listing
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 800);
+        
+        return false;
+        
+    } catch (err) {
+        console.error('[submitListing] Error:', err);
+        statusEl.style.color = '#dc2626';
+        statusEl.innerText = '❌ ' + err.message;
+        return false;
+    }
+};
+
+console.log('[Salon AutoZone] submitListing function loaded');
 
 </script>
 </body>
