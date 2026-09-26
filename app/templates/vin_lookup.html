@@ -1987,6 +1987,108 @@ window.submitListing = async function(event) {
 
 console.log('[Salon AutoZone] submitListing function loaded');
 
+
+// ============ SUBMIT LISTING - BULLETPROOF ============
+window.submitListing = async function(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    console.log('[submitListing] Called');
+    
+    var form = document.getElementById('listing-form');
+    var statusEl = document.getElementById('form-status');
+    
+    if (!form || !statusEl) {
+        alert('Form error. Please refresh the page.');
+        return false;
+    }
+    
+    var type = form.dataset.type || 'vehicle';
+    statusEl.style.color = '#00a8e8';
+    statusEl.innerText = 'Publishing...';
+    
+    var token = localStorage.getItem('token');
+    var userId = 1;
+    try {
+        var userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+        if (userInfo.id) userId = userInfo.id;
+    } catch(err) {}
+    
+    var formData = new FormData(form);
+    var payload = {};
+    formData.forEach(function(value, key) {
+        if (value === '' || value === null) return;
+        var numeric = ['year', 'price_sll', 'price_usd', 'mileage_km', 'stock_quantity', 'quantity', 'budget_sll'];
+        if (numeric.indexOf(key) > -1) {
+            var num = parseFloat(value);
+            if (!isNaN(num)) {
+                payload[key] = num;
+                return;
+            }
+        }
+        payload[key] = value;
+    });
+    
+    if (type === 'vehicle') {
+        payload.seller_id = userId;
+    } else {
+        payload.vendor_id = userId;
+    }
+    
+    console.log('[submitListing] Payload:', payload);
+    
+    var url = (type === 'vehicle') ? '/api/vehicles/' : '/api/parts/';
+    
+    try {
+        var res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (token || '')
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        console.log('[submitListing] Status:', res.status);
+        
+        var responseText = await res.text();
+        var data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (err) {
+            throw new Error('Server error: ' + responseText.substring(0, 100));
+        }
+        
+        if (!res.ok) {
+            var errMsg = data.detail || 'Failed to publish';
+            if (res.status === 401) errMsg = 'Please login first (session expired)';
+            throw new Error(errMsg);
+        }
+        
+        console.log('[submitListing] Success:', data);
+        statusEl.style.color = '#22c55e';
+        statusEl.innerText = '✅ Listing published!';
+        
+        setTimeout(function() {
+            closeModal();
+            if (typeof doSearch === 'function') doSearch();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 800);
+        
+        return false;
+        
+    } catch (err) {
+        console.error('[submitListing] Error:', err);
+        statusEl.style.color = '#dc2626';
+        statusEl.innerText = '❌ ' + err.message;
+        return false;
+    }
+};
+
+console.log('[Salon AutoZone] submitListing loaded');
+
 </script>
 </body>
 </html>
