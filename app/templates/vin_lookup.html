@@ -1587,6 +1587,69 @@ document.addEventListener('change', function(e) {
 
 console.log('[Salon AutoZone] Page loaded. openModal exists:', typeof openModal);
 
+
+// ==========================================================
+// NHTSA VEHICLE DATA INTEGRATION
+// ==========================================================
+var NHTSA_MAKES = null;
+var NHTSA_MODEL_CACHE = {};
+
+async function loadNhtsaMakes() {
+    try {
+        var res = await fetch('/api/nhtsa/makes');
+        if (!res.ok) throw new Error('Failed');
+        var data = await res.json();
+        NHTSA_MAKES = data.makes || [];
+        console.log('[NHTSA] Loaded ' + NHTSA_MAKES.length + ' makes');
+        return NHTSA_MAKES;
+    } catch (err) {
+        console.warn('[NHTSA] Could not load makes, using fallback');
+        return null;
+    }
+}
+
+async function loadNhtsaModels(make, year) {
+    var cacheKey = make.toLowerCase() + (year ? '_' + year : '');
+    if (NHTSA_MODEL_CACHE[cacheKey]) {
+        return NHTSA_MODEL_CACHE[cacheKey];
+    }
+    
+    try {
+        var url = '/api/nhtsa/models?make=' + encodeURIComponent(make);
+        if (year) url += '&year=' + year;
+        var res = await fetch(url);
+        if (!res.ok) throw new Error('Failed');
+        var data = await res.json();
+        NHTSA_MODEL_CACHE[cacheKey] = data.models || [];
+        return NHTSA_MODEL_CACHE[cacheKey];
+    } catch (err) {
+        console.warn('[NHTSA] Could not load models for ' + make);
+        return null;
+    }
+}
+
+// ==========================================================
+// SEARCH SUGGESTIONS WITH NHTSA
+// ==========================================================
+async function searchNhtsaSuggestions(query) {
+    try {
+        var res = await fetch('/api/nhtsa/search?q=' + encodeURIComponent(query) + '&limit=8');
+        if (!res.ok) return [];
+        var data = await res.json();
+        return data.results || [];
+    } catch (err) {
+        return [];
+    }
+}
+
+
+// Load NHTSA data in background when page loads
+setTimeout(function() {
+    if (typeof loadNhtsaMakes === 'function') {
+        loadNhtsaMakes();
+    }
+}, 1000);
+
 </script>
 </body>
 </html>
