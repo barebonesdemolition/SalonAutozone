@@ -7,7 +7,8 @@ from fastapi.templating import Jinja2Templates
 
 from app.routers import (
     auth, parts, listings, orders, vin, upload, ai_chat, search, imports,
-    catalog, unified_search, inquiries, admin, identify, nhtsa, my_account, analytics
+    catalog, unified_search, inquiries, admin, identify, nhtsa, my_account
+)
 )
 from app.db import engine, Base
 from app.config import get_settings
