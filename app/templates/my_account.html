@@ -1,830 +1,500 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>My Account · SalonAutoZone</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
-      background: #f4f6f8;
-      color: #1a1a1a;
-      line-height: 1.4;
-    }
-
-    /* ---------- NAVBAR ---------- */
-    .navbar {
-      background: #0b1e3a;
-      color: white;
-      padding: 14px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .logo {
-      font-size: 18px;
-      font-weight: 900;
-      color: #00a8e8;
-      text-decoration: none;
-      letter-spacing: -0.3px;
-    }
-    .logo span {
-      color: #ffb800;
-    }
-    .nav-links {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .navbar a {
-      color: white;
-      text-decoration: none;
-      font-size: 13px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.08);
-      transition: background 0.15s;
-    }
-    .navbar a:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    .navbar a.logout {
-      background: #dc2626;
-    }
-    .navbar a.logout:hover {
-      background: #b91c1c;
-    }
-
-    /* ---------- CONTAINER ---------- */
-    .container {
-      max-width: 1200px;
-      margin: 24px auto;
-      padding: 0 16px;
-    }
-
-    /* ---------- WELCOME ---------- */
-    .welcome {
-      background: white;
-      border-radius: 14px;
-      padding: 20px 24px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .welcome h1 {
-      font-size: 20px;
-      color: #0b1e3a;
-    }
-    .welcome p {
-      font-size: 13px;
-      color: #666;
-      margin-top: 4px;
-    }
-
-    /* ---------- STATS ---------- */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      border-left: 4px solid #00a8e8;
-    }
-    .stat-label {
-      font-size: 10px;
-      color: #888;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-    .stat-value {
-      font-size: 26px;
-      color: #0b1e3a;
-      font-weight: 900;
-      margin-top: 4px;
-    }
-
-    /* ---------- TABS ---------- */
-    .tabs {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 16px;
-      background: white;
-      padding: 6px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      overflow-x: auto;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-    }
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
-    .tab {
-      padding: 12px 16px;
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      color: #64748b;
-      font-size: 13px;
-      white-space: nowrap;
-      flex-shrink: 0;
-      font-family: inherit;
-      min-height: 44px;
-      transition: background 0.15s, color 0.15s;
-    }
-    .tab.active {
-      background: #0b1e3a;
-      color: white;
-    }
-
-    /* ---------- SECTIONS ---------- */
-    .section {
-      background: white;
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      display: none;
-    }
-    .section.active {
-      display: block;
-    }
-    .section h2 {
-      color: #0b1e3a;
-      font-size: 18px;
-      margin-bottom: 16px;
-    }
-
-    /* ---------- LISTING CARDS ---------- */
-    .listing-card {
-      display: flex;
-      gap: 14px;
-      padding: 14px;
-      border-bottom: 1px solid #f1f5f9;
-      align-items: center;
-      flex-wrap: wrap;
-      cursor: pointer;
-      transition: background 0.15s;
-      text-decoration: none;
-      color: inherit;
-    }
-    .listing-card:last-child {
-      border-bottom: none;
-    }
-    .listing-card:hover {
-      background: #f8fafc;
-    }
-    .listing-img {
-      width: 80px;
-      height: 80px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #e0e6ed, #cbd5e0);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      flex-shrink: 0;
-      background-size: cover;
-      background-position: center;
-      overflow: hidden;
-    }
-    .listing-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .listing-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .listing-title {
-      font-weight: 700;
-      color: #0b1e3a;
-      font-size: 15px;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .listing-price {
-      color: #00a8e8;
-      font-size: 17px;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-    .listing-meta {
-      font-size: 12px;
-      color: #666;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-      align-items: center;
-    }
-
-    /* ---------- BADGES ---------- */
-    .badge {
-      background: #f0f4f8;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      display: inline-block;
-      line-height: 1.4;
-    }
-    .badge.sold {
-      background: #22c55e;
-      color: white;
-    }
-    .badge.inquiry {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .badge.new {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-    .badge.contacted {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .badge.quoted {
-      background: #e0e7ff;
-      color: #3730a3;
-    }
-    .badge.ordered {
-      background: #dcfce7;
-      color: #166534;
-    }
-    .badge.delivered {
-      background: #22c55e;
-      color: white;
-    }
-    .badge.pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .badge.lost {
-      background: #fef2f2;
-      color: #dc2626;
-    }
-
-    /* ---------- ACTIONS ---------- */
-    .actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .action-btn {
-      padding: 9px 14px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 12px;
-      font-family: inherit;
-      min-height: 40px;
-      transition: opacity 0.15s;
-    }
-    .action-btn:hover {
-      opacity: 0.85;
-    }
-    .sold-btn {
-      background: #ffb800;
-      color: #0b1e3a;
-    }
-    .delete-btn {
-      background: #fef2f2;
-      color: #dc2626;
-    }
-
-    /* ---------- EMPTY / LOADING ---------- */
-    .empty {
-      text-align: center;
-      padding: 60px 20px;
-      color: #94a3b8;
-      font-size: 14px;
-    }
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-      opacity: 0.5;
-    }
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #00a8e8;
-      font-weight: 600;
-      font-size: 14px;
-    }
-    .error {
-      text-align: center;
-      padding: 24px;
-      color: #dc2626;
-      background: #fef2f2;
-      border-radius: 10px;
-      font-size: 14px;
-    }
-
-    /* ---------- QUOTE BOX ---------- */
-    .quote-box {
-      background: #dcfce7;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 8px;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    .admin-note {
-      font-size: 12px;
-      color: #64748b;
-      margin-top: 6px;
-      font-style: italic;
-    }
-    .buyer-msg {
-      font-size: 13px;
-      color: #475569;
-      margin-top: 4px;
-      font-style: italic;
-    }
-
-    /* ---------- MOBILE ---------- */
-    @media (max-width: 768px) {
-      .navbar {
-        padding: 12px 16px;
-        flex-direction: column;
-        text-align: center;
-      }
-      .nav-links {
-        width: 100%;
-        justify-content: center;
-      }
-      .container {
-        margin: 16px auto;
-        padding: 0 12px;
-      }
-      .welcome {
-        padding: 16px 18px;
-      }
-      .welcome h1 {
-        font-size: 17px;
-      }
-      .stats-row {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-      .stat-value {
-        font-size: 22px;
-      }
-      .listing-card {
-        padding: 12px;
-        gap: 12px;
-      }
-      .listing-img {
-        width: 70px;
-        height: 70px;
-      }
-      .actions {
-        width: 100%;
-        justify-content: flex-end;
-        margin-top: 8px;
-      }
-      .action-btn {
-        flex: 1;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>My Account · SalonAutoZone</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background:#f4f6f8;color:#1a1a1a;line-height:1.4}
+.navbar{background:#0b1e3a;color:white;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.logo{font-size:18px;font-weight:900;color:#00a8e8;text-decoration:none;letter-spacing:-0.3px}
+.logo span{color:#ffb800}
+.nav-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.navbar a{color:white;text-decoration:none;font-size:13px;padding:8px 14px;border-radius:8px;background:rgba(255,255,255,0.08);transition:background 0.15s}
+.navbar a:hover{background:rgba(255,255,255,0.2)}
+.navbar a.logout{background:#dc2626}
+.navbar a.logout:hover{background:#b91c1c}
+.container{max-width:1200px;margin:24px auto;padding:0 16px}
+.welcome{background:white;border-radius:14px;padding:20px 24px;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.welcome h1{font-size:20px;color:#0b1e3a}
+.welcome p{font-size:13px;color:#666;margin-top:4px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border-left:4px solid #00a8e8}
+.stat-label{font-size:10px;color:#888;text-transform:uppercase;font-weight:700;letter-spacing:0.5px}
+.stat-value{font-size:26px;color:#0b1e3a;font-weight:900;margin-top:4px}
+.tabs{display:flex;gap:6px;margin-bottom:16px;background:white;padding:6px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 16px;background:transparent;border:none;border-radius:8px;font-weight:600;cursor:pointer;color:#64748b;font-size:13px;white-space:nowrap;flex-shrink:0;font-family:inherit;min-height:44px;transition:background 0.15s,color 0.15s}
+.tab.active{background:#0b1e3a;color:white}
+.section{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:none}
+.section.active{display:block}
+.section h2{color:#0b1e3a;font-size:18px;margin-bottom:16px}
+.listing-card{display:flex;gap:14px;padding:14px;border-bottom:1px solid #f1f5f9;align-items:center;flex-wrap:wrap;cursor:pointer;transition:background 0.15s;text-decoration:none;color:inherit}
+.listing-card:last-child{border-bottom:none}
+.listing-card:hover{background:#f8fafc}
+.listing-img{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#e0e6ed,#cbd5e0);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;overflow:hidden}
+.listing-img img{width:100%;height:100%;object-fit:cover;display:block}
+.listing-info{flex:1;min-width:0}
+.listing-title{font-weight:700;color:#0b1e3a;font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.listing-price{color:#00a8e8;font-size:17px;font-weight:800;margin-bottom:4px}
+.listing-meta{font-size:12px;color:#666;display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;align-items:center}
+.badge{background:#f0f4f8;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-block;line-height:1.4}
+.badge.sold{background:#22c55e;color:white}
+.badge.inquiry{background:#fef3c7;color:#92400e}
+.badge.new{background:#dbeafe;color:#1e40af}
+.badge.contacted{background:#fef3c7;color:#92400e}
+.badge.quoted{background:#e0e7ff;color:#3730a3}
+.badge.ordered{background:#dcfce7;color:#166534}
+.badge.delivered{background:#22c55e;color:white}
+.badge.pending{background:#fef3c7;color:#92400e}
+.badge.lost{background:#fef2f2;color:#dc2626}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.action-btn{padding:9px 14px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px;font-family:inherit;min-height:40px;transition:opacity 0.15s}
+.action-btn:hover:not(:disabled){opacity:0.85}
+.action-btn:disabled{opacity:0.5;cursor:wait}
+.sold-btn{background:#22c55e;color:white}
+.edit-btn{background:#00a8e8;color:white}
+.delete-btn{background:#fef2f2;color:#dc2626}
+.empty{text-align:center;padding:60px 20px;color:#94a3b8;font-size:14px}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:0.5}
+.loading{text-align:center;padding:40px;color:#00a8e8;font-weight:600;font-size:14px}
+.error{text-align:center;padding:24px;color:#dc2626;background:#fef2f2;border-radius:10px;font-size:14px}
+.quote-box{background:#dcfce7;padding:10px;border-radius:8px;margin-top:8px;font-size:13px;line-height:1.6}
+.admin-note{font-size:12px;color:#64748b;margin-top:6px;font-style:italic}
+.buyer-msg{font-size:13px;color:#475569;margin-top:4px;font-style:italic}
+@media (max-width:768px){
+  .navbar{padding:12px 16px;flex-direction:column;text-align:center}
+  .nav-links{width:100%;justify-content:center}
+  .container{margin:16px auto;padding:0 12px}
+  .welcome{padding:16px 18px}
+  .welcome h1{font-size:17px}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat-value{font-size:22px}
+  .listing-card{padding:12px;gap:12px}
+  .listing-img{width:70px;height:70px}
+  .actions{width:100%;justify-content:flex-end;margin-top:8px}
+  .action-btn{flex:1}
+}
+</style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <div class="navbar">
-    <a href="/" class="logo">Salon<span>AutoZone</span> & AutoTrader</a>
-    <div class="nav-links">
-      <a href="/">🏠 Home</a>
-      <a href="/vin-tool">🔍 VIN</a>
-      <a href="#" class="logout" id="logoutBtn">Logout</a>
+<!-- NAVBAR -->
+<div class="navbar">
+  <a href="/" class="logo">Salon<span>AutoZone</span> &amp; AutoTrader</a>
+  <div class="nav-links">
+    <a href="/">🏠 Home</a>
+    <a href="/vin-tool">🔍 VIN</a>
+    <a href="#" class="logout" id="logoutBtn">Logout</a>
+  </div>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="container">
+  <div class="welcome">
+    <div>
+      <h1 id="greeting">Welcome back!</h1>
+      <p id="user-info">Loading…</p>
     </div>
   </div>
 
-  <!-- MAIN CONTAINER -->
-  <div class="container">
-    <!-- WELCOME -->
-    <div class="welcome">
-      <div>
-        <h1 id="greeting">Welcome back!</h1>
-        <p id="user-info">Loading…</p>
-      </div>
-    </div>
-
-    <!-- STATS -->
-    <div class="stats-row" id="stats-row">
-      <div class="stat-card"><div class="stat-label">My Cars</div><div class="stat-value" id="stat-cars">—</div></div>
-      <div class="stat-card" style="border-left-color:#22c55e"><div class="stat-label">Cars Sold</div><div class="stat-value" id="stat-sold">—</div></div>
-      <div class="stat-card" style="border-left-color:#a855f7"><div class="stat-label">My Parts</div><div class="stat-value" id="stat-parts">—</div></div>
-      <div class="stat-card" style="border-left-color:#ff6b00"><div class="stat-label">Inquiries Received</div><div class="stat-value" id="stat-inq-rec">—</div></div>
-      <div class="stat-card" style="border-left-color:#f59e0b"><div class="stat-label">Inquiries Sent</div><div class="stat-value" id="stat-inq-sent">—</div></div>
-      <div class="stat-card" style="border-left-color:#ef4444"><div class="stat-label">Import Requests</div><div class="stat-value" id="stat-imports">—</div></div>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab active" data-tab="cars">🚗 My Cars</button>
-      <button class="tab" data-tab="parts">🔧 My Parts</button>
-      <button class="tab" data-tab="inquiries">💬 My Inquiries</button>
-      <button class="tab" data-tab="imports">🌍 My Imports</button>
-    </div>
-
-    <!-- SECTIONS -->
-    <div id="section-cars" class="section active">
-      <h2>My Car Listings</h2>
-      <div id="cars-list"><div class="loading">Loading…</div></div>
-    </div>
-
-    <div id="section-parts" class="section">
-      <h2>My Part Listings</h2>
-      <div id="parts-list"><div class="loading">Loading…</div></div>
-    </div>
-
-    <div id="section-inquiries" class="section">
-      <h2>My Inquiries (Sent)</h2>
-      <div id="inquiries-list"><div class="loading">Loading…</div></div>
-    </div>
-
-    <div id="section-imports" class="section">
-      <h2>My Import Requests</h2>
-      <div id="imports-list"><div class="loading">Loading…</div></div>
-    </div>
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-label">My Cars</div><div class="stat-value" id="stat-cars">—</div></div>
+    <div class="stat-card" style="border-left-color:#22c55e"><div class="stat-label">Cars Sold</div><div class="stat-value" id="stat-sold">—</div></div>
+    <div class="stat-card" style="border-left-color:#a855f7"><div class="stat-label">My Parts</div><div class="stat-value" id="stat-parts">—</div></div>
+    <div class="stat-card" style="border-left-color:#ff6b00"><div class="stat-label">Inquiries Received</div><div class="stat-value" id="stat-inq-rec">—</div></div>
+    <div class="stat-card" style="border-left-color:#f59e0b"><div class="stat-label">Inquiries Sent</div><div class="stat-value" id="stat-inq-sent">—</div></div>
+    <div class="stat-card" style="border-left-color:#ef4444"><div class="stat-label">Import Requests</div><div class="stat-value" id="stat-imports">—</div></div>
   </div>
 
-  <!-- ================= JAVASCRIPT ================= -->
-  <script>
-    (function () {
-      'use strict';
+  <div class="tabs">
+    <button class="tab active" data-tab="cars">🚗 My Cars</button>
+    <button class="tab" data-tab="parts">🔧 My Parts</button>
+    <button class="tab" data-tab="inquiries">💬 My Inquiries</button>
+    <button class="tab" data-tab="imports">🌍 My Imports</button>
+  </div>
 
-      // ---------- TOKEN & AUTH ----------
-      const TOKEN_KEY = 'token';
-      const USER_KEY = 'userInfo';
-      const token = localStorage.getItem(TOKEN_KEY) || '';
+  <div id="section-cars" class="section active">
+    <h2>My Car Listings</h2>
+    <div id="cars-list"><div class="loading">Loading…</div></div>
+  </div>
 
-      // Redirect if no token
-      if (!token) {
-        window.location.href = '/login?next=/my-account';
-        return; // stop execution
-      }
+  <div id="section-parts" class="section">
+    <h2>My Part Listings</h2>
+    <div id="parts-list"><div class="loading">Loading…</div></div>
+  </div>
 
-      // ---------- HELPERS ----------
-      function esc(s) {
-        if (s === null || s === undefined) return '';
-        return String(s).replace(/[&<>"']/g, function (c) {
-          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
-      }
+  <div id="section-inquiries" class="section">
+    <h2>My Inquiries (Sent)</h2>
+    <div id="inquiries-list"><div class="loading">Loading…</div></div>
+  </div>
 
-      function safeUrl(url) {
-        if (!url) return '';
-        // Only allow http, https, or data URLs
-        const trimmed = String(url).trim();
-        if (/^(https?:|data:image\/)/i.test(trimmed)) {
-          return trimmed;
-        }
-        return '';
-      }
+  <div id="section-imports" class="section">
+    <h2>My Import Requests</h2>
+    <div id="imports-list"><div class="loading">Loading…</div></div>
+  </div>
+</div>
 
-      function timeAgo(iso) {
-        if (!iso) return '';
-        const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-        if (diff < 60) return 'just now';
-        if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-        if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-        if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-        return new Date(iso).toLocaleDateString();
-      }
+<script>
+(function () {
+  'use strict';
 
-      function authHeaders() {
-        return { 'Authorization': 'Bearer ' + token };
-      }
+  // ---------- TOKEN & AUTH ----------
+  var TOKEN_KEY = 'token';
+  var USER_KEY = 'userInfo';
+  var token = '';
 
-      async function apiFetch(url, options) {
-        const opts = options || {};
-        opts.headers = Object.assign({}, opts.headers || {}, authHeaders());
-        const res = await fetch(url, opts);
-        if (res.status === 401) {
-          localStorage.removeItem(TOKEN_KEY);
-          localStorage.removeItem(USER_KEY);
-          window.location.href = '/login?next=/my-account';
-          throw new Error('Unauthorized');
-        }
-        if (!res.ok) {
-          throw new Error('Request failed: ' + res.status);
-        }
-        return res.json();
-      }
+  try { token = localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { token = ''; }
 
-      // ---------- LOGOUT ----------
-      document.getElementById('logoutBtn').addEventListener('click', function (e) {
-        e.preventDefault();
+  if (!token) {
+    window.location.href = '/login?next=/my-account';
+    return;
+  }
+
+  // ---------- HELPERS ----------
+  function esc(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function safeUrl(url) {
+    if (!url) return '';
+    var u = String(url).trim();
+    if (/^https?:\/\//i.test(u) || /^data:image\//i.test(u) || /^\//.test(u)) return u;
+    return '';
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return '';
+    var diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+    return new Date(iso).toLocaleDateString();
+  }
+
+  function authHeaders() {
+    return { 'Authorization': 'Bearer ' + token };
+  }
+
+  async function apiFetch(url, options) {
+    var opts = options || {};
+    opts.headers = Object.assign({}, opts.headers || {}, authHeaders());
+    var res = await fetch(url, opts);
+    if (res.status === 401) {
+      try {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(USER_KEY);
-        window.location.href = '/';
-      });
+      } catch (e) {}
+      window.location.href = '/login?next=/my-account';
+      throw new Error('Unauthorized');
+    }
+    if (!res.ok) throw new Error('Request failed: ' + res.status);
+    return res.json();
+  }
 
-      // ---------- LOAD USER ----------
-      async function loadUser() {
-        try {
-          const u = await apiFetch('/api/auth/me');
-          document.getElementById('greeting').textContent = 'Welcome back, ' + (u.full_name || 'User') + '!';
-          const parts = [];
-          if (u.email) parts.push(u.email);
-          if (u.phone) parts.push(u.phone);
-          document.getElementById('user-info').textContent = parts.join(' • ') || 'No contact info';
-          localStorage.setItem(USER_KEY, JSON.stringify(u));
-        } catch (e) {
-          console.warn('loadUser failed', e);
-        }
+  function setBusy(btn, busy) {
+    if (!btn) return;
+    btn.disabled = busy;
+  }
+
+  // ---------- LOGOUT ----------
+  document.getElementById('logoutBtn').addEventListener('click', function (e) {
+    e.preventDefault();
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    } catch (err) {}
+    window.location.href = '/';
+  });
+
+  // ---------- LOAD USER ----------
+  async function loadUser() {
+    try {
+      var u = await apiFetch('/api/auth/me');
+      document.getElementById('greeting').textContent = 'Welcome back, ' + (u.full_name || 'User') + '!';
+      var parts = [];
+      if (u.email) parts.push(u.email);
+      if (u.phone) parts.push(u.phone);
+      document.getElementById('user-info').textContent = parts.join(' • ') || 'No contact info';
+      try { localStorage.setItem(USER_KEY, JSON.stringify(u)); } catch (e) {}
+    } catch (e) {
+      console.warn('loadUser failed', e);
+    }
+  }
+
+  // ---------- LOAD STATS ----------
+  async function loadStats() {
+    try {
+      var d = await apiFetch('/api/my-account/stats');
+      document.getElementById('stat-cars').textContent = d.total_cars ?? 0;
+      document.getElementById('stat-sold').textContent = d.cars_sold ?? 0;
+      document.getElementById('stat-parts').textContent = d.total_parts ?? 0;
+      document.getElementById('stat-inq-rec').textContent = d.total_inquiries_received ?? 0;
+      document.getElementById('stat-inq-sent').textContent = d.total_inquiries_sent ?? 0;
+      document.getElementById('stat-imports').textContent = d.total_import_requests ?? 0;
+    } catch (e) {
+      console.warn('loadStats failed', e);
+    }
+  }
+
+  // ---------- LOAD CARS ----------
+  async function loadCars() {
+    var el = document.getElementById('cars-list');
+    el.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      var data = await apiFetch('/api/my-account/my-cars');
+      if (!data.count || data.count === 0) {
+        el.innerHTML = '<div class="empty"><div class="empty-icon">🚗</div>You haven\'t listed any cars yet.<br><br><a href="/?action=list-car" style="color:#00a8e8;font-weight:bold;text-decoration:none;">+ List Your First Car</a></div>';
+        return;
       }
+      el.innerHTML = data.vehicles.map(function (v) {
+        var imgUrl = safeUrl(v.image_url);
+        var imgHtml = imgUrl
+          ? '<img src="' + esc(imgUrl) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.textContent=\'🚗\';">'
+          : '🚗';
+        var soldBadge = v.is_sold ? ' <span class="badge sold">SOLD</span>' : '';
+        var inqBadge = (v.inquiry_count > 0) ? '<span class="badge inquiry">📩 ' + v.inquiry_count + ' inquiries</span>' : '';
+        var soldBtn = v.is_sold ? '' : '<button type="button" class="action-btn sold-btn" data-action="sold" data-id="' + v.id + '">✅ Mark Sold</button>';
+        var editBtn = '<button type="button" class="action-btn edit-btn" data-action="edit-vehicle" data-id="' + v.id + '">✏️ Edit</button>';
+        return '<div class="listing-card" data-href="/vehicle/' + v.id + '">' +
+          '<div class="listing-img">' + imgHtml + '</div>' +
+          '<div class="listing-info">' +
+            '<div class="listing-title">' + esc(v.title) + soldBadge + '</div>' +
+            '<div class="listing-price">SLL ' + Number(v.price_sll || 0).toLocaleString() + '</div>' +
+            '<div class="listing-meta">' +
+              '<span class="badge">' + esc(v.year) + '</span>' +
+              '<span class="badge">📍 ' + esc(v.location) + '</span>' +
+              inqBadge +
+              '<span class="badge">' + timeAgo(v.created_at) + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="actions">' + soldBtn + editBtn +
+            '<button type="button" class="action-btn delete-btn" data-action="delete-car" data-id="' + v.id + '">🗑 Delete</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    } catch (e) {
+      el.innerHTML = '<div class="error">Failed to load cars. Please try again.</div>';
+    }
+  }
 
-      // ---------- LOAD STATS ----------
-      async function loadStats() {
-        try {
-          const d = await apiFetch('/api/my-account/stats');
-          document.getElementById('stat-cars').textContent = d.total_cars ?? 0;
-          document.getElementById('stat-sold').textContent = d.cars_sold ?? 0;
-          document.getElementById('stat-parts').textContent = d.total_parts ?? 0;
-          document.getElementById('stat-inq-rec').textContent = d.total_inquiries_received ?? 0;
-          document.getElementById('stat-inq-sent').textContent = d.total_inquiries_sent ?? 0;
-          document.getElementById('stat-imports').textContent = d.total_import_requests ?? 0;
-        } catch (e) {
-          console.warn('loadStats failed', e);
-        }
+  // ---------- LOAD PARTS ----------
+  async function loadParts() {
+    var el = document.getElementById('parts-list');
+    el.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      var data = await apiFetch('/api/my-account/my-parts');
+      if (!data.count || data.count === 0) {
+        el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div>You haven\'t listed any parts yet.<br><br><a href="/?action=list-part" style="color:#00a8e8;font-weight:bold;text-decoration:none;">+ List Your First Part</a></div>';
+        return;
       }
+      el.innerHTML = data.parts.map(function (p) {
+        var imgUrl = safeUrl(p.image_url);
+        var imgHtml = imgUrl
+          ? '<img src="' + esc(imgUrl) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.textContent=\'🔧\';">'
+          : '🔧';
+        var inqBadge = (p.inquiry_count > 0) ? '<span class="badge inquiry">📩 ' + p.inquiry_count + '</span>' : '';
+        var editBtn = '<button type="button" class="action-btn edit-btn" data-action="edit-part" data-id="' + p.id + '">✏️ Edit</button>';
+        return '<div class="listing-card" data-href="/part/' + p.id + '">' +
+          '<div class="listing-img">' + imgHtml + '</div>' +
+          '<div class="listing-info">' +
+            '<div class="listing-title">' + esc(p.name) + '</div>' +
+            '<div class="listing-price">SLL ' + Number(p.price_sll || 0).toLocaleString() + '</div>' +
+            '<div class="listing-meta">' +
+              '<span class="badge">' + esc(p.category) + '</span>' +
+              '<span class="badge">📍 ' + esc(p.location) + '</span>' +
+              '<span class="badge">Stock: ' + (p.stock_quantity ?? 0) + '</span>' +
+              inqBadge +
+            '</div>' +
+          '</div>' +
+          '<div class="actions">' + editBtn +
+            '<button type="button" class="action-btn delete-btn" data-action="delete-part" data-id="' + p.id + '">🗑 Delete</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    } catch (e) {
+      el.innerHTML = '<div class="error">Failed to load parts. Please try again.</div>';
+    }
+  }
 
-      // ---------- LOAD CARS ----------
-      async function loadCars() {
-        const el = document.getElementById('cars-list');
-        el.innerHTML = '<div class="loading">Loading…</div>';
-        try {
-          const data = await apiFetch('/api/my-account/my-cars');
-          if (!data.count || data.count === 0) {
-            el.innerHTML = '<div class="empty"><div class="empty-icon">🚗</div>You haven\'t listed any cars yet.<br><br><a href="/?action=list-car" style="color:#00a8e8;font-weight:bold;text-decoration:none;">+ List Your First Car</a></div>';
-            return;
-          }
-          el.innerHTML = data.vehicles.map(function (v) {
-            const imgUrl = safeUrl(v.image_url);
-            let imgHtml = '';
-            if (imgUrl) {
-              imgHtml = '<img src="' + esc(imgUrl) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'; this.parentNode.textContent=\'🚗\';">';
-            } else {
-              imgHtml = '🚗';
-            }
-            const soldBadge = v.is_sold ? ' <span class="badge sold">SOLD</span>' : '';
-            const inqBadge = (v.inquiry_count > 0) ? '<span class="badge inquiry">📩 ' + v.inquiry_count + ' inquiries</span>' : '';
-            const soldBtn = v.is_sold ? '' : '<button class="action-btn sold-btn" data-action="sold" data-id="' + v.id + '">Mark Sold</button>';
-            return '<div class="listing-card" data-href="/vehicle/' + v.id + '">' +
-              '<div class="listing-img">' + imgHtml + '</div>' +
-              '<div class="listing-info">' +
-                '<div class="listing-title">' + esc(v.title) + soldBadge + '</div>' +
-                '<div class="listing-price">SLL ' + Number(v.price_sll || 0).toLocaleString() + '</div>' +
-                '<div class="listing-meta">' +
-                  '<span class="badge">' + esc(v.year) + '</span>' +
-                  '<span class="badge">📍 ' + esc(v.location) + '</span>' +
-                  inqBadge +
-                  '<span class="badge">' + timeAgo(v.created_at) + '</span>' +
-                '</div>' +
-              '</div>' +
-              '<div class="actions">' +
-                soldBtn +
-                '<button class="action-btn delete-btn" data-action="delete-car" data-id="' + v.id + '">Delete</button>' +
-              '</div>' +
+  // ---------- LOAD INQUIRIES ----------
+  async function loadInquiries() {
+    var el = document.getElementById('inquiries-list');
+    el.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      var data = await apiFetch('/api/my-account/my-inquiries');
+      if (!data.count || data.count === 0) {
+        el.innerHTML = '<div class="empty"><div class="empty-icon">💬</div>You haven\'t sent any inquiries yet.<br><br><a href="/" style="color:#00a8e8;font-weight:bold;text-decoration:none;">Browse listings →</a></div>';
+        return;
+      }
+      el.innerHTML = data.inquiries.map(function (i) {
+        var link = i.listing_type === 'vehicle' ? '/vehicle/' + i.listing_id : '/part/' + i.listing_id;
+        var icon = i.listing_type === 'vehicle' ? '🚗' : '🔧';
+        var msg = i.buyer_message ? '<div class="buyer-msg">"' + esc(i.buyer_message) + '"</div>' : '';
+        var statusClass = esc(i.status || 'pending');
+        return '<div class="listing-card" data-href="' + link + '">' +
+          '<div class="listing-img">' + icon + '</div>' +
+          '<div class="listing-info">' +
+            '<div class="listing-title">' + esc(i.listing_title || '(listing #' + i.listing_id + ')') + '</div>' +
+            msg +
+            '<div class="listing-meta">' +
+              '<span class="badge ' + statusClass + '">' + esc(i.status) + '</span>' +
+              '<span class="badge">' + timeAgo(i.created_at) + '</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    } catch (e) {
+      el.innerHTML = '<div class="error">Failed to load inquiries. Please try again.</div>';
+    }
+  }
+
+  // ---------- LOAD IMPORTS ----------
+  async function loadImports() {
+    var el = document.getElementById('imports-list');
+    el.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      var data = await apiFetch('/api/my-account/my-import-requests');
+      if (!data.count || data.count === 0) {
+        el.innerHTML = '<div class="empty"><div class="empty-icon">🌍</div>You haven\'t requested any imports yet.<br><br><a href="/" style="color:#00a8e8;font-weight:bold;text-decoration:none;">Request a part →</a></div>';
+        return;
+      }
+      el.innerHTML = data.requests.map(function (r) {
+        var quoteHtml = '';
+        if (r.quoted_price_sll) {
+          quoteHtml = '<div class="quote-box"><strong>💰 Quoted Price: SLL ' + Number(r.quoted_price_sll).toLocaleString() + '</strong>' +
+            (r.estimated_days ? '<br>📅 Est. delivery: ' + esc(r.estimated_days) + ' days' : '') +
+            (r.supplier_country ? '<br>🌍 Supplier: ' + esc(r.supplier_country) : '') +
             '</div>';
-          }).join('');
-        } catch (e) {
-          el.innerHTML = '<div class="error">Failed to load cars. Please try again.</div>';
         }
-      }
+        var urgencyBadge = r.urgency ? '<span class="badge">' + esc(r.urgency) + '</span>' : '';
+        var adminNote = r.admin_notes ? '<div class="admin-note">"' + esc(r.admin_notes) + '"</div>' : '';
+        var statusClass = esc(r.status || 'pending');
+        return '<div class="listing-card" style="cursor:default;">' +
+          '<div class="listing-img">🌍</div>' +
+          '<div class="listing-info">' +
+            '<div class="listing-title">' + esc(r.part_name) + '</div>' +
+            '<div style="font-size:13px;color:#475569;">' + esc(r.car_make) + ' ' + esc(r.car_model) + ' (' + esc(r.car_year) + ')</div>' +
+            '<div class="listing-meta">' +
+              '<span class="badge ' + statusClass + '">' + esc(r.status) + '</span>' +
+              urgencyBadge +
+              '<span class="badge">' + timeAgo(r.created_at) + '</span>' +
+            '</div>' +
+            quoteHtml + adminNote +
+          '</div>' +
+        '</div>';
+      }).join('');
+    } catch (e) {
+      el.innerHTML = '<div class="error">Failed to load import requests. Please try again.</div>';
+    }
+  }
 
-      // ---------- LOAD PARTS ----------
-      async function loadParts() {
-        const el = document.getElementById('parts-list');
-        el.innerHTML = '<div class="loading">Loading…</div>';
-        try {
-          const data = await apiFetch('/api/my-account/my-parts');
-          if (!data.count || data.count === 0) {
-            el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div>You haven\'t listed any parts yet.<br><br><a href="/?action=list-part" style="color:#00a8e8;font-weight:bold;text-decoration:none;">+ List Your First Part</a></div>';
-            return;
-          }
-          el.innerHTML = data.parts.map(function (p) {
-            const imgUrl = safeUrl(p.image_url);
-            let imgHtml = '';
-            if (imgUrl) {
-              imgHtml = '<img src="' + esc(imgUrl) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'; this.parentNode.textContent=\'🔧\';">';
-            } else {
-              imgHtml = '🔧';
-            }
-            const inqBadge = (p.inquiry_count > 0) ? '<span class="badge inquiry">📩 ' + p.inquiry_count + '</span>' : '';
-            return '<div class="listing-card" data-href="/part/' + p.id + '">' +
-              '<div class="listing-img">' + imgHtml + '</div>' +
-              '<div class="listing-info">' +
-                '<div class="listing-title">' + esc(p.name) + '</div>' +
-                '<div class="listing-price">SLL ' + Number(p.price_sll || 0).toLocaleString() + '</div>' +
-                '<div class="listing-meta">' +
-                  '<span class="badge">' + esc(p.category) + '</span>' +
-                  '<span class="badge">📍 ' + esc(p.location) + '</span>' +
-                  '<span class="badge">Stock: ' + (p.stock_quantity ?? 0) + '</span>' +
-                  inqBadge +
-                '</div>' +
-              '</div>' +
-              '<div class="actions">' +
-                '<button class="action-btn delete-btn" data-action="delete-part" data-id="' + p.id + '">Delete</button>' +
-              '</div>' +
-            '</div>';
-          }).join('');
-        } catch (e) {
-          el.innerHTML = '<div class="error">Failed to load parts. Please try again.</div>';
-        }
-      }
+  // ---------- ACTIONS ----------
+  async function markSold(id, btn) {
+    if (!confirm('Mark this car as sold?')) return;
+    setBusy(btn, true);
+    try {
+      await apiFetch('/api/vehicles/' + encodeURIComponent(id) + '/sold', { method: 'PUT' });
+      await Promise.all([loadCars(), loadStats()]);
+    } catch (e) {
+      alert('Failed to mark as sold');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
 
-      // ---------- LOAD INQUIRIES ----------
-      async function loadInquiries() {
-        const el = document.getElementById('inquiries-list');
-        el.innerHTML = '<div class="loading">Loading…</div>';
-        try {
-          const data = await apiFetch('/api/my-account/my-inquiries');
-          if (!data.count || data.count === 0) {
-            el.innerHTML = '<div class="empty"><div class="empty-icon">💬</div>You haven\'t sent any inquiries yet.<br><br><a href="/" style="color:#00a8e8;font-weight:bold;text-decoration:none;">Browse listings →</a></div>';
-            return;
-          }
-          el.innerHTML = data.inquiries.map(function (i) {
-            const link = i.listing_type === 'vehicle' ? '/vehicle/' + i.listing_id : '/part/' + i.listing_id;
-            const icon = i.listing_type === 'vehicle' ? '🚗' : '🔧';
-            const msg = i.buyer_message ? '<div class="buyer-msg">"' + esc(i.buyer_message) + '"</div>' : '';
-            const statusClass = esc(i.status || 'pending');
-            return '<div class="listing-card" data-href="' + link + '">' +
-              '<div class="listing-img">' + icon + '</div>' +
-              '<div class="listing-info">' +
-                '<div class="listing-title">' + esc(i.listing_title || '(listing #' + i.listing_id + ')') + '</div>' +
-                msg +
-                '<div class="listing-meta">' +
-                  '<span class="badge ' + statusClass + '">' + esc(i.status) + '</span>' +
-                  '<span class="badge">' + timeAgo(i.created_at) + '</span>' +
-                '</div>' +
-              '</div>' +
-            '</div>';
-          }).join('');
-        } catch (e) {
-          el.innerHTML = '<div class="error">Failed to load inquiries. Please try again.</div>';
-        }
-      }
+  function editListing(type, id) {
+    var action = (type === 'vehicle') ? 'edit-vehicle' : 'edit-part';
+    window.location.href = '/?action=' + action + '&id=' + encodeURIComponent(id);
+  }
 
-      // ---------- LOAD IMPORTS ----------
-      async function loadImports() {
-        const el = document.getElementById('imports-list');
-        el.innerHTML = '<div class="loading">Loading…</div>';
-        try {
-          const data = await apiFetch('/api/my-account/my-import-requests');
-          if (!data.count || data.count === 0) {
-            el.innerHTML = '<div class="empty"><div class="empty-icon">🌍</div>You haven\'t requested any imports yet.<br><br><a href="/" style="color:#00a8e8;font-weight:bold;text-decoration:none;">Request a part →</a></div>';
-            return;
-          }
-          el.innerHTML = data.requests.map(function (r) {
-            let quoteHtml = '';
-            if (r.quoted_price_sll) {
-              quoteHtml = '<div class="quote-box"><strong>💰 Quoted Price: SLL ' + Number(r.quoted_price_sll).toLocaleString() + '</strong>' +
-                (r.estimated_days ? '<br>📅 Est. delivery: ' + esc(r.estimated_days) + ' days' : '') +
-                (r.supplier_country ? '<br>🌍 Supplier: ' + esc(r.supplier_country) : '') +
-                '</div>';
-            }
-            const urgencyBadge = r.urgency ? '<span class="badge">' + esc(r.urgency) + '</span>' : '';
-            const adminNote = r.admin_notes ? '<div class="admin-note">"' + esc(r.admin_notes) + '"</div>' : '';
-            const statusClass = esc(r.status || 'pending');
-            return '<div class="listing-card" style="cursor:default;">' +
-              '<div class="listing-img">🌍</div>' +
-              '<div class="listing-info">' +
-                '<div class="listing-title">' + esc(r.part_name) + '</div>' +
-                '<div style="font-size:13px;color:#475569;">' + esc(r.car_make) + ' ' + esc(r.car_model) + ' (' + esc(r.car_year) + ')</div>' +
-                '<div class="listing-meta">' +
-                  '<span class="badge ' + statusClass + '">' + esc(r.status) + '</span>' +
-                  urgencyBadge +
-                  '<span class="badge">' + timeAgo(r.created_at) + '</span>' +
-                '</div>' +
-                quoteHtml +
-                adminNote +
-              '</div>' +
-            '</div>';
-          }).join('');
-        } catch (e) {
-          el.innerHTML = '<div class="error">Failed to load import requests. Please try again.</div>';
-        }
-      }
+  async function deleteCar(id, btn) {
+    if (!confirm('Delete this car listing permanently? This cannot be undone.')) return;
+    setBusy(btn, true);
+    try {
+      await apiFetch('/api/my-account/vehicle/' + encodeURIComponent(id), { method: 'DELETE' });
+      await Promise.all([loadCars(), loadStats()]);
+    } catch (e) {
+      alert('Failed to delete car');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
 
-      // ---------- ACTIONS ----------
-      async function markSold(id) {
-        if (!confirm('Mark this car as sold?')) return;
-        try {
-          await apiFetch('/api/vehicles/' + id + '/sold', { method: 'PUT' });
-          await Promise.all([loadCars(), loadStats()]);
-        } catch (e) {
-          alert('Failed to mark as sold');
-        }
-      }
+  async function deletePart(id, btn) {
+    if (!confirm('Delete this part listing permanently? This cannot be undone.')) return;
+    setBusy(btn, true);
+    try {
+      await apiFetch('/api/my-account/part/' + encodeURIComponent(id), { method: 'DELETE' });
+      await Promise.all([loadParts(), loadStats()]);
+    } catch (e) {
+      alert('Failed to delete part');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
 
-      async function deleteCar(id) {
-        if (!confirm('Delete this car listing permanently?')) return;
-        try {
-          await apiFetch('/api/my-account/vehicle/' + id, { method: 'DELETE' });
-          await Promise.all([loadCars(), loadStats()]);
-        } catch (e) {
-          alert('Failed to delete car');
-        }
-      }
+  // ---------- EVENT DELEGATION ----------
+  document.addEventListener('click', function (e) {
+    var actionBtn = e.target.closest('[data-action]');
+    if (actionBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      var action = actionBtn.dataset.action;
+      var id = actionBtn.dataset.id;
+      if (action === 'sold') markSold(id, actionBtn);
+      else if (action === 'edit-vehicle') editListing('vehicle', id);
+      else if (action === 'edit-part') editListing('part', id);
+      else if (action === 'delete-car') deleteCar(id, actionBtn);
+      else if (action === 'delete-part') deletePart(id, actionBtn);
+      return;
+    }
 
-      async function deletePart(id) {
-        if (!confirm('Delete this part listing permanently?')) return;
-        try {
-          await apiFetch('/api/my-account/part/' + id, { method: 'DELETE' });
-          await Promise.all([loadParts(), loadStats()]);
-        } catch (e) {
-          alert('Failed to delete part');
-        }
-      }
+    var card = e.target.closest('[data-href]');
+    if (card && !e.target.closest('button')) {
+      window.location.href = card.dataset.href;
+    }
+  });
 
-      // ---------- EVENT DELEGATION ----------
-      document.addEventListener('click', function (e) {
-        // Action buttons
-        const actionBtn = e.target.closest('[data-action]');
-        if (actionBtn) {
-          e.preventDefault();
-          e.stopPropagation();
-          const action = actionBtn.dataset.action;
-          const id = Number(actionBtn.dataset.id);
-          if (action === 'sold') markSold(id);
-          else if (action === 'delete-car') deleteCar(id);
-          else if (action === 'delete-part') deletePart(id);
-          return;
-        }
+  // ---------- TABS ----------
+  var tabs = document.querySelectorAll('.tab');
+  var sections = {
+    cars: document.getElementById('section-cars'),
+    parts: document.getElementById('section-parts'),
+    inquiries: document.getElementById('section-inquiries'),
+    imports: document.getElementById('section-imports')
+  };
 
-        // Card navigation
-        const card = e.target.closest('[data-href]');
-        if (card && !e.target.closest('button')) {
-          window.location.href = card.dataset.href;
-        }
-      });
+  function switchTab(tabName) {
+    tabs.forEach(function (t) {
+      t.classList.toggle('active', t.dataset.tab === tabName);
+    });
+    Object.keys(sections).forEach(function (key) {
+      sections[key].classList.toggle('active', key === tabName);
+    });
+    if (tabName === 'cars') loadCars();
+    else if (tabName === 'parts') loadParts();
+    else if (tabName === 'inquiries') loadInquiries();
+    else if (tabName === 'imports') loadImports();
+  }
 
-      // ---------- TABS ----------
-      const tabs = document.querySelectorAll('.tab');
-      const sections = {
-        cars: document.getElementById('section-cars'),
-        parts: document.getElementById('section-parts'),
-        inquiries: document.getElementById('section-inquiries'),
-        imports: document.getElementById('section-imports')
-      };
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      switchTab(t.dataset.tab);
+    });
+  });
 
-      function switchTab(tabName) {
-        tabs.forEach(function (t) {
-          t.classList.toggle('active', t.dataset.tab === tabName);
-        });
-        Object.keys(sections).forEach(function (key) {
-          sections[key].classList.toggle('active', key === tabName);
-        });
-        if (tabName === 'cars') loadCars();
-        else if (tabName === 'parts') loadParts();
-        else if (tabName === 'inquiries') loadInquiries();
-        else if (tabName === 'imports') loadImports();
-      }
-
-      tabs.forEach(function (t) {
-        t.addEventListener('click', function () {
-          switchTab(t.dataset.tab);
-        });
-      });
-
-      // ---------- INIT ----------
-      loadUser();
-      loadStats();
-      loadCars();
-    })();
-  </script>
+  // ---------- INIT ----------
+  loadUser();
+  loadStats();
+  loadCars();
+})();
+</script>
 </body>
 </html>
+<!-- END OF FILE -->
