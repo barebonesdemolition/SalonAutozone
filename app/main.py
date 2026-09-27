@@ -94,6 +94,43 @@ async def admin_catalog_page(request: Request):
 async def catalog_detail_page(request: Request, part_id: int):
     return templates.TemplateResponse(request=request, name="catalog_detail.html", context={"app_name": settings.APP_NAME})
 
-@app.get("/health")
+@app.get("/health")@app.get("/admin/run-migration-xyz")
+async def run_migration():
+    """One-time migration endpoint. Delete after use."""
+    from sqlalchemy import text
+    results = []
+    try:
+        async with engine.begin() as conn:
+            # Add views column to vehicle_listings
+            try:
+                await conn.execute(text("ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0"))
+                results.append("✅ vehicle_listings.views added")
+            except Exception as e:
+                results.append(f"⚠️ vehicle_listings: {str(e)}")
+            
+            # Add views column to part_listings
+            try:
+                await conn.execute(text("ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0"))
+                results.append("✅ part_listings.views added")
+            except Exception as e:
+                results.append(f"⚠️ part_listings: {str(e)}")
+            
+            # Add image_url column to vehicle_listings if missing
+            try:
+                await conn.execute(text("ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS image_url VARCHAR"))
+                results.append("✅ vehicle_listings.image_url verified")
+            except Exception as e:
+                results.append(f"⚠️ image_url: {str(e)}")
+            
+            # Add contact_phone column to vehicle_listings if missing
+            try:
+                await conn.execute(text("ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS contact_phone VARCHAR"))
+                results.append("✅ vehicle_listings.contact_phone verified")
+            except Exception as e:
+                results.append(f"⚠️ contact_phone: {str(e)}")
+        
+        return {"status": "success", "results": results}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
 async def health():
     return {"status": "ok", "app": settings.APP_NAME}
