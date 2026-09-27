@@ -7,7 +7,6 @@ from typing import List, Optional
 from app.db import get_db
 from app import models, schemas
 
-# 👇 THIS LINE MUST BE HERE — without it, main.py crashes on import
 router = APIRouter(prefix="/api/parts", tags=["Parts Marketplace"])
 
 
@@ -119,7 +118,7 @@ async def update_part(
     update_data = part.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         if key == "vendor_id":
-            continue  # never overwrite ownership via update
+            continue
         setattr(existing, key, value)
 
     await db.commit()
