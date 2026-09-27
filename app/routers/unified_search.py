@@ -22,25 +22,18 @@ async def unified_parts_search(
     limit: int = Query(24, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Unified search across local parts AND importable catalog.
-    Returns: { total, local_count, catalog_count, local_parts, catalog_parts }
-    """
     offset = (page - 1) * limit
 
-    # ---------- Local parts ----------
+    # Local parts
     local_q = select(models.PartListing)
-
     if q:
         like = f"%{q}%"
-        local_q = local_q.where(
-            or_(
-                models.PartListing.name.ilike(like),
-                models.PartListing.category.ilike(like),
-                models.PartListing.compatible_make.ilike(like),
-                models.PartListing.compatible_model.ilike(like),
-            )
-        )
+        local_q = local_q.where(or_(
+            models.PartListing.name.ilike(like),
+            models.PartListing.category.ilike(like),
+            models.PartListing.compatible_make.ilike(like),
+            models.PartListing.compatible_model.ilike(like),
+        ))
     if category:
         local_q = local_q.where(models.PartListing.category.ilike(f"%{category}%"))
     if make:
@@ -55,23 +48,20 @@ async def unified_parts_search(
     )).scalar() or 0
 
     local_q = local_q.order_by(models.PartListing.created_at.desc()).limit(limit).offset(offset)
-    local_result = await db.execute(local_q)
-    local_parts = local_result.scalars().all()
+    local_parts = (await db.execute(local_q)).scalars().all()
 
-    # ---------- Catalog (importable) parts ----------
+    # Catalog (importable) parts
     catalog_count = 0
     catalog_parts = []
 
     catalog_q = select(models.SupplierCatalog)
     if q:
         like = f"%{q}%"
-        catalog_q = catalog_q.where(
-            or_(
-                models.SupplierCatalog.part_number.ilike(like),
-                models.SupplierCatalog.category.ilike(like),
-                models.SupplierCatalog.vehicle_compatibility.ilike(like),
-            )
-        )
+        catalog_q = catalog_q.where(or_(
+            models.SupplierCatalog.part_number.ilike(like),
+            models.SupplierCatalog.category.ilike(like),
+            models.SupplierCatalog.vehicle_compatibility.ilike(like),
+        ))
     if category:
         catalog_q = catalog_q.where(models.SupplierCatalog.category.ilike(f"%{category}%"))
 
@@ -80,8 +70,7 @@ async def unified_parts_search(
     )).scalar() or 0
 
     catalog_q = catalog_q.limit(limit).offset(offset)
-    catalog_result = await db.execute(catalog_q)
-    catalog_parts = catalog_result.scalars().all()
+    catalog_parts = (await db.execute(catalog_q)).scalars().all()
 
     return {
         "total": local_count + catalog_count,
@@ -108,26 +97,15 @@ async def unified_suggest(
     limit: int = Query(8, ge=1, le=20),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Predictive search suggestions across parts + vehicles + catalog.
-    """
     like = f"%{q}%"
     suggestions = []
 
-    # Local parts
-    parts_q = (
-        select(models.PartListing)
-        .where(
-            or_(
-                models.PartListing.name.ilike(like),
-                models.PartListing.category.ilike(like),
-                models.PartListing.compatible_make.ilike(like),
-            )
-        )
-        .limit(4)
-    )
-    parts_result = await db.execute(parts_q)
-    for p in parts_result.scalars().all():
+    parts_q = select(models.PartListing).where(or_(
+        models.PartListing.name.ilike(like),
+        models.PartListing.category.ilike(like),
+        models.PartListing.compatible_make.ilike(like),
+    )).limit(4)
+    for p in (await db.execute(parts_q)).scalars().all():
         suggestions.append({
             "type": "part",
             "icon": "🔧",
@@ -136,20 +114,12 @@ async def unified_suggest(
             "url": f"/part/{p.id}",
         })
 
-    # Vehicles
-    vehicles_q = (
-        select(models.VehicleListing)
-        .where(
-            or_(
-                models.VehicleListing.title.ilike(like),
-                models.VehicleListing.make.ilike(like),
-                models.VehicleListing.model.ilike(like),
-            )
-        )
-        .limit(4)
-    )
-    vehicles_result = await db.execute(vehicles_q)
-    for v in vehicles_result.scalars().all():
+    vehicles_q = select(models.VehicleListing).where(or_(
+        models.VehicleListing.title.ilike(like),
+        models.VehicleListing.make.ilike(like),
+        models.VehicleListing.model.ilike(like),
+    )).limit(4)
+    for v in (await db.execute(vehicles_q)).scalars().all():
         suggestions.append({
             "type": "vehicle",
             "icon": "🚗",
@@ -158,20 +128,12 @@ async def unified_suggest(
             "url": f"/vehicle/{v.id}",
         })
 
-    # Catalog (importable)
-    catalog_q = (
-        select(models.SupplierCatalog)
-        .where(
-            or_(
-                models.SupplierCatalog.part_number.ilike(like),
-                models.SupplierCatalog.category.ilike(like),
-                models.SupplierCatalog.vehicle_compatibility.ilike(like),
-            )
-        )
-        .limit(4)
-    )
-    catalog_result = await db.execute(catalog_q)
-    for c in catalog_result.scalars().all():
+    catalog_q = select(models.SupplierCatalog).where(or_(
+        models.SupplierCatalog.part_number.ilike(like),
+        models.SupplierCatalog.category.ilike(like),
+        models.SupplierCatalog.vehicle_compatibility.ilike(like),
+    )).limit(4)
+    for c in (await db.execute(catalog_q)).scalars().all():
         suggestions.append({
             "type": "catalog",
             "icon": "🌍",
