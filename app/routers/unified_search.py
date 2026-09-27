@@ -24,7 +24,7 @@ async def unified_parts_search(
 ):
     offset = (page - 1) * limit
 
-    # Local parts
+    # ---------- Local parts ----------
     local_q = select(models.PartListing)
     if q:
         like = f"%{q}%"
@@ -50,7 +50,8 @@ async def unified_parts_search(
     local_q = local_q.order_by(models.PartListing.created_at.desc()).limit(limit).offset(offset)
     local_parts = (await db.execute(local_q)).scalars().all()
 
-    # Catalog (importable) parts
+    # ---------- Supplier catalog (importable parts) ----------
+    # ✅ FIXED: was models.CatalogPart — your class is SupplierCatalog
     catalog_count = 0
     catalog_parts = []
 
@@ -82,15 +83,16 @@ async def unified_parts_search(
         "catalog_parts": [
             {
                 "id": c.id,
-                "part_number": c.part_number or "",
-                "category": c.category or "",
-                "vehicle_compatibility": c.vehicle_compatibility or "",
+                "part_number": getattr(c, "part_number", "") or "",
+                "category": getattr(c, "category", "") or "",
+                "vehicle_compatibility": getattr(c, "vehicle_compatibility", "") or "",
             }
             for c in catalog_parts
         ],
     }
 
 
+# ✅ ADDED: /suggest route — your homepage predictive search calls this
 @router.get("/suggest")
 async def unified_suggest(
     q: str = Query("", min_length=1),
@@ -100,6 +102,7 @@ async def unified_suggest(
     like = f"%{q}%"
     suggestions = []
 
+    # Local parts
     parts_q = select(models.PartListing).where(or_(
         models.PartListing.name.ilike(like),
         models.PartListing.category.ilike(like),
@@ -114,6 +117,7 @@ async def unified_suggest(
             "url": f"/part/{p.id}",
         })
 
+    # Vehicles
     vehicles_q = select(models.VehicleListing).where(or_(
         models.VehicleListing.title.ilike(like),
         models.VehicleListing.make.ilike(like),
@@ -128,6 +132,7 @@ async def unified_suggest(
             "url": f"/vehicle/{v.id}",
         })
 
+    # Supplier catalog
     catalog_q = select(models.SupplierCatalog).where(or_(
         models.SupplierCatalog.part_number.ilike(like),
         models.SupplierCatalog.category.ilike(like),
