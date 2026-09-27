@@ -1,0 +1,113 @@
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy import func, or_
+from typing import Optional
+
+from app.db import get_db
+from app import models, schemas
+
+router = APIRouter(prefix="/api/unified", tags=["Unified Search"])
+
+
+@router.get("/parts")
+async def unified_parts_search(
+    q: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    make: Optional[str] = Query(None),
+    model: Optional[str] = Query(None),
+    year: Optional[str] = Query(None),
+    location: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    limit: int = Query(24, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Unified search across local parts AND importable catalog.
+    Returns paginated results in the shape the frontend expects:
+    {
+      "total": int,
+      "local_count": int,
+      "catalog_count": int,
+      "local_parts": [...],
+      "catalog_parts": [...]
+    }
+    """
+    offset = (page - 1) * limit
+
+    # ---------- Local parts ----------
+    local_q = select(models.PartListing)
+
+    if q:
+        like = f"%{q}%"
+        local_q = local_q.where(
+            or_(
+                models.PartListing.name.ilike(like),
+                models.PartListing.category.ilike(like),
+                models.PartListing.compatible_make.ilike(like),
+                models.PartListing.compatible_model.ilike(like),
+            )
+        )
+    if category:
+        local_q = local_q.where(models.PartListing.category.ilike(f"%{category}%"))
+    if make:
+        local_q = local_q.where(models.PartListing.compatible_make.ilike(f"%{make}%"))
+    if model:
+        local_q = local_q.where(models.PartListing.compatible_model.ilike(f"%{model}%"))
+    if location:
+        local_q = local_q.where(models.PartListing.location.ilike(f"%{location}%"))
+
+    # Count local matches
+    local_count_result = await db.execute(
+        select(func.count()).select_from(local_q.subquery())
+    )
+    local_count = local_count_result.scalar() or 0
+
+    # Fetch paginated local parts
+    local_q = local_q.order_by(models.PartListing.created_at.desc()).limit(limit).offset(offset)
+    local_result = await db.execute(local_q)
+    local_parts = local_result.scalars().all()
+
+    # ---------- Catalog (importable) parts ----------
+    catalog_count = 0
+    catalog_parts = []
+    if hasattr(models, "CatalogPart"):
+        catalog_q = select(models.CatalogPart)
+        if q:
+            like = f"%{q}%"
+            catalog_q = catalog_q.where(
+                or_(
+                    models.CatalogPart.part_number.ilike(like),
+                    models.CatalogPart.category.ilike(like),
+                    models.CatalogPart.vehicle_compatibility.ilike(like),
+                )
+            )
+        if category:
+            catalog_q = catalog_q.where(models.CatalogPart.category.ilike(f"%{category}%"))
+
+        catalog_count_result = await db.execute(
+            select(func.count()).select_from(catalog_q.subquery())
+        )
+        catalog_count = catalog_count_result.scalar() or 0
+
+        catalog_q = catalog_q.limit(limit).offset(offset)
+        catalog_result = await db.execute(catalog_q)
+        catalog_parts = catalog_result.scalars().all()
+
+    return {
+        "total": local_count + catalog_count,
+        "local_count": local_count,
+        "catalog_count": catalog_count,
+        "page": page,
+        "limit": limit,
+        "local_parts": [schemas.PartResponse.model_validate(p).model_dump() for p in local_parts],
+        "catalog_parts": [
+            {
+                "id": c.id,
+                "part_number": getattr(c, "part_number", ""),
+                "category": getattr(c, "category", ""),
+                "vehicle_compatibility": getattr(c, "vehicle_compatibility", ""),
+            }
+            for c in catalog_parts
+        ],
+    }
