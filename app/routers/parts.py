@@ -1,15 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import func, or_
+from sqlalchemy import func
 from typing import List, Optional
 
 from app.db import get_db
 from app import models, schemas
 
-# 👇👇👇 THIS LINE WAS MISSING 👇👇👇
 router = APIRouter(prefix="/api/parts", tags=["Parts Marketplace"])
-# 👆👆👆 THAT'S WHY DEPLOY FAILED 👆👆👆
 
 
 @router.post("/", response_model=schemas.PartResponse)
@@ -32,11 +30,10 @@ async def search_parts(
     min_price: Optional[float] = Query(None),
     max_price: Optional[float] = Query(None),
     page: int = Query(1, ge=1),
-    limit: int = Query(50, ge=1, le=200),   # 👈 performance cap
+    limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
 ):
     query = select(models.PartListing)
-
     if name:
         query = query.where(models.PartListing.name.ilike(f"%{name}%"))
     if category:
@@ -54,10 +51,8 @@ async def search_parts(
     if max_price is not None:
         query = query.where(models.PartListing.price_sll <= max_price)
 
-    # 👇 Pagination — prevents pulling every row
     offset = (page - 1) * limit
     query = query.order_by(models.PartListing.created_at.desc()).limit(limit).offset(offset)
-
     result = await db.execute(query)
     return result.scalars().all()
 
