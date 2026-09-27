@@ -25,11 +25,19 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION, lifespan=lifespan)
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
-# Routers
+
+# ==================== ROUTERS ====================
 app.include_router(auth.router)
 app.include_router(parts.router)
 app.include_router(listings.router)
@@ -48,89 +56,126 @@ app.include_router(nhtsa.router)
 app.include_router(my_account.router)
 
 
-# ==================== FRONTEND ====================
-
+# ==================== FRONTEND PAGES ====================
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse(request=request, name="vin_lookup.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="vin_lookup.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
-    return templates.TemplateResponse(request=request, name="login.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
 
 @app.get("/welcome", response_class=HTMLResponse)
 async def welcome_page(request: Request):
-    return templates.TemplateResponse(request=request, name="welcome.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="welcome.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
 
 @app.get("/dashboard")
 async def dashboard_redirect():
     return RedirectResponse(url="/my-account", status_code=302)
 
+
 @app.get("/my-account", response_class=HTMLResponse)
 async def my_account_page(request: Request):
-    return templates.TemplateResponse(request=request, name="my_account.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="my_account.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
 
 @app.get("/vehicle/{vehicle_id}", response_class=HTMLResponse)
 async def vehicle_detail(request: Request, vehicle_id: int):
-    return templates.TemplateResponse(request=request, name="vehicle_detail.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="vehicle_detail.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
 
 @app.get("/part/{part_id}", response_class=HTMLResponse)
 async def part_detail(request: Request, part_id: int):
-    return templates.TemplateResponse(request=request, name="part_detail.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="part_detail.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
 
 @app.get("/vin-tool", response_class=HTMLResponse)
 async def vin_tool_page(request: Request):
-    return templates.TemplateResponse(request=request, name="vin_tool.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="vin_tool.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
 
 @app.get("/admin-panel-x9k2m7", response_class=HTMLResponse)
 async def admin_dashboard_secret(request: Request):
-    return templates.TemplateResponse(request=request, name="admin_dashboard.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_dashboard.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
 
 @app.get("/admin/catalog", response_class=HTMLResponse)
 async def admin_catalog_page(request: Request):
-    return templates.TemplateResponse(request=request, name="admin_catalog.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_catalog.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
 
 @app.get("/catalog/{part_id}", response_class=HTMLResponse)
 async def catalog_detail_page(request: Request, part_id: int):
-    return templates.TemplateResponse(request=request, name="catalog_detail.html", context={"app_name": settings.APP_NAME})
+    return templates.TemplateResponse(
+        request=request,
+        name="catalog_detail.html",
+        context={"app_name": settings.APP_NAME},
+    )
 
-@app.get("/health")@app.get("/admin/run-migration-xyz")
+
+# ==================== MIGRATION ENDPOINT ====================
+@app.get("/admin/run-migration-xyz")
 async def run_migration():
-    """One-time migration endpoint. Delete after use."""
+    """One-time migration endpoint to add missing columns. Delete after use."""
     from sqlalchemy import text
     results = []
     try:
         async with engine.begin() as conn:
-            # Add views column to vehicle_listings
             try:
                 await conn.execute(text("ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0"))
-                results.append("✅ vehicle_listings.views added")
+                results.append("vehicle_listings.views added")
             except Exception as e:
-                results.append(f"⚠️ vehicle_listings: {str(e)}")
-            
-            # Add views column to part_listings
+                results.append("vehicle_listings: " + str(e))
             try:
                 await conn.execute(text("ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0"))
-                results.append("✅ part_listings.views added")
+                results.append("part_listings.views added")
             except Exception as e:
-                results.append(f"⚠️ part_listings: {str(e)}")
-            
-            # Add image_url column to vehicle_listings if missing
-            try:
-                await conn.execute(text("ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS image_url VARCHAR"))
-                results.append("✅ vehicle_listings.image_url verified")
-            except Exception as e:
-                results.append(f"⚠️ image_url: {str(e)}")
-            
-            # Add contact_phone column to vehicle_listings if missing
-            try:
-                await conn.execute(text("ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS contact_phone VARCHAR"))
-                results.append("✅ vehicle_listings.contact_phone verified")
-            except Exception as e:
-                results.append(f"⚠️ contact_phone: {str(e)}")
-        
+                results.append("part_listings: " + str(e))
         return {"status": "success", "results": results}
     except Exception as e:
         return {"status": "error", "detail": str(e)}
+
+
+# ==================== HEALTH CHECK ====================
+@app.get("/health")
 async def health():
     return {"status": "ok", "app": settings.APP_NAME}
