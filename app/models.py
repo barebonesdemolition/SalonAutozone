@@ -1,5 +1,8 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text
+from sqlalchemy import (
+    Column, Integer, String, Float, Boolean, DateTime,
+    ForeignKey, Text, Index
+)
 from sqlalchemy.orm import relationship
 from app.db import Base
 
@@ -40,14 +43,21 @@ class VehicleListing(Base):
     seller_id = Column(Integer, ForeignKey("users.id"))
     seller = relationship("User")
 
+    # 👇 Composite indexes for common queries
+    __table_args__ = (
+        Index("idx_vehicle_created_at", "created_at"),
+        Index("idx_vehicle_make_model", "make", "model"),
+        Index("idx_vehicle_location_created", "location", "created_at"),
+    )
+
 
 class PartListing(Base):
     __tablename__ = "part_listings"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     category = Column(String, index=True)
-    compatible_make = Column(String, nullable=True)
-    compatible_model = Column(String, nullable=True)
+    compatible_make = Column(String, nullable=True, index=True)
+    compatible_model = Column(String, nullable=True, index=True)
     price_sll = Column(Float)
     stock_quantity = Column(Integer, default=1)
     condition = Column(String)
@@ -60,6 +70,14 @@ class PartListing(Base):
     vendor_id = Column(Integer, ForeignKey("users.id"))
     vendor = relationship("User")
 
+    # 👇 Composite indexes for common queries
+    __table_args__ = (
+        Index("idx_part_created_at", "created_at"),
+        Index("idx_part_category_created", "category", "created_at"),
+        Index("idx_part_make_model", "compatible_make", "compatible_model"),
+        Index("idx_part_location_created", "location", "created_at"),
+    )
+
 
 class Order(Base):
     __tablename__ = "orders"
@@ -71,6 +89,11 @@ class Order(Base):
     payment_reference = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     buyer = relationship("User")
+
+    __table_args__ = (
+        Index("idx_order_created_at", "created_at"),
+        Index("idx_order_buyer_created", "buyer_id", "created_at"),
+    )
 
 
 class ImportRequest(Base):
@@ -97,6 +120,11 @@ class ImportRequest(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    __table_args__ = (
+        Index("idx_import_created_at", "created_at"),
+        Index("idx_import_status_created", "status", "created_at"),
+    )
+
 
 class SupplierCatalog(Base):
     __tablename__ = "supplier_catalog"
@@ -118,6 +146,11 @@ class SupplierCatalog(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    __table_args__ = (
+        Index("idx_catalog_created_at", "created_at"),
+        Index("idx_catalog_category_created", "category", "created_at"),
+    )
+
 
 class Inquiry(Base):
     __tablename__ = "inquiries"
@@ -134,3 +167,9 @@ class Inquiry(Base):
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        Index("idx_inquiry_created_at", "created_at"),
+        Index("idx_inquiry_seller_created", "seller_id", "created_at"),
+        Index("idx_inquiry_listing", "listing_type", "listing_id"),
+    )
