@@ -2,101 +2,331 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Welcome to Salon AutoZone!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>SalonAutoZone - Sierra Leone Auto Marketplace</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#0b1e3a 0%,#1a3a6b 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.card{background:white;border-radius:20px;padding:40px 32px;max-width:520px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,0.3);text-align:center}
-.confetti{font-size:64px;margin-bottom:12px}
-.logo{font-size:22px;font-weight:900;color:#0b1e3a;margin-bottom:20px}
-.logo span{color:#00a8e8}
-.logo .y{color:#ffb800}
-h1{font-size:28px;color:#0b1e3a;margin-bottom:8px;line-height:1.2}
-.name{color:#00a8e8;font-weight:800}
-.subtitle{color:#64748b;font-size:15px;margin-bottom:24px;line-height:1.5}
-.list{background:#f8fafc;border-radius:14px;padding:20px;text-align:left;margin-bottom:24px}
-.list-title{font-size:12px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:1px;margin-bottom:12px}
-.list-item{display:flex;align-items:flex-start;gap:12px;padding:8px 0;font-size:14px;color:#334155;line-height:1.4}
-.list-item .emoji{font-size:20px;flex-shrink:0}
-.btn{display:block;width:100%;padding:16px;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;border:none;margin-bottom:10px;font-family:inherit;text-decoration:none;text-align:center}
-.btn-primary{background:linear-gradient(135deg,#ff6b00,#e55a00);color:white}
-.btn-secondary{background:#f0f4f8;color:#0b1e3a;border:1px solid #e2e8f0}
-.footer{margin-top:20px;padding-top:20px;border-top:1px solid #f1f5f9;color:#94a3b8;font-size:13px}
-.footer strong{color:#0b1e3a}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
+.top-bar{background:#0a1628;color:#ccc;padding:8px 30px;font-size:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.top-bar a{color:#ccc;text-decoration:none}
+.top-bar .phone{color:#ffb800;font-weight:bold}
+.brand-bar{background:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);flex-wrap:wrap;gap:15px}
+.brand-logo{font-size:22px;font-weight:900;color:#0b1e3a}
+.brand-logo span{color:#00a8e8}
+.brand-logo .y{color:#ffb800}
+.brand-toggle{display:flex;background:#f0f4f8;border-radius:12px;padding:5px;gap:5px}
+.brand-toggle button{background:transparent;border:none;padding:12px 24px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;color:#666;font-family:inherit}
+.brand-toggle button.active{background:#ff6b00;color:white}
+.brand-toggle button.active.cars{background:#00a8e8}
+.brand-actions{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.brand-actions a{color:#0b1e3a;text-decoration:none;font-size:14px;font-weight:600}
+.fitment-bar{background:linear-gradient(90deg,#0b1e3a,#1a3a6b);color:white;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.fitment-left{display:flex;align-items:center;gap:14px}
+.fitment-icon{background:#ff6b00;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.fitment-label{font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:1px}
+.fitment-value{font-size:15px;font-weight:bold}
+.fitment-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fitment-controls select{padding:8px 12px;border-radius:6px;border:none;font-size:13px;background:rgba(255,255,255,0.15);color:white;font-family:inherit}
+.fitment-controls select option{color:#333}
+.btn-save{background:#00a8e8;color:white;border:none;padding:8px 18px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;font-family:inherit}
+.btn-clear{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:8px 18px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;display:none;font-family:inherit}
+.hero{background:linear-gradient(135deg,#0b1e3a,#1a3a6b);color:white;padding:50px 30px 90px;text-align:center;position:relative;z-index:1}
+.hero-badge{display:inline-block;background:#22c55e;color:white;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:bold;margin-bottom:18px;letter-spacing:1px}
+.hero h1{font-size:40px;margin-bottom:12px;line-height:1.15}
+.hero p{font-size:15px;opacity:0.85;margin-bottom:28px}
+.search-container{max-width:1100px;margin:0 auto;background:white;padding:14px;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,0.25)}
+.search-row{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr auto;gap:8px}
+.search-row select,.search-row input{padding:12px;border:1px solid #e0e6ed;border-radius:10px;font-size:14px;background:white;width:100%;font-family:inherit}
+.search-row button{background:#ff6b00;color:white;border:none;padding:12px 24px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;font-family:inherit;white-space:nowrap}
+.search-text-row{position:relative;margin-top:8px}
+.search-text-row input{width:100%;padding:12px 14px;border:1px solid #e0e6ed;border-radius:10px;font-size:14px;font-family:inherit}
+.suggestions-box{position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.15);z-index:1000;margin-top:6px;max-height:400px;overflow-y:auto;display:none}
+.suggestion-item{padding:12px 16px;cursor:pointer;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:12px}
+.suggestion-item:hover{background:#f0f9ff}
+.identify-cta-wrap{max-width:800px;margin:20px auto 0;padding:0 12px;position:relative;z-index:2}
+.identify-cta{width:100%;background:linear-gradient(135deg,#00a8e8,#0077b6);color:white;border:none;padding:14px 20px;border-radius:12px;font-weight:bold;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 20px rgba(0,168,232,0.35);min-height:52px;font-family:inherit}
+.import-cta-wrap{margin-top:18px;text-align:center}
+.import-cta{background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:15px;box-shadow:0 8px 20px rgba(255,107,0,0.35);font-family:inherit}
+.categories{max-width:1200px;margin:-40px auto 40px;padding:0 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:12px;position:relative;z-index:10}
+.category{background:white;border-radius:14px;padding:22px 12px;text-align:center;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:all 0.2s;position:relative;z-index:11}
+.category:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,168,232,0.2)}
+.category-icon{font-size:32px;margin-bottom:6px}
+.category-label{font-size:13px;font-weight:600;color:#0b1e3a}
+.cat-icon{width:32px;height:32px;margin-bottom:6px;color:#00a8e8;stroke-width:2}
+.results-section{max-width:1300px;margin:30px auto 60px;padding:0 20px}
+.results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.results-title{font-size:24px;color:#0b1e3a;font-weight:700}
+.results-count{background:#e0f2fe;color:#00a8e8;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);transition:all 0.25s;cursor:pointer}
+.card:hover{transform:translateY(-5px);box-shadow:0 12px 30px rgba(0,0,0,0.15)}
+.card-img{height:180px;background:#e0e6ed;display:flex;align-items:center;justify-content:center;font-size:60px;color:#94a3b8;background-size:cover;background-position:center;position:relative}
+.card-badges{position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;color:white}
+.badge-verified{background:#22c55e}
+.badge-new{background:#00a8e8}
+.badge-fits{background:#ffb800;color:#0b1e3a}
+.card-body{padding:16px}
+.card-title{font-size:16px;font-weight:700;margin-bottom:8px;color:#0b1e3a;line-height:1.3}
+.card-price{color:#00a8e8;font-size:22px;font-weight:800;margin-bottom:4px}
+.card-price-usd{color:#94a3b8;font-size:13px;margin-bottom:10px}
+.card-meta{display:flex;gap:6px;flex-wrap:wrap}
+.meta-tag{background:#f0f4f8;color:#475569;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.meta-tag.loc{background:#fef3c7;color:#92400e}
+.empty,.loading{text-align:center;padding:80px 20px;color:#94a3b8;font-size:15px}
+.empty button,.empty a{font-family:inherit}
+.hamburger{display:none;background:transparent;border:none;cursor:pointer;padding:8px}
+.mobile-menu{display:none;background:#0b1e3a;padding:12px 20px;flex-direction:column;gap:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.mobile-menu.open{display:flex}
+.mobile-menu a{color:white;text-decoration:none;padding:12px 10px;border-radius:8px;font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px}
+.mobile-menu a:hover{background:rgba(255,255,255,0.08)}
+.list-btn{background:#ff6b00;color:white !important;padding:8px 16px;border-radius:8px;margin-left:12px !important;font-weight:bold}
+@media (max-width:900px){.search-row{grid-template-columns:1fr 1fr 1fr}.categories{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:768px){
+  .top-bar{padding:8px 15px;font-size:11px;justify-content:center;text-align:center}
+  .brand-bar{padding:12px 15px;flex-direction:column;text-align:center}
+  .brand-toggle{width:100%}
+  .brand-toggle button{padding:10px 8px;font-size:12px;flex:1;min-height:44px}
+  .brand-actions{width:100%;justify-content:center;gap:10px}
+  .brand-actions a{font-size:12px}
+  .fitment-bar{padding:12px 15px;flex-direction:column;text-align:center;gap:10px}
+  .fitment-controls{width:100%;flex-direction:column;gap:8px}
+  .fitment-controls select{width:100%;min-height:44px;font-size:14px}
+  .fitment-controls button{min-height:44px;font-size:14px}
+  .hero{padding:30px 15px 70px}
+  .hero h1{font-size:24px;line-height:1.2}
+  .hero p{font-size:14px;padding:0 8px}
+  .search-row{grid-template-columns:1fr !important;gap:8px !important}
+  .search-row select,.search-row input,.search-row button{padding:12px !important;font-size:16px !important;min-height:48px}
+  .search-text-row input{font-size:16px !important;padding:12px 14px !important;min-height:48px}
+  .categories{grid-template-columns:repeat(3,1fr) !important;gap:8px;margin-top:-30px;padding:0 10px}
+  .category{padding:14px 6px}
+  .cat-icon{width:26px;height:26px;margin-bottom:4px}
+  .category-label{font-size:11px}
+  .results-section{padding:0 12px;margin-top:20px;margin-bottom:40px}
+  .results-header{flex-direction:column;align-items:flex-start;gap:8px}
+  .results-title{font-size:18px}
+  .results-count{font-size:12px;padding:5px 12px}
+  .grid{grid-template-columns:1fr !important;gap:14px}
+  .card{border-radius:12px}
+  .card-img{height:180px}
+  .card-body{padding:14px}
+  .card-title{font-size:15px;line-height:1.35}
+  .card-price{font-size:20px}
+  .hamburger{display:flex;align-items:center;justify-content:center;background:#0b1e3a;border-radius:8px;margin-left:auto}
+  .brand-actions{display:none !important}
+}
+@media (max-width:400px){
+  .hero h1{font-size:22px}
+  .categories{grid-template-columns:repeat(2,1fr) !important}
+}
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="confetti">🎉</div>
-  <div class="logo">Salon<span>AutoZone</span> <span class="y">&amp; AutoTrader</span></div>
-  <h1>Welcome to <br>Salon AutoZone!</h1>
-  <p class="subtitle">Hi <span class="name" id="user-name">there</span>,<br>Your account is all set. You're now part of Sierra Leone's #1 marketplace for cars and auto parts.</p>
-  <div class="list">
-    <div class="list-title">What you can do now</div>
-    <div class="list-item"><span class="emoji">🚗</span><span>Browse cars from local sellers</span></div>
-    <div class="list-item"><span class="emoji">🔧</span><span>Find parts for any Toyota, Honda, Nissan</span></div>
-    <div class="list-item"><span class="emoji">🌍</span><span>Request parts from abroad (7-14 days)</span></div>
-    <div class="list-item"><span class="emoji">📱</span><span>Contact sellers directly on WhatsApp</span></div>
-    <div class="list-item"><span class="emoji">🔢</span><span>Decode any VIN instantly</span></div>
-  </div>
-  <a href="/" class="btn btn-primary">Explore Marketplace →</a>
-  <a href="/dashboard" class="btn btn-secondary">Go to My Dashboard</a>
-  
-  <div style="margin-top:20px;padding:16px;background:#f0f9ff;border-radius:12px;border-left:4px solid #00a8e8;text-align:left;">
-    <div style="font-size:13px;color:#0369a1;font-weight:700;margin-bottom:8px;">📱 Get Notified Instantly</div>
-    <div style="font-size:13px;color:#475569;line-height:1.5;margin-bottom:12px;">Tap below to send us a WhatsApp message so we can welcome you personally and set up your account faster.</div>
-    <a id="notify-admin-btn" href="#" onclick="notifyAdmin(event)" style="display:block;background:#25D366;color:white;text-align:center;padding:14px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:15px;min-height:48px;">💬 Message Salon AutoZone on WhatsApp</a>
-  </div>
 
-  <div class="footer">Signed in as <strong id="user-email">your account</strong></div>
+<!-- ============ MODAL: NEW LISTING ============ -->
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:white;border-radius:16px;max-width:640px;width:100%;padding:28px;position:relative;max-height:90vh;overflow-y:auto;">
+    <span onclick="closeModal()" style="position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#888;line-height:1;">&times;</span>
+    <h2 id="modal-title" style="margin-bottom:20px;color:#0b1e3a;font-size:22px;">List Item</h2>
+    <form id="listing-form">
+      <div id="form-fields"></div>
+      <button type="submit" style="background:#ff6b00;color:white;border:none;padding:16px;border-radius:10px;width:100%;font-weight:bold;font-size:16px;cursor:pointer;margin-top:20px;min-height:52px;">Publish Listing</button>
+      <div id="form-status" aria-live="polite" style="margin-top:15px;text-align:center;font-weight:bold;font-size:14px;"></div>
+    </form>
+  </div>
 </div>
-<script>
-(function(){
-  try {
-    var raw = localStorage.getItem('userInfo');
-    if (raw) {
-      var u = JSON.parse(raw);
-      if (u.full_name) document.getElementById('user-name').innerText = u.full_name.split(' ')[0];
-      if (u.email) document.getElementById('user-email').innerText = u.email;
-    }
-    var token = localStorage.getItem('token');
-    if (token) {
-      fetch('/api/auth/me', {headers:{'Authorization':'Bearer '+token}})
-        .then(function(r){return r.ok?r.json():null})
-        .then(function(u){
-          if (u) {
-            if (u.full_name) document.getElementById('user-name').innerText = u.full_name.split(' ')[0];
-            if (u.email) document.getElementById('user-email').innerText = u.email;
-            localStorage.setItem('userInfo', JSON.stringify(u));
-          }
-        })
-        .catch(function(){});
-    }
-  } catch(e){}
-})();
 
-function notifyAdmin(e) {
-    e.preventDefault();
-    var userInfo = {};
-    try { userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}'); } catch(err) {}
-    
-    var name = userInfo.full_name || 'New user';
-    var email = userInfo.email || '';
-    var phone = userInfo.phone || '';
-    var roles = userInfo.roles || 'buyer';
-    
-    var msg = 'Hello Salon AutoZone! I just registered on your marketplace.\n\n'
-            + '👤 Name: ' + name + '\n'
-            + '📧 Email: ' + email + '\n'
-            + '📱 Phone: ' + phone + '\n'
-            + '🎯 Roles: ' + roles + '\n\n'
-            + 'Please activate my account.';
-    
-    var url = 'https://wa.me/23276570104?text=' + encodeURIComponent(msg);
-    window.open(url, '_blank');
-}
+<!-- ============ SVG SPRITE ============ -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-brakes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></symbol>
+  <symbol id="icon-engine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l2-4h6l2 4h3"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M5 12v6M19 12v6"/></symbol>
+  <symbol id="icon-suspension" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4"/><path d="M8 6h8M8 18h8"/><path d="M9 9h6M9 15h6"/><path d="M10 12h4"/></symbol>
+  <symbol id="icon-electrical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="icon-tires" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><line x1="12" y1="2" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="22"/></symbol>
+  <symbol id="icon-accessories" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 7V4h6v3"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+</svg>
 
-</script>
-</body>
-</html>
+<!-- ============ TOP BAR ============ -->
+<div class="top-bar">
+  <div><strong>Salon AutoZone HQ - Freetown, Sierra Leone</strong></div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
+    <a href="tel:+23276123456" class="phone">+232 76 123456</a>
+    <a href="#">Store Locator</a>
+    <a href="/login" id="signin-link">Sign In / Register</a>
+  </div>
+</div>
+
+<!-- ============ BRAND BAR ============ -->
+<div class="brand-bar">
+  <div class="brand-logo">Salon<span>AutoZone</span> <span class="y">&amp; AutoTrader</span></div>
+  <div class="brand-toggle">
+    <button id="btn-parts" class="active" onclick="switchMarket('parts')">AutoZone Parts Store</button>
+    <button id="btn-vehicles" class="cars" onclick="switchMarket('vehicles')">AutoTrader Cars &amp; Trucks</button>
+  </div>
+  <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+    <svg style="width:24px;height:24px" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-menu"/></svg>
+  </button>
+  <div class="brand-actions">
+    <a href="/vin-tool">VIN Lookup</a>
+    <a href="/login">Login</a>
+    <a href="#" onclick="event.preventDefault();openModal('parts', event)" class="list-btn">+ List Item</a>
+  </div>
+</div>
+
+<!-- ============ MOBILE MENU ============ -->
+<div id="mobile-menu" class="mobile-menu">
+  <a href="/">🏠 Home</a>
+  <a href="/vin-tool">🔍 VIN Lookup</a>
+  <a href="/login">👤 Login / Register</a>
+  <a href="#" onclick="event.preventDefault();closeMobileMenu();openModal('vehicle', event)">🚗 + List Your Car</a>
+  <a href="#" onclick="event.preventDefault();closeMobileMenu();openModal('parts', event)">🔧 + List a Part</a>
+</div>
+
+<!-- ============ FITMENT BAR ============ -->
+<div class="fitment-bar">
+  <div class="fitment-left">
+    <div class="fitment-icon"><svg style="width:24px;height:24px;" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-car"/></svg></div>
+    <div>
+      <div class="fitment-label">Your Vehicle</div>
+      <div class="fitment-value" id="fitment-label">Not set - select your car for exact-fit parts</div>
+    </div>
+  </div>
+  <div class="fitment-controls">
+    <select id="fitment-make"><option value="">Select Make</option></select>
+    <select id="fitment-model"><option value="">Select Model</option></select>
+    <select id="fitment-year"><option value="">Select Year</option></select>
+    <button type="button" class="btn-save" onclick="saveFitment()">Save</button>
+    <button type="button" class="btn-clear" id="fitment-clear" onclick="clearFitment()">Clear</button>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+  <div class="hero-badge">SIERRA LEONE VERIFIED VENDORS</div>
+  <h1>Find Your Next Car or Part in Sierra Leone</h1>
+  <p>Buy and sell cars &amp; parts across Freetown, Bo, Kenema, Makeni and beyond.</p>
+
+  <div class="search-container">
+    <div class="search-row">
+      <select id="search-category">
+        <option value="">All Categories</option>
+        <option value="Brakes">Brakes</option>
+        <option value="Engine">Engine</option>
+        <option value="Suspension">Suspension</option>
+        <option value="Electrical">Electrical</option>
+        <option value="Tires &amp; Wheels">Tires &amp; Wheels</option>
+        <option value="Transmission">Transmission</option>
+        <option value="Body">Body</option>
+        <option value="Interior">Interior</option>
+        <option value="Exhaust">Exhaust</option>
+        <option value="Lighting">Lighting</option>
+        <option value="Audio">Audio</option>
+        <option value="Accessories">Accessories</option>
+      </select>
+      <select id="search-make" onchange="updateSearchModels()"><option value="">Any Make</option></select>
+      <select id="search-model"><option value="">Any Model</option></select>
+      <select id="search-year"><option value="">Any Year</option></select>
+      <select id="filter-location">
+        <option value="">All Locations</option>
+        <option value="Freetown">Freetown</option>
+        <option value="Bo">Bo</option>
+        <option value="Kenema">Kenema</option>
+        <option value="Makeni">Makeni</option>
+        <option value="Koidu">Koidu</option>
+      </select>
+      <button onclick="doSearch()">Search</button>
+    </div>
+    <div class="search-text-row">
+      <input type="text" id="search-input" placeholder="Or type a part name..." autocomplete="off">
+      <div class="suggestions-box" id="suggestions-box"></div>
+    </div>
+  </div>
+
+  <div class="import-cta-wrap">
+    <button type="button" class="import-cta" onclick="openImportModal()">
+      🌍 Can't find it locally? Request from Abroad
+    </button>
+  </div>
+</div>
+
+<!-- ============ IDENTIFY CAR CTA ============ -->
+<div class="identify-cta-wrap">
+  <button type="button" class="identify-cta" onclick="openIdentifyCar()">
+    <span style="font-size:20px;">📸</span> Identify Your Car from a Photo — AI Powered
+  </button>
+</div>
+
+<!-- ============ IDENTIFY CAR MODAL ============ -->
+<div id="identify-car-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:3000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:white;border-radius:16px;max-width:520px;width:100%;padding:24px;position:relative;max-height:90vh;overflow-y:auto;">
+    <span onclick="closeIdentifyCar()" style="position:absolute;top:14px;right:18px;font-size:28px;cursor:pointer;color:#888;">&times;</span>
+    <div id="identify-stage-upload">
+      <h2 style="color:#0b1e3a;margin-bottom:8px;font-size:20px;">📸 Identify Your Car</h2>
+      <p style="color:#64748b;font-size:14px;margin-bottom:20px;line-height:1.5;">Take a clear photo of the front or side of the car. AI will tell you the make, model, year, and estimated price in Sierra Leone Leones.</p>
+      <input type="file" id="identify-file-input" accept="image/*" capture="environment" style="display:none;">
+      <button type="button" onclick="document.getElementById('identify-file-input').click()" style="width:100%;background:#f0f4f8;color:#0b1e3a;border:2px dashed #cbd5e0;padding:32px;border-radius:12px;font-weight:bold;cursor:pointer;font-size:15px;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:12px;min-height:180px;">
+        <span style="font-size:48px;">📷</span>
+        <span>Tap to Take Photo or Upload</span>
+        <span style="font-size:12px;color:#94a3b8;font-weight:normal;">JPG, PNG, or WEBP • Max 8 MB</span>
+      </button>
+      <div id="identify-status" aria-live="polite" style="margin-top:16px;text-align:center;font-size:14px;font-weight:600;line-height:1.5;"></div>
+    </div>
+    <div id="identify-stage-result" style="display:none;">
+      <div id="identify-result-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CATEGORIES ============ -->
+<div class="categories" id="categories-row">
+  <div class="category" onclick="filterCategory('Brakes')"><svg class="cat-icon"><use href="#icon-brakes"/></svg><div class="category-label">Brakes</div></div>
+  <div class="category" onclick="filterCategory('Engine')"><svg class="cat-icon"><use href="#icon-engine"/></svg><div class="category-label">Engine</div></div>
+  <div class="category" onclick="filterCategory('Suspension')"><svg class="cat-icon"><use href="#icon-suspension"/></svg><div class="category-label">Suspension</div></div>
+  <div class="category" onclick="filterCategory('Electrical')"><svg class="cat-icon"><use href="#icon-electrical"/></svg><div class="category-label">Electrical</div></div>
+  <div class="category" onclick="filterCategory('Tires &amp; Wheels')"><svg class="cat-icon"><use href="#icon-tires"/></svg><div class="category-label">Tires</div></div>
+  <div class="category" onclick="filterCategory('Accessories')"><svg class="cat-icon"><use href="#icon-accessories"/></svg><div class="category-label">Accessories</div></div>
+</div>
+
+<!-- ============ RESULTS ============ -->
+<div class="results-section">
+  <div class="results-header">
+    <h2 class="results-title" id="section-title">Latest Auto Parts</h2>
+    <div class="results-count" id="results-count">Loading...</div>
+  </div>
+  <div id="results" class="grid"></div>
+</div>
+
+<!-- ============ IMPORT MODAL ============ -->
+<div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:white;border-radius:16px;max-width:640px;width:100%;padding:30px;position:relative;max-height:90vh;overflow-y:auto;">
+    <span onclick="closeImportModal()" style="position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#888;">&times;</span>
+    <h2 style="margin-bottom:8px;color:#0b1e3a;font-size:22px;">🌍 Request a Part from Abroad</h2>
+    <p style="color:#666;font-size:14px;margin-bottom:20px;">We'll source it from our international suppliers (Dubai, China, UK, USA) and deliver to you in Sierra Leone.</p>
+    <form id="import-form">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Your Name *</label>
+          <input name="customer_name" required placeholder="Aminata Kamara" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">WhatsApp Number *</label>
+          <input name="customer_phone" required placeholder="+232 76 123456" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Your Location *</label>
+          <select name="customer_location" required style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            <option value="">Select City</option>
+            <option>Freetown</option><option>Bo</option><option>Kenema</option>
+            <option>Makeni</option><option>Koidu</option><option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Email (optional)</label>
+          <input name="customer_email" type="email" placeholder="you@example.com" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+        </div>
+      </div>
+      <h3 style="margin-top:20px;margin-bottom:10px;color:#0b1e3a;font-size:15px;">🔧 Part Details</h3>
+      <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Part Name
