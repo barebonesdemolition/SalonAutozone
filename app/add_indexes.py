@@ -1,8 +1,14 @@
 """
-One-off script to add indexes to existing tables.
-Safe to run multiple times — uses IF NOT EXISTS.
+Add performance indexes to the database.
+Run from project root:  python -m app.add_indexes
 """
 import asyncio
+import sys
+import os
+
+# Ensure project root is on sys.path so "app.*" imports work
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from sqlalchemy import text
 from app.db import engine
 
@@ -41,14 +47,16 @@ INDEXES = [
 
 
 async def main():
+    print("Connecting to database...")
     async with engine.begin() as conn:
         for sql in INDEXES:
+            name = sql.split(" ON ")[0].replace("CREATE INDEX IF NOT EXISTS ", "")
             try:
                 await conn.execute(text(sql))
-                print(f"✅ {sql.split(' ON ')[0].replace('CREATE INDEX IF NOT EXISTS ', '')}")
+                print(f"✅ {name}")
             except Exception as e:
-                print(f"⚠️  Skipped: {sql[:60]}... ({e})")
-    print("\n🎉 All indexes created.")
+                print(f"⚠️  {name} — skipped ({e})")
+    print("\n🎉 Done.")
 
 
 if __name__ == "__main__":
