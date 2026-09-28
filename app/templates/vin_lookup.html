@@ -73,6 +73,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
 .card-meta{display:flex;gap:6px;flex-wrap:wrap}
 .meta-tag{background:#f0f4f8;color:#475569;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
 .meta-tag.loc{background:#fef3c7;color:#92400e}
+.save-btn{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,0.95);color:#0b1e3a;border:none;padding:6px 12px;border-radius:20px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:all 0.15s;z-index:5}
+.save-btn:hover{background:white;transform:scale(1.05)}
+.save-btn.saved{background:#22c55e;color:white}
+.save-btn.saving{background:#ffb800;color:#0b1e3a;cursor:wait}
 .empty,.loading{text-align:center;padding:80px 20px;color:#94a3b8;font-size:15px}
 .hamburger{display:none;background:transparent;border:none;cursor:pointer;padding:8px}
 .mobile-menu{display:none;background:#0b1e3a;padding:12px 20px;flex-direction:column;gap:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
@@ -116,6 +120,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   .card-price{font-size:18px;margin-bottom:4px}
   .card-price-usd{font-size:12px;margin-bottom:8px}
   .meta-tag{font-size:10px;padding:3px 7px}
+  .save-btn{top:6px;right:6px;bottom:auto;padding:5px 10px;font-size:11px}
   .hamburger{display:flex;align-items:center;justify-content:center;background:#0b1e3a;border-radius:8px;margin-left:auto}
   .brand-actions{display:none !important}
 }
@@ -435,6 +440,93 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
     return fetch(url, opts).finally(function () { clearTimeout(timer); });
   }
 
+  // ============ TOAST ============
+  function showToast(msg, type) {
+    var t = document.getElementById('app-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'app-toast';
+      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#0b1e3a;color:white;padding:14px 24px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform 0.3s,opacity 0.3s;opacity:0;z-index:9999;pointer-events:none;max-width:90vw;text-align:center';
+      document.body.appendChild(t);
+    }
+    t.innerText = msg;
+    if (type === 'success') t.style.background = '#16a34a';
+    else if (type === 'error') t.style.background = '#dc2626';
+    else t.style.background = '#0b1e3a';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    t.style.opacity = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () {
+      t.style.transform = 'translateX(-50%) translateY(100px)';
+      t.style.opacity = '0';
+    }, 2600);
+  }
+
+  // ============ SAVE ITEM ============
+  window.saveItem = async function (btn, type, id, title, price) {
+    if (!getToken()) {
+      showToast('Please log in to save items', 'error');
+      setTimeout(function () { window.location.href = '/login?next=/'; }, 1200);
+      return;
+    }
+    var prevText = btn.innerText;
+    btn.innerText = '⏳ Saving...';
+    btn.className = 'save-btn saving';
+    btn.disabled = true;
+    try {
+      var res = await fetch('/api/my-account/saved', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({ listing_type: type, listing_id: id })
+      });
+      if (!res.ok) {
+        var err = await res.json().catch(function() { return {}; });
+        if (res.status === 401) {
+          showToast('Please log in to save', 'error');
+          setTimeout(function () { window.location.href = '/login?next=/'; }, 1200);
+          return;
+        }
+        throw new Error(err.detail || 'Failed to save');
+      }
+      var data = await res.json();
+      btn.innerText = '✅ Saved';
+      btn.className = 'save-btn saved';
+      showToast(data.already_saved ? 'Already in saved items' : '💾 Saved to your account', 'success');
+    } catch (e) {
+      showToast('❌ ' + e.message, 'error');
+      btn.innerText = prevText;
+      btn.className = 'save-btn';
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  // Mark already-saved items
+  async function markSavedItems() {
+    if (!getToken()) return;
+    try {
+      var res = await fetch('/api/my-account/saved', {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+      });
+      if (!res.ok) return;
+      var data = await res.json();
+      var saved = {};
+      (data.items || []).forEach(function (s) {
+        saved[s.listing_type + '-' + s.listing_id] = true;
+      });
+      document.querySelectorAll('.save-btn').forEach(function (btn) {
+        var key = btn.dataset.saveType + '-' + btn.dataset.saveId;
+        if (saved[key]) {
+          btn.innerText = '✅ Saved';
+          btn.classList.add('saved');
+        }
+      });
+    } catch (e) {}
+  }
+
   function showSkeletons(el, count) {
     var html = '';
     for (var i = 0; i < count; i++) {
@@ -559,7 +651,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
       html += '<div class="card-img" style="' + imgStyle + '">' + (imgUrl ? '' : 'CAR');
       html += '<div class="card-badges">';
       if (item.is_featured) html += '<span class="badge badge-featured">⭐ FEATURED</span>';
-      html += '<span class="badge badge-verified">Verified</span></div></div>';
+      html += '<span class="badge badge-verified">Verified</span></div>';
+      html += '<button type="button" class="save-btn" data-save-type="vehicle" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'vehicle\',' + item.id + ',\'' + escAttr(item.title || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
+      html += '</div>';
       html += '<div class="card-body"><div class="card-title">' + esc(item.title) + '</div>';
       html += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
       if (item.price_usd) html += '<div class="card-price-usd">Approx $' + Number(item.price_usd).toLocaleString() + ' USD</div>';
@@ -568,6 +662,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
       html += '<span class="meta-tag loc">' + esc(item.location) + '</span></div></div></div>';
     }
     el.innerHTML = html;
+    markSavedItems();
   }
 
   // ============ RENDER PARTS ============
@@ -615,6 +710,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
         localHtml += '<button type="button" class="save-btn" data-save-type="part" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'part\',' + item.id + ',\'' + escAttr(item.name || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
         localHtml += '</div>';
         localHtml += '<div class="card-body"><div class="card-title">' + esc(item.name) + '</div>';
+        localHtml += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
         localHtml += '<div class="card-meta"><span class="meta-tag">' + esc(item.category) + '</span>';
         localHtml += '<span class="meta-tag">Stock: ' + (item.stock_quantity || 0) + '</span>';
         localHtml += '<span class="meta-tag loc">📍 ' + esc(item.location) + '</span></div></div></div>';
@@ -647,6 +743,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
     }
 
     el.innerHTML = html;
+    markSavedItems();
   }
 
   // ============ CATEGORY FILTER ============
@@ -766,7 +863,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
       if (!mSel || !moSel || !ySel) return;
 
       mSel.value = primary.make || '';
-      // Populate models for the selected make
       if (primary.make) {
         var models = MODELS[primary.make] || [];
         var moHtml = '<option value="">Select Model</option>';
@@ -784,7 +880,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
       var clearBtn = document.getElementById('fitment-clear');
       if (clearBtn) clearBtn.style.display = 'inline-block';
 
-      // Re-run search so "fits your car" badges appear
       if (typeof doSearch === 'function') doSearch();
     } catch (e) {
       console.warn('garage sync failed:', e);
