@@ -124,7 +124,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
 </head>
 <body>
 
-<!-- ============ MODAL FOR NEW LISTINGS ============ -->
+<!-- MODAL FOR NEW LISTINGS -->
 <div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
   <div style="background:white;border-radius:16px;max-width:640px;width:100%;padding:28px;position:relative;max-height:90vh;overflow-y:auto;">
     <span onclick="closeModal()" style="position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#888;line-height:1;">&times;</span>
@@ -137,7 +137,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   </div>
 </div>
 
-<!-- ============ SVG SPRITE ============ -->
+<!-- SVG SPRITE -->
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
   <symbol id="icon-brakes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></symbol>
   <symbol id="icon-engine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l2-4h6l2 4h3"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M5 12v6M19 12v6"/></symbol>
@@ -149,7 +149,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
 </svg>
 
-<!-- ============ TOP BAR ============ -->
+<!-- TOP BAR -->
 <div class="top-bar">
   <div><strong>Salon AutoZone HQ - Freetown, Sierra Leone</strong></div>
   <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
@@ -159,7 +159,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   </div>
 </div>
 
-<!-- ============ BRAND BAR ============ -->
+<!-- BRAND BAR -->
 <div class="brand-bar">
   <div class="brand-logo">Salon<span>AutoZone</span> <span class="y">&amp; AutoTrader</span></div>
   <div class="brand-toggle">
@@ -176,7 +176,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   </div>
 </div>
 
-<!-- ============ MOBILE MENU ============ -->
+<!-- MOBILE MENU -->
 <div id="mobile-menu" class="mobile-menu">
   <a href="/">🏠 Home</a>
   <a href="/vin-tool">🔍 VIN Lookup</a>
@@ -185,7 +185,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   <a href="#" onclick="event.preventDefault();closeMobileMenu();openModal('parts', event)">🔧 + List a Part</a>
 </div>
 
-<!-- ============ FITMENT BAR ============ -->
+<!-- FITMENT BAR -->
 <div class="fitment-bar">
   <div class="fitment-left">
     <div class="fitment-icon"><svg style="width:24px;height:24px;" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-car"/></svg></div>
@@ -203,7 +203,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   </div>
 </div>
 
-<!-- ============ HERO ============ -->
+<!-- HERO -->
 <div class="hero">
   <div class="hero-badge">SIERRA LEONE VERIFIED VENDORS</div>
   <h1>Find Your Next Car or Part in Sierra Leone</h1>
@@ -252,14 +252,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   </div>
 </div>
 
-<!-- ============ IDENTIFY CAR CTA ============ -->
+<!-- IDENTIFY CAR CTA -->
 <div style="max-width:800px;margin:14px auto 0;padding:0 12px;">
   <button type="button" onclick="openIdentifyCar()" style="width:100%;background:linear-gradient(135deg,#00a8e8,#0077b6);color:white;border:none;padding:14px 20px;border-radius:12px;font-weight:bold;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 20px rgba(0,168,232,0.35);min-height:52px;">
     <span style="font-size:20px;">📸</span> Identify Your Car from a Photo — AI Powered
   </button>
 </div>
 
-<!-- ============ IDENTIFY CAR MODAL ============ -->
+<!-- IDENTIFY CAR MODAL -->
 <div id="identify-car-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:3000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
   <div style="background:white;border-radius:16px;max-width:520px;width:100%;padding:24px;position:relative;max-height:90vh;overflow-y:auto;">
     <span onclick="closeIdentifyCar()" style="position:absolute;top:14px;right:18px;font-size:28px;cursor:pointer;color:#888;">&times;</span>
@@ -280,7 +280,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   </div>
 </div>
 
-<!-- ============ CATEGORIES ============ -->
+<!-- CATEGORIES -->
 <div class="categories" id="categories-row">
   <div class="category" onclick="filterCategory('Brakes')"><svg class="cat-icon"><use href="#icon-brakes"/></svg><div class="category-label">Brakes</div></div>
   <div class="category" onclick="filterCategory('Engine')"><svg class="cat-icon"><use href="#icon-engine"/></svg><div class="category-label">Engine</div></div>
@@ -290,7 +290,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   <div class="category" onclick="filterCategory('Accessories')"><svg class="cat-icon"><use href="#icon-accessories"/></svg><div class="category-label">Accessories</div></div>
 </div>
 
-<!-- ============ RESULTS ============ -->
+<!-- RESULTS -->
 <div class="results-section">
   <div class="results-header">
     <h2 class="results-title" id="section-title">Latest Auto Parts</h2>
@@ -299,7 +299,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   <div id="results" class="grid"></div>
 </div>
 
-<!-- ============ IMPORT MODAL ============ -->
+<!-- IMPORT MODAL -->
 <div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
   <div style="background:white;border-radius:16px;max-width:640px;width:100%;padding:30px;position:relative;max-height:90vh;overflow-y:auto;">
     <span onclick="closeImportModal()" style="position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#888;">&times;</span>
@@ -307,27 +307,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
     <p style="color:#666;font-size:14px;margin-bottom:20px;">We'll source it from our international suppliers (Dubai, China, UK, USA) and deliver to you in Sierra Leone.</p>
     <form id="import-form">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div>
-          <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Your Name *</label>
-          <input name="customer_name" required placeholder="Aminata Kamara" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-        </div>
-        <div>
-          <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">WhatsApp Number *</label>
-          <input name="customer_phone" required placeholder="+232 76 123456" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-        </div>
-        <div>
-          <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Your Location *</label>
-          <select name="customer_location" required style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-            <option value="">Select City</option>
-            <option>Freetown</option><option>Bo</option><option>Kenema</option>
-            <option>Makeni</option><option>Koidu</option><option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Email (optional)</label>
-          <input name="customer_email" type="email" placeholder="you@example.com" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-        </div>
+        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Your Name *</label><input name="customer_name" required placeholder="Aminata Kamara" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
+        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">WhatsApp Number *</label><input name="customer_phone" required placeholder="+232 76 123456" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
+        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Your Location *</label><select name="customer_location" required style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"><option value="">Select City</option><option>Freetown</option><option>Bo</option><option>Kenema</option><option>Makeni</option><option>Koidu</option><option>Other</option></select></div>
+        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Email (optional)</label><input name="customer_email" type="email" placeholder="you@example.com" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
       </div>
-      <h3 style="margin-top:20px;margin-bottom:10px;color:#0b1e3a;font-size:15px;">🔧 Part Details</h3>
-      <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Part Name *</label>
-      <input name="part_name" required placeholder="e.g. Front
+      <h3 style="margin-top:20px;margin-bottom:10px;color:#0b1e3a;font-size:15px;">🔧 Part Details
