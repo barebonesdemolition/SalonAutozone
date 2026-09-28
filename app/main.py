@@ -61,7 +61,7 @@ app.include_router(my_account.router)
 async def home(request: Request):
     return templates.TemplateResponse(
         request=request,
-        name="vin_lookup.html",
+        name="index.html",
         context={"app_name": settings.APP_NAME},
     )
 
