@@ -454,7 +454,156 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
     }
     doSearch();
   };
+  // ----- AI photo identification -----
+  var identifySelectedFile = null;
 
+  document.getElementById('identify-file-input').addEventListener('change', function (e) {
+    if (e.target.files && e.target.files.length > 0) {
+      identifySelectedFile = e.target.files[0];
+      handleIdentifyUpload();
+    }
+  });
+
+  async function handleIdentifyUpload() {
+    if (!identifySelectedFile) return;
+    var statusEl = document.getElementById('identify-status');
+    var file = identifySelectedFile;
+
+    if (file.size > 8 * 1024 * 1024) {
+      statusEl.style.color = '#dc2626';
+      statusEl.innerText = '❌ Image too large (max 8 MB).';
+      return;
+    }
+
+    var startTime = Date.now();
+    statusEl.style.color = '#00a8e8';
+    statusEl.innerHTML = '<div style="padding:10px;">' +
+      '<div style="font-size:32px;margin-bottom:8px;">🔍</div>' +
+      '<div style="font-weight:700;">Analyzing your photo...</div>' +
+      '<div style="font-size:13px;color:#64748b;margin-top:6px;" id="identify-progress">Starting up (0s)</div>' +
+      '</div>';
+
+    var progressInterval = setInterval(function () {
+      var elapsed = Math.floor((Date.now() - startTime) / 1000);
+      var progressEl = document.getElementById('identify-progress');
+      if (progressEl) {
+        if (elapsed < 10) progressEl.innerText = 'Uploading photo... (' + elapsed + 's)';
+        else if (elapsed < 25) progressEl.innerText = 'AI is analyzing... (' + elapsed + 's)';
+        else progressEl.innerText = 'Almost done... (' + elapsed + 's)';
+      }
+    }, 1000);
+
+    var fd = new FormData();
+    fd.append('file', file);
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function () { controller.abort(); }, 120000);
+
+    try {
+      var res = await fetch('/api/identify/car', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + getToken() },
+        body: fd,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      clearInterval(progressInterval);
+
+      var responseText = await res.text();
+      var data;
+      try { data = JSON.parse(responseText); }
+      catch (err) {
+        statusEl.style.color = '#dc2626';
+        statusEl.innerHTML = '<div style="padding:10px;">' +
+          '<div style="font-size:32px;margin-bottom:8px;">⚠️</div>' +
+          '<div style="font-weight:700;">Server error</div>' +
+          '<div style="font-size:13px;color:#64748b;margin-top:6px;">Please try again.</div>' +
+          '</div>';
+        return;
+      }
+
+      if (!res.ok) {
+        statusEl.style.color = '#dc2626';
+        var errMsg = data.detail || 'Identification failed';
+        if (res.status === 401) errMsg = 'Please log in again (session expired)';
+        if (res.status === 429) errMsg = 'Daily limit reached (20/day). Try again tomorrow.';
+        statusEl.innerHTML = '<div style="padding:10px;">' +
+          '<div style="font-size:32px;margin-bottom:8px;">❌</div>' +
+          '<div style="font-weight:700;">' + esc(errMsg) + '</div>' +
+          '</div>';
+        return;
+      }
+
+      renderIdentifyResult(data.identification);
+    } catch (err) {
+      clearTimeout(timeoutId);
+      clearInterval(progressInterval);
+      statusEl.style.color = '#dc2626';
+      if (err.name === 'AbortError') {
+        statusEl.innerHTML = '<div style="padding:10px;">' +
+          '<div style="font-size:32px;margin-bottom:8px;">⏱️</div>' +
+          '<div style="font-weight:700;">Request timed out</div>' +
+          '</div>';
+      } else {
+        statusEl.innerHTML = '<div style="padding:10px;">' +
+          '<div style="font-size:32px;margin-bottom:8px;">🌐</div>' +
+          '<div style="font-weight:700;">Network error</div>' +
+          '</div>';
+      }
+    }
+  }
+
+  function renderIdentifyResult(car) {
+    var html = '';
+    if (!car || !car.make || !car.model) {
+      html = '<div style="text-align:center;padding:20px;">' +
+        '<div style="font-size:48px;margin-bottom:12px;">😕</div>' +
+        '<h3 style="color:#0b1e3a;margin-bottom:8px;">Could Not Identify</h3>' +
+        '<p style="color:#64748b;font-size:14px;">Please try a clearer photo.</p>' +
+        '<button onclick="closeIdentifyCar();openIdentifyCar()" style="margin-top:16px;background:#00a8e8;color:white;border:none;padding:12px 24px;border-radius:8px;font-weight:bold;cursor:pointer;">Try Another Photo</button>' +
+        '</div>';
+    } else {
+      var priceRange = '';
+      if (car.estimated_price_sll_low && car.estimated_price_sll_high) {
+        priceRange = 'SLL ' + Math.round(car.estimated_price_sll_low).toLocaleString() +
+                     ' – ' + Math.round(car.estimated_price_sll_high).toLocaleString();
+      }
+      var partsList = '';
+      if (car.common_parts && car.common_parts.length > 0) {
+        partsList = car.common_parts.map(function (p) {
+          return '<span style="display:inline-block;background:#f0f9ff;color:#0369a1;padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;margin:4px 4px 0 0;">' +
+                 esc(p) + '</span>';
+        }).join('');
+      }
+      html = '<div style="text-align:center;margin-bottom:20px;">' +
+        '<div style="font-size:48px;margin-bottom:8px;">🚗</div>' +
+        '<h2 style="color:#0b1e3a;font-size:22px;margin-bottom:4px;">' + esc(car.make) + ' ' + esc(car.model) + '</h2>' +
+        '<div style="color:#64748b;font-size:14px;">' + esc(car.year_range || '') + ' • ' + esc(car.body_type || '') + ' • ' + esc(car.color || '') + '</div>' +
+        '</div>' +
+        (priceRange ? '<div style="background:#dcfce7;padding:16px;border-radius:12px;text-align:center;margin-bottom:16px;"><div style="font-size:11px;color:#166534;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Estimated Price</div><div style="font-size:20px;color:#166534;font-weight:900;">' + priceRange + '</div></div>' : '') +
+        (partsList ? '<div style="margin-bottom:16px;"><div style="font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Common Parts</div><div>' + partsList + '</div></div>' : '') +
+        (car.description ? '<div style="background:#f8fafc;padding:12px;border-radius:8px;font-size:13px;color:#475569;line-height:1.5;margin-bottom:16px;">' + esc(car.description) + '</div>' : '') +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;">' +
+        '<button onclick="searchPartsForCar(\'' + escAttr(car.make) + '\', \'' + escAttr(car.model) + '\')" style="background:#00a8e8;color:white;border:none;padding:14px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;min-height:48px;">🔧 Find Parts</button>' +
+        '<button onclick="listCarFromIdentify(\'' + escAttr(car.make) + '\', \'' + escAttr(car.model) + '\')" style="background:#ff6b00;color:white;border:none;padding:14px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;min-height:48px;">📝 List for Sale</button>' +
+        '</div>' +
+        '<button onclick="closeIdentifyCar();openIdentifyCar()" style="width:100%;margin-top:10px;background:#f0f4f8;color:#0b1e3a;border:1px solid #e0e6ed;padding:12px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;">Try Another Photo</button>';
+    }
+    document.getElementById('identify-result-content').innerHTML = html;
+    document.getElementById('identify-stage-upload').style.display = 'none';
+    document.getElementById('identify-stage-result').style.display = 'block';
+  }
+
+  window.searchPartsForCar = function (make, model) {
+    closeIdentifyCar();
+    document.getElementById('search-input').value = make + ' ' + model;
+    switchMarket('parts');
+    setTimeout(function () { doSearch(); }, 100);
+  };
+
+  window.listCarFromIdentify = function (make, model) {
+    closeIdentifyCar();
+    setTimeout(function () { openModal('vehicle'); }, 100);
+  };
   window.updateSearchModels = function () {
     var make = document.getElementById('search-make').value;
     var mSel = document.getElementById('search-model');
