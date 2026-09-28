@@ -43,11 +43,15 @@ class VehicleListing(Base):
     seller_id = Column(Integer, ForeignKey("users.id"))
     seller = relationship("User")
 
-    # 👇 Composite indexes for common queries
+    # Featured listing support
+    is_featured = Column(Boolean, default=False, index=True)
+    featured_until = Column(DateTime, nullable=True)
+
     __table_args__ = (
         Index("idx_vehicle_created_at", "created_at"),
         Index("idx_vehicle_make_model", "make", "model"),
         Index("idx_vehicle_location_created", "location", "created_at"),
+        Index("idx_vehicle_featured", "is_featured", "created_at"),
     )
 
 
@@ -70,12 +74,16 @@ class PartListing(Base):
     vendor_id = Column(Integer, ForeignKey("users.id"))
     vendor = relationship("User")
 
-    # 👇 Composite indexes for common queries
+    # Featured listing support
+    is_featured = Column(Boolean, default=False, index=True)
+    featured_until = Column(DateTime, nullable=True)
+
     __table_args__ = (
         Index("idx_part_created_at", "created_at"),
         Index("idx_part_category_created", "category", "created_at"),
         Index("idx_part_make_model", "compatible_make", "compatible_model"),
         Index("idx_part_location_created", "location", "created_at"),
+        Index("idx_part_featured", "is_featured", "created_at"),
     )
 
 
