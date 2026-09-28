@@ -199,7 +199,9 @@ class Garage(Base):
     __table_args__ = (
         Index("idx_garage_user", "user_id"),
         Index("idx_garage_user_primary", "user_id", "is_primary"),
-    )class SavedListing(Base):
+    )
+    
+    class SavedListing(Base):
     __tablename__ = "saved_listings"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
