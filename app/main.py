@@ -41,6 +41,19 @@ async def lifespan(app: FastAPI):
                 is_primary BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT NOW()
             )""",
+                        """CREATE TABLE IF NOT EXISTS saved_listings (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                listing_type VARCHAR NOT NULL,
+                listing_id INTEGER NOT NULL,
+                listing_title VARCHAR,
+                listing_price_sll FLOAT,
+                listing_image_url VARCHAR,
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT NOW()
+            )""",            # Saved listings
+            "CREATE INDEX IF NOT EXISTS idx_saved_user ON saved_listings (user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_saved_user_listing ON saved_listings (user_id, listing_type, listing_id)",
         ]
         for _sql in _migrations:
             try:
