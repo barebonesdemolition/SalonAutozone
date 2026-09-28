@@ -59,9 +59,13 @@ async def lifespan(app: FastAPI):
             "CREATE INDEX IF NOT EXISTS idx_order_buyer_created ON orders (buyer_id, created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_order_status ON orders (status)",
 
-            # Users
+                   # Users
             "CREATE INDEX IF NOT EXISTS idx_user_email ON users (email)",
             "CREATE INDEX IF NOT EXISTS idx_user_phone ON users (phone)",
+
+            # Featured listings
+            "CREATE INDEX IF NOT EXISTS idx_part_featured ON part_listings (is_featured, created_at DESC)",
+            "CREATE INDEX IF NOT EXISTS idx_vehicle_featured ON vehicle_listings (is_featured, created_at DESC)",
         ]
 
         created = 0
