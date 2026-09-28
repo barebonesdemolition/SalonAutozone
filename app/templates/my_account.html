@@ -8,102 +8,94 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background:#f4f6f8;color:#1a1a1a;line-height:1.4}
 .navbar{background:#0b1e3a;color:white;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.logo{font-size:18px;font-weight:900;color:#00a8e8;text-decoration:none;letter-spacing:-0.3px}
+.logo{font-size:18px;font-weight:900;color:#00a8e8;text-decoration:none}
 .logo span{color:#ffb800}
 .nav-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .navbar a{color:white;text-decoration:none;font-size:13px;padding:8px 14px;border-radius:8px;background:rgba(255,255,255,0.08);transition:background 0.15s}
 .navbar a:hover{background:rgba(255,255,255,0.2)}
 .navbar a.logout{background:#dc2626}
-.navbar a.logout:hover{background:#b91c1c}
 .container{max-width:1200px;margin:24px auto;padding:0 16px}
-.welcome{background:white;border-radius:14px;padding:20px 24px;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.welcome{background:white;border-radius:14px;padding:20px 24px;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px}
 .welcome h1{font-size:20px;color:#0b1e3a}
 .welcome p{font-size:13px;color:#666;margin-top:4px}
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
 .stat-card{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border-left:4px solid #00a8e8}
 .stat-label{font-size:10px;color:#888;text-transform:uppercase;font-weight:700;letter-spacing:0.5px}
 .stat-value{font-size:26px;color:#0b1e3a;font-weight:900;margin-top:4px}
-.tabs{display:flex;gap:6px;margin-bottom:16px;background:white;padding:6px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs{display:flex;gap:6px;margin-bottom:16px;background:white;padding:6px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:12px 16px;background:transparent;border:none;border-radius:8px;font-weight:600;cursor:pointer;color:#64748b;font-size:13px;white-space:nowrap;flex-shrink:0;font-family:inherit;min-height:44px;transition:background 0.15s,color 0.15s}
+.tab{padding:12px 16px;background:transparent;border:none;border-radius:8px;font-weight:600;cursor:pointer;color:#64748b;font-size:13px;white-space:nowrap;flex-shrink:0;font-family:inherit;min-height:44px}
 .tab.active{background:#0b1e3a;color:white}
 .section{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:none}
 .section.active{display:block}
 .section h2{color:#0b1e3a;font-size:18px;margin-bottom:16px}
-.listing-card{display:flex;gap:14px;padding:14px;border-bottom:1px solid #f1f5f9;align-items:center;flex-wrap:wrap;cursor:pointer;transition:background 0.15s;text-decoration:none;color:inherit}
+.listing-card{display:flex;gap:14px;padding:14px;border-bottom:1px solid #f1f5f9;align-items:center;flex-wrap:wrap;transition:background 0.15s}
 .listing-card:last-child{border-bottom:none}
 .listing-card:hover{background:#f8fafc}
+.listing-card.featured{border-left:4px solid #ffb800;background:linear-gradient(90deg,#fffbeb,#ffffff)}
 .listing-img{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#e0e6ed,#cbd5e0);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;overflow:hidden}
-.listing-img img{width:100%;height:100%;object-fit:cover;display:block}
+.listing-img img{width:100%;height:100%;object-fit:cover}
 .listing-info{flex:1;min-width:0}
 .listing-title{font-weight:700;color:#0b1e3a;font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .listing-price{color:#00a8e8;font-size:17px;font-weight:800;margin-bottom:4px}
 .listing-meta{font-size:12px;color:#666;display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;align-items:center}
-.badge{background:#f0f4f8;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-block;line-height:1.4}
+.badge{background:#f0f4f8;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;display:inline-block}
+.badge-featured{background:#ffb800;color:#0b1e3a;font-weight:900}
 .badge.sold{background:#22c55e;color:white}
 .badge.inquiry{background:#fef3c7;color:#92400e}
-.badge.new{background:#dbeafe;color:#1e40af}
-.badge.contacted{background:#fef3c7;color:#92400e}
-.badge.quoted{background:#e0e7ff;color:#3730a3}
-.badge.ordered{background:#dcfce7;color:#166534}
-.badge.delivered{background:#22c55e;color:white}
-.badge.pending{background:#fef3c7;color:#92400e}
-.badge.lost{background:#fef2f2;color:#dc2626}
 .actions{display:flex;gap:6px;flex-wrap:wrap}
 .action-btn{padding:9px 14px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px;font-family:inherit;min-height:40px;transition:opacity 0.15s}
 .action-btn:hover:not(:disabled){opacity:0.85}
 .action-btn:disabled{opacity:0.5;cursor:wait}
-.sold-btn{background:#22c55e;color:white}
 .edit-btn{background:#00a8e8;color:white}
+.promote-btn{background:#ffb800;color:#0b1e3a;font-weight:800}
+.unpromote-btn{background:#fef3c7;color:#92400e;font-weight:800}
+.sold-btn{background:#22c55e;color:white}
 .delete-btn{background:#fef2f2;color:#dc2626}
 .empty{text-align:center;padding:60px 20px;color:#94a3b8;font-size:14px}
 .empty-icon{font-size:48px;margin-bottom:12px;opacity:0.5}
 .loading{text-align:center;padding:40px;color:#00a8e8;font-weight:600;font-size:14px}
 .error{text-align:center;padding:24px;color:#dc2626;background:#fef2f2;border-radius:10px;font-size:14px}
-.quote-box{background:#dcfce7;padding:10px;border-radius:8px;margin-top:8px;font-size:13px;line-height:1.6}
-.admin-note{font-size:12px;color:#64748b;margin-top:6px;font-style:italic}
-.buyer-msg{font-size:13px;color:#475569;margin-top:4px;font-style:italic}
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#0b1e3a;color:white;padding:14px 24px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform 0.3s,opacity 0.3s;opacity:0;z-index:9999;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
 @media (max-width:768px){
-  .navbar{padding:12px 16px;flex-direction:column;text-align:center}
+  .navbar{padding:12px 16px;flex-direction:column}
   .nav-links{width:100%;justify-content:center}
   .container{margin:16px auto;padding:0 12px}
-  .welcome{padding:16px 18px}
-  .welcome h1{font-size:17px}
   .stats-row{grid-template-columns:repeat(2,1fr);gap:10px}
   .stat-value{font-size:22px}
   .listing-card{padding:12px;gap:12px}
   .listing-img{width:70px;height:70px}
-  .actions{width:100%;justify-content:flex-end;margin-top:8px}
+  .actions{width:100%;margin-top:8px}
   .action-btn{flex:1}
 }
 </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <div class="navbar">
-  <a href="/" class="logo">Salon<span>AutoZone</span> &amp; AutoTrader</a>
+  <a href="/" class="logo">Salon<span>AutoZone</span></a>
   <div class="nav-links">
     <a href="/">🏠 Home</a>
-    <a href="/vin-tool">🔍 VIN</a>
+    <a href="/garage">🚗 My Garage</a>
     <a href="#" class="logout" id="logoutBtn">Logout</a>
   </div>
 </div>
 
-<!-- MAIN CONTAINER -->
 <div class="container">
   <div class="welcome">
-    <div>
-      <h1 id="greeting">Welcome back!</h1>
-      <p id="user-info">Loading…</p>
-    </div>
+    <h1 id="greeting">Welcome back!</h1>
+    <p id="user-info">Loading…</p>
   </div>
 
-  <div class="stats-row" id="stats-row">
+  <div class="stats-row">
     <div class="stat-card"><div class="stat-label">My Cars</div><div class="stat-value" id="stat-cars">—</div></div>
     <div class="stat-card" style="border-left-color:#22c55e"><div class="stat-label">Cars Sold</div><div class="stat-value" id="stat-sold">—</div></div>
     <div class="stat-card" style="border-left-color:#a855f7"><div class="stat-label">My Parts</div><div class="stat-value" id="stat-parts">—</div></div>
-    <div class="stat-card" style="border-left-color:#ff6b00"><div class="stat-label">Inquiries Received</div><div class="stat-value" id="stat-inq-rec">—</div></div>
+    <div class="stat-card" style="border-left-color:#ffb800"><div class="stat-label">Featured</div><div class="stat-value" id="stat-featured">—</div></div>
     <div class="stat-card" style="border-left-color:#f59e0b"><div class="stat-label">Inquiries Sent</div><div class="stat-value" id="stat-inq-sent">—</div></div>
     <div class="stat-card" style="border-left-color:#ef4444"><div class="stat-label">Import Requests</div><div class="stat-value" id="stat-imports">—</div></div>
   </div>
@@ -136,16 +128,16 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
   </div>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script>
 (function () {
   'use strict';
 
-  // ---------- TOKEN & AUTH ----------
   var TOKEN_KEY = 'token';
   var USER_KEY = 'userInfo';
   var token = '';
-
-  try { token = localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { token = ''; }
+  try { token = localStorage.getItem(TOKEN_KEY) || ''; } catch (e) {}
 
   if (!token) {
     window.location.href = '/login?next=/my-account';
@@ -159,14 +151,12 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-
   function safeUrl(url) {
     if (!url) return '';
     var u = String(url).trim();
     if (/^https?:\/\//i.test(u) || /^data:image\//i.test(u) || /^\//.test(u)) return u;
     return '';
   }
-
   function timeAgo(iso) {
     if (!iso) return '';
     var diff = (Date.now() - new Date(iso).getTime()) / 1000;
@@ -176,27 +166,31 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
     if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
     return new Date(iso).toLocaleDateString();
   }
-
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.innerText = msg;
+    t.className = 'toast show ' + (type || '');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () { t.className = 'toast'; }, 3000);
+  }
   function authHeaders() {
     return { 'Authorization': 'Bearer ' + token };
   }
-
   async function apiFetch(url, options) {
     var opts = options || {};
     opts.headers = Object.assign({}, opts.headers || {}, authHeaders());
     var res = await fetch(url, opts);
     if (res.status === 401) {
-      try {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
-      } catch (e) {}
+      try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch (e) {}
       window.location.href = '/login?next=/my-account';
       throw new Error('Unauthorized');
     }
-    if (!res.ok) throw new Error('Request failed: ' + res.status);
+    if (!res.ok) {
+      var err = await res.json().catch(function() { return {}; });
+      throw new Error(err.detail || 'Request failed: ' + res.status);
+    }
     return res.json();
   }
-
   function setBusy(btn, busy) {
     if (!btn) return;
     btn.disabled = busy;
@@ -205,10 +199,7 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
   // ---------- LOGOUT ----------
   document.getElementById('logoutBtn').addEventListener('click', function (e) {
     e.preventDefault();
-    try {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
-    } catch (err) {}
+    try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch (err) {}
     window.location.href = '/';
   });
 
@@ -234,7 +225,7 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
       document.getElementById('stat-cars').textContent = d.total_cars ?? 0;
       document.getElementById('stat-sold').textContent = d.cars_sold ?? 0;
       document.getElementById('stat-parts').textContent = d.total_parts ?? 0;
-      document.getElementById('stat-inq-rec').textContent = d.total_inquiries_received ?? 0;
+      document.getElementById('stat-featured').textContent = (d.featured_parts ?? 0) + (d.featured_cars ?? 0);
       document.getElementById('stat-inq-sent').textContent = d.total_inquiries_sent ?? 0;
       document.getElementById('stat-imports').textContent = d.total_import_requests ?? 0;
     } catch (e) {
@@ -257,14 +248,17 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
         var imgHtml = imgUrl
           ? '<img src="' + esc(imgUrl) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.textContent=\'🚗\';">'
           : '🚗';
+        var featuredBadge = v.is_featured ? ' <span class="badge badge-featured">⭐ FEATURED</span>' : '';
         var soldBadge = v.is_sold ? ' <span class="badge sold">SOLD</span>' : '';
-        var inqBadge = (v.inquiry_count > 0) ? '<span class="badge inquiry">📩 ' + v.inquiry_count + ' inquiries</span>' : '';
-        var soldBtn = v.is_sold ? '' : '<button type="button" class="action-btn sold-btn" data-action="sold" data-id="' + v.id + '">✅ Mark Sold</button>';
-        var editBtn = '<button type="button" class="action-btn edit-btn" data-action="edit-vehicle" data-id="' + v.id + '">✏️ Edit</button>';
-        return '<div class="listing-card" data-href="/vehicle/' + v.id + '">' +
+        var inqBadge = (v.inquiry_count > 0) ? '<span class="badge inquiry">📩 ' + v.inquiry_count + '</span>' : '';
+        var soldBtn = v.is_sold ? '' : '<button type="button" class="action-btn sold-btn" data-action="sold" data-id="' + v.id + '">✅ Sold</button>';
+        var promoteBtn = v.is_featured
+          ? '<button type="button" class="action-btn unpromote-btn" data-action="unpromote-car" data-id="' + v.id + '">⭐ Unfeature</button>'
+          : '<button type="button" class="action-btn promote-btn" data-action="promote-car" data-id="' + v.id + '">⭐ Promote</button>';
+        return '<div class="listing-card' + (v.is_featured ? ' featured' : '') + '">' +
           '<div class="listing-img">' + imgHtml + '</div>' +
           '<div class="listing-info">' +
-            '<div class="listing-title">' + esc(v.title) + soldBadge + '</div>' +
+            '<div class="listing-title">' + esc(v.title) + featuredBadge + soldBadge + '</div>' +
             '<div class="listing-price">SLL ' + Number(v.price_sll || 0).toLocaleString() + '</div>' +
             '<div class="listing-meta">' +
               '<span class="badge">' + esc(v.year) + '</span>' +
@@ -273,13 +267,14 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
               '<span class="badge">' + timeAgo(v.created_at) + '</span>' +
             '</div>' +
           '</div>' +
-          '<div class="actions">' + soldBtn + editBtn +
+          '<div class="actions">' + promoteBtn + soldBtn +
+            '<button type="button" class="action-btn edit-btn" data-action="edit-vehicle" data-id="' + v.id + '">✏️ Edit</button>' +
             '<button type="button" class="action-btn delete-btn" data-action="delete-car" data-id="' + v.id + '">🗑 Delete</button>' +
           '</div>' +
         '</div>';
       }).join('');
     } catch (e) {
-      el.innerHTML = '<div class="error">Failed to load cars. Please try again.</div>';
+      el.innerHTML = '<div class="error">Failed to load cars: ' + esc(e.message) + '</div>';
     }
   }
 
@@ -298,12 +293,15 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
         var imgHtml = imgUrl
           ? '<img src="' + esc(imgUrl) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.textContent=\'🔧\';">'
           : '🔧';
+        var featuredBadge = p.is_featured ? ' <span class="badge badge-featured">⭐ FEATURED</span>' : '';
         var inqBadge = (p.inquiry_count > 0) ? '<span class="badge inquiry">📩 ' + p.inquiry_count + '</span>' : '';
-        var editBtn = '<button type="button" class="action-btn edit-btn" data-action="edit-part" data-id="' + p.id + '">✏️ Edit</button>';
-        return '<div class="listing-card" data-href="/part/' + p.id + '">' +
+        var promoteBtn = p.is_featured
+          ? '<button type="button" class="action-btn unpromote-btn" data-action="unpromote-part" data-id="' + p.id + '">⭐ Unfeature</button>'
+          : '<button type="button" class="action-btn promote-btn" data-action="promote-part" data-id="' + p.id + '">⭐ Promote</button>';
+        return '<div class="listing-card' + (p.is_featured ? ' featured' : '') + '">' +
           '<div class="listing-img">' + imgHtml + '</div>' +
           '<div class="listing-info">' +
-            '<div class="listing-title">' + esc(p.name) + '</div>' +
+            '<div class="listing-title">' + esc(p.name) + featuredBadge + '</div>' +
             '<div class="listing-price">SLL ' + Number(p.price_sll || 0).toLocaleString() + '</div>' +
             '<div class="listing-meta">' +
               '<span class="badge">' + esc(p.category) + '</span>' +
@@ -312,13 +310,14 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
               inqBadge +
             '</div>' +
           '</div>' +
-          '<div class="actions">' + editBtn +
+          '<div class="actions">' + promoteBtn +
+            '<button type="button" class="action-btn edit-btn" data-action="edit-part" data-id="' + p.id + '">✏️ Edit</button>' +
             '<button type="button" class="action-btn delete-btn" data-action="delete-part" data-id="' + p.id + '">🗑 Delete</button>' +
           '</div>' +
         '</div>';
       }).join('');
     } catch (e) {
-      el.innerHTML = '<div class="error">Failed to load parts. Please try again.</div>';
+      el.innerHTML = '<div class="error">Failed to load parts: ' + esc(e.message) + '</div>';
     }
   }
 
@@ -329,28 +328,25 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
     try {
       var data = await apiFetch('/api/my-account/my-inquiries');
       if (!data.count || data.count === 0) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">💬</div>You haven\'t sent any inquiries yet.<br><br><a href="/" style="color:#00a8e8;font-weight:bold;text-decoration:none;">Browse listings →</a></div>';
+        el.innerHTML = '<div class="empty"><div class="empty-icon">💬</div>You haven\'t sent any inquiries yet.</div>';
         return;
       }
       el.innerHTML = data.inquiries.map(function (i) {
-        var link = i.listing_type === 'vehicle' ? '/vehicle/' + i.listing_id : '/part/' + i.listing_id;
-        var icon = i.listing_type === 'vehicle' ? '🚗' : '🔧';
-        var msg = i.buyer_message ? '<div class="buyer-msg">"' + esc(i.buyer_message) + '"</div>' : '';
-        var statusClass = esc(i.status || 'pending');
-        return '<div class="listing-card" data-href="' + link + '">' +
-          '<div class="listing-img">' + icon + '</div>' +
+        var msg = i.buyer_message ? '<div style="font-size:13px;color:#475569;margin-top:4px;font-style:italic;">"' + esc(i.buyer_message) + '"</div>' : '';
+        return '<div class="listing-card">' +
+          '<div class="listing-img">' + (i.listing_type === 'vehicle' ? '🚗' : '🔧') + '</div>' +
           '<div class="listing-info">' +
             '<div class="listing-title">' + esc(i.listing_title || '(listing #' + i.listing_id + ')') + '</div>' +
             msg +
             '<div class="listing-meta">' +
-              '<span class="badge ' + statusClass + '">' + esc(i.status) + '</span>' +
+              '<span class="badge">' + esc(i.status) + '</span>' +
               '<span class="badge">' + timeAgo(i.created_at) + '</span>' +
             '</div>' +
           '</div>' +
         '</div>';
       }).join('');
     } catch (e) {
-      el.innerHTML = '<div class="error">Failed to load inquiries. Please try again.</div>';
+      el.innerHTML = '<div class="error">Failed to load inquiries: ' + esc(e.message) + '</div>';
     }
   }
 
@@ -361,36 +357,29 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
     try {
       var data = await apiFetch('/api/my-account/my-import-requests');
       if (!data.count || data.count === 0) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">🌍</div>You haven\'t requested any imports yet.<br><br><a href="/" style="color:#00a8e8;font-weight:bold;text-decoration:none;">Request a part →</a></div>';
+        el.innerHTML = '<div class="empty"><div class="empty-icon">🌍</div>You haven\'t requested any imports yet.</div>';
         return;
       }
       el.innerHTML = data.requests.map(function (r) {
         var quoteHtml = '';
         if (r.quoted_price_sll) {
-          quoteHtml = '<div class="quote-box"><strong>💰 Quoted Price: SLL ' + Number(r.quoted_price_sll).toLocaleString() + '</strong>' +
-            (r.estimated_days ? '<br>📅 Est. delivery: ' + esc(r.estimated_days) + ' days' : '') +
-            (r.supplier_country ? '<br>🌍 Supplier: ' + esc(r.supplier_country) : '') +
-            '</div>';
+          quoteHtml = '<div style="background:#dcfce7;padding:10px;border-radius:8px;margin-top:8px;font-size:13px;"><strong>💰 Quoted: SLL ' + Number(r.quoted_price_sll).toLocaleString() + '</strong></div>';
         }
-        var urgencyBadge = r.urgency ? '<span class="badge">' + esc(r.urgency) + '</span>' : '';
-        var adminNote = r.admin_notes ? '<div class="admin-note">"' + esc(r.admin_notes) + '"</div>' : '';
-        var statusClass = esc(r.status || 'pending');
-        return '<div class="listing-card" style="cursor:default;">' +
+        return '<div class="listing-card">' +
           '<div class="listing-img">🌍</div>' +
           '<div class="listing-info">' +
             '<div class="listing-title">' + esc(r.part_name) + '</div>' +
             '<div style="font-size:13px;color:#475569;">' + esc(r.car_make) + ' ' + esc(r.car_model) + ' (' + esc(r.car_year) + ')</div>' +
             '<div class="listing-meta">' +
-              '<span class="badge ' + statusClass + '">' + esc(r.status) + '</span>' +
-              urgencyBadge +
+              '<span class="badge">' + esc(r.status) + '</span>' +
               '<span class="badge">' + timeAgo(r.created_at) + '</span>' +
             '</div>' +
-            quoteHtml + adminNote +
+            quoteHtml +
           '</div>' +
         '</div>';
       }).join('');
     } catch (e) {
-      el.innerHTML = '<div class="error">Failed to load import requests. Please try again.</div>';
+      el.innerHTML = '<div class="error">Failed to load imports: ' + esc(e.message) + '</div>';
     }
   }
 
@@ -399,10 +388,11 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
     if (!confirm('Mark this car as sold?')) return;
     setBusy(btn, true);
     try {
-      await apiFetch('/api/vehicles/' + encodeURIComponent(id) + '/sold', { method: 'PUT' });
+      await apiFetch('/api/vehicles/' + encodeURIComponent(id) + '/sold', { method: 'POST' });
+      showToast('✅ Marked as sold', 'success');
       await Promise.all([loadCars(), loadStats()]);
     } catch (e) {
-      alert('Failed to mark as sold');
+      showToast('❌ ' + e.message, 'error');
     } finally {
       setBusy(btn, false);
     }
@@ -414,26 +404,93 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
   }
 
   async function deleteCar(id, btn) {
-    if (!confirm('Delete this car listing permanently? This cannot be undone.')) return;
+    if (!confirm('Delete this car listing permanently?')) return;
     setBusy(btn, true);
     try {
       await apiFetch('/api/my-account/vehicle/' + encodeURIComponent(id), { method: 'DELETE' });
+      showToast('🗑 Car deleted', 'success');
       await Promise.all([loadCars(), loadStats()]);
     } catch (e) {
-      alert('Failed to delete car');
+      showToast('❌ ' + e.message, 'error');
     } finally {
       setBusy(btn, false);
     }
   }
 
   async function deletePart(id, btn) {
-    if (!confirm('Delete this part listing permanently? This cannot be undone.')) return;
+    if (!confirm('Delete this part listing permanently?')) return;
     setBusy(btn, true);
     try {
       await apiFetch('/api/my-account/part/' + encodeURIComponent(id), { method: 'DELETE' });
+      showToast('🗑 Part deleted', 'success');
       await Promise.all([loadParts(), loadStats()]);
     } catch (e) {
-      alert('Failed to delete part');
+      showToast('❌ ' + e.message, 'error');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  // ---------- PROMOTE / UNPROMOTE ----------
+  async function promotePart(id, btn) {
+    var msg = '⭐ Feature this part listing for 7 days?\n\n' +
+              'Price: SLL 150,000\n' +
+              'Pay via Orange Money to: +232 76 123456\n\n' +
+              'After sending payment, click OK. Your listing will be featured immediately and appear at the top of the homepage.';
+    if (!confirm(msg)) return;
+    setBusy(btn, true);
+    try {
+      await apiFetch('/api/parts/' + encodeURIComponent(id) + '/promote?days=7', { method: 'POST' });
+      showToast('⭐ Listing featured for 7 days!', 'success');
+      await Promise.all([loadParts(), loadStats()]);
+    } catch (e) {
+      showToast('❌ ' + e.message, 'error');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  async function unpromotePart(id, btn) {
+    if (!confirm('Remove featured status from this listing?')) return;
+    setBusy(btn, true);
+    try {
+      await apiFetch('/api/parts/' + encodeURIComponent(id) + '/unpromote', { method: 'POST' });
+      showToast('Featured status removed', 'success');
+      await Promise.all([loadParts(), loadStats()]);
+    } catch (e) {
+      showToast('❌ ' + e.message, 'error');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  async function promoteCar(id, btn) {
+    var msg = '⭐ Feature this car listing for 7 days?\n\n' +
+              'Price: SLL 150,000\n' +
+              'Pay via Orange Money to: +232 76 123456\n\n' +
+              'After sending payment, click OK. Your listing will be featured immediately and appear at the top of the homepage.';
+    if (!confirm(msg)) return;
+    setBusy(btn, true);
+    try {
+      await apiFetch('/api/vehicles/' + encodeURIComponent(id) + '/promote?days=7', { method: 'POST' });
+      showToast('⭐ Listing featured for 7 days!', 'success');
+      await Promise.all([loadCars(), loadStats()]);
+    } catch (e) {
+      showToast('❌ ' + e.message, 'error');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  async function unpromoteCar(id, btn) {
+    if (!confirm('Remove featured status from this listing?')) return;
+    setBusy(btn, true);
+    try {
+      await apiFetch('/api/vehicles/' + encodeURIComponent(id) + '/unpromote', { method: 'POST' });
+      showToast('Featured status removed', 'success');
+      await Promise.all([loadCars(), loadStats()]);
+    } catch (e) {
+      showToast('❌ ' + e.message, 'error');
     } finally {
       setBusy(btn, false);
     }
@@ -441,24 +498,21 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
 
   // ---------- EVENT DELEGATION ----------
   document.addEventListener('click', function (e) {
-    var actionBtn = e.target.closest('[data-action]');
-    if (actionBtn) {
-      e.preventDefault();
-      e.stopPropagation();
-      var action = actionBtn.dataset.action;
-      var id = actionBtn.dataset.id;
-      if (action === 'sold') markSold(id, actionBtn);
-      else if (action === 'edit-vehicle') editListing('vehicle', id);
-      else if (action === 'edit-part') editListing('part', id);
-      else if (action === 'delete-car') deleteCar(id, actionBtn);
-      else if (action === 'delete-part') deletePart(id, actionBtn);
-      return;
-    }
-
-    var card = e.target.closest('[data-href]');
-    if (card && !e.target.closest('button')) {
-      window.location.href = card.dataset.href;
-    }
+    var btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var action = btn.dataset.action;
+    var id = btn.dataset.id;
+    if (action === 'sold') markSold(id, btn);
+    else if (action === 'edit-vehicle') editListing('vehicle', id);
+    else if (action === 'edit-part') editListing('part', id);
+    else if (action === 'delete-car') deleteCar(id, btn);
+    else if (action === 'delete-part') deletePart(id, btn);
+    else if (action === 'promote-part') promotePart(id, btn);
+    else if (action === 'unpromote-part') unpromotePart(id, btn);
+    else if (action === 'promote-car') promoteCar(id, btn);
+    else if (action === 'unpromote-car') unpromoteCar(id, btn);
   });
 
   // ---------- TABS ----------
@@ -469,24 +523,16 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
     inquiries: document.getElementById('section-inquiries'),
     imports: document.getElementById('section-imports')
   };
-
   function switchTab(tabName) {
-    tabs.forEach(function (t) {
-      t.classList.toggle('active', t.dataset.tab === tabName);
-    });
-    Object.keys(sections).forEach(function (key) {
-      sections[key].classList.toggle('active', key === tabName);
-    });
+    tabs.forEach(function (t) { t.classList.toggle('active', t.dataset.tab === tabName); });
+    Object.keys(sections).forEach(function (key) { sections[key].classList.toggle('active', key === tabName); });
     if (tabName === 'cars') loadCars();
     else if (tabName === 'parts') loadParts();
     else if (tabName === 'inquiries') loadInquiries();
     else if (tabName === 'imports') loadImports();
   }
-
   tabs.forEach(function (t) {
-    t.addEventListener('click', function () {
-      switchTab(t.dataset.tab);
-    });
+    t.addEventListener('click', function () { switchTab(t.dataset.tab); });
   });
 
   // ---------- INIT ----------
@@ -497,4 +543,3 @@ body{font-family:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;background
 </script>
 </body>
 </html>
-<!-- END OF FILE -->
