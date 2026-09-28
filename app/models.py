@@ -180,7 +180,10 @@ class Inquiry(Base):
         Index("idx_inquiry_created_at", "created_at"),
         Index("idx_inquiry_seller_created", "seller_id", "created_at"),
         Index("idx_inquiry_listing", "listing_type", "listing_id"),
-    )class Garage(Base):
+    )
+
+
+class Garage(Base):
     __tablename__ = "garages"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
@@ -196,5 +199,4 @@ class Inquiry(Base):
     __table_args__ = (
         Index("idx_garage_user", "user_id"),
         Index("idx_garage_user_primary", "user_id", "is_primary"),
-    
-   )
+    )
