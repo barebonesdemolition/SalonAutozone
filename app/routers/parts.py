@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import func
 from typing import List, Optional
+from datetime import datetime, timedelta
 
 from app.db import get_db
 from app import models, schemas
@@ -26,7 +27,7 @@ async def create_part_listing(
 
 
 # ============================================================
-# SEARCH (paginated)
+# SEARCH (paginated, featured first)
 # ============================================================
 @router.get("/", response_model=List[schemas.PartResponse])
 async def search_parts(
@@ -64,7 +65,10 @@ async def search_parts(
     offset = (page - 1) * limit
     query = (
         query
-        .order_by(models.PartListing.created_at.desc())
+        .order_by(
+            models.PartListing.is_featured.desc(),
+            models.PartListing.created_at.desc(),
+        )
         .limit(limit)
         .offset(offset)
     )
@@ -162,3 +166,60 @@ async def delete_part(
     await db.delete(part)
     await db.commit()
     return {"message": "Part deleted"}
+
+
+# ============================================================
+# PROMOTE (FEATURE) A PART LISTING
+# ============================================================
+@router.post("/{part_id}/promote")
+async def promote_part(
+    part_id: int,
+    days: int = 7,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Feature a part listing for N days.
+    In production, gate this behind payment verification.
+    """
+    result = await db.execute(
+        select(models.PartListing).where(models.PartListing.id == part_id)
+    )
+    part = result.scalars().first()
+    if not part:
+        raise HTTPException(status_code=404, detail="Part not found")
+
+    now = datetime.utcnow()
+    base = part.featured_until if (part.featured_until and part.featured_until > now) else now
+    part.featured_until = base + timedelta(days=days)
+    part.is_featured = True
+
+    await db.commit()
+    await db.refresh(part)
+    return {
+        "success": True,
+        "part_id": part.id,
+        "is_featured": part.is_featured,
+        "featured_until": part.featured_until.isoformat(),
+    }
+
+
+# ============================================================
+# UNPROMOTE
+# ============================================================
+@router.post("/{part_id}/unpromote")
+async def unpromote_part(
+    part_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Remove featured status from a listing."""
+    result = await db.execute(
+        select(models.PartListing).where(models.PartListing.id == part_id)
+    )
+    part = result.scalars().first()
+    if not part:
+        raise HTTPException(status_code=404, detail="Part not found")
+
+    part.is_featured = False
+    part.featured_until = None
+    await db.commit()
+    return {"success": True}
