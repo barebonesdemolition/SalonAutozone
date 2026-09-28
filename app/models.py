@@ -18,7 +18,7 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     roles = Column(String, default="buyer")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    garage_cars = relationship("Garage", back_populates="owner", cascade="all, delete-orphan")
 
 
 class VehicleListing(Base):
