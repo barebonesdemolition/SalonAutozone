@@ -12,14 +12,28 @@ from app.routers import (
 )
 from app.db import engine, Base
 from app.config import get_settings
-
-settings = get_settings()
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+        # ---------- One-time column migrations ----------
+        from sqlalchemy import text as _text
+        _migrations = [
+            "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0",
+            "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0",
+            "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP NULL",
+            "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP NULL",
+        ]
+        for _sql in _migrations:
+            try:
+                await conn.execute(_text(_sql))
+            except Exception as _e:
+                print(f"[migration-skip] {_sql[:60]}... ({_e})")
+
+        print("[lifespan] Column migrations applied")
 
         # ---------- Auto-create performance indexes ----------
         from sqlalchemy import text
@@ -60,7 +74,7 @@ async def lifespan(app: FastAPI):
             "CREATE INDEX IF NOT EXISTS idx_order_buyer_created ON orders (buyer_id, created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_order_status ON orders (status)",
 
-                   # Users
+            # Users
             "CREATE INDEX IF NOT EXISTS idx_user_email ON users (email)",
             "CREATE INDEX IF NOT EXISTS idx_user_phone ON users (phone)",
 
@@ -71,6 +85,20 @@ async def lifespan(app: FastAPI):
 
         created = 0
         for sql in _indexes:
+            try:
+                await conn.execute(text(sql))
+                created += 1
+            except Exception as e:
+                print(f"[index-skip] {sql[:70]}... ({e})")
+
+        print(f"[lifespan] Indexes ensured: {created}/{len(_indexes)}")
+
+    yield
+    await engine.dispose()
+settings = get_settings()
+
+
+for sql in _indexes:
             try:
                 await conn.execute(text(sql))
                 created += 1
