@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 from app.routers import (
     auth, parts, listings, orders, vin, upload, ai_chat, search, imports,
     catalog, unified_search, inquiries, admin, identify, nhtsa, my_account,
-    vehicles
+    vehicles, garage
 )
 from app.db import engine, Base
 from app.config import get_settings
@@ -21,16 +21,16 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-        # ---------- One-time column migrations ----------
-        from sqlalchemy import text as _text
+        from sqlalchemy import text
 
+        # ---------- One-time migrations ----------
         _migrations = [
             "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0",
             "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0",
             "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE",
             "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP NULL",
             "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE",
-                       "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP NULL",
+            "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP NULL",
             """CREATE TABLE IF NOT EXISTS garages (
                 id SERIAL PRIMARY KEY,
                 user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -42,20 +42,16 @@ async def lifespan(app: FastAPI):
                 created_at TIMESTAMP DEFAULT NOW()
             )""",
         ]
-        ]
         for _sql in _migrations:
             try:
-                await conn.execute(_text(_sql))
+                await conn.execute(text(_sql))
             except Exception as _e:
                 print(f"[migration-skip] {_sql[:60]}... ({_e})")
 
         print("[lifespan] Column migrations applied")
 
-        # ---------- Auto-create performance indexes ----------
-        from sqlalchemy import text
-
+        # ---------- Indexes ----------
         _indexes = [
-            # Vehicle listings
             "CREATE INDEX IF NOT EXISTS idx_vehicle_created_at ON vehicle_listings (created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_vehicle_make_model ON vehicle_listings (make, model)",
             "CREATE INDEX IF NOT EXISTS idx_vehicle_location_created ON vehicle_listings (location, created_at DESC)",
@@ -63,7 +59,6 @@ async def lifespan(app: FastAPI):
             "CREATE INDEX IF NOT EXISTS idx_vehicle_sold_created ON vehicle_listings (is_sold, created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_vehicle_featured ON vehicle_listings (is_featured, created_at DESC)",
 
-            # Part listings
             "CREATE INDEX IF NOT EXISTS idx_part_created_at ON part_listings (created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_part_category_created ON part_listings (category, created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_part_make_model ON part_listings (compatible_make, compatible_model)",
@@ -72,32 +67,29 @@ async def lifespan(app: FastAPI):
             "CREATE INDEX IF NOT EXISTS idx_part_condition ON part_listings (condition)",
             "CREATE INDEX IF NOT EXISTS idx_part_featured ON part_listings (is_featured, created_at DESC)",
 
-            # Import requests
             "CREATE INDEX IF NOT EXISTS idx_import_created_at ON import_requests (created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_import_status_created ON import_requests (status, created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_import_phone ON import_requests (customer_phone)",
 
-            # Supplier catalog
             "CREATE INDEX IF NOT EXISTS idx_catalog_created_at ON supplier_catalog (created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_catalog_category_created ON supplier_catalog (category, created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_catalog_part_number ON supplier_catalog (part_number)",
 
-            # Inquiries
             "CREATE INDEX IF NOT EXISTS idx_inquiry_created_at ON inquiries (created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_inquiry_seller_created ON inquiries (seller_id, created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_inquiry_listing ON inquiries (listing_type, listing_id)",
             "CREATE INDEX IF NOT EXISTS idx_inquiry_status ON inquiries (status)",
 
-            # Orders
             "CREATE INDEX IF NOT EXISTS idx_order_created_at ON orders (created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_order_buyer_created ON orders (buyer_id, created_at DESC)",
             "CREATE INDEX IF NOT EXISTS idx_order_status ON orders (status)",
 
-            # Users
             "CREATE INDEX IF NOT EXISTS idx_user_email ON users (email)",
             "CREATE INDEX IF NOT EXISTS idx_user_phone ON users (phone)",
-        ]
 
+            "CREATE INDEX IF NOT EXISTS idx_garage_user ON garages (user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_garage_user_primary ON garages (user_id, is_primary)",
+        ]
         created = 0
         for _sql in _indexes:
             try:
@@ -144,6 +136,7 @@ app.include_router(identify.router)
 app.include_router(nhtsa.router)
 app.include_router(my_account.router)
 app.include_router(vehicles.router)
+app.include_router(garage.router)
 
 
 # ==================== FRONTEND PAGES ====================
@@ -184,6 +177,15 @@ async def my_account_page(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="my_account.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
+
+@app.get("/garage", response_class=HTMLResponse)
+async def garage_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="garage.html",
         context={"app_name": settings.APP_NAME},
     )
 
@@ -245,10 +247,8 @@ async def catalog_detail_page(request: Request, part_id: int):
 # ==================== MIGRATION ENDPOINT ====================
 @app.get("/admin/run-migration-xyz")
 async def run_migration():
-    """One-time migration endpoint to add missing columns. Delete after use."""
     from sqlalchemy import text
 
-    results = []
     migrations = [
         ("vehicle_listings.views",
          "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0"),
@@ -262,8 +262,20 @@ async def run_migration():
          "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE"),
         ("part_listings.featured_until",
          "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP NULL"),
+        ("garages",
+         """CREATE TABLE IF NOT EXISTS garages (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            make VARCHAR NOT NULL,
+            model VARCHAR NOT NULL,
+            year INTEGER NOT NULL,
+            nickname VARCHAR,
+            is_primary BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT NOW()
+         )"""),
     ]
 
+    results = []
     try:
         async with engine.begin() as conn:
             for label, sql in migrations:
