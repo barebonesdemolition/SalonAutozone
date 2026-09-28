@@ -30,7 +30,18 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE",
             "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP NULL",
             "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP NULL",
+                       "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP NULL",
+            """CREATE TABLE IF NOT EXISTS garages (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                make VARCHAR NOT NULL,
+                model VARCHAR NOT NULL,
+                year INTEGER NOT NULL,
+                nickname VARCHAR,
+                is_primary BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT NOW()
+            )""",
+        ]
         ]
         for _sql in _migrations:
             try:
