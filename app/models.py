@@ -18,8 +18,11 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     roles = Column(String, default="buyer")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
     garage_cars = relationship("Garage", back_populates="owner", cascade="all, delete-orphan")
     saved_items = relationship("SavedListing", cascade="all, delete-orphan")
+
 
 class VehicleListing(Base):
     __tablename__ = "vehicle_listings"
@@ -200,8 +203,9 @@ class Garage(Base):
         Index("idx_garage_user", "user_id"),
         Index("idx_garage_user_primary", "user_id", "is_primary"),
     )
-    
-    class SavedListing(Base):
+
+
+class SavedListing(Base):
     __tablename__ = "saved_listings"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
