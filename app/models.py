@@ -19,7 +19,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     roles = Column(String, default="buyer")
     garage_cars = relationship("Garage", back_populates="owner", cascade="all, delete-orphan")
-
+    saved_items = relationship("SavedListing", cascade="all, delete-orphan")
 
 class VehicleListing(Base):
     __tablename__ = "vehicle_listings"
@@ -199,4 +199,21 @@ class Garage(Base):
     __table_args__ = (
         Index("idx_garage_user", "user_id"),
         Index("idx_garage_user_primary", "user_id", "is_primary"),
+    )class SavedListing(Base):
+    __tablename__ = "saved_listings"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    listing_type = Column(String, nullable=False)
+    listing_id = Column(Integer, nullable=False)
+    listing_title = Column(String, nullable=True)
+    listing_price_sll = Column(Float, nullable=True)
+    listing_image_url = Column(String, nullable=True)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    owner = relationship("User")
+
+    __table_args__ = (
+        Index("idx_saved_user", "user_id"),
+        Index("idx_saved_user_listing", "user_id", "listing_type", "listing_id"),
     )
