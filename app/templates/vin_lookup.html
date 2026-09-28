@@ -611,9 +611,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
         if (item.is_featured) localHtml += '<span class="badge badge-featured">⭐ FEATURED</span>';
         localHtml += '<span class="badge badge-new">' + esc(item.condition || 'New') + '</span>';
         if (fits) localHtml += '<span class="badge badge-fits">✅ Fits your car</span>';
-        localHtml += '</div></div>';
+        localHtml += '</div>';
+        localHtml += '<button type="button" class="save-btn" data-save-type="part" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'part\',' + item.id + ',\'' + escAttr(item.name || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
+        localHtml += '</div>';
         localHtml += '<div class="card-body"><div class="card-title">' + esc(item.name) + '</div>';
-        localHtml += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
         localHtml += '<div class="card-meta"><span class="meta-tag">' + esc(item.category) + '</span>';
         localHtml += '<span class="meta-tag">Stock: ' + (item.stock_quantity || 0) + '</span>';
         localHtml += '<span class="meta-tag loc">📍 ' + esc(item.location) + '</span></div></div></div>';
