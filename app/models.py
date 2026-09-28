@@ -196,4 +196,5 @@ class Inquiry(Base):
     __table_args__ = (
         Index("idx_garage_user", "user_id"),
         Index("idx_garage_user_primary", "user_id", "is_primary"),
-    )
+    
+   )
