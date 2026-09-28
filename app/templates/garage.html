@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>My Garage · SalonAutoZone</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a;line-height:1.4}
+
+/* Navbar */
+.navbar{background:#0b1e3a;color:white;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.navbar a{color:white;text-decoration:none;font-size:13px;padding:8px 14px;border-radius:8px;background:rgba(255,255,255,0.08);transition:background 0.15s}
+.navbar a:hover{background:rgba(255,255,255,0.2)}
+.logo{font-size:18px;font-weight:900;color:#00a8e8;text-decoration:none;background:transparent !important}
+.logo span{color:#ffb800}
+
+/* Container */
+.container{max-width:1000px;margin:24px auto;padding:0 16px}
+
+/* Hero */
+.garage-hero{background:linear-gradient(135deg,#0b1e3a,#1a3a6b);color:white;padding:36px 30px;border-radius:16px;margin-bottom:24px;text-align:center}
+.garage-hero h1{font-size:28px;margin-bottom:8px}
+.garage-hero p{opacity:0.85;font-size:14px}
+
+/* Add Car Form */
+.add-card{background:white;border-radius:16px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:24px}
+.add-card h2{color:#0b1e3a;font-size:18px;margin-bottom:16px}
+.form-row{display:grid;grid-template-columns:1.2fr 1.2fr 0.8fr 1.2fr auto;gap:10px;align-items:end}
+@media(max-width:768px){.form-row{grid-template-columns:1fr;gap:8px}}
+.form-field label{display:block;font-size:12px;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.form-field select,.form-field input{width:100%;padding:12px;border:1px solid #e0e6ed;border-radius:10px;font-size:15px;font-family:inherit;background:white}
+.form-field select:focus,.form-field input:focus{outline:none;border-color:#00a8e8;box-shadow:0 0 0 3px rgba(0,168,232,0.15)}
+.btn-primary{background:#ff6b00;color:white;border:none;padding:13px 24px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:15px;font-family:inherit;min-height:48px;white-space:nowrap}
+.btn-primary:hover{background:#e55a00}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed}
+@media(max-width:768px){.btn-primary{width:100%}}
+
+/* Garage car cards */
+.cars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+@media(max-width:500px){.cars-grid{grid-template-columns:1fr}}
+.car-card{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.06);position:relative;border-left:4px solid #00a8e8;transition:transform 0.15s}
+.car-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.1)}
+.car-card.primary{border-left-color:#22c55e;background:linear-gradient(135deg,#ffffff,#f0fdf4)}
+.car-card .primary-badge{position:absolute;top:12px;right:12px;background:#22c55e;color:white;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:0.5px}
+.car-icon{font-size:32px;margin-bottom:8px}
+.car-title{font-size:18px;font-weight:800;color:#0b1e3a;margin-bottom:4px}
+.car-nickname{font-size:13px;color:#64748b;font-style:italic;margin-bottom:10px}
+.car-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.car-meta .tag{background:#f0f4f8;color:#475569;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.car-actions{display:flex;gap:6px;flex-wrap:wrap}
+.car-actions button{flex:1;min-width:100px;padding:9px 12px;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;font-family:inherit;min-height:40px}
+.btn-use{background:#00a8e8;color:white}
+.btn-use:hover{background:#0077b6}
+.btn-remove{background:#fef2f2;color:#dc2626}
+.btn-remove:hover{background:#fee2e2}
+.btn-primary-action{background:#22c55e;color:white}
+.btn-primary-action:hover{background:#16a34a}
+.btn-primary-action:disabled{background:#cbd5e0;cursor:not-allowed}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 24px;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06)}
+.empty-icon{font-size:64px;margin-bottom:16px;opacity:0.5}
+.empty-state h3{font-size:20px;color:#0b1e3a;margin-bottom:8px}
+.empty-state p{color:#64748b;font-size:14px;margin-bottom:20px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#0b1e3a;color:white;padding:14px 24px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform 0.3s,opacity 0.3s;opacity:0;z-index:9999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+  <a href="/" class="logo">Salon<span>AutoZone</span></a>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <a href="/">🏠 Home</a>
+    <a href="/my-account">👤 My Account</a>
+    <a href="/garage">🚗 My Garage</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="garage-hero">
+    <h1>🚗 My Garage</h1>
+    <p>Save your vehicles to get exact-fit parts and personalized recommendations</p>
+  </div>
+
+  <!-- Add Car Form -->
+  <div class="add-card">
+    <h2>➕ Add a Vehicle</h2>
+    <form id="add-car-form">
+      <div class="form-row">
+        <div class="form-field">
+          <label>Make</label>
+          <select id="garage-make" required>
+            <option value="">Select Make</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Model</label>
+          <select id="garage-model" required>
+            <option value="">Select Make First</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Year</label>
+          <select id="garage-year" required>
+            <option value="">Select Year</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Nickname (optional)</label>
+          <input type="text" id="garage-nickname" placeholder="e.g. Daily Driver" maxlength="40">
+        </div>
+        <button type="submit" class="btn-primary" id="add-car-btn">Add Car</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Cars list -->
+  <div id="garage-content">
+    <div class="empty-state">
+      <div class="empty-icon">⏳</div>
+      <h3>Loading your cars…</h3>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ============ CONSTANTS ============
+  var MAKES = ["Toyota","Nissan","Honda","Mitsubishi","Mazda","Suzuki","Subaru","Isuzu","Daihatsu","Lexus","Hyundai","Kia","Genesis","Mercedes-Benz","BMW","Volkswagen","Audi","Porsche","Ford","Chevrolet","Jeep","Peugeot","Renault","Citroen","Land Rover","Jaguar","Volvo","Chery","Geely","Great Wall","BYD","MG","Other"];
+  var MODELS = {
+    "Toyota":["Corolla","Camry","Hilux","RAV4","Land Cruiser","Prado","Vitz","Yaris","Avensis","Prius","Highlander","Fortuner","Hiace"],
+    "Nissan":["X-Trail","Altima","Sunny","Patrol","Navara","Qashqai","Juke","Note","Murano","Sentra"],
+    "Honda":["Civic","Accord","CR-V","Fit","Jazz","City","Pilot","HR-V"],
+    "Mitsubishi":["Pajero","Lancer","Outlander","L200","ASX"],
+    "Mazda":["CX-5","CX-9","Mazda3","Mazda6","BT-50"],
+    "Suzuki":["Swift","Vitara","Jimny","SX4","Alto"],
+    "Subaru":["Forester","Outback","Impreza","Legacy"],
+    "Isuzu":["D-Max","MU-X","Trooper"],
+    "Daihatsu":["Terios","Sirion","Cuore"],
+    "Lexus":["RX","NX","ES","IS","GX","LX"],
+    "Hyundai":["Tucson","Santa Fe","Elantra","Sonata","i10","i20","Accent","Creta","Kona"],
+    "Kia":["Sportage","Sorento","Rio","Cerato","Soul","Seltos","Picanto"],
+    "Genesis":["G70","G80","G90"],
+    "Mercedes-Benz":["C-Class","E-Class","S-Class","GLC","GLE","GLS","A-Class","ML","G-Class","Sprinter"],
+    "BMW":["3 Series","5 Series","7 Series","X1","X3","X5","X6","X7"],
+    "Volkswagen":["Golf","Passat","Tiguan","Polo","Jetta","Touareg"],
+    "Audi":["A3","A4","A6","Q3","Q5","Q7"],
+    "Porsche":["911","Cayenne","Macan","Panamera"],
+    "Ford":["Focus","Fiesta","F-150","Ranger","Explorer","Escape","Mustang"],
+    "Chevrolet":["Silverado","Cruze","Malibu","Equinox","Tahoe","Spark"],
+    "Jeep":["Wrangler","Grand Cherokee","Cherokee","Compass"],
+    "Peugeot":["208","308","3008","5008","Partner"],
+    "Renault":["Clio","Megane","Duster","Captur","Logan"],
+    "Citroen":["C3","C4","C5","Berlingo"],
+    "Land Rover":["Defender","Discovery","Range Rover","Range Rover Sport","Evoque"],
+    "Jaguar":["XE","XF","XJ","F-Pace","E-Pace"],
+    "Volvo":["XC40","XC60","XC90","S60","S90"],
+    "Chery":["Tiggo 4","Tiggo 7","Tiggo 8","Arrizo 5"],
+    "Geely":["Coolray","Azkarra","Tugella","Emgrand"],
+    "Great Wall":["Wingle","Poer","Haval H6","Haval Jolion"],
+    "BYD":["Atto 3","Han","Tang","Song","Seal"],
+    "MG":["ZS","HS","MG5","MG6"],
+    "Other":["Other"]
+  };
+  var YEARS = (function () { var a = []; for (var y = 2026; y >= 1980; y--) a.push(y); return a; })();
+
+  // ============ HELPERS ============
+  function esc(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function getToken() {
+    try { return localStorage.getItem('token') || ''; } catch (e) { return ''; }
+  }
+
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.innerText = msg;
+    t.className = 'toast show ' + (type || '');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () { t.className = 'toast'; }, 2600);
+  }
+
+  async function apiFetch(url, options) {
+    var opts = options || {};
+    opts.headers = Object.assign({}, opts.headers || {}, {
+      'Authorization': 'Bearer ' + getToken()
+    });
+    var res = await fetch(url, opts);
+    if (res.status === 401) {
+      window.location.href = '/login?next=/garage';
+      throw new Error('Unauthorized');
+    }
+    if (!res.ok) {
+      var err = await res.json().catch(function() { return {}; });
+      throw new Error(err.detail || 'Request failed: ' + res.status);
+    }
+    return res.json();
+  }
+
+  // ============ INIT SELECTS ============
+  function initSelects() {
+    var makeSel = document.getElementById('garage-make');
+    var modelSel = document.getElementById('garage-model');
+    var yearSel = document.getElementById('garage-year');
+
+    var mHtml = '<option value="">Select Make</option>';
+    MAKES.forEach(function (m) { mHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
+    makeSel.innerHTML = mHtml;
+
+    var yHtml = '<option value="">Select Year</option>';
+    YEARS.forEach(function (y) { yHtml += '<option value="' + y + '">' + y + '</option>'; });
+    yearSel.innerHTML = yHtml;
+
+    makeSel.addEventListener('change', function () {
+      var make = this.value;
+      if (!make) { modelSel.innerHTML = '<option value="">Select Make First</option>'; return; }
+      var models = MODELS[make] || ['Other'];
+      var html = '<option value="">Select Model</option>';
+      models.forEach(function (m) { html += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
+      modelSel.innerHTML = html;
+    });
+  }
+
+  // ============ RENDER CARS ============
+  function renderCars(cars) {
+    var el = document.getElementById('garage-content');
+    if (!cars || cars.length === 0) {
+      el.innerHTML = '<div class="empty-state">' +
+        '<div class="empty-icon">🚗</div>' +
+        '<h3>Your garage is empty</h3>' +
+        '<p>Add your first vehicle above to start finding exact-fit parts.</p>' +
+        '</div>';
+      return;
+    }
+    var html = '<div class="cars-grid">';
+    cars.forEach(function (c) {
+      html += '<div class="car-card' + (c.is_primary ? ' primary' : '') + '">';
+      if (c.is_primary) html += '<span class="primary-badge">PRIMARY</span>';
+      html += '<div class="car-icon">🚗</div>';
+      html += '<div class="car-title">' + esc(c.year + ' ' + c.make + ' ' + c.model) + '</div>';
+      if (c.nickname) html += '<div class="car-nickname">"' + esc(c.nickname) + '"</div>';
+      html += '<div class="car-meta">';
+      html += '<span class="tag">' + esc(c.make) + '</span>';
+      html += '<span class="tag">' + esc(c.model) + '</span>';
+      html += '<span class="tag">' + c.year + '</span>';
+      html += '</div>';
+      html += '<div class="car-actions">';
+      if (!c.is_primary) {
+        html += '<button class="btn-primary-action" data-action="set-primary" data-id="' + c.id + '">⭐ Set as Primary</button>';
+      }
+      html += '<button class="btn-remove" data-action="delete" data-id="' + c.id + '">🗑 Remove</button>';
+      html += '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  // ============ LOAD CARS ============
+  async function loadCars() {
+    try {
+      var cars = await apiFetch('/api/garage/');
+      renderCars(cars);
+      // Sync primary car to fitment localStorage so the homepage uses it
+      var primary = cars.find(function (c) { return c.is_primary; });
+      if (primary) {
+        try {
+          localStorage.setItem('fitmentVehicle', JSON.stringify({
+            make: primary.make,
+            model: primary.model,
+            year: primary.year
+          }));
+        } catch (e) {}
+      }
+    } catch (err) {
+      document.getElementById('garage-content').innerHTML =
+        '<div class="empty-state"><div class="empty-icon">⚠️</div>' +
+        '<h3>Could not load your garage</h3>' +
+        '<p>' + esc(err.message) + '</p>' +
+        '<button class="btn-primary" onclick="location.reload()">Retry</button>' +
+        '</div>';
+    }
+  }
+
+  // ============ ADD CAR ============
+  document.getElementById('add-car-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('add-car-btn');
+    var make = document.getElementById('garage-make').value;
+    var model = document.getElementById('garage-model').value;
+    var year = parseInt(document.getElementById('garage-year').value, 10);
+    var nickname = document.getElementById('garage-nickname').value.trim();
+
+    if (!make || !model || !year) {
+      showToast('Please select make, model, and year', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = 'Adding…';
+
+    try {
+      await apiFetch('/api/garage/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          make: make,
+          model: model,
+          year: year,
+          nickname: nickname || null,
+          is_primary: false
+        })
+      });
+      document.getElementById('add-car-form').reset();
+      document.getElementById('garage-model').innerHTML = '<option value="">Select Make First</option>';
+      showToast('✅ Car added to your garage', 'success');
+      await loadCars();
+    } catch (err) {
+      showToast('❌ ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerText = 'Add Car';
+    }
+  });
+
+  // ============ DELEGATED ACTIONS ============
+  document.addEventListener('click', async function (e) {
+    var btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    e.preventDefault();
+    var action = btn.dataset.action;
+    var id = btn.dataset.id;
+
+    if (action === 'delete') {
+      if (!confirm('Remove this car from your garage?')) return;
+      btn.disabled = true;
+      try {
+        await apiFetch('/api/garage/' + encodeURIComponent(id), { method: 'DELETE' });
+        showToast('🗑 Car removed', 'success');
+        await loadCars();
+      } catch (err) {
+        showToast('❌ ' + err.message, 'error');
+        btn.disabled = false;
+      }
+    } else if (action === 'set-primary') {
+      btn.disabled = true;
+      try {
+        await apiFetch('/api/garage/' + encodeURIComponent(id) + '/primary', { method: 'PUT' });
+        showToast('⭐ Primary car updated', 'success');
+        await loadCars();
+      } catch (err) {
+        showToast('❌ ' + err.message, 'error');
+        btn.disabled = false;
+      }
+    }
+  });
+
+  // ============ INIT ============
+  if (!getToken()) {
+    window.location.href = '/login?next=/garage';
+  } else {
+    initSelects();
+    loadCars();
+  }
+
+})();
+</script>
+</body>
+</html>
