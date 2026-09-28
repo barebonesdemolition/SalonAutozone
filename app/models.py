@@ -180,4 +180,20 @@ class Inquiry(Base):
         Index("idx_inquiry_created_at", "created_at"),
         Index("idx_inquiry_seller_created", "seller_id", "created_at"),
         Index("idx_inquiry_listing", "listing_type", "listing_id"),
+    )class Garage(Base):
+    __tablename__ = "garages"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    make = Column(String, nullable=False, index=True)
+    model = Column(String, nullable=False)
+    year = Column(Integer, nullable=False)
+    nickname = Column(String, nullable=True)
+    is_primary = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    owner = relationship("User", back_populates="garage_cars")
+
+    __table_args__ = (
+        Index("idx_garage_user", "user_id"),
+        Index("idx_garage_user_primary", "user_id", "is_primary"),
     )
