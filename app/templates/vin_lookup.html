@@ -214,19 +214,35 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
   <div class="search-container">
     <div class="search-row">
       <select id="search-category">
+              <select id="search-category">
         <option value="">All Categories</option>
-        <option value="Brakes">Brakes</option>
-        <option value="Engine">Engine</option>
-        <option value="Suspension">Suspension</option>
-        <option value="Electrical">Electrical</option>
-        <option value="Tires &amp; Wheels">Tires &amp; Wheels</option>
-        <option value="Transmission">Transmission</option>
-        <option value="Body">Body</option>
-        <option value="Interior">Interior</option>
-        <option value="Exhaust">Exhaust</option>
-        <option value="Lighting">Lighting</option>
-        <option value="Audio">Audio</option>
-        <option value="Accessories">Accessories</option>
+        <optgroup label="Fluids &amp; Oils">
+          <option value="Fluids">All Fluids &amp; Oils</option>
+          <option value="Engine Oil">Engine Oil</option>
+          <option value="Transmission Fluid">Transmission Fluid</option>
+          <option value="Power Steering Fluid">Power Steering Fluid</option>
+          <option value="Brake Fluid">Brake Fluid</option>
+          <option value="Coolant / Antifreeze">Coolant / Antifreeze</option>
+          <option value="Differential Oil">Differential Oil</option>
+          <option value="Windshield Washer">Windshield Washer Fluid</option>
+          <option value="Grease">Grease</option>
+        </optgroup>
+        <optgroup label="Parts">
+          <option value="Filters">Filters</option>
+          <option value="Batteries">Batteries</option>
+          <option value="Brakes">Brakes</option>
+          <option value="Engine">Engine</option>
+          <option value="Suspension">Suspension</option>
+          <option value="Electrical">Electrical</option>
+          <option value="Tires &amp; Wheels">Tires &amp; Wheels</option>
+          <option value="Transmission">Transmission</option>
+          <option value="Body">Body</option>
+          <option value="Interior">Interior</option>
+          <option value="Exhaust">Exhaust</option>
+          <option value="Lighting">Lighting</option>
+          <option value="Audio">Audio</option>
+          <option value="Accessories">Accessories</option>
+        </optgroup>
       </select>
       <select id="search-make" onchange="updateSearchModels()"><option value="">Any Make</option></select>
       <select id="search-model"><option value="">Any Model</option></select>
