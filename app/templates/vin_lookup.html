@@ -1,1347 +1,798 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>SalonAutoZone - Sierra Leone Auto Marketplace</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
-.top-bar{background:#0a1628;color:#ccc;padding:8px 30px;font-size:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.top-bar a{color:#ccc;text-decoration:none}
-.top-bar .phone{color:#ffb800;font-weight:bold}
-.brand-bar{background:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);flex-wrap:wrap;gap:15px}
-.brand-logo{font-size:22px;font-weight:900;color:#0b1e3a}
-.brand-logo span{color:#00a8e8}
-.brand-logo .y{color:#ffb800}
-.brand-toggle{display:flex;background:#f0f4f8;border-radius:12px;padding:5px;gap:5px}
-.brand-toggle button{background:transparent;border:none;padding:12px 24px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;color:#666;font-family:inherit}
-.brand-toggle button.active{background:#ff6b00;color:white}
-.brand-toggle button.active.cars{background:#00a8e8}
-.brand-actions{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
-.brand-actions a{color:#0b1e3a;text-decoration:none;font-size:14px;font-weight:600}
-.fitment-bar{background:linear-gradient(90deg,#0b1e3a,#1a3a6b);color:white;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.fitment-left{display:flex;align-items:center;gap:14px}
-.fitment-icon{background:#ff6b00;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
-.fitment-label{font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:1px}
-.fitment-value{font-size:15px;font-weight:bold}
-.fitment-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.fitment-controls select{padding:8px 12px;border-radius:6px;border:none;font-size:13px;background:rgba(255,255,255,0.15);color:white;font-family:inherit}
-.fitment-controls select option{color:#333}
-.fitment-filter-label{display:none;align-items:center;gap:6px;color:white;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;padding:0 4px}
-.btn-save{background:#00a8e8;color:white;border:none;padding:8px 18px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;font-family:inherit}
-.btn-clear{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:8px 18px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;display:none;font-family:inherit}
-.hero{background:linear-gradient(135deg,#0b1e3a,#1a3a6b);color:white;padding:50px 30px 90px;text-align:center;position:relative;z-index:1}
-.hero-badge{display:inline-block;background:#22c55e;color:white;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:bold;margin-bottom:18px;letter-spacing:1px}
-.hero h1{font-size:40px;margin-bottom:12px;line-height:1.15}
-.hero p{font-size:15px;opacity:0.85;margin-bottom:28px}
-.search-container{max-width:1100px;margin:0 auto;background:white;padding:14px;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,0.25)}
-.search-row{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr auto;gap:8px}
-.search-row select,.search-row input{padding:12px;border:1px solid #e0e6ed;border-radius:10px;font-size:14px;background:white;width:100%;font-family:inherit}
-.search-row button{background:#ff6b00;color:white;border:none;padding:12px 24px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;font-family:inherit;white-space:nowrap}
-.search-text-row{position:relative;margin-top:8px}
-.search-text-row input{width:100%;padding:12px 14px;border:1px solid #e0e6ed;border-radius:10px;font-size:14px;font-family:inherit}
-.suggestions-box{position:absolute;top:100%;left:0;right:0;background:white;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.15);z-index:1000;margin-top:6px;max-height:400px;overflow-y:auto;display:none}
-.suggestion-item{padding:12px 16px;cursor:pointer;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:12px}
-.suggestion-item:hover{background:#f0f9ff}
-.identify-cta-wrap{max-width:800px;margin:14px auto 24px;padding:0 12px;background:transparent;position:relative;z-index:5}
-.identify-cta{width:100%;background:linear-gradient(135deg,#00a8e8,#0077b6);color:white;border:none;padding:14px 20px;border-radius:12px;font-weight:bold;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 20px rgba(0,168,232,0.35);min-height:52px;font-family:inherit}
-.categories{max-width:1200px;margin:-20px auto 40px;padding:0 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:12px;position:relative;z-index:20}
-.category{background:white;border-radius:14px;padding:22px 12px;text-align:center;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:all 0.2s;position:relative;z-index:21}
-.category:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,168,232,0.2)}
-.category-icon{font-size:32px;margin-bottom:6px}
-.category-label{font-size:13px;font-weight:600;color:#0b1e3a}
-.cat-icon{width:32px;height:32px;margin-bottom:6px;color:#00a8e8;stroke-width:2}
-.results-section{max-width:1300px;margin:30px auto 60px;padding:0 20px}
-.results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-.results-title{font-size:24px;color:#0b1e3a;font-weight:700}
-.results-count{background:#e0f2fe;color:#00a8e8;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
-.card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);transition:all 0.25s;cursor:pointer}
-.card:hover{transform:translateY(-5px);box-shadow:0 12px 30px rgba(0,0,0,0.15)}
-.card-img{height:180px;background:#e0e6ed;display:flex;align-items:center;justify-content:center;font-size:60px;color:#94a3b8;background-size:cover;background-position:center;position:relative}
-.card-badges{position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap}
-.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;color:white}
-.badge-verified{background:#22c55e}
-.badge-new{background:#00a8e8}
-.badge-fits{background:#22c55e;color:white;font-weight:800}
-.badge-featured{background:#ffb800;color:#0b1e3a;font-weight:900}
-.card-body{padding:16px}
-.card-title{font-size:16px;font-weight:700;margin-bottom:8px;color:#0b1e3a;line-height:1.3}
-.card-price{color:#00a8e8;font-size:22px;font-weight:800;margin-bottom:4px}
-.card-price-usd{color:#94a3b8;font-size:13px;margin-bottom:10px}
-.card-meta{display:flex;gap:6px;flex-wrap:wrap}
-.meta-tag{background:#f0f4f8;color:#475569;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
+/* ============================================================
+   DESIGN SYSTEM
+   ============================================================ */
+:root{
+  /* Colors */
+  --navy-900:#0a1729;
+  --navy-800:#0b1e3a;
+  --navy-700:#12294d;
+  --navy-600:#1a3a6b;
+  --blue-500:#0091d5;
+  --blue-400:#00a8e8;
+  --blue-300:#4dc3f0;
+  --amber-500:#ffb800;
+  --amber-600:#f59e0b;
+  --orange-500:#ff6b00;
+  --orange-600:#e55a00;
+  --green-500:#16a34a;
+  --green-400:#22c55e;
+  --red-500:#dc2626;
+  --red-400:#ef4444;
+  --slate-50:#f8fafc;
+  --slate-100:#f1f5f9;
+  --slate-200:#e2e8f0;
+  --slate-300:#cbd5e1;
+  --slate-400:#94a3b8;
+  --slate-500:#64748b;
+  --slate-600:#475569;
+  --slate-700:#334155;
+  --slate-800:#1e293b;
+  --slate-900:#0f172a;
+
+  /* Spacing (8px scale) */
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:20px;
+  --space-6:24px;
+  --space-8:32px;
+  --space-10:40px;
+  --space-12:48px;
+  --space-16:64px;
+
+  /* Radius */
+  --radius-sm:8px;
+  --radius-md:12px;
+  --radius-lg:16px;
+  --radius-xl:20px;
+  --radius-full:9999px;
+
+  /* Shadows */
+  --shadow-sm:0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+  --shadow-md:0 2px 4px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06);
+  --shadow-lg:0 4px 8px rgba(15,23,42,0.06), 0 12px 28px rgba(15,23,42,0.10);
+  --shadow-xl:0 8px 24px rgba(15,23,42,0.12), 0 24px 48px rgba(15,23,42,0.14);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  color:var(--slate-800);
+  background:var(--slate-50);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  letter-spacing:-0.01em;
+}
+
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+.top-bar{
+  background:var(--navy-900);
+  color:var(--slate-400);
+  padding:10px 32px;
+  font-size:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:var(--space-2);
+  letter-spacing:0;
+}
+.top-bar strong{color:#fff;font-weight:600;letter-spacing:-0.01em}
+.top-bar a{color:var(--slate-400);transition:color 0.15s}
+.top-bar a:hover{color:#fff}
+.top-bar .phone{color:var(--amber-500);font-weight:700}
+
+/* ============================================================
+   BRAND BAR
+   ============================================================ */
+.brand-bar{
+  background:#fff;
+  padding:14px 32px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:var(--space-4);
+  border-bottom:1px solid var(--slate-200);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+.brand-logo{
+  font-size:20px;
+  font-weight:800;
+  color:var(--navy-800);
+  letter-spacing:-0.03em;
+}
+.brand-logo span{color:var(--blue-400)}
+.brand-logo .y{color:var(--amber-500)}
+
+.brand-toggle{
+  display:flex;
+  background:var(--slate-100);
+  border-radius:var(--radius-md);
+  padding:4px;
+  gap:4px;
+}
+.brand-toggle button{
+  padding:10px 20px;
+  border-radius:var(--radius-sm);
+  font-weight:600;
+  font-size:13px;
+  color:var(--slate-500);
+  transition:all 0.15s;
+  white-space:nowrap;
+}
+.brand-toggle button:hover{color:var(--navy-800)}
+.brand-toggle button.active{
+  background:var(--orange-500);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(255,107,0,0.25);
+}
+.brand-toggle button.active.cars{
+  background:var(--blue-400);
+  box-shadow:0 2px 8px rgba(0,168,232,0.25);
+}
+
+.brand-actions{display:flex;align-items:center;gap:var(--space-5);flex-wrap:wrap}
+.brand-actions a{
+  color:var(--slate-700);
+  font-size:14px;
+  font-weight:600;
+  transition:color 0.15s;
+}
+.brand-actions a:hover{color:var(--blue-400)}
+
+.list-btn{
+  background:linear-gradient(135deg,var(--orange-500),var(--orange-600)) !important;
+  color:#fff !important;
+  padding:10px 20px !important;
+  border-radius:var(--radius-sm) !important;
+  font-weight:700 !important;
+  box-shadow:0 4px 12px rgba(255,107,0,0.28);
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+.list-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 16px rgba(255,107,0,0.35);
+}
+
+/* ============================================================
+   FITMENT BAR
+   ============================================================ */
+.fitment-bar{
+  background:linear-gradient(90deg,var(--navy-800) 0%,var(--navy-600) 100%);
+  color:#fff;
+  padding:14px 32px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:var(--space-4);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.fitment-left{display:flex;align-items:center;gap:var(--space-4)}
+.fitment-icon{
+  background:var(--orange-500);
+  width:44px;height:44px;
+  border-radius:var(--radius-md);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  box-shadow:0 4px 12px rgba(255,107,0,0.3);
+  flex-shrink:0;
+}
+.fitment-label{
+  font-size:10px;
+  color:var(--slate-400);
+  text-transform:uppercase;
+  font-weight:700;
+  letter-spacing:0.08em;
+  margin-bottom:2px;
+}
+.fitment-value{font-size:14px;font-weight:700;line-height:1.3}
+
+.fitment-controls{display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center}
+.fitment-controls select{
+  padding:9px 14px;
+  border-radius:var(--radius-sm);
+  border:1px solid rgba(255,255,255,0.1);
+  font-size:13px;
+  font-weight:600;
+  background:rgba(255,255,255,0.08);
+  color:#fff;
+  transition:background 0.15s;
+  font-family:inherit;
+}
+.fitment-controls select:hover{background:rgba(255,255,255,0.14)}
+.fitment-controls select:focus{outline:none;background:rgba(255,255,255,0.18);border-color:var(--blue-400)}
+.fitment-controls select option{color:var(--slate-800)}
+
+.fitment-filter-label{
+  display:none;
+  align-items:center;
+  gap:8px;
+  color:#fff;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  padding:9px 14px;
+  border-radius:var(--radius-sm);
+  background:rgba(255,255,255,0.08);
+  transition:background 0.15s;
+  white-space:nowrap;
+}
+.fitment-filter-label:hover{background:rgba(255,255,255,0.14)}
+.fitment-filter-label input[type=checkbox]{
+  width:16px;height:16px;
+  cursor:pointer;
+  accent-color:var(--green-400);
+}
+
+.btn-save{
+  background:var(--blue-400);
+  color:#fff;
+  padding:9px 18px;
+  border-radius:var(--radius-sm);
+  font-weight:700;
+  font-size:13px;
+  transition:background 0.15s;
+}
+.btn-save:hover{background:var(--blue-500)}
+
+.btn-clear{
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.2);
+  padding:9px 18px;
+  border-radius:var(--radius-sm);
+  font-weight:700;
+  font-size:13px;
+  display:none;
+  transition:background 0.15s;
+}
+.btn-clear:hover{background:rgba(255,255,255,0.18)}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-600) 100%);
+  color:#fff;
+  padding:56px 32px 96px;
+  text-align:center;
+  position:relative;
+  z-index:1;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 20% 20%,rgba(0,168,232,0.15) 0%,transparent 50%),
+             radial-gradient(circle at 80% 80%,rgba(255,184,0,0.08) 0%,transparent 50%);
+  pointer-events:none;
+}
+.hero > *{position:relative;z-index:1}
+
+.hero-badge{
+  display:inline-block;
+  background:var(--green-400);
+  color:#fff;
+  padding:7px 18px;
+  border-radius:var(--radius-full);
+  font-size:11px;
+  font-weight:800;
+  margin-bottom:20px;
+  letter-spacing:0.08em;
+  box-shadow:0 4px 12px rgba(34,197,94,0.35);
+}
+.hero h1{
+  font-size:clamp(28px,5vw,44px);
+  font-weight:800;
+  margin-bottom:12px;
+  line-height:1.15;
+  letter-spacing:-0.03em;
+  max-width:800px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.hero p{
+  font-size:16px;
+  opacity:0.82;
+  margin-bottom:32px;
+  max-width:600px;
+  margin-left:auto;
+  margin-right:auto;
+  line-height:1.55;
+}
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+.search-container{
+  max-width:1100px;
+  margin:0 auto;
+  background:#fff;
+  padding:var(--space-4);
+  border-radius:var(--radius-lg);
+  box-shadow:0 20px 60px rgba(10,23,41,0.35), 0 8px 24px rgba(10,23,41,0.2);
+}
+.search-row{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 1fr 1fr 1fr auto;
+  gap:var(--space-2);
+}
+.search-row select,
+.search-row input{
+  padding:13px 16px;
+  border:1.5px solid var(--slate-200);
+  border-radius:var(--radius-sm);
+  font-size:14px;
+  font-weight:500;
+  color:var(--slate-800);
+  background:#fff;
+  width:100%;
+  transition:border-color 0.15s,box-shadow 0.15s;
+}
+.search-row select:focus,
+.search-row input:focus{
+  outline:none;
+  border-color:var(--blue-400);
+  box-shadow:0 0 0 4px rgba(0,168,232,0.12);
+}
+.search-row button{
+  background:linear-gradient(135deg,var(--orange-500),var(--orange-600));
+  color:#fff;
+  padding:13px 28px;
+  border-radius:var(--radius-sm);
+  font-weight:700;
+  font-size:14px;
+  white-space:nowrap;
+  box-shadow:0 4px 12px rgba(255,107,0,0.28);
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+.search-row button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 18px rgba(255,107,0,0.35);
+}
+
+.search-text-row{position:relative;margin-top:var(--space-2)}
+.search-text-row input{
+  width:100%;
+  padding:13px 16px;
+  border:1.5px solid var(--slate-200);
+  border-radius:var(--radius-sm);
+  font-size:14px;
+  transition:border-color 0.15s,box-shadow 0.15s;
+}
+.search-text-row input:focus{
+  outline:none;
+  border-color:var(--blue-400);
+  box-shadow:0 0 0 4px rgba(0,168,232,0.12);
+}
+
+.suggestions-box{
+  position:absolute;
+  top:100%;left:0;right:0;
+  background:#fff;
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-xl);
+  z-index:1000;
+  margin-top:6px;
+  max-height:420px;
+  overflow-y:auto;
+  display:none;
+  border:1px solid var(--slate-200);
+}
+.suggestion-item{
+  padding:14px 18px;
+  cursor:pointer;
+  border-bottom:1px solid var(--slate-100);
+  display:flex;
+  align-items:center;
+  gap:14px;
+  transition:background 0.1s;
+}
+.suggestion-item:last-child{border-bottom:none}
+.suggestion-item:hover{background:var(--slate-50)}
+
+/* ============================================================
+   IDENTIFY CTA
+   ============================================================ */
+.identify-cta-wrap{
+  max-width:800px;
+  margin:16px auto 24px;
+  padding:0 16px;
+  position:relative;
+  z-index:5;
+}
+.identify-cta{
+  width:100%;
+  background:linear-gradient(135deg,var(--blue-400),var(--blue-500));
+  color:#fff;
+  padding:16px 24px;
+  border-radius:var(--radius-md);
+  font-weight:700;
+  font-size:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 8px 24px rgba(0,168,232,0.35);
+  min-height:56px;
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+.identify-cta:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 32px rgba(0,168,232,0.45);
+}
+
+/* ============================================================
+   CATEGORIES
+   ============================================================ */
+.categories{
+  max-width:1200px;
+  margin:-24px auto 48px;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:var(--space-3);
+  position:relative;
+  z-index:20;
+}
+.category{
+  background:#fff;
+  border-radius:var(--radius-md);
+  padding:24px 12px;
+  text-align:center;
+  cursor:pointer;
+  box-shadow:var(--shadow-md);
+  transition:transform 0.2s,box-shadow 0.2s;
+  position:relative;
+  z-index:21;
+  border:1px solid rgba(226,232,240,0.6);
+}
+.category:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-lg);
+  border-color:var(--blue-300);
+}
+.cat-icon{
+  width:32px;height:32px;
+  margin-bottom:8px;
+  color:var(--blue-400);
+  stroke-width:2;
+}
+.category-label{
+  font-size:13px;
+  font-weight:700;
+  color:var(--navy-800);
+  letter-spacing:-0.01em;
+}
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+.results-section{
+  max-width:1300px;
+  margin:32px auto 80px;
+  padding:0 20px;
+}
+.results-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+  flex-wrap:wrap;
+  gap:var(--space-3);
+}
+.results-title{
+  font-size:26px;
+  color:var(--navy-800);
+  font-weight:800;
+  letter-spacing:-0.02em;
+}
+.results-count{
+  background:rgba(0,168,232,0.1);
+  color:var(--blue-500);
+  padding:7px 16px;
+  border-radius:var(--radius-full);
+  font-size:13px;
+  font-weight:700;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:var(--space-5);
+}
+
+/* ============================================================
+   CARD
+   ============================================================ */
+.card{
+  background:#fff;
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  transition:transform 0.25s,box-shadow 0.25s;
+  cursor:pointer;
+  border:1px solid rgba(226,232,240,0.7);
+}
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-lg);
+  border-color:rgba(0,168,232,0.3);
+}
+.card-img{
+  height:190px;
+  background:linear-gradient(135deg,var(--slate-100),var(--slate-200));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:56px;
+  color:var(--slate-300);
+  background-size:cover;
+  background-position:center;
+  position:relative;
+}
+.card-badges{
+  position:absolute;
+  top:12px;left:12px;
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  z-index:2;
+}
+.badge{
+  padding:5px 11px;
+  border-radius:var(--radius-full);
+  font-size:11px;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:0.01em;
+  backdrop-filter:blur(8px);
+}
+.badge-verified{background:var(--green-400);box-shadow:0 2px 6px rgba(34,197,94,0.3)}
+.badge-new{background:var(--blue-400);box-shadow:0 2px 6px rgba(0,168,232,0.3)}
+.badge-fits{background:var(--green-400);color:#fff;font-weight:800;box-shadow:0 2px 6px rgba(34,197,94,0.35)}
+.badge-featured{background:var(--amber-500);color:var(--navy-900);font-weight:800;box-shadow:0 2px 6px rgba(255,184,0,0.4)}
+
+.save-btn{
+  position:absolute;
+  bottom:12px;right:12px;
+  background:rgba(255,255,255,0.96);
+  color:var(--navy-800);
+  padding:7px 14px;
+  border-radius:var(--radius-full);
+  font-weight:700;
+  font-size:12px;
+  box-shadow:0 2px 8px rgba(15,23,42,0.15);
+  transition:all 0.15s;
+  z-index:5;
+  backdrop-filter:blur(8px);
+}
+.save-btn:hover{
+  background:#fff;
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(15,23,42,0.2);
+}
+.save-btn.saved{
+  background:var(--green-400);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(34,197,94,0.4);
+}
+.save-btn.saving{
+  background:var(--amber-500);
+  color:var(--navy-900);
+  cursor:wait;
+}
+
+.card-body{padding:var(--space-4)}
+.card-title{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:8px;
+  color:var(--navy-800);
+  line-height:1.35;
+  letter-spacing:-0.01em;
+}
+.card-price{
+  color:var(--blue-500);
+  font-size:21px;
+  font-weight:800;
+  margin-bottom:4px;
+  letter-spacing:-0.02em;
+}
+.card-price-usd{color:var(--slate-400);font-size:12px;margin-bottom:12px;font-weight:500}
+.card-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.meta-tag{
+  background:var(--slate-100);
+  color:var(--slate-600);
+  padding:4px 10px;
+  border-radius:var(--radius-sm);
+  font-size:11px;
+  font-weight:600;
+}
 .meta-tag.loc{background:#fef3c7;color:#92400e}
-.save-btn{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,0.95);color:#0b1e3a;border:none;padding:6px 12px;border-radius:20px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:all 0.15s;z-index:5}
-.save-btn:hover{background:white;transform:scale(1.05)}
-.save-btn.saved{background:#22c55e;color:white}
-.save-btn.saving{background:#ffb800;color:#0b1e3a;cursor:wait}
-.empty,.loading{text-align:center;padding:80px 20px;color:#94a3b8;font-size:15px}
-.hamburger{display:none;background:transparent;border:none;cursor:pointer;padding:8px}
-.mobile-menu{display:none;background:#0b1e3a;padding:12px 20px;flex-direction:column;gap:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+
+/* ============================================================
+   EMPTY / LOADING
+   ============================================================ */
+.empty,.loading{
+  text-align:center;
+  padding:80px 20px;
+  color:var(--slate-400);
+  font-size:15px;
+  line-height:1.6;
+  grid-column:1/-1;
+}
+.loading::before{
+  content:'';
+  display:block;
+  width:32px;height:32px;
+  border:3px solid var(--slate-200);
+  border-top-color:var(--blue-400);
+  border-radius:50%;
+  margin:0 auto 16px;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============================================================
+   MOBILE MENU / HAMBURGER
+   ============================================================ */
+.hamburger{
+  display:none;
+  background:transparent;
+  padding:10px;
+  border-radius:var(--radius-sm);
+  color:#fff;
+}
+.mobile-menu{
+  display:none;
+  background:var(--navy-800);
+  padding:12px 20px;
+  flex-direction:column;
+  gap:4px;
+  box-shadow:0 8px 24px rgba(10,23,41,0.3);
+  border-top:1px solid rgba(255,255,255,0.06);
+}
 .mobile-menu.open{display:flex}
-.mobile-menu a{color:white;text-decoration:none;padding:12px 10px;border-radius:8px;font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px}
-.mobile-menu a:hover{background:rgba(255,255,255,0.08)}
-.list-btn{background:#ff6b00;color:white !important;padding:8px 16px;border-radius:8px;margin-left:12px !important;font-weight:bold}
-@media (max-width:900px){.search-row{grid-template-columns:1fr 1fr 1fr}.categories{grid-template-columns:repeat(3,1fr)}}
+.mobile-menu a{
+  color:#fff;
+  padding:14px 12px;
+  border-radius:var(--radius-sm);
+  font-size:15px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  transition:background 0.15s;
+}
+.mobile-menu a:hover{background:rgba(255,255,255,0.06)}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1100px){
+  .search-row{grid-template-columns:1fr 1fr 1fr}
+  .search-row button{grid-column:1/-1}
+}
+
+@media (max-width:900px){
+  .categories{grid-template-columns:repeat(3,1fr)}
+}
+
 @media (max-width:768px){
-  .top-bar{padding:8px 15px;font-size:11px;justify-content:center;text-align:center}
-  .brand-bar{padding:12px 15px;flex-direction:column;text-align:center}
+  .top-bar{
+    padding:10px 16px;
+    font-size:11px;
+    flex-direction:column;
+    gap:6px;
+    text-align:center;
+  }
+  .top-bar > div{justify-content:center !important;display:flex;flex-wrap:wrap;gap:14px}
+
+  .brand-bar{
+    padding:12px 16px;
+    flex-direction:column;
+    gap:12px;
+  }
+  .brand-logo{font-size:18px}
   .brand-toggle{width:100%}
-  .brand-toggle button{padding:10px 8px;font-size:12px;flex:1;min-height:44px}
+  .brand-toggle button{padding:11px 8px;font-size:12px;flex:1;min-height:44px}
   .brand-actions{width:100%;justify-content:center;gap:10px}
-  .brand-actions a{font-size:12px}
-  .fitment-bar{padding:12px 15px;flex-direction:column;text-align:center;gap:10px}
+  .brand-actions a{font-size:13px;padding:8px 12px;background:var(--slate-100);border-radius:var(--radius-sm);color:var(--navy-800)}
+  .list-btn{background:linear-gradient(135deg,var(--orange-500),var(--orange-600)) !important;color:#fff !important}
+  .hamburger{display:flex;align-items:center;justify-content:center;background:var(--navy-800);position:absolute;top:14px;right:16px;z-index:10}
+
+  .fitment-bar{padding:14px 16px;flex-direction:column;gap:12px}
+  .fitment-left{width:100%}
   .fitment-controls{width:100%;flex-direction:column;gap:8px}
   .fitment-controls select{width:100%;min-height:44px;font-size:14px}
-  .fitment-controls button{min-height:44px;font-size:14px}
-  .hero{padding:30px 15px 70px}
-  .hero h1{font-size:24px;line-height:1.2}
+  .fitment-controls button{min-height:44px;font-size:14px;width:100%}
+  .fitment-filter-label{width:100%;justify-content:center}
+
+  .hero{padding:40px 16px 80px}
+  .hero h1{font-size:26px;line-height:1.2}
   .hero p{font-size:14px;padding:0 8px}
+  .hero-badge{font-size:10px;padding:6px 14px}
+
+  .search-container{padding:14px;border-radius:var(--radius-md)}
   .search-row{grid-template-columns:1fr !important;gap:8px !important}
-  .search-row select,.search-row input,.search-row button{padding:12px !important;font-size:16px !important;min-height:48px}
-  .search-text-row input{font-size:16px !important;padding:12px 14px !important;min-height:48px}
-  .categories{grid-template-columns:repeat(3,1fr) !important;gap:8px;margin-top:-30px;padding:0 10px}
-  .category{padding:14px 6px}
-  .cat-icon{width:26px;height:26px;margin-bottom:4px}
+  .search-row select,.search-row input,.search-row button{
+    padding:13px !important;
+    font-size:16px !important;
+    min-height:48px;
+  }
+  .search-text-row input{font-size:16px !important;padding:13px !important;min-height:48px}
+
+  .identify-cta-wrap{padding:0 16px;margin:16px auto 20px}
+  .identify-cta{font-size:14px;padding:14px 16px}
+
+  .categories{
+    grid-template-columns:repeat(3,1fr) !important;
+    gap:8px;
+    margin-top:-24px;
+    padding:0 12px;
+    margin-bottom:32px;
+  }
+  .category{padding:16px 8px;border-radius:var(--radius-sm)}
+  .cat-icon{width:26px;height:26px;margin-bottom:6px}
   .category-label{font-size:11px}
-  .results-section{padding:0 12px;margin-top:20px;margin-bottom:40px}
-  .results-header{flex-direction:column;align-items:flex-start;gap:8px}
-  .results-title{font-size:18px}
-  .results-count{font-size:12px;padding:5px 12px}
+
+  .results-section{padding:0 16px;margin-top:24px;margin-bottom:48px}
+  .results-header{flex-direction:column;align-items:flex-start;gap:10px}
+  .results-title{font-size:20px}
+  .results-count{font-size:12px;padding:6px 14px}
+
   .grid{grid-template-columns:1fr !important;gap:14px}
-  .card{border-radius:12px;display:flex;flex-direction:row;align-items:stretch}
-  .card-img{width:110px;height:auto;min-height:110px;font-size:40px;flex-shrink:0;border-radius:12px 0 0 12px}
-  .card-badges{top:6px;left:6px}
-  .badge{font-size:9px;padding:3px 7px}
-  .card-body{padding:12px;display:flex;flex-direction:column;justify-content:center;flex:1}
-  .card-title{font-size:14px;line-height:1.3;margin-bottom:6px}
+
+  .card{
+    border-radius:var(--radius-md);
+    display:flex;
+    flex-direction:row;
+    align-items:stretch;
+  }
+  .card-img{
+    width:120px;
+    height:auto;
+    min-height:120px;
+    font-size:44px;
+    flex-shrink:0;
+    border-radius:var(--radius-md) 0 0 var(--radius-md);
+  }
+  .card-badges{top:8px;left:8px}
+  .badge{font-size:9px;padding:3px 8px}
+  .save-btn{top:8px;right:8px;bottom:auto;padding:6px 10px;font-size:11px}
+  .card-body{padding:14px;display:flex;flex-direction:column;justify-content:center;flex:1}
+  .card-title{font-size:14px;line-height:1.35;margin-bottom:6px}
   .card-price{font-size:18px;margin-bottom:4px}
-  .card-price-usd{font-size:12px;margin-bottom:8px}
-  .meta-tag{font-size:10px;padding:3px 7px}
-  .save-btn{top:6px;right:6px;bottom:auto;padding:5px 10px;font-size:11px}
-  .hamburger{display:flex;align-items:center;justify-content:center;background:#0b1e3a;border-radius:8px;margin-left:auto}
-  .brand-actions{display:none !important}
+  .card-price-usd{font-size:11px;margin-bottom:10px}
+  .meta-tag{font-size:10px;padding:3px 8px}
 }
+
 @media (max-width:400px){
-  .hero h1{font-size:21px}
+  .hero h1{font-size:22px}
   .categories{grid-template-columns:repeat(2,1fr) !important}
-  .card-img{width:90px;min-height:90px;font-size:32px}
+  .card-img{width:100px;min-height:100px;font-size:36px}
 }
-</style>
-</head>
-<body>
-
-<!-- MODAL FOR NEW LISTINGS -->
-<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
-  <div style="background:white;border-radius:16px;max-width:640px;width:100%;padding:28px;position:relative;max-height:90vh;overflow-y:auto;">
-    <span onclick="closeModal()" style="position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#888;line-height:1;">&times;</span>
-    <h2 id="modal-title" style="margin-bottom:20px;color:#0b1e3a;font-size:22px;">List Item</h2>
-    <form id="listing-form">
-      <div id="form-fields"></div>
-      <button type="submit" style="background:#ff6b00;color:white;border:none;padding:16px;border-radius:10px;width:100%;font-weight:bold;font-size:16px;cursor:pointer;margin-top:20px;min-height:52px;">Publish Listing</button>
-      <div id="form-status" aria-live="polite" style="margin-top:15px;text-align:center;font-weight:bold;font-size:14px;"></div>
-    </form>
-  </div>
-</div>
-
-<!-- SVG SPRITE -->
-<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="icon-brakes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></symbol>
-  <symbol id="icon-engine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l2-4h6l2 4h3"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M5 12v6M19 12v6"/></symbol>
-  <symbol id="icon-suspension" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4"/><path d="M8 6h8M8 18h8"/><path d="M9 9h6M9 15h6"/><path d="M10 12h4"/></symbol>
-  <symbol id="icon-electrical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
-  <symbol id="icon-tires" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><line x1="12" y1="2" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="22"/></symbol>
-  <symbol id="icon-accessories" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 7V4h6v3"/></symbol>
-  <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
-</svg>
-
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div><strong>Salon AutoZone HQ - Freetown, Sierra Leone</strong></div>
-  <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
-    <a href="tel:+23276123456" class="phone">+232 76 123456</a>
-    <a href="#">Store Locator</a>
-    <a href="/login" id="signin-link">Sign In / Register</a>
-  </div>
-</div>
-
-<!-- BRAND BAR -->
-<div class="brand-bar">
-  <div class="brand-logo">Salon<span>AutoZone</span> <span class="y">&amp; AutoTrader</span></div>
-  <div class="brand-toggle">
-    <button id="btn-parts" class="active" onclick="switchMarket('parts')">AutoZone Parts Store</button>
-    <button id="btn-vehicles" class="cars" onclick="switchMarket('vehicles')">AutoTrader Cars &amp; Trucks</button>
-  </div>
-  <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
-    <svg style="width:24px;height:24px" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-menu"/></svg>
-  </button>
-  <div class="brand-actions">
-    <a href="/vin-tool">VIN Lookup</a>
-    <a href="/garage">🚗 My Garage</a>
-    <a href="/login">Login</a>
-    <a href="#" onclick="event.preventDefault();openModal('parts', event)" class="list-btn">+ List Item</a>
-  </div>
-</div>
-
-<!-- MOBILE MENU -->
-<div id="mobile-menu" class="mobile-menu">
-  <a href="/">🏠 Home</a>
-  <a href="/vin-tool">🔍 VIN Lookup</a>
-  <a href="/garage">🚗 My Garage</a>
-  <a href="/login">👤 Login / Register</a>
-  <a href="#" onclick="event.preventDefault();closeMobileMenu();openModal('vehicle', event)">🚗 + List Your Car</a>
-  <a href="#" onclick="event.preventDefault();closeMobileMenu();openModal('parts', event)">🔧 + List a Part</a>
-</div>
-
-<!-- FITMENT BAR -->
-<div class="fitment-bar">
-  <div class="fitment-left">
-    <div class="fitment-icon"><svg style="width:24px;height:24px;" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-car"/></svg></div>
-    <div>
-      <div class="fitment-label">Your Vehicle</div>
-      <div class="fitment-value" id="fitment-label">Not set - select your car for exact-fit parts</div>
-    </div>
-  </div>
-  <div class="fitment-controls">
-    <select id="fitment-make"><option value="">Select Make</option></select>
-    <select id="fitment-model"><option value="">Select Model</option></select>
-    <select id="fitment-year"><option value="">Select Year</option></select>
-    <button type="button" class="btn-save" onclick="saveFitment()">Save</button>
-    <button type="button" class="btn-clear" id="fitment-clear" onclick="clearFitment()">Clear</button>
-    <label id="fitment-filter-label" class="fitment-filter-label">
-      <input type="checkbox" id="fitment-filter" onchange="onFitmentFilterChange()" style="width:16px;height:16px;cursor:pointer;">
-      Only show parts that fit
-    </label>
-  </div>
-</div>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-badge">SIERRA LEONE VERIFIED VENDORS</div>
-  <h1>Find Your Next Car or Part in Sierra Leone</h1>
-  <p>Buy and sell cars &amp; parts across Freetown, Bo, Kenema, Makeni and beyond.</p>
-
-  <div class="search-container">
-    <div class="search-row">
-      <select id="search-category">
-        <option value="">All Categories</option>
-        <optgroup label="Fluids &amp; Oils">
-          <option value="Fluids">All Fluids &amp; Oils</option>
-          <option value="Engine Oil">Engine Oil</option>
-          <option value="Transmission Fluid">Transmission Fluid</option>
-          <option value="Power Steering Fluid">Power Steering Fluid</option>
-          <option value="Brake Fluid">Brake Fluid</option>
-          <option value="Coolant / Antifreeze">Coolant / Antifreeze</option>
-          <option value="Differential Oil">Differential Oil</option>
-          <option value="Windshield Washer">Windshield Washer Fluid</option>
-          <option value="Grease">Grease</option>
-        </optgroup>
-        <optgroup label="Parts">
-          <option value="Filters">Filters</option>
-          <option value="Batteries">Batteries</option>
-          <option value="Brakes">Brakes</option>
-          <option value="Engine">Engine</option>
-          <option value="Suspension">Suspension</option>
-          <option value="Electrical">Electrical</option>
-          <option value="Tires &amp; Wheels">Tires &amp; Wheels</option>
-          <option value="Transmission">Transmission</option>
-          <option value="Body">Body</option>
-          <option value="Interior">Interior</option>
-          <option value="Exhaust">Exhaust</option>
-          <option value="Lighting">Lighting</option>
-          <option value="Audio">Audio</option>
-          <option value="Accessories">Accessories</option>
-        </optgroup>
-      </select>
-      <select id="search-make" onchange="updateSearchModels()"><option value="">Any Make</option></select>
-      <select id="search-model"><option value="">Any Model</option></select>
-      <select id="search-year"><option value="">Any Year</option></select>
-      <select id="filter-location">
-        <option value="">All Locations</option>
-        <option value="Freetown">Freetown</option>
-        <option value="Bo">Bo</option>
-        <option value="Kenema">Kenema</option>
-        <option value="Makeni">Makeni</option>
-        <option value="Koidu">Koidu</option>
-      </select>
-      <button onclick="doSearch()">Search</button>
-    </div>
-    <div class="search-text-row">
-      <input type="text" id="search-input" placeholder="Or type a part name..." autocomplete="off">
-      <div class="suggestions-box" id="suggestions-box"></div>
-    </div>
-  </div>
-
-  <div style="margin-top:18px;text-align:center;">
-    <button type="button" onclick="openImportModal()" style="background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:15px;box-shadow:0 8px 20px rgba(255,107,0,0.35);">
-      🌍 Can't find it locally? Request from Abroad
-    </button>
-  </div>
-</div>
-
-<!-- IDENTIFY CAR CTA -->
-<div class="identify-cta-wrap">
-  <button type="button" class="identify-cta" onclick="openIdentifyCar()">
-    <span style="font-size:20px;">📸</span> Identify Your Car from a Photo — AI Powered
-  </button>
-</div>
-
-<!-- IDENTIFY CAR MODAL -->
-<div id="identify-car-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:3000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
-  <div style="background:white;border-radius:16px;max-width:520px;width:100%;padding:24px;position:relative;max-height:90vh;overflow-y:auto;">
-    <span onclick="closeIdentifyCar()" style="position:absolute;top:14px;right:18px;font-size:28px;cursor:pointer;color:#888;">&times;</span>
-    <div id="identify-stage-upload">
-      <h2 style="color:#0b1e3a;margin-bottom:8px;font-size:20px;">📸 Identify Your Car</h2>
-      <p style="color:#64748b;font-size:14px;margin-bottom:20px;line-height:1.5;">Take a clear photo of the front or side of the car. AI will tell you the make, model, year, and estimated price in Sierra Leone Leones.</p>
-      <input type="file" id="identify-file-input" accept="image/*" capture="environment" style="display:none;">
-      <button type="button" onclick="document.getElementById('identify-file-input').click()" style="width:100%;background:#f0f4f8;color:#0b1e3a;border:2px dashed #cbd5e0;padding:32px;border-radius:12px;font-weight:bold;cursor:pointer;font-size:15px;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:12px;min-height:180px;">
-        <span style="font-size:48px;">📷</span>
-        <span>Tap to Take Photo or Upload</span>
-        <span style="font-size:12px;color:#94a3b8;font-weight:normal;">JPG, PNG, or WEBP • Max 8 MB</span>
-      </button>
-      <div id="identify-status" aria-live="polite" style="margin-top:16px;text-align:center;font-size:14px;font-weight:600;line-height:1.5;"></div>
-    </div>
-    <div id="identify-stage-result" style="display:none;">
-      <div id="identify-result-content"></div>
-    </div>
-  </div>
-</div>
-
-<!-- CATEGORIES -->
-<div class="categories" id="categories-row">
-  <div class="category" onclick="filterCategory('Brakes')"><svg class="cat-icon"><use href="#icon-brakes"/></svg><div class="category-label">Brakes</div></div>
-  <div class="category" onclick="filterCategory('Engine')"><svg class="cat-icon"><use href="#icon-engine"/></svg><div class="category-label">Engine</div></div>
-  <div class="category" onclick="filterCategory('Suspension')"><svg class="cat-icon"><use href="#icon-suspension"/></svg><div class="category-label">Suspension</div></div>
-  <div class="category" onclick="filterCategory('Electrical')"><svg class="cat-icon"><use href="#icon-electrical"/></svg><div class="category-label">Electrical</div></div>
-  <div class="category" onclick="filterCategory('Tires &amp; Wheels')"><svg class="cat-icon"><use href="#icon-tires"/></svg><div class="category-label">Tires</div></div>
-  <div class="category" onclick="filterCategory('Accessories')"><svg class="cat-icon"><use href="#icon-accessories"/></svg><div class="category-label">Accessories</div></div>
-</div>
-
-<!-- RESULTS -->
-<div class="results-section">
-  <div class="results-header">
-    <h2 class="results-title" id="section-title">Latest Auto Parts</h2>
-    <div class="results-count" id="results-count">Loading...</div>
-  </div>
-  <div id="results" class="grid"></div>
-</div>
-
-<!-- IMPORT MODAL -->
-<div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
-  <div style="background:white;border-radius:16px;max-width:640px;width:100%;padding:30px;position:relative;max-height:90vh;overflow-y:auto;">
-    <span onclick="closeImportModal()" style="position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#888;">&times;</span>
-    <h2 style="margin-bottom:8px;color:#0b1e3a;font-size:22px;">🌍 Request a Part from Abroad</h2>
-    <p style="color:#666;font-size:14px;margin-bottom:20px;">We'll source it from our international suppliers (Dubai, China, UK, USA) and deliver to you in Sierra Leone.</p>
-    <form id="import-form">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Your Name *</label><input name="customer_name" required placeholder="Aminata Kamara" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
-        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">WhatsApp Number *</label><input name="customer_phone" required placeholder="+232 76 123456" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
-        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Your Location *</label><select name="customer_location" required style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"><option value="">Select City</option><option>Freetown</option><option>Bo</option><option>Kenema</option><option>Makeni</option><option>Koidu</option><option>Other</option></select></div>
-        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Email (optional)</label><input name="customer_email" type="email" placeholder="you@example.com" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
-      </div>
-      <h3 style="margin-top:20px;margin-bottom:10px;color:#0b1e3a;font-size:15px;">🔧 Part Details</h3>
-      <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Part Name *</label>
-      <input name="part_name" required placeholder="e.g. Front Bumper, Alternator, Turbo" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Car Make *</label><input name="car_make" required placeholder="Toyota" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
-        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Model *</label><input name="car_model" required placeholder="Corolla" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
-        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Year *</label><input name="car_year" required placeholder="2018" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
-        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Quantity</label><input name="quantity" type="number" value="1" min="1" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
-        <div><label style="display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:600;">Budget (SLL, optional)</label><input name="budget_sll" type="number" placeholder="8000000" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></div>
-      </div>
-      <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;margin-top:12px;font-weight:600;">Urgency</label>
-      <select name="urgency" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"><option>Normal</option><option>Urgent (need within 1 week)</option><option>Flexible (can wait 1+ month)</option></select>
-      <label style="display:block;font-size:13px;color:#666;margin-bottom:6px;margin-top:12px;font-weight:600;">Additional Notes</label>
-      <textarea name="notes" rows="3" placeholder="e.g. Prefer OEM original, any color is fine..." style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;font-size:14px;"></textarea>
-      <button type="submit" style="background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;border:none;padding:14px;border-radius:10px;width:100%;font-weight:bold;font-size:16px;cursor:pointer;margin-top:20px;">Submit Request</button>
-      <div id="import-status" aria-live="polite" style="margin-top:15px;text-align:center;font-weight:bold;font-size:14px;"></div>
-    </form>
-  </div>
-</div>
-
-<script>
-(function () {
-  'use strict';
-
-  // ============ CONSTANTS ============
-  var CITIES = ["Freetown","Bo","Kenema","Makeni","Koidu","Lunsar","Port Loko","Kabala","Waterloo"];
-  var MAKES = ["Toyota","Nissan","Honda","Mitsubishi","Mazda","Suzuki","Subaru","Isuzu","Daihatsu","Lexus","Hyundai","Kia","Genesis","Mercedes-Benz","BMW","Volkswagen","Audi","Porsche","Ford","Chevrolet","Jeep","Peugeot","Renault","Citroen","Land Rover","Jaguar","Volvo","Chery","Geely","Great Wall","BYD","MG","Other"];
-  var CATS = ["Fluids","Filters","Batteries","Brakes","Engine","Suspension","Electrical","Tires & Wheels","Transmission","Body","Interior","Exhaust","Lighting","Audio","Accessories"];
-  var MODELS = {
-    "Toyota":["Corolla","Camry","Hilux","RAV4","Land Cruiser","Prado","Vitz","Yaris","Avensis","Prius","Highlander","Fortuner","Hiace"],
-    "Nissan":["X-Trail","Altima","Sunny","Patrol","Navara","Qashqai","Juke","Note","Murano","Sentra"],
-    "Honda":["Civic","Accord","CR-V","Fit","Jazz","City","Pilot","HR-V"],
-    "Mitsubishi":["Pajero","Lancer","Outlander","L200","ASX"],
-    "Mazda":["CX-5","CX-9","Mazda3","Mazda6","BT-50"],
-    "Suzuki":["Swift","Vitara","Jimny","SX4","Alto"],
-    "Subaru":["Forester","Outback","Impreza","Legacy"],
-    "Isuzu":["D-Max","MU-X","Trooper"],
-    "Daihatsu":["Terios","Sirion","Cuore"],
-    "Lexus":["RX","NX","ES","IS","GX","LX"],
-    "Hyundai":["Tucson","Santa Fe","Elantra","Sonata","i10","i20","Accent","Creta","Kona"],
-    "Kia":["Sportage","Sorento","Rio","Cerato","Soul","Seltos","Picanto"],
-    "Genesis":["G70","G80","G90"],
-    "Mercedes-Benz":["C-Class","E-Class","S-Class","GLC","GLE","GLS","A-Class","ML","G-Class","Sprinter"],
-    "BMW":["3 Series","5 Series","7 Series","X1","X3","X5","X6","X7"],
-    "Volkswagen":["Golf","Passat","Tiguan","Polo","Jetta","Touareg"],
-    "Audi":["A3","A4","A6","Q3","Q5","Q7"],
-    "Porsche":["911","Cayenne","Macan","Panamera"],
-    "Ford":["Focus","Fiesta","F-150","Ranger","Explorer","Escape","Mustang"],
-    "Chevrolet":["Silverado","Cruze","Malibu","Equinox","Tahoe","Spark"],
-    "Jeep":["Wrangler","Grand Cherokee","Cherokee","Compass"],
-    "Peugeot":["208","308","3008","5008","Partner"],
-    "Renault":["Clio","Megane","Duster","Captur","Logan"],
-    "Citroen":["C3","C4","C5","Berlingo"],
-    "Land Rover":["Defender","Discovery","Range Rover","Range Rover Sport","Evoque"],
-    "Jaguar":["XE","XF","XJ","F-Pace","E-Pace"],
-    "Volvo":["XC40","XC60","XC90","S60","S90"],
-    "Chery":["Tiggo 4","Tiggo 7","Tiggo 8","Arrizo 5"],
-    "Geely":["Coolray","Azkarra","Tugella","Emgrand"],
-    "Great Wall":["Wingle","Poer","Haval H6","Haval Jolion"],
-    "BYD":["Atto 3","Han","Tang","Song","Seal"],
-    "MG":["ZS","HS","MG5","MG6"],
-    "Other":["Other"]
-  };
-  var YEARS = (function () { var a = []; for (var y = 2026; y >= 1980; y--) a.push(y); return a; })();
-
-  var currentTab = 'parts';
-  var suggestTimeout = null;
-
-  // ============ HELPERS ============
-  function esc(s) {
-    if (s === null || s === undefined) return '';
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-  function escAttr(s) {
-    if (s === null || s === undefined) return '';
-    return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-  }
-  function safeUrl(url) {
-    if (!url) return '';
-    var u = String(url).trim();
-    if (/^https?:\/\//i.test(u) || /^data:image\//i.test(u) || /^\//.test(u)) return u;
-    return '';
-  }
-  function getToken() {
-    try { return localStorage.getItem('token') || ''; } catch (e) { return ''; }
-  }
-  function fetchWithTimeout(url, ms, options) {
-    var controller = new AbortController();
-    var timer = setTimeout(function () { controller.abort(); }, ms);
-    var opts = options || {};
-    opts.signal = controller.signal;
-    return fetch(url, opts).finally(function () { clearTimeout(timer); });
-  }
-
-  // ============ TOAST ============
-  function showToast(msg, type) {
-    var t = document.getElementById('app-toast');
-    if (!t) {
-      t = document.createElement('div');
-      t.id = 'app-toast';
-      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#0b1e3a;color:white;padding:14px 24px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform 0.3s,opacity 0.3s;opacity:0;z-index:9999;pointer-events:none;max-width:90vw;text-align:center';
-      document.body.appendChild(t);
-    }
-    t.innerText = msg;
-    if (type === 'success') t.style.background = '#16a34a';
-    else if (type === 'error') t.style.background = '#dc2626';
-    else t.style.background = '#0b1e3a';
-    t.style.transform = 'translateX(-50%) translateY(0)';
-    t.style.opacity = '1';
-    clearTimeout(t._timer);
-    t._timer = setTimeout(function () {
-      t.style.transform = 'translateX(-50%) translateY(100px)';
-      t.style.opacity = '0';
-    }, 2600);
-  }
-
-  // ============ SAVE ITEM ============
-  window.saveItem = async function (btn, type, id, title, price) {
-    if (!getToken()) {
-      showToast('Please log in to save items', 'error');
-      setTimeout(function () { window.location.href = '/login?next=/'; }, 1200);
-      return;
-    }
-    var prevText = btn.innerText;
-    btn.innerText = '⏳ Saving...';
-    btn.className = 'save-btn saving';
-    btn.disabled = true;
-    try {
-      var res = await fetch('/api/my-account/saved', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getToken()
-        },
-        body: JSON.stringify({ listing_type: type, listing_id: id })
-      });
-      if (!res.ok) {
-        var err = await res.json().catch(function() { return {}; });
-        if (res.status === 401) {
-          showToast('Please log in to save', 'error');
-          setTimeout(function () { window.location.href = '/login?next=/'; }, 1200);
-          return;
-        }
-        throw new Error(err.detail || 'Failed to save');
-      }
-      var data = await res.json();
-      btn.innerText = '✅ Saved';
-      btn.className = 'save-btn saved';
-      showToast(data.already_saved ? 'Already in saved items' : '💾 Saved to your account', 'success');
-    } catch (e) {
-      showToast('❌ ' + e.message, 'error');
-      btn.innerText = prevText;
-      btn.className = 'save-btn';
-    } finally {
-      btn.disabled = false;
-    }
-  };
-
-  // Mark already-saved items
-  async function markSavedItems() {
-    if (!getToken()) return;
-    try {
-      var res = await fetch('/api/my-account/saved', {
-        headers: { 'Authorization': 'Bearer ' + getToken() }
-      });
-      if (!res.ok) return;
-      var data = await res.json();
-      var saved = {};
-      (data.items || []).forEach(function (s) {
-        saved[s.listing_type + '-' + s.listing_id] = true;
-      });
-      document.querySelectorAll('.save-btn').forEach(function (btn) {
-        var key = btn.dataset.saveType + '-' + btn.dataset.saveId;
-        if (saved[key]) {
-          btn.innerText = '✅ Saved';
-          btn.classList.add('saved');
-        }
-      });
-    } catch (e) {}
-  }
-
-  function showSkeletons(el, count) {
-    var html = '';
-    for (var i = 0; i < count; i++) {
-      html += '<div class="card" style="pointer-events:none;opacity:0.6;">' +
-        '<div class="card-img" style="background:linear-gradient(90deg,#f0f4f8 0%,#e0e6ed 50%,#f0f4f8 100%);color:transparent;">…</div>' +
-        '<div class="card-body">' +
-          '<div style="height:16px;background:#f0f4f8;border-radius:6px;margin-bottom:8px;"></div>' +
-          '<div style="height:22px;background:#f0f4f8;border-radius:6px;width:60%;margin-bottom:8px;"></div>' +
-          '<div style="height:12px;background:#f0f4f8;border-radius:6px;width:40%;"></div>' +
-        '</div>' +
-      '</div>';
-    }
-    el.innerHTML = html;
-  }
-
-  // ============ MARKET SWITCH ============
-  window.switchMarket = function (market) {
-    currentTab = market;
-    var bp = document.getElementById('btn-parts');
-    var bv = document.getElementById('btn-vehicles');
-    if (market === 'parts') {
-      bp.className = 'active'; bv.className = 'cars';
-      document.getElementById('section-title').innerText = 'Latest Auto Parts';
-      document.getElementById('categories-row').style.display = 'grid';
-    } else {
-      bp.className = ''; bv.className = 'cars active';
-      document.getElementById('section-title').innerText = 'Latest Cars & Trucks';
-      document.getElementById('categories-row').style.display = 'none';
-    }
-    doSearch();
-  };
-
-  // ============ SEARCH CASCADE ============
-  window.updateSearchModels = function () {
-    var make = document.getElementById('search-make').value;
-    var mSel = document.getElementById('search-model');
-    if (!make) { mSel.innerHTML = '<option value="">Any Model</option>'; return; }
-    var models = MODELS[make] || ['Other'];
-    var html = '<option value="">Any Model</option>';
-    models.forEach(function (m) { html += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
-    mSel.innerHTML = html;
-  };
-
-  function initSearchCascade() {
-    var mSel = document.getElementById('search-make');
-    var ySel = document.getElementById('search-year');
-    if (!mSel) return;
-    var mHtml = '<option value="">Any Make</option>';
-    MAKES.forEach(function (m) { mHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
-    mSel.innerHTML = mHtml;
-    var yHtml = '<option value="">Any Year</option>';
-    YEARS.forEach(function (y) { yHtml += '<option value="' + y + '">' + y + '</option>'; });
-    ySel.innerHTML = yHtml;
-  }
-
-  // ============ SEARCH ============
-  window.doSearch = function () {
-    var resultsEl = document.getElementById('results');
-    var countEl = document.getElementById('results-count');
-    countEl.innerText = 'Loading...';
-    showSkeletons(resultsEl, 6);
-
-    var sv = document.getElementById('search-input').value.trim();
-    var cat = document.getElementById('search-category').value;
-    var mk = document.getElementById('search-make').value;
-    var md = document.getElementById('search-model').value;
-    var yr = document.getElementById('search-year').value;
-    var loc = document.getElementById('filter-location').value;
-    var p = new URLSearchParams();
-    if (loc) p.append('location', loc);
-    if (mk) p.append('make', mk);
-    if (md) p.append('model', md);
-    if (yr) p.append('year', yr);
-
-    if (currentTab === 'vehicles') {
-      if (sv) p.append('q', sv);
-      fetchWithTimeout('/api/vehicles/?' + p.toString(), 10000)
-        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(function (data) {
-          var items = Array.isArray(data) ? data : (data.items || []);
-          countEl.innerText = items.length + ' car' + (items.length !== 1 ? 's' : '') + ' found';
-          renderVehicleResults(items);
-        })
-        .catch(function (err) {
-          console.error('[doSearch vehicles]', err);
-          countEl.innerText = 'Error';
-          resultsEl.innerHTML = '<div class="empty">Could not load cars.<br><br><button onclick="doSearch()" style="background:#00a8e8;color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;">🔄 Retry</button></div>';
-        });
-    } else {
-      if (cat) p.append('category', cat);
-      if (sv) p.append('q', sv);
-      fetchWithTimeout('/api/unified/parts?' + p.toString(), 10000)
-        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(function (data) {
-          var total = data.total || 0;
-          var localCount = data.local_count || 0;
-          var catCount = data.catalog_count || 0;
-          countEl.innerText = total + ' result' + (total !== 1 ? 's' : '') + ' (' + localCount + ' local, ' + catCount + ' importable)';
-          renderPartsResults(data);
-        })
-        .catch(function (err) {
-          console.error('[doSearch parts]', err);
-          countEl.innerText = 'Error';
-          resultsEl.innerHTML = '<div class="empty">Could not load parts.<br><br><button onclick="doSearch()" style="background:#00a8e8;color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;">🔄 Retry</button></div>';
-        });
-    }
-  };
-
-  // ============ RENDER VEHICLES ============
-  function renderVehicleResults(items) {
-    var el = document.getElementById('results');
-    if (!items || items.length === 0) {
-      el.innerHTML = '<div class="empty">No cars found. Try a different search.</div>';
-      return;
-    }
-    var html = '';
-    for (var i = 0; i < items.length; i++) {
-      var item = items[i];
-      var imgUrl = safeUrl(item.image_url);
-      var imgStyle = imgUrl ? 'background-image:url(\'' + imgUrl + '\');color:transparent;' : '';
-      html += '<div class="card" onclick="location.href=\'/vehicle/' + encodeURIComponent(item.id) + '\'">';
-      html += '<div class="card-img" style="' + imgStyle + '">' + (imgUrl ? '' : 'CAR');
-      html += '<div class="card-badges">';
-      if (item.is_featured) html += '<span class="badge badge-featured">⭐ FEATURED</span>';
-      html += '<span class="badge badge-verified">Verified</span></div>';
-      html += '<button type="button" class="save-btn" data-save-type="vehicle" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'vehicle\',' + item.id + ',\'' + escAttr(item.title || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
-      html += '</div>';
-      html += '<div class="card-body"><div class="card-title">' + esc(item.title) + '</div>';
-      html += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
-      if (item.price_usd) html += '<div class="card-price-usd">Approx $' + Number(item.price_usd).toLocaleString() + ' USD</div>';
-      html += '<div class="card-meta"><span class="meta-tag">' + esc(item.year) + '</span>';
-      html += '<span class="meta-tag">' + esc(item.transmission) + '</span>';
-      html += '<span class="meta-tag loc">' + esc(item.location) + '</span></div></div></div>';
-    }
-    el.innerHTML = html;
-    markSavedItems();
-  }
-
-  // ============ RENDER PARTS ============
-  function renderPartsResults(data) {
-    var el = document.getElementById('results');
-    var local = data.local_parts || [];
-    var catalog = data.catalog_parts || [];
-    if (local.length === 0 && catalog.length === 0) {
-      el.innerHTML = '<div class="empty">No parts found.<br><br>Try a different search or <a href="#" onclick="openImportModal();return false;" style="color:#00a8e8;font-weight:bold;">request it from abroad</a>.</div>';
-      return;
-    }
-    var fitment = null;
-    try { fitment = JSON.parse(localStorage.getItem('fitmentVehicle') || 'null'); } catch (e) {}
-    var filterOn = false;
-    try { filterOn = localStorage.getItem('fitmentFilterOn') === '1'; } catch (e) {}
-    var html = '';
-
-    if (local.length > 0) {
-      var renderedLocal = 0;
-      var localHtml = '';
-      for (var i = 0; i < local.length; i++) {
-        var item = local[i];
-        var imgUrl = safeUrl(item.image_url);
-        var imgStyle = imgUrl ? 'background-image:url(\'' + imgUrl + '\');color:transparent;' : '';
-
-        var fits = false;
-        if (fitment && fitment.make && item.compatible_make) {
-          var makeMatch = item.compatible_make.toLowerCase() === fitment.make.toLowerCase();
-          var modelMatch = !item.compatible_model
-            || !fitment.model
-            || item.compatible_model.toLowerCase().indexOf(String(fitment.model).toLowerCase()) !== -1;
-          fits = makeMatch && modelMatch;
-        }
-
-        if (filterOn && fitment && fitment.make && !fits) continue;
-        renderedLocal++;
-
-        localHtml += '<div class="card" onclick="location.href=\'/part/' + encodeURIComponent(item.id) + '\'">';
-        localHtml += '<div class="card-img" style="' + imgStyle + '">' + (imgUrl ? '' : '🔧');
-        localHtml += '<div class="card-badges">';
-        if (item.is_featured) localHtml += '<span class="badge badge-featured">⭐ FEATURED</span>';
-        localHtml += '<span class="badge badge-new">' + esc(item.condition || 'New') + '</span>';
-        if (fits) localHtml += '<span class="badge badge-fits">✅ Fits your car</span>';
-        localHtml += '</div>';
-        localHtml += '<button type="button" class="save-btn" data-save-type="part" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'part\',' + item.id + ',\'' + escAttr(item.name || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
-        localHtml += '</div>';
-        localHtml += '<div class="card-body"><div class="card-title">' + esc(item.name) + '</div>';
-        localHtml += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
-        localHtml += '<div class="card-meta"><span class="meta-tag">' + esc(item.category) + '</span>';
-        localHtml += '<span class="meta-tag">Stock: ' + (item.stock_quantity || 0) + '</span>';
-        localHtml += '<span class="meta-tag loc">📍 ' + esc(item.location) + '</span></div></div></div>';
-      }
-      if (renderedLocal > 0) {
-        html += '<div style="grid-column:1/-1;margin-top:10px;margin-bottom:6px;"><h3 style="color:#0b1e3a;font-size:18px;">Available Locally in Sierra Leone</h3></div>';
-        html += localHtml;
-      }
-    }
-
-    if (catalog.length > 0) {
-      html += '<div style="grid-column:1/-1;margin-top:24px;margin-bottom:6px;"><h3 style="color:#0b1e3a;font-size:18px;">Import from Abroad (7-14 days)</h3></div>';
-      for (var j = 0; j < catalog.length; j++) {
-        var c = catalog[j];
-        html += '<div class="card" onclick="location.href=\'/catalog/' + encodeURIComponent(c.id) + '\'">';
-        html += '<div class="card-img" style="background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#c2410c;font-size:44px;">🌍';
-        html += '<div class="card-badges"><span class="badge" style="background:#ff6b00;">Import Available</span></div></div>';
-        html += '<div class="card-body">';
-        html += '<div style="font-family:monospace;font-size:12px;color:#94a3b8;margin-bottom:6px;">' + esc(c.part_number) + '</div>';
-        html += '<div class="card-title">' + esc(c.category || 'Part') + '</div>';
-        html += '<div style="font-size:13px;color:#666;margin-bottom:6px;">Fits: ' + esc(c.vehicle_compatibility || 'Universal') + '</div>';
-        html += '<div style="color:#ff6b00;font-weight:700;font-size:13px;">Request Quote</div>';
-        html += '</div></div>';
-      }
-    }
-
-    if (!html) {
-      el.innerHTML = '<div class="empty">No parts fit your car in this category.<br><br><button onclick="onFitmentFilterChange()" style="background:#00a8e8;color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;">Show all parts</button></div>';
-      return;
-    }
-
-    el.innerHTML = html;
-    markSavedItems();
-  }
-
-  // ============ CATEGORY FILTER ============
-  window.filterCategory = function (cat) {
-    document.getElementById('search-category').value = cat;
-    doSearch();
-  };
-
-  // ============ FITMENT ============
-  function initFitment() {
-    var mSel = document.getElementById('fitment-make');
-    var moSel = document.getElementById('fitment-model');
-    var ySel = document.getElementById('fitment-year');
-    if (!mSel) return;
-    var mHtml = '<option value="">Select Make</option>';
-    MAKES.forEach(function (m) { mHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
-    mSel.innerHTML = mHtml;
-    var yHtml = '<option value="">Select Year</option>';
-    YEARS.forEach(function (y) { yHtml += '<option value="' + y + '">' + y + '</option>'; });
-    ySel.innerHTML = yHtml;
-    mSel.addEventListener('change', function () {
-      var make = this.value;
-      var models = MODELS[make] || ['Other'];
-      var moHtml = '<option value="">Select Model</option>';
-      models.forEach(function (m) { moHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
-      moSel.innerHTML = moHtml;
-    });
-    var saved = null;
-    try { saved = JSON.parse(localStorage.getItem('fitmentVehicle') || 'null'); } catch (e) {}
-    if (saved) {
-      mSel.value = saved.make || '';
-      if (saved.make) {
-        var models = MODELS[saved.make] || [];
-        var moHtml = '<option value="">Select Model</option>';
-        models.forEach(function (m) { moHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
-        moSel.innerHTML = moHtml;
-      }
-      moSel.value = saved.model || '';
-      ySel.value = saved.year || '';
-      updateFitmentLabel(saved);
-      document.getElementById('fitment-clear').style.display = 'inline-block';
-    }
-    try {
-      if (localStorage.getItem('fitmentFilterOn') === '1') {
-        var cb = document.getElementById('fitment-filter');
-        if (cb) cb.checked = true;
-      }
-    } catch (e) {}
-  }
-
-  function updateFitmentLabel(v) {
-    var el = document.getElementById('fitment-label');
-    if (el) el.innerText = v.year + ' ' + v.make + ' ' + v.model + ' — Showing exact-fit parts';
-    var filterLabel = document.getElementById('fitment-filter-label');
-    if (filterLabel) filterLabel.style.display = 'inline-flex';
-  }
-
-  window.onFitmentFilterChange = function () {
-    var cb = document.getElementById('fitment-filter');
-    try {
-      if (cb && cb.checked) localStorage.setItem('fitmentFilterOn', '1');
-      else localStorage.removeItem('fitmentFilterOn');
-    } catch (e) {}
-    doSearch();
-  };
-
-  window.saveFitment = function () {
-    var make = document.getElementById('fitment-make').value;
-    var model = document.getElementById('fitment-model').value;
-    var year = document.getElementById('fitment-year').value;
-    if (!make || !model || !year) { alert('Please select Make, Model, and Year'); return; }
-    var v = { make: make, model: model, year: year };
-    try { localStorage.setItem('fitmentVehicle', JSON.stringify(v)); } catch (e) {}
-    updateFitmentLabel(v);
-    document.getElementById('fitment-clear').style.display = 'inline-block';
-    if (currentTab === 'parts') doSearch();
-  };
-
-  window.clearFitment = function () {
-    try { localStorage.removeItem('fitmentVehicle'); } catch (e) {}
-    document.getElementById('fitment-label').innerText = 'Not set - select your car for exact-fit parts';
-    document.getElementById('fitment-make').value = '';
-    document.getElementById('fitment-model').innerHTML = '<option value="">Select Model</option>';
-    document.getElementById('fitment-year').value = '';
-    document.getElementById('fitment-clear').style.display = 'none';
-    var filterLabel = document.getElementById('fitment-filter-label');
-    if (filterLabel) filterLabel.style.display = 'none';
-    var cb = document.getElementById('fitment-filter');
-    if (cb) cb.checked = false;
-    try { localStorage.removeItem('fitmentFilterOn'); } catch (e) {}
-    if (currentTab === 'parts') doSearch();
-  };
-
-  // ============ GARAGE SYNC ============
-  async function syncGarageFromBackend() {
-    if (!getToken()) return;
-    try {
-      var res = await fetch('/api/garage/', {
-        headers: { 'Authorization': 'Bearer ' + getToken() }
-      });
-      if (!res.ok) return;
-      var cars = await res.json();
-      var primary = cars.find(function (c) { return c.is_primary; }) || cars[0];
-      if (!primary) return;
-
-      try {
-        localStorage.setItem('fitmentVehicle', JSON.stringify({
-          make: primary.make,
-          model: primary.model,
-          year: String(primary.year)
-        }));
-      } catch (e) {}
-
-      var mSel = document.getElementById('fitment-make');
-      var moSel = document.getElementById('fitment-model');
-      var ySel = document.getElementById('fitment-year');
-      if (!mSel || !moSel || !ySel) return;
-
-      mSel.value = primary.make || '';
-      if (primary.make) {
-        var models = MODELS[primary.make] || [];
-        var moHtml = '<option value="">Select Model</option>';
-        models.forEach(function (m) { moHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
-        moSel.innerHTML = moHtml;
-      }
-      moSel.value = primary.model || '';
-      ySel.value = String(primary.year || '');
-
-      updateFitmentLabel({
-        make: primary.make,
-        model: primary.model,
-        year: String(primary.year)
-      });
-      var clearBtn = document.getElementById('fitment-clear');
-      if (clearBtn) clearBtn.style.display = 'inline-block';
-
-      if (typeof doSearch === 'function') doSearch();
-    } catch (e) {
-      console.warn('garage sync failed:', e);
-    }
-  }
-
-  // ============ PREDICTIVE SEARCH ============
-  function hideSuggestions() {
-    var b = document.getElementById('suggestions-box');
-    if (b) b.style.display = 'none';
-  }
-
-  function setupPredictiveSearch() {
-    var input = document.getElementById('search-input');
-    if (!input) return;
-    input.addEventListener('input', function (e) {
-      var q = e.target.value.trim();
-      clearTimeout(suggestTimeout);
-      if (q.length < 2) { hideSuggestions(); return; }
-      suggestTimeout = setTimeout(function () { fetchSuggestions(q); }, 200);
-    });
-    input.addEventListener('focus', function () {
-      var q = input.value.trim();
-      if (q.length >= 2) fetchSuggestions(q);
-    });
-    document.addEventListener('click', function (e) {
-      var box = document.getElementById('suggestions-box');
-      if (box && !box.contains(e.target) && e.target !== input) hideSuggestions();
-    });
-  }
-
-  function fetchSuggestions(q) {
-    var box = document.getElementById('suggestions-box');
-    box.innerHTML = '<div style="padding:14px;text-align:center;color:#94a3b8;font-size:13px">Searching...</div>';
-    box.style.display = 'block';
-    fetchWithTimeout('/api/unified/suggest?q=' + encodeURIComponent(q), 5000)
-      .then(function (r) { return r.json(); })
-      .then(function (data) { renderSuggestions(data.suggestions || [], q); })
-      .catch(function () { hideSuggestions(); });
-  }
-
-  function renderSuggestions(suggestions, q) {
-    var box = document.getElementById('suggestions-box');
-    if (!suggestions || suggestions.length === 0) {
-      box.innerHTML = '<div style="padding:14px;text-align:center;color:#94a3b8;font-size:13px">No results for "' + esc(q) + '"</div>';
-      return;
-    }
-    var html = '';
-    for (var i = 0; i < suggestions.length; i++) {
-      var s = suggestions[i];
-      var icon = s.icon || (s.type === 'vehicle' ? '🚗' : (s.type === 'catalog' ? '🌍' : '🔧'));
-      html += '<div class="suggestion-item" onclick="selectSuggestion(\'' + escAttr(s.url) + '\')">';
-      html += '<div style="width:32px;height:32px;border-radius:8px;background:#f0f9ff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">' + icon + '</div>';
-      html += '<div style="flex:1;min-width:0;">';
-      html += '<div style="font-weight:600;color:#0b1e3a;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(s.label) + '</div>';
-      html += '<div style="color:#94a3b8;font-size:12px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(s.sublabel) + '</div>';
-      html += '</div>';
-      html += '<div style="color:#00a8e8;font-size:16px;flex-shrink:0;">→</div>';
-      html += '</div>';
-    }
-    box.innerHTML = html;
-  }
-
-  window.selectSuggestion = function (url) {
-    hideSuggestions();
-    window.location.href = url;
-  };
-
-  // ============ MODALS ============
-  window.openImportModal = function () { document.getElementById('import-modal').style.display = 'flex'; };
-  window.closeImportModal = function () {
-    document.getElementById('import-modal').style.display = 'none';
-    document.getElementById('import-form').reset();
-    document.getElementById('import-status').innerHTML = '';
-  };
-
-  window.openModal = function (type, evt) {
-    if (evt) { evt.preventDefault(); evt.stopPropagation(); }
-    if (!getToken()) {
-      if (confirm('Please login or register to list items. Go to login page?')) {
-        window.location.href = '/login?next=/';
-      }
-      return false;
-    }
-    var modal = document.getElementById('modal-overlay');
-    if (!modal) { alert('Error: Modal not found.'); return false; }
-    var form = document.getElementById('listing-form');
-    if (form) { form.reset(); form.dataset.type = type; }
-    var statusEl = document.getElementById('form-status');
-    if (statusEl) statusEl.innerHTML = '';
-    var titleEl = document.getElementById('modal-title');
-    if (titleEl) titleEl.innerText = type === 'vehicle' ? '🚗 List Your Car' : '🔧 List a Part';
-    var fieldsEl = document.getElementById('form-fields');
-    if (fieldsEl) fieldsEl.innerHTML = type === 'vehicle' ? vehicleFormHTML() : partFormHTML();
-    modal.style.display = 'flex';
-    return false;
-  };
-
-  window.closeModal = function () {
-    var modal = document.getElementById('modal-overlay');
-    if (modal) modal.style.display = 'none';
-    var statusEl = document.getElementById('form-status');
-    if (statusEl) statusEl.innerHTML = '';
-  };
-
-  function vehicleFormHTML() {
-    var makesOpts = MAKES.map(function (m) { return '<option value="' + esc(m) + '">' + esc(m) + '</option>'; }).join('');
-    var yearsOpts = YEARS.map(function (y) { return '<option value="' + y + '">' + y + '</option>'; }).join('');
-    var citiesOpts = CITIES.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
-    return '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Car Title *</label>'
-      + '<input name="title" required placeholder="2015 Toyota Corolla" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Make *</label>'
-      + '<select name="make" id="v-make" required onchange="updateModels()" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select Make</option>' + makesOpts + '</select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Model *</label>'
-      + '<select name="model" id="v-model" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select Make First</option></select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Year *</label>'
-      + '<select name="year" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select Year</option>' + yearsOpts + '</select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Price (SLL) *</label>'
-      + '<input name="price_sll" type="number" required placeholder="150000000" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Price (USD, optional)</label>'
-      + '<input name="price_usd" type="number" placeholder="6500" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Mileage (km) *</label>'
-      + '<input name="mileage_km" type="number" required placeholder="85000" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Fuel *</label>'
-      + '<select name="fuel_type" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option></select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Transmission *</label>'
-      + '<select name="transmission" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option>Automatic</option><option>Manual</option></select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Location *</label>'
-      + '<select name="location" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select City</option>' + citiesOpts + '</select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">📱 WhatsApp Number *</label>'
-      + '<input name="contact_phone" required placeholder="+232 76 123456" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Description</label>'
-      + '<textarea name="description" rows="3" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"></textarea>';
-  }
-
-  function partFormHTML() {
-    var catsOpts = CATS.map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
-    var makesOpts = MAKES.map(function (m) { return '<option>' + esc(m) + '</option>'; }).join('');
-    var citiesOpts = CITIES.map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
-    return '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Part Name *</label>'
-      + '<input name="name" required placeholder="Toyota Corolla Brake Pads" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Category *</label>'
-      + '<select name="category" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select</option>' + catsOpts + '</select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Compatible Make</label>'
-      + '<select name="compatible_make" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Any</option>' + makesOpts + '</select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Compatible Model</label>'
-      + '<input name="compatible_model" placeholder="Corolla" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Price (SLL) *</label>'
-      + '<input name="price_sll" type="number" required placeholder="450000" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Stock Quantity *</label>'
-      + '<input name="stock_quantity" type="number" required value="1" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Condition *</label>'
-      + '<select name="condition" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option>New</option><option>Used</option><option>Refurbished</option></select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Location *</label>'
-      + '<select name="location" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"><option value="">Select City</option>' + citiesOpts + '</select>'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">📱 WhatsApp Number *</label>'
-      + '<input name="contact_phone" required placeholder="+232 76 123456" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">'
-      + '<label style="display:block;font-size:13px;color:#666;margin:8px 0 6px;font-weight:600;">Description</label>'
-      + '<textarea name="description" rows="3" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;"></textarea>';
-  }
-
-  window.updateModels = function () {
-    var makeSelect = document.getElementById('v-make');
-    var modelSelect = document.getElementById('v-model');
-    if (!makeSelect || !modelSelect) return;
-    var make = makeSelect.value;
-    if (!make) { modelSelect.innerHTML = '<option value="">Select Make First</option>'; return; }
-    var models = MODELS[make] || ['Other'];
-    var html = '<option value="">Select Model</option>';
-    for (var i = 0; i < models.length; i++) {
-      html += '<option value="' + esc(models[i]) + '">' + esc(models[i]) + '</option>';
-    }
-    html += '<option value="Other">Other (not listed)</option>';
-    modelSelect.innerHTML = html;
-  };
-
-  document.getElementById('listing-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var form = e.target;
-    var statusEl = document.getElementById('form-status');
-    var type = form.dataset.type || 'vehicle';
-    statusEl.style.color = '#00a8e8';
-    statusEl.innerText = 'Publishing...';
-    var userId = 1;
-    try {
-      var userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-      if (userInfo.id) userId = userInfo.id;
-    } catch (err) {}
-    var formData = new FormData(form);
-    var payload = {};
-    formData.forEach(function (value, key) {
-      if (value === '' || value === null) return;
-      var numeric = ['year', 'price_sll', 'price_usd', 'mileage_km', 'stock_quantity'];
-      if (numeric.indexOf(key) > -1) {
-        var num = parseFloat(value);
-        if (!isNaN(num)) { payload[key] = num; return; }
-      }
-      payload[key] = value;
-    });
-    if (type === 'vehicle') payload.seller_id = userId;
-    else payload.vendor_id = userId;
-    var url = (type === 'vehicle') ? '/api/vehicles/' : '/api/parts/';
-    try {
-      var res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getToken()
-        },
-        body: JSON.stringify(payload)
-      });
-      var responseText = await res.text();
-      var data;
-      try { data = JSON.parse(responseText); }
-      catch (err) { throw new Error('Server returned invalid response'); }
-      if (!res.ok) {
-        var errMsg = data.detail || 'Failed to publish';
-        if (res.status === 401) errMsg = 'Please login first (session expired)';
-        throw new Error(errMsg);
-      }
-      statusEl.style.color = '#22c55e';
-      statusEl.innerText = '✅ Listing published successfully!';
-      setTimeout(function () {
-        closeModal();
-        doSearch();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 800);
-    } catch (err) {
-      statusEl.style.color = '#dc2626';
-      statusEl.innerText = '❌ ' + err.message;
-    }
-  });
-
-  document.getElementById('import-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    var statusEl = document.getElementById('import-status');
-    statusEl.style.color = '#00a8e8';
-    statusEl.innerText = 'Submitting...';
-    var fd = new FormData(e.target);
-    var payload = {};
-    fd.forEach(function (v, k) {
-      if (v === '') return;
-      if (k === 'quantity' || k === 'budget_sll') payload[k] = Number(v);
-      else payload[k] = v;
-    });
-    try {
-      var res = await fetch('/api/import-requests/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) { var err = await res.json(); throw new Error(JSON.stringify(err)); }
-      var data = await res.json();
-      statusEl.style.color = 'green';
-      statusEl.innerHTML = '✅ Request received! We\'ll contact you on WhatsApp within 24 hours.';
-      setTimeout(function () { closeImportModal(); }, 4000);
-    } catch (err) {
-      statusEl.style.color = 'red';
-      statusEl.innerText = '❌ ' + err.message;
-    }
-  });
-
-  window.toggleMobileMenu = function () {
-    var menu = document.getElementById('mobile-menu');
-    if (menu) menu.classList.toggle('open');
-  };
-  window.closeMobileMenu = function () {
-    var menu = document.getElementById('mobile-menu');
-    if (menu) menu.classList.remove('open');
-  };
-
-  // ============ AI IDENTIFY CAR ============
-  var identifySelectedFile = null;
-
-  window.openIdentifyCar = function () {
-    if (!getToken()) {
-      alert('Please log in to use AI car identification.');
-      window.location.href = '/login';
-      return;
-    }
-    document.getElementById('identify-car-modal').style.display = 'flex';
-    document.getElementById('identify-stage-upload').style.display = 'block';
-    document.getElementById('identify-stage-result').style.display = 'none';
-    document.getElementById('identify-status').innerHTML = '';
-    document.getElementById('identify-file-input').value = '';
-    identifySelectedFile = null;
-  };
-
-  window.closeIdentifyCar = function () {
-    document.getElementById('identify-car-modal').style.display = 'none';
-    document.getElementById('identify-file-input').value = '';
-    identifySelectedFile = null;
-  };
-
-  document.getElementById('identify-file-input').addEventListener('change', function (e) {
-    if (e.target.files && e.target.files.length > 0) {
-      identifySelectedFile = e.target.files[0];
-      handleIdentifyUpload();
-    }
-  });
-
-  async function handleIdentifyUpload() {
-    if (!identifySelectedFile) return;
-    var statusEl = document.getElementById('identify-status');
-    var file = identifySelectedFile;
-
-    if (file.size > 8 * 1024 * 1024) {
-      statusEl.style.color = '#dc2626';
-      statusEl.innerText = '❌ Image too large (max 8 MB).';
-      return;
-    }
-
-    var startTime = Date.now();
-    statusEl.style.color = '#00a8e8';
-    statusEl.innerHTML = '<div style="padding:10px;">' +
-      '<div style="font-size:32px;margin-bottom:8px;">🔍</div>' +
-      '<div style="font-weight:700;">Analyzing your photo...</div>' +
-      '<div style="font-size:13px;color:#64748b;margin-top:6px;" id="identify-progress">Starting up (0s)</div>' +
-      '</div>';
-
-    var progressInterval = setInterval(function () {
-      var elapsed = Math.floor((Date.now() - startTime) / 1000);
-      var progressEl = document.getElementById('identify-progress');
-      if (progressEl) {
-        if (elapsed < 10) progressEl.innerText = 'Uploading photo... (' + elapsed + 's)';
-        else if (elapsed < 25) progressEl.innerText = 'AI is analyzing... (' + elapsed + 's)';
-        else progressEl.innerText = 'Almost done... (' + elapsed + 's)';
-      }
-    }, 1000);
-
-    var fd = new FormData();
-    fd.append('file', file);
-    var controller = new AbortController();
-    var timeoutId = setTimeout(function () { controller.abort(); }, 120000);
-
-    try {
-      var res = await fetch('/api/identify/car', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + getToken() },
-        body: fd,
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      clearInterval(progressInterval);
-
-      var responseText = await res.text();
-      var data;
-      try { data = JSON.parse(responseText); }
-      catch (err) {
-        statusEl.style.color = '#dc2626';
-        statusEl.innerHTML = '<div style="padding:10px;">' +
-          '<div style="font-size:32px;margin-bottom:8px;">⚠️</div>' +
-          '<div style="font-weight:700;">Server error</div>' +
-          '<div style="font-size:13px;color:#64748b;margin-top:6px;">Please try again.</div>' +
-          '</div>';
-        return;
-      }
-
-      if (!res.ok) {
-        statusEl.style.color = '#dc2626';
-        var errMsg = data.detail || 'Identification failed';
-        if (res.status === 401) errMsg = 'Please log in again (session expired)';
-        if (res.status === 429) errMsg = 'Daily limit reached (20/day). Try again tomorrow.';
-        statusEl.innerHTML = '<div style="padding:10px;">' +
-          '<div style="font-size:32px;margin-bottom:8px;">❌</div>' +
-          '<div style="font-weight:700;">' + esc(errMsg) + '</div>' +
-          '</div>';
-        return;
-      }
-
-      renderIdentifyResult(data.identification);
-    } catch (err) {
-      clearTimeout(timeoutId);
-      clearInterval(progressInterval);
-      statusEl.style.color = '#dc2626';
-      if (err.name === 'AbortError') {
-        statusEl.innerHTML = '<div style="padding:10px;">' +
-          '<div style="font-size:32px;margin-bottom:8px;">⏱️</div>' +
-          '<div style="font-weight:700;">Request timed out</div>' +
-          '</div>';
-      } else {
-        statusEl.innerHTML = '<div style="padding:10px;">' +
-          '<div style="font-size:32px;margin-bottom:8px;">🌐</div>' +
-          '<div style="font-weight:700;">Network error</div>' +
-          '</div>';
-      }
-    }
-  }
-
-  function renderIdentifyResult(car) {
-    var html = '';
-    if (!car || !car.make || !car.model) {
-      html = '<div style="text-align:center;padding:20px;">' +
-        '<div style="font-size:48px;margin-bottom:12px;">😕</div>' +
-        '<h3 style="color:#0b1e3a;margin-bottom:8px;">Could Not Identify</h3>' +
-        '<p style="color:#64748b;font-size:14px;">Please try a clearer photo.</p>' +
-        '<button onclick="closeIdentifyCar();openIdentifyCar()" style="margin-top:16px;background:#00a8e8;color:white;border:none;padding:12px 24px;border-radius:8px;font-weight:bold;cursor:pointer;">Try Another Photo</button>' +
-        '</div>';
-    } else {
-      var priceRange = '';
-      if (car.estimated_price_sll_low && car.estimated_price_sll_high) {
-        priceRange = 'SLL ' + Math.round(car.estimated_price_sll_low).toLocaleString() +
-                     ' – ' + Math.round(car.estimated_price_sll_high).toLocaleString();
-      }
-      var partsList = '';
-      if (car.common_parts && car.common_parts.length > 0) {
-        partsList = car.common_parts.map(function (p) {
-          return '<span style="display:inline-block;background:#f0f9ff;color:#0369a1;padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;margin:4px 4px 0 0;">' +
-                 esc(p) + '</span>';
-        }).join('');
-      }
-      html = '<div style="text-align:center;margin-bottom:20px;">' +
-        '<div style="font-size:48px;margin-bottom:8px;">🚗</div>' +
-        '<h2 style="color:#0b1e3a;font-size:22px;margin-bottom:4px;">' + esc(car.make) + ' ' + esc(car.model) + '</h2>' +
-        '<div style="color:#64748b;font-size:14px;">' + esc(car.year_range || '') + ' • ' + esc(car.body_type || '') + ' • ' + esc(car.color || '') + '</div>' +
-        '</div>' +
-        (priceRange ? '<div style="background:#dcfce7;padding:16px;border-radius:12px;text-align:center;margin-bottom:16px;"><div style="font-size:11px;color:#166534;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Estimated Price</div><div style="font-size:20px;color:#166534;font-weight:900;">' + priceRange + '</div></div>' : '') +
-        (partsList ? '<div style="margin-bottom:16px;"><div style="font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Common Parts</div><div>' + partsList + '</div></div>' : '') +
-        (car.description ? '<div style="background:#f8fafc;padding:12px;border-radius:8px;font-size:13px;color:#475569;line-height:1.5;margin-bottom:16px;">' + esc(car.description) + '</div>' : '') +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;">' +
-        '<button onclick="searchPartsForCar(\'' + escAttr(car.make) + '\', \'' + escAttr(car.model) + '\')" style="background:#00a8e8;color:white;border:none;padding:14px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;min-height:48px;">🔧 Find Parts</button>' +
-        '<button onclick="listCarFromIdentify(\'' + escAttr(car.make) + '\', \'' + escAttr(car.model) + '\')" style="background:#ff6b00;color:white;border:none;padding:14px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;min-height:48px;">📝 List for Sale</button>' +
-        '</div>' +
-        '<button onclick="closeIdentifyCar();openIdentifyCar()" style="width:100%;margin-top:10px;background:#f0f4f8;color:#0b1e3a;border:1px solid #e0e6ed;padding:12px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;">Try Another Photo</button>';
-    }
-    document.getElementById('identify-result-content').innerHTML = html;
-    document.getElementById('identify-stage-upload').style.display = 'none';
-    document.getElementById('identify-stage-result').style.display = 'block';
-  }
-
-  window.searchPartsForCar = function (make, model) {
-    closeIdentifyCar();
-    document.getElementById('search-input').value = make + ' ' + model;
-    switchMarket('parts');
-    setTimeout(function () { doSearch(); }, 100);
-  };
-
-  window.listCarFromIdentify = function (make, model) {
-    closeIdentifyCar();
-    setTimeout(function () { openModal('vehicle'); }, 100);
-  };
-
-  // ============ INIT ============
-  function init() {
-    if (getToken()) {
-      var link = document.getElementById('signin-link');
-      if (link) { link.innerText = 'My Dashboard'; link.href = '/my-account'; }
-    }
-    switchMarket('parts');
-    setupPredictiveSearch();
-    initFitment();
-    initSearchCascade();
-    syncGarageFromBackend();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
-</body>
-</html>
+</style>  
