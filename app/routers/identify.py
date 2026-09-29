@@ -63,11 +63,9 @@ async def identify_car(
     Identify a car from a photo using Gemini Vision.
     Requires login. Rate limited to 20/day per user.
     """
-    # Require login
     if not user:
         raise HTTPException(status_code=401, detail="Please log in to use photo identification")
 
-    # Rate limit check (20/day per user)
     user_key = f"user_{user.id}"
     now = datetime.utcnow()
     day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -83,7 +81,6 @@ async def identify_car(
     else:
         _rate_limit[user_key] = (1, now)
 
-    # Validate file
     if file.content_type not in {"image/jpeg", "image/png", "image/webp", "image/jpg"}:
         raise HTTPException(status_code=400, detail="File type not supported. Use JPG, PNG, or WEBP.")
 
@@ -91,7 +88,6 @@ async def identify_car(
     if len(contents) > 8 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Image too large. Max 8 MB.")
 
-    # Use Gemini Vision to identify
     try:
         from google import genai
         from google.genai import types
@@ -99,7 +95,6 @@ async def identify_car(
         if not settings.GEMINI_API_KEY:
             raise HTTPException(status_code=500, detail="AI not configured")
 
-        # Build the vision prompt
         prompt = """You are a car identification expert for the Sierra Leone automotive market.
 
 Analyze this photo of a car and identify it. Return ONLY valid JSON with these exact fields:
@@ -124,12 +119,9 @@ Rules:
 - Return ONLY JSON, no markdown, no explanation
 """
 
-        # Create the client with the new SDK
-        # The new SDK sends the key via x-goog-api-key header (required for AQ. keys)
         client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-        # Call Gemini Vision directly with image bytes (no temp file, no upload)
-                response = client.models.generate_content(
+        response = client.models.generate_content(
             model="gemini-3.8-flash",
             contents=[
                 types.Part.from_bytes(
@@ -140,9 +132,7 @@ Rules:
             ],
         )
 
-        # Parse JSON from response
         text = (response.text or "").strip()
-        # Remove markdown code fences if present
         text = re.sub(r'^```(?:json)?\s*', '', text)
         text = re.sub(r'\s*```$', '', text)
 
