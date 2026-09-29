@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
                 is_primary BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT NOW()
             )""",
-                        """CREATE TABLE IF NOT EXISTS saved_listings (
+            """CREATE TABLE IF NOT EXISTS saved_listings (
                 id SERIAL PRIMARY KEY,
                 user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
                 listing_type VARCHAR NOT NULL,
@@ -51,9 +51,7 @@ async def lifespan(app: FastAPI):
                 listing_image_url VARCHAR,
                 notes TEXT,
                 created_at TIMESTAMP DEFAULT NOW()
-            )""",            # Saved listings
-            "CREATE INDEX IF NOT EXISTS idx_saved_user ON saved_listings (user_id)",
-            "CREATE INDEX IF NOT EXISTS idx_saved_user_listing ON saved_listings (user_id, listing_type, listing_id)",
+            )""",
         ]
         for _sql in _migrations:
             try:
@@ -102,6 +100,9 @@ async def lifespan(app: FastAPI):
 
             "CREATE INDEX IF NOT EXISTS idx_garage_user ON garages (user_id)",
             "CREATE INDEX IF NOT EXISTS idx_garage_user_primary ON garages (user_id, is_primary)",
+
+            "CREATE INDEX IF NOT EXISTS idx_saved_user ON saved_listings (user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_saved_user_listing ON saved_listings (user_id, listing_type, listing_id)",
         ]
         created = 0
         for _sql in _indexes:
@@ -153,6 +154,8 @@ app.include_router(garage.router)
 
 
 # ==================== FRONTEND PAGES ====================
+
+# 🏠 HOMEPAGE — serves the marketplace (hero + categories + results + featured)
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse(
@@ -162,65 +165,7 @@ async def home(request: Request):
     )
 
 
-@app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="login.html",
-        context={"app_name": settings.APP_NAME},
-    )
-
-
-@app.get("/welcome", response_class=HTMLResponse)
-async def welcome_page(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="welcome.html",
-        context={"app_name": settings.APP_NAME},
-    )
-
-
-@app.get("/dashboard")
-async def dashboard_redirect():
-    return RedirectResponse(url="/my-account", status_code=302)
-
-
-@app.get("/my-account", response_class=HTMLResponse)
-async def my_account_page(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="my_account.html",
-        context={"app_name": settings.APP_NAME},
-    )
-
-
-@app.get("/garage", response_class=HTMLResponse)
-async def garage_page(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="garage.html",
-        context={"app_name": settings.APP_NAME},
-    )
-
-
-@app.get("/vehicle/{vehicle_id}", response_class=HTMLResponse)
-async def vehicle_detail(request: Request, vehicle_id: int):
-    return templates.TemplateResponse(
-        request=request,
-        name="vehicle_detail.html",
-        context={"app_name": settings.APP_NAME},
-    )
-
-
-@app.get("/part/{part_id}", response_class=HTMLResponse)
-async def part_detail(request: Request, part_id: int):
-    return templates.TemplateResponse(
-        request=request,
-        name="part_detail.html",
-        context={"app_name": settings.APP_NAME},
-    )
-
-
+# 🔍 VIN TOOL — the VIN decoder page
 @app.get("/vin-tool", response_class=HTMLResponse)
 async def vin_tool_page(request: Request):
     return templates.TemplateResponse(
@@ -230,6 +175,73 @@ async def vin_tool_page(request: Request):
     )
 
 
+# 🔐 LOGIN
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
+
+# 👋 WELCOME (legacy — kept as alias to /)
+@app.get("/welcome", response_class=HTMLResponse)
+async def welcome_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="vin_lookup.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
+
+# 📊 DASHBOARD → MY ACCOUNT redirect
+@app.get("/dashboard")
+async def dashboard_redirect():
+    return RedirectResponse(url="/my-account", status_code=302)
+
+
+# 👤 MY ACCOUNT
+@app.get("/my-account", response_class=HTMLResponse)
+async def my_account_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="my_account.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
+
+# 🚗 MY GARAGE
+@app.get("/garage", response_class=HTMLResponse)
+async def garage_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="garage.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
+
+# 🚙 VEHICLE DETAIL
+@app.get("/vehicle/{vehicle_id}", response_class=HTMLResponse)
+async def vehicle_detail(request: Request, vehicle_id: int):
+    return templates.TemplateResponse(
+        request=request,
+        name="vehicle_detail.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
+
+# 🔧 PART DETAIL
+@app.get("/part/{part_id}", response_class=HTMLResponse)
+async def part_detail(request: Request, part_id: int):
+    return templates.TemplateResponse(
+        request=request,
+        name="part_detail.html",
+        context={"app_name": settings.APP_NAME},
+    )
+
+
+# 🛡️ ADMIN DASHBOARD (secret URL)
 @app.get("/admin-panel-x9k2m7", response_class=HTMLResponse)
 async def admin_dashboard_secret(request: Request):
     return templates.TemplateResponse(
@@ -239,6 +251,7 @@ async def admin_dashboard_secret(request: Request):
     )
 
 
+# 📦 ADMIN CATALOG
 @app.get("/admin/catalog", response_class=HTMLResponse)
 async def admin_catalog_page(request: Request):
     return templates.TemplateResponse(
@@ -248,6 +261,7 @@ async def admin_catalog_page(request: Request):
     )
 
 
+# 🌍 CATALOG DETAIL
 @app.get("/catalog/{part_id}", response_class=HTMLResponse)
 async def catalog_detail_page(request: Request, part_id: int):
     return templates.TemplateResponse(
@@ -284,6 +298,18 @@ async def run_migration():
             year INTEGER NOT NULL,
             nickname VARCHAR,
             is_primary BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT NOW()
+         )"""),
+        ("saved_listings",
+         """CREATE TABLE IF NOT EXISTS saved_listings (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            listing_type VARCHAR NOT NULL,
+            listing_id INTEGER NOT NULL,
+            listing_title VARCHAR,
+            listing_price_sll FLOAT,
+            listing_image_url VARCHAR,
+            notes TEXT,
             created_at TIMESTAMP DEFAULT NOW()
          )"""),
     ]
