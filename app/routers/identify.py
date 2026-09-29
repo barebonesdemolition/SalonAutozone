@@ -93,7 +93,7 @@ async def identify_car(
 
     # Use Gemini Vision to identify
     try:
-        import google.generativeai as genai
+        from google import genai
         if not settings.GEMINI_API_KEY:
             raise HTTPException(status_code=500, detail="AI not configured")
         genai.configure(api_key=settings.GEMINI_API_KEY)
