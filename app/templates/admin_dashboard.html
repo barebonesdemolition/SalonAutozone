@@ -2,602 +2,402 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Admin - {{ app_name }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard · SalonAutoZone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%23ffb800' font-family='Arial'>A</text></svg>">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
-.navbar{background:#0b1e3a;color:white;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-.logo{font-size:18px;font-weight:900;color:#00a8e8;text-decoration:none}
-.logo span{color:#ffb800}
-.admin-badge{background:#ff6b00;color:white;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:bold;margin-left:10px}
-.navbar a{color:white;text-decoration:none;font-size:13px;margin-left:20px}
-.container{max-width:1400px;margin:30px auto;padding:0 20px}
-.login-prompt{background:white;border-radius:16px;padding:60px 40px;text-align:center;max-width:500px;margin:80px auto;box-shadow:0 10px 40px rgba(0,0,0,0.1)}
-.login-prompt h1{color:#0b1e3a;margin-bottom:12px;font-size:22px}
-.login-prompt p{color:#64748b;margin-bottom:24px;font-size:14px}
-.login-prompt input{width:100%;padding:12px;border:1px solid #e0e6ed;border-radius:8px;margin-bottom:12px;font-size:14px;font-family:inherit}
-.login-prompt button{width:100%;padding:14px;background:#00a8e8;color:white;border:none;border-radius:10px;font-weight:bold;font-size:15px;cursor:pointer}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{background:white;padding:18px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border-left:4px solid #00a8e8}
-.stat-card.green{border-left-color:#22c55e}
-.stat-card.orange{border-left-color:#ff6b00}
-.stat-card.red{border-left-color:#dc2626}
-.stat-card.purple{border-left-color:#a855f7}
-.stat-label{font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;letter-spacing:0.5px}
-.stat-value{font-size:28px;color:#0b1e3a;font-weight:900;margin-top:6px}
-.stat-sub{font-size:12px;color:#64748b;margin-top:4px}
-.tabs{display:flex;gap:6px;margin-bottom:20px;background:white;padding:6px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);flex-wrap:wrap}
-.tab{padding:10px 16px;background:transparent;border:none;border-radius:8px;font-weight:600;cursor:pointer;color:#64748b;font-size:13px;font-family:inherit}
-.tab.active{background:#0b1e3a;color:white}
-.tab:hover:not(.active){background:#f0f4f8}
-.section{background:white;border-radius:14px;padding:22px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:none}
-.section.active{display:block}
-.section h2{color:#0b1e3a;font-size:18px;margin-bottom:16px}
-.activity-item{display:flex;gap:14px;padding:12px;border-bottom:1px solid #f1f5f9;align-items:center}
-.activity-item:last-child{border-bottom:none}
-.activity-icon{width:38px;height:38px;border-radius:10px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.activity-text{flex:1;color:#334155;font-size:14px}
-.activity-time{color:#94a3b8;font-size:11px;white-space:nowrap}
-.data-row{display:flex;gap:14px;padding:14px;border-bottom:1px solid #f1f5f9;align-items:center;flex-wrap:wrap}
+:root{
+  --navy-900:#0a1729;--navy-800:#0b1e3a;--navy-600:#1a3a6b;
+  --blue-400:#00a8e8;--blue-500:#0091d5;
+  --amber-500:#ffb800;--orange-500:#ff6b00;
+  --green-500:#16a34a;--green-400:#22c55e;
+  --red-500:#dc2626;--red-400:#ef4444;
+  --slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;
+  --slate-400:#94a3b8;--slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;
+  --slate-800:#1e293b;
+  --shadow-sm:0 1px 2px rgba(15,23,42,0.04),0 1px 3px rgba(15,23,42,0.06);
+  --shadow-md:0 2px 4px rgba(15,23,42,0.04),0 4px 12px rgba(15,23,42,0.06);
+  --shadow-lg:0 4px 8px rgba(15,23,42,0.06),0 12px 28px rgba(15,23,42,0.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--slate-800);background:var(--slate-50);-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+
+.navbar{background:var(--navy-800);color:white;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.logo{font-size:18px;font-weight:800;color:var(--amber-500);text-decoration:none;letter-spacing:-0.03em}
+.logo span{color:var(--blue-400)}
+.navbar a{color:white;text-decoration:none;font-size:13px;font-weight:600;padding:9px 14px;border-radius:8px;background:rgba(255,255,255,0.08);transition:background 0.15s}
+.navbar a:hover{background:rgba(255,255,255,0.18)}
+
+.container{max-width:1300px;margin:24px auto;padding:0 20px}
+.page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-600) 100%);color:white;padding:36px 32px;border-radius:16px;margin-bottom:24px;position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(255,184,0,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(0,168,232,0.12) 0%,transparent 50%);pointer-events:none}
+.page-header > *{position:relative;z-index:1}
+.page-header h1{font-size:28px;font-weight:800;margin-bottom:6px;letter-spacing:-0.03em}
+.page-header p{font-size:14px;opacity:0.85}
+.page-header .admin-key-form{display:flex;gap:8px;margin-top:16px;max-width:420px}
+.page-header .admin-key-form input{flex:1;padding:12px 14px;border:none;border-radius:8px;font-size:14px;font-family:inherit}
+.page-header .admin-key-form button{background:var(--amber-500);color:var(--navy-900);border:none;padding:12px 22px;border-radius:8px;font-weight:800;cursor:pointer;font-size:14px;font-family:inherit}
+.page-header .admin-key-form button:hover{opacity:0.9}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:white;border-radius:14px;padding:18px 20px;box-shadow:var(--shadow-sm);border-left:4px solid var(--blue-400);transition:transform 0.15s,box-shadow 0.15s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-label{font-size:10px;color:var(--slate-400);text-transform:uppercase;font-weight:700;letter-spacing:0.08em}
+.stat-value{font-size:28px;color:var(--navy-800);font-weight:800;margin-top:6px;letter-spacing:-0.03em}
+.stat-value.revenue{color:var(--green-500)}
+
+.tabs{display:flex;gap:6px;margin-bottom:18px;background:white;padding:6px;border-radius:12px;box-shadow:var(--shadow-sm);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 18px;background:transparent;border:none;border-radius:8px;font-weight:700;cursor:pointer;color:var(--slate-500);font-size:13px;white-space:nowrap;flex-shrink:0;font-family:inherit;transition:all 0.15s}
+.tab:hover{color:var(--navy-800)}
+.tab.active{background:var(--navy-800);color:white}
+
+.section{background:white;border-radius:16px;padding:24px;box-shadow:var(--shadow-sm);display:none;border:1px solid var(--slate-200)}
+.section.active{display:block;animation:fadeInUp 0.3s ease-out}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section h2{color:var(--navy-800);font-size:20px;font-weight:800;margin-bottom:18px;letter-spacing:-0.02em}
+
+.data-row{display:flex;gap:14px;padding:14px 16px;border-bottom:1px solid var(--slate-100);align-items:center;flex-wrap:wrap;transition:background 0.15s;border-radius:10px}
+.data-row:hover{background:var(--slate-50)}
 .data-row:last-child{border-bottom:none}
-.data-row:hover{background:#f8fafc}
-.data-main{flex:1;min-width:200px}
-.data-title{font-weight:700;color:#0b1e3a;font-size:14px}
-.data-meta{color:#64748b;font-size:12px;margin-top:3px}
-.wa-btn{background:#25D366;color:white;padding:7px 12px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;border:none;cursor:pointer;white-space:nowrap}
-.wa-btn:hover{background:#1da851}
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.badge.new{background:#fef3c7;color:#92400e}
-.badge.contacted{background:#dbeafe;color:#1e40af}
-.badge.sold{background:#dcfce7;color:#166534}
-.badge.pending{background:#fef3c7;color:#92400e}
-.badge.quoted{background:#dbeafe;color:#1e40af}
-.badge.ordered{background:#e0e7ff;color:#3730a3}
-.badge.delivered{background:#dcfce7;color:#166534}
-.loading{text-align:center;padding:40px;color:#94a3b8}
-.empty{text-align:center;padding:40px;color:#94a3b8;font-size:14px}
-.status-select{padding:6px 10px;border-radius:6px;border:1px solid #e0e6ed;font-size:12px;font-family:inherit;background:white;cursor:pointer}
-.refresh-btn{background:#0b1e3a;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-.refresh-btn:hover{background:#1a3a6b}
-@media(max-width:768px){
-  .navbar{padding:12px 16px;flex-wrap:wrap;gap:8px}
-  .logo{font-size:15px}
-  .container{padding:0 12px;margin-top:16px}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
+.data-icon{width:44px;height:44px;border-radius:12px;background:var(--slate-100);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.data-icon.featured{background:linear-gradient(135deg,var(--amber-500),#e5a700);color:white}
+.data-main{flex:1;min-width:0}
+.data-title{font-weight:700;color:var(--navy-800);font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.data-meta{font-size:12px;color:var(--slate-500);display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.data-meta strong{color:var(--slate-700)}
+
+.badge{padding:4px 10px;border-radius:9999px;font-size:11px;font-weight:700;background:var(--slate-100);color:var(--slate-600)}
+.badge-featured{background:var(--amber-500);color:var(--navy-900)}
+.badge-green{background:var(--green-500);color:white}
+.badge-red{background:var(--red-500);color:white}
+.badge-blue{background:var(--blue-400);color:white}
+
+.action-btn{padding:8px 14px;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;font-family:inherit;min-height:36px;transition:opacity 0.15s}
+.action-btn:hover{opacity:0.85}
+.btn-unfeature{background:#fef3c7;color:#92400e}
+.btn-contact{background:var(--blue-400);color:white}
+
+.loading{text-align:center;padding:40px;color:var(--blue-400);font-weight:600}
+.empty{text-align:center;padding:60px 20px;color:var(--slate-400);font-size:14px}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:0.4}
+.error-box{background:#fef2f2;border-radius:12px;padding:16px 20px;border-left:4px solid var(--red-500);color:#991b1b;font-weight:600;font-size:14px;margin-bottom:16px}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--navy-800);color:white;padding:14px 24px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:var(--shadow-lg);transition:transform 0.3s,opacity 0.3s;opacity:0;z-index:9999;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{background:var(--green-500)}
+.toast.error{background:var(--red-500)}
+
+@media (max-width:768px){
+  .navbar{padding:12px 16px;flex-direction:column}
+  .page-header{padding:24px 20px}
+  .page-header h1{font-size:22px}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
   .stat-value{font-size:22px}
-  .tabs{overflow-x:auto;flex-wrap:nowrap}
-  .tab{white-space:nowrap;font-size:12px;padding:8px 12px}
-  .section{padding:16px}
-  .data-row{padding:10px}
+  .data-row{padding:12px}
+  .action-btn{width:100%;margin-top:6px}
 }
-
-/* ========== MOBILE ADMIN OPTIMIZATIONS ========== */
-@media (max-width: 768px) {
-    .navbar {
-        padding: 12px 16px;
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-    .navbar > div {
-        width: 100%;
-        justify-content: center;
-        display: flex;
-        gap: 15px;
-    }
-    .logo { font-size: 16px; }
-    .admin-badge { font-size: 10px; padding: 3px 8px; }
-    
-    .container {
-        padding: 0 12px;
-        margin-top: 16px;
-    }
-    
-    .login-prompt {
-        margin: 30px 12px;
-        padding: 32px 20px;
-        border-radius: 14px;
-    }
-    .login-prompt h1 { font-size: 20px; margin-bottom: 10px; }
-    .login-prompt p { font-size: 13px; margin-bottom: 20px; }
-    .login-prompt input {
-        font-size: 16px;  /* Prevents iOS auto-zoom */
-        padding: 14px;
-        min-height: 48px;
-        border-radius: 10px;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-    .login-prompt button {
-        font-size: 16px;
-        padding: 16px;
-        min-height: 52px;
-        border-radius: 12px;
-        -webkit-tap-highlight-color: transparent;
-        touch-action: manipulation;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin-bottom: 16px;
-    }
-    .stat-card { padding: 14px; }
-    .stat-label { font-size: 10px; }
-    .stat-value { font-size: 22px; }
-    .stat-sub { font-size: 11px; }
-    
-    .tabs {
-        overflow-x: auto;
-        overflow-y: hidden;
-        flex-wrap: nowrap;
-        -webkit-overflow-scrolling: touch;
-        padding: 6px;
-        gap: 4px;
-        scrollbar-width: none;
-    }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab {
-        white-space: nowrap;
-        font-size: 13px;
-        padding: 10px 14px;
-        min-height: 40px;
-        flex-shrink: 0;
-    }
-    
-    .section { padding: 16px; }
-    .section h2 { font-size: 16px; flex-direction: column; align-items: flex-start; gap: 10px; }
-    .section h2 .refresh-btn { 
-        width: 100%;
-        padding: 12px;
-        font-size: 13px;
-        min-height: 44px;
-    }
-    
-    .data-row {
-        padding: 12px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-    .data-main { width: 100%; min-width: 0; }
-    .data-title { font-size: 14px; line-height: 1.4; }
-    .data-meta { font-size: 12px; line-height: 1.5; }
-    .wa-btn { 
-        width: 100%;
-        justify-content: center;
-        padding: 12px;
-        min-height: 44px;
-        font-size: 13px;
-    }
-    
-    .activity-item { padding: 12px; gap: 10px; }
-    .activity-icon { width: 34px; height: 34px; font-size: 16px; }
-    .activity-text { font-size: 13px; line-height: 1.4; }
-    .activity-time { font-size: 11px; }
-    
-    .badge { font-size: 10px; padding: 3px 8px; }
-    .status-select { min-height: 40px; font-size: 14px; }
-}
-
-@media (max-width: 400px) {
-    .stats-grid { grid-template-columns: 1fr; }
-    .stat-value { font-size: 20px; }
-    .login-prompt h1 { font-size: 18px; }
-}
-
-/* iOS safe area for notch/home indicator */
-@supports (padding: max(0px)) {
-    .navbar {
-        padding-top: max(12px, env(safe-area-inset-top));
-        padding-left: max(16px, env(safe-area-inset-left));
-        padding-right: max(16px, env(safe-area-inset-right));
-    }
-}
-
-/* Ensure tap targets are big enough */
-@media (hover: none) and (pointer: coarse) {
-    button, a, input[type="submit"], .tab { 
-        -webkit-tap-highlight-color: rgba(0,168,232,0.15);
-    }
-}
-
-
-/* Password toggle button mobile optimization */
-@media (max-width: 768px) {
-    #admin-password {
-        font-size: 16px !important;
-        padding: 14px 48px 14px 14px !important;
-        min-height: 48px;
-    }
-    button[onclick*="togglePassword"] {
-        font-size: 20px !important;
-        padding: 10px !important;
-        min-width: 44px;
-        min-height: 44px;
-    }
-}
-
-
-/* Mobile-optimized admin login */
-@media (max-width: 768px) {
-    .login-prompt {
-        margin: 20px 16px;
-        padding: 32px 20px;
-        border-radius: 16px;
-    }
-    .login-prompt h1 {
-        font-size: 20px;
-        margin-bottom: 8px;
-    }
-    .login-prompt p {
-        font-size: 13px;
-        margin-bottom: 24px;
-        line-height: 1.5;
-    }
-    .login-prompt input {
-        font-size: 16px !important;
-        padding: 14px !important;
-        min-height: 48px;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-    #admin-password {
-        padding-right: 48px !important;
-    }
-    #admin-pw-toggle {
-        font-size: 20px !important;
-        padding: 10px !important;
-        min-width: 44px;
-        min-height: 44px;
-    }
-    .login-prompt button[onclick*="loginAdmin"] {
-        font-size: 16px !important;
-        padding: 16px !important;
-        min-height: 52px;
-        border-radius: 12px;
-    }
-}
-
-@media (max-width: 400px) {
-    .login-prompt {
-        padding: 24px 16px;
-    }
-    .login-prompt h1 { font-size: 18px; }
-}
-
 </style>
 </head>
 <body>
+
 <div class="navbar">
-  <div>
-    <a href="/" class="logo">Salon<span>AutoZone</span></a>
-    <span class="admin-badge">ADMIN</span>
-  </div>
-  <div>
-    <a href="/">← Home</a>
-    <a href="#" onclick="logout()">Logout</a>
+  <a href="/" class="logo">Salon<span>AutoZone</span> · Admin</a>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <a href="/">🏠 Back to Site</a>
+    <a href="/my-account">👤 My Account</a>
   </div>
 </div>
 
-<!-- Login prompt (shown if not authenticated) -->
-<div id="login-prompt" class="login-prompt" style="display:none;">
-  <h1>🔒 Admin Access</h1>
-  <p>Enter your admin credentials to access the control center.</p>
-  
-  <div style="text-align:left;max-width:400px;margin:0 auto;">
-    <label for="admin-email" style="display:block;font-size:13px;color:#475569;font-weight:600;margin-bottom:6px;">Email</label>
-    <input 
-      type="email" 
-      id="admin-email" 
-      placeholder="admin@salonautozone.com" 
-      autocomplete="email" 
-      inputmode="email" 
-      autocapitalize="off" 
-      autocorrect="off" 
-      spellcheck="false" 
-      style="width:100%;padding:14px;border:1px solid #e0e6ed;border-radius:10px;font-size:16px;font-family:inherit;box-sizing:border-box;outline:none;">
-    
-    <label for="admin-password" style="display:block;font-size:13px;color:#475569;font-weight:600;margin-bottom:6px;margin-top:14px;">Password</label>
-    <div style="position:relative;width:100%;">
-      <input 
-        type="password" 
-        id="admin-password" 
-        placeholder="Your password" 
-        autocomplete="current-password" 
-        style="width:100%;padding:14px 48px 14px 14px;border:1px solid #e0e6ed;border-radius:10px;font-size:16px;font-family:inherit;box-sizing:border-box;outline:none;">
-      <button 
-        type="button" 
-        id="admin-pw-toggle" 
-        onclick="togglePassword('admin-password', this)" 
-        style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:8px;font-size:18px;line-height:1;color:#64748b;" 
-        aria-label="Show password">👁️</button>
+<div class="container">
+  <div class="page-header">
+    <h1>🛡️ Admin Dashboard</h1>
+    <p>Manage featured listings, users, imports, and inquiries</p>
+    <div class="admin-key-form" id="admin-key-wrap">
+      <input type="password" id="admin-key-input" placeholder="Enter admin key" autocomplete="current-password">
+      <button onclick="saveAdminKey()">Unlock</button>
     </div>
   </div>
-  
-  <button 
-    onclick="loginAdmin()" 
-    style="width:100%;max-width:400px;margin-top:20px;padding:16px;background:#00a8e8;color:white;border:none;border-radius:12px;font-weight:bold;font-size:16px;cursor:pointer;font-family:inherit;min-height:52px;">
-    Sign In
-  </button>
-  <div id="login-status" style="margin-top:14px;font-size:14px;text-align:center;font-weight:600;color:#64748b;"></div>
+
+  <div id="error-box" class="error-box" style="display:none;"></div>
+
+  <div id="dashboard-content" style="display:none;">
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">—</div></div>
+      <div class="stat-card" style="border-left-color:var(--amber-500)"><div class="stat-label">Featured Listings</div><div class="stat-value" id="stat-featured">—</div></div>
+      <div class="stat-card" style="border-left-color:var(--green-500)"><div class="stat-label">Featured Revenue (SLL)</div><div class="stat-value revenue" id="stat-revenue">—</div></div>
+      <div class="stat-card" style="border-left-color:#a855f7"><div class="stat-label">Total Vehicles</div><div class="stat-value" id="stat-vehicles">—</div></div>
+      <div class="stat-card" style="border-left-color:#ff6b00"><div class="stat-label">Total Parts</div><div class="stat-value" id="stat-parts">—</div></div>
+      <div class="stat-card" style="border-left-color:var(--blue-400)"><div class="stat-label">Total Inquiries</div><div class="stat-value" id="stat-inquiries">—</div></div>
+      <div class="stat-card" style="border-left-color:var(--red-500)"><div class="stat-label">Import Requests</div><div class="stat-value" id="stat-imports">—</div></div>
+      <div class="stat-card" style="border-left-color:var(--slate-400)"><div class="stat-label">Saved Items</div><div class="stat-value" id="stat-saved">—</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="featured">⭐ Featured (Revenue)</button>
+      <button class="tab" data-tab="users">👥 Users</button>
+      <button class="tab" data-tab="imports">🌍 Imports</button>
+      <button class="tab" data-tab="inquiries">💬 Inquiries</button>
+    </div>
+
+    <div id="section-featured" class="section active">
+      <h2>⭐ Featured Listings — Payment Tracker</h2>
+      <div id="featured-list"><div class="loading">Loading…</div></div>
+    </div>
+
+    <div id="section-users" class="section">
+      <h2>👥 Users</h2>
+      <div id="users-list"><div class="loading">Loading…</div></div>
+    </div>
+
+    <div id="section-imports" class="section">
+      <h2>🌍 Import Requests</h2>
+      <div id="imports-list"><div class="loading">Loading…</div></div>
+    </div>
+
+    <div id="section-inquiries" class="section">
+      <h2>💬 Recent Inquiries</h2>
+      <div id="inquiries-list"><div class="loading">Loading…</div></div>
+    </div>
+  </div>
 </div>
 
-<div id="dashboard" class="container" style="display:none;">
-  <div class="stats-grid" id="stats-grid">
-    <div class="loading" style="grid-column:1/-1;">Loading stats...</div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('activity')">📊 Activity</button>
-    <button class="tab" onclick="switchTab('inquiries')">💬 Inquiries</button>
-    <button class="tab" onclick="switchTab('imports')">🌍 Import Requests</button>
-    <button class="tab" onclick="switchTab('users')">👥 Users</button>
-  </div>
-
-  <div id="section-activity" class="section active">
-    <h2>📊 Recent Activity <button class="refresh-btn" style="float:right;" onclick="loadActivity()">↻ Refresh</button></h2>
-    <div id="activity-list"><div class="loading">Loading...</div></div>
-  </div>
-
-  <div id="section-inquiries" class="section">
-    <h2>💬 All Inquiries <button class="refresh-btn" style="float:right;" onclick="loadInquiries()">↻ Refresh</button></h2>
-    <div id="inquiries-list"><div class="loading">Loading...</div></div>
-  </div>
-
-  <div id="section-imports" class="section">
-    <h2>🌍 Import Requests <button class="refresh-btn" style="float:right;" onclick="loadImports()">↻ Refresh</button></h2>
-    <div id="imports-list"><div class="loading">Loading...</div></div>
-  </div>
-
-  <div id="section-users" class="section">
-    <h2>👥 Registered Users <button class="refresh-btn" style="float:right;" onclick="loadUsers()">↻ Refresh</button></h2>
-    <div id="users-list"><div class="loading">Loading...</div></div>
-  </div>
-</div>
+<div id="toast" class="toast"></div>
 
 <script>
-var token = localStorage.getItem('token') || '';
-var currentTab = 'activity';
+(function () {
+  'use strict';
 
+  var ADMIN_KEY_STORAGE = 'admin_key';
+  var adminKey = '';
+  try { adminKey = localStorage.getItem(ADMIN_KEY_STORAGE) || ''; } catch (e) {}
 
-function togglePassword(fieldId, btn) {
-    const field = document.getElementById(fieldId);
-    if (!field) return;
-    if (field.type === 'password') {
-        field.type = 'text';
-        btn.innerText = '🙈';
-        btn.setAttribute('aria-label', 'Hide password');
-    } else {
-        field.type = 'password';
-        btn.innerText = '👁️';
-        btn.setAttribute('aria-label', 'Show password');
-    }
-}
-
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('userInfo');
-  window.location.href = '/';
-}
-
-function timeAgo(iso) {
-  if (!iso) return '';
-  var diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (diff < 60) return 'just now';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
-  return new Date(iso).toLocaleDateString();
-}
-
-function esc(s) {
-  if (!s) return '';
-  return String(s).replace(/[&<>"']/g, function(c) {
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-  });
-}
-
-function waLink(phone, msg) {
-  var clean = (phone || '').replace(/[^0-9]/g, '');
-  var text = encodeURIComponent(msg || 'Hi from Salon AutoZone');
-  return 'https://wa.me/' + clean + '?text=' + text;
-}
-
-async function checkAuth() {
-  if (!token) {
-    document.getElementById('login-prompt').style.display = 'block';
-    return false;
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.innerText = msg;
+    t.className = 'toast show ' + (type || '');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () { t.className = 'toast'; }, 3000);
   }
-  try {
-    var res = await fetch('/api/admin/stats', {
-      headers: {'Authorization': 'Bearer ' + token}
+
+  function showError(msg) {
+    var e = document.getElementById('error-box');
+    e.innerHTML = '⚠️ ' + msg;
+    e.style.display = 'block';
+  }
+
+  function hideError() {
+    document.getElementById('error-box').style.display = 'none';
+  }
+
+  async function adminFetch(url, options) {
+    var opts = options || {};
+    opts.headers = Object.assign({}, opts.headers || {}, {
+      'X-Admin-Key': adminKey,
     });
-    if (res.ok) {
-      document.getElementById('dashboard').style.display = 'block';
-      var stats = await res.json();
-      renderStats(stats);
-      loadActivity();
-      return true;
-    } else if (res.status === 401 || res.status === 403) {
-      document.getElementById('login-prompt').style.display = 'block';
-      return false;
+    var res = await fetch(url, opts);
+    if (res.status === 403) {
+      throw new Error('Invalid admin key. Please check and try again.');
     }
-  } catch(e) {
-    document.getElementById('login-prompt').style.display = 'block';
-    return false;
+    if (!res.ok) {
+      var err = await res.json().catch(function() { return {}; });
+      throw new Error(err.detail || 'Request failed: ' + res.status);
+    }
+    return res.json();
   }
-}
 
-async function loginAdmin() {
-    var email = document.getElementById('admin-email').value;
-    var password = document.getElementById('admin-password').value;
-    var statusEl = document.getElementById('login-status');
-    
-    if (!email || !password) {
-        statusEl.style.color = '#dc2626';
-        statusEl.innerText = 'Please enter email and password.';
-        return;
-    }
-    
-    statusEl.style.color = '#00a8e8';
-    statusEl.innerText = 'Signing in...';
-    
+  window.saveAdminKey = function () {
+    var input = document.getElementById('admin-key-input');
+    var key = (input.value || '').trim();
+    if (!key) { showToast('Please enter the admin key', 'error'); return; }
+    adminKey = key;
+    try { localStorage.setItem(ADMIN_KEY_STORAGE, key); } catch (e) {}
+    input.value = '';
+    initDashboard();
+  };
+
+  async function loadStats() {
     try {
-        var res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email: email, password: password})
-        });
-        var data = await res.json();
-        if (!res.ok) throw new Error(data.detail || 'Invalid credentials');
-        
-        localStorage.setItem('token', data.access_token);
-        token = data.access_token;
-        
-        // Verify admin access
-        var adminTest = await fetch('/api/admin/stats', {
-            headers: {'Authorization': 'Bearer ' + token}
-        });
-        if (!adminTest.ok) {
-            statusEl.style.color = '#dc2626';
-            statusEl.innerText = '❌ This account is not an admin.';
-            localStorage.removeItem('token');
-            token = '';
-            return;
-        }
-        
-        statusEl.style.color = '#22c55e';
-        statusEl.innerText = '✅ Welcome! Loading dashboard...';
-        setTimeout(function() { window.location.reload(); }, 600);
-        
-    } catch(e) {
-        statusEl.style.color = '#dc2626';
-        statusEl.innerText = '❌ ' + e.message;
+      var d = await adminFetch('/api/admin/stats');
+      document.getElementById('stat-users').textContent = d.total_users ?? 0;
+      document.getElementById('stat-featured').textContent = (d.featured_parts ?? 0) + (d.featured_vehicles ?? 0);
+      document.getElementById('stat-revenue').textContent = 'SLL ' + Number(d.featured_revenue_sll || 0).toLocaleString();
+      document.getElementById('stat-vehicles').textContent = d.total_vehicles ?? 0;
+      document.getElementById('stat-parts').textContent = d.total_parts ?? 0;
+      document.getElementById('stat-inquiries').textContent = d.total_inquiries ?? 0;
+      document.getElementById('stat-imports').textContent = d.total_imports ?? 0;
+      document.getElementById('stat-saved').textContent = d.total_saved ?? 0;
+    } catch (err) {
+      showError(err.message);
     }
-}
-
-function renderStats(s) {
-  document.getElementById('stats-grid').innerHTML =
-    '<div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value">' + s.total_users + '</div><div class="stat-sub">+' + s.recent_users_7d + ' this week</div></div>' +
-    '<div class="stat-card orange"><div class="stat-label">Active Vehicles</div><div class="stat-value">' + s.active_vehicles + '</div><div class="stat-sub">listed for sale</div></div>' +
-    '<div class="stat-card purple"><div class="stat-label">Parts Listed</div><div class="stat-value">' + s.total_parts + '</div><div class="stat-sub">by vendors</div></div>' +
-    '<div class="stat-card green"><div class="stat-label">Total Inquiries</div><div class="stat-value">' + s.total_inquiries + '</div><div class="stat-sub">' + s.new_inquiries + ' new</div></div>' +
-    '<div class="stat-card red"><div class="stat-label">Import Requests</div><div class="stat-value">' + s.pending_import_requests + '</div><div class="stat-sub">pending action</div></div>' +
-    '<div class="stat-card"><div class="stat-label">Supplier Catalog</div><div class="stat-value">' + s.supplier_catalog_size + '</div><div class="stat-sub">importable parts</div></div>';
-}
-
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
-  event.target.classList.add('active');
-  document.getElementById('section-' + tab).classList.add('active');
-  if (tab === 'inquiries') loadInquiries();
-  if (tab === 'imports') loadImports();
-  if (tab === 'users') loadUsers();
-}
-
-async function loadActivity() {
-  var el = document.getElementById('activity-list');
-  el.innerHTML = '<div class="loading">Loading...</div>';
-  try {
-    var res = await fetch('/api/admin/activity', {headers:{'Authorization':'Bearer '+token}});
-    var data = await res.json();
-    if (data.length === 0) {
-      el.innerHTML = '<div class="empty">No recent activity yet.</div>';
-      return;
-    }
-    el.innerHTML = data.map(function(item) {
-      return '<div class="activity-item"><div class="activity-icon">' + item.icon + '</div><div class="activity-text">' + esc(item.text) + '</div><div class="activity-time">' + timeAgo(item.timestamp) + '</div></div>';
-    }).join('');
-  } catch(e) {
-    el.innerHTML = '<div class="empty">Failed to load.</div>';
   }
-}
 
-async function loadInquiries() {
-  var el = document.getElementById('inquiries-list');
-  el.innerHTML = '<div class="loading">Loading...</div>';
-  try {
-    var res = await fetch('/api/admin/inquiries', {headers:{'Authorization':'Bearer '+token}});
-    var data = await res.json();
-    if (data.length === 0) {
-      el.innerHTML = '<div class="empty">No inquiries yet. When buyers contact sellers, they\'ll show here.</div>';
-      return;
+  async function loadFeatured() {
+    var el = document.getElementById('featured-list');
+    el.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      var d = await adminFetch('/api/admin/featured');
+      if (!d.count || d.count === 0) {
+        el.innerHTML = '<div class="empty"><div class="empty-icon">⭐</div>No featured listings right now.</div>';
+        return;
+      }
+      el.innerHTML = '<div style="background:#fef3c7;padding:12px 16px;border-radius:10px;margin-bottom:14px;font-weight:700;color:#92400e;">💰 Total featured revenue this cycle: SLL ' + Number(d.revenue_sll).toLocaleString() + '</div>' +
+        d.items.map(function (item) {
+          var owner = item.owner || {};
+          return '<div class="data-row">' +
+            '<div class="data-icon featured">⭐</div>' +
+            '<div class="data-main">' +
+              '<div class="data-title">' + item.title + ' <span class="badge badge-featured">' + item.type.toUpperCase() + '</span></div>' +
+              '<div class="data-meta">' +
+                '<span>SLL ' + Number(item.price_sll || 0).toLocaleString() + '</span>' +
+                '<span>📍 ' + item.location + '</span>' +
+                '<span>Featured until: ' + (item.featured_until ? new Date(item.featured_until).toLocaleDateString() : '—') + '</span>' +
+              '</div>' +
+              (owner.name ? '<div class="data-meta" style="margin-top:6px"><span>👤 <strong>' + owner.name + '</strong></span><span>📞 ' + (owner.phone || '—') + '</span><span>✉️ ' + (owner.email || '—') + '</span></div>' : '') +
+            '</div>' +
+            '<button class="action-btn btn-unfeature" onclick="unfeature(\'' + item.type + '\',' + item.id + ')">Unfeature</button>' +
+            (owner.phone ? '<a href="https://wa.me/' + (owner.phone || '').replace(/[^0-9]/g, '') + '" target="_blank" rel="noopener" class="action-btn btn-contact" style="text-decoration:none;display:inline-flex;align-items:center;">💬 WhatsApp</a>' : '') +
+          '</div>';
+        }).join('');
+    } catch (err) {
+      el.innerHTML = '<div class="error-box">' + err.message + '</div>';
     }
-    el.innerHTML = data.map(function(i) {
-      var msg = 'Hi ' + esc(i.buyer_name) + ', thanks for your interest in ' + esc(i.listing_title || 'the listing') + ' on Salon AutoZone!';
-      return '<div class="data-row">' +
-        '<div class="data-main">' +
-        '<div class="data-title">' + esc(i.buyer_name) + ' → ' + esc(i.listing_title || '(listing ' + i.listing_id + ')') + '</div>' +
-        '<div class="data-meta">📱 ' + esc(i.buyer_phone) + ' • ' + timeAgo(i.created_at) + ' • <span class="badge ' + i.status + '">' + i.status + '</span></div>' +
-        (i.buyer_message ? '<div class="data-meta" style="margin-top:6px;font-style:italic;">"' + esc(i.buyer_message) + '"</div>' : '') +
-        '</div>' +
-        '<a href="' + waLink(i.buyer_phone, msg) + '" target="_blank" class="wa-btn">💬 Reply</a>' +
+  }
+
+  window.unfeature = async function (type, id) {
+    if (!confirm('Remove featured status?')) return;
+    try {
+      await adminFetch('/api/admin/unfeature/' + type + '/' + id, { method: 'POST' });
+      showToast('Unfeatured', 'success');
+      loadFeatured();
+      loadStats();
+    } catch (err) {
+      showToast('❌ ' + err.message, 'error');
+    }
+  };
+
+  async function loadUsers() {
+    var el = document.getElementById('users-list');
+    el.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      var d = await adminFetch('/api/admin/users');
+      if (!d.count) { el.innerHTML = '<div class="empty">No users yet.</div>'; return; }
+      el.innerHTML = d.users.map(function (u) {
+        return '<div class="data-row">' +
+          '<div class="data-icon">👤</div>' +
+          '<div class="data-main">' +
+            '<div class="data-title">' + u.full_name + (u.is_admin ? ' <span class="badge badge-red">ADMIN</span>' : '') + (u.is_vendor ? ' <span class="badge badge-blue">VENDOR</span>' : '') + '</div>' +
+            '<div class="data-meta">' +
+              '<span>✉️ ' + u.email + '</span>' +
+              '<span>📞 ' + u.phone + '</span>' +
+              '<span>Joined: ' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '—') + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<a href="https://wa.me/' + (u.phone || '').replace(/[^0-9]/g, '') + '" target="_blank" rel="noopener" class="action-btn btn-contact" style="text-decoration:none;display:inline-flex;align-items:center;">💬 WhatsApp</a>' +
         '</div>';
-    }).join('');
-  } catch(e) {
-    el.innerHTML = '<div class="empty">Failed to load.</div>';
+      }).join('');
+    } catch (err) {
+      el.innerHTML = '<div class="error-box">' + err.message + '</div>';
+    }
   }
-}
 
-async function loadImports() {
-  var el = document.getElementById('imports-list');
-  el.innerHTML = '<div class="loading">Loading...</div>';
-  try {
-    var res = await fetch('/api/admin/import-requests', {headers:{'Authorization':'Bearer '+token}});
-    var data = await res.json();
-    if (data.length === 0) {
-      el.innerHTML = '<div class="empty">No import requests yet.</div>';
+  async function loadImports() {
+    var el = document.getElementById('imports-list');
+    el.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      var d = await adminFetch('/api/admin/imports');
+      if (!d.count) { el.innerHTML = '<div class="empty">No import requests.</div>'; return; }
+      el.innerHTML = d.imports.map(function (r) {
+        return '<div class="data-row">' +
+          '<div class="data-icon">🌍</div>' +
+          '<div class="data-main">' +
+            '<div class="data-title">' + r.part_name + ' <span class="badge">' + r.status + '</span></div>' +
+            '<div class="data-meta">' +
+              '<span>🚗 ' + r.car_make + ' ' + r.car_model + ' ' + r.car_year + '</span>' +
+              '<span>👤 ' + r.customer_name + '</span>' +
+              '<span>📞 ' + r.customer_phone + '</span>' +
+              (r.budget_sll ? '<span>💰 SLL ' + Number(r.budget_sll).toLocaleString() + '</span>' : '') +
+              '<span>⏱️ ' + (r.created_at ? new Date(r.created_at).toLocaleDateString() : '—') + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<a href="https://wa.me/' + (r.customer_phone || '').replace(/[^0-9]/g, '') + '" target="_blank" rel="noopener" class="action-btn btn-contact" style="text-decoration:none;display:inline-flex;align-items:center;">💬 WhatsApp</a>' +
+        '</div>';
+      }).join('');
+    } catch (err) {
+      el.innerHTML = '<div class="error-box">' + err.message + '</div>';
+    }
+  }
+
+  async function loadInquiries() {
+    var el = document.getElementById('inquiries-list');
+    el.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+      var d = await adminFetch('/api/admin/inquiries');
+      if (!d.count) { el.innerHTML = '<div class="empty">No inquiries yet.</div>'; return; }
+      el.innerHTML = d.inquiries.map(function (i) {
+        var msg = i.buyer_message ? '<div style="font-size:13px;color:var(--slate-600);margin-top:4px;font-style:italic;">"' + i.buyer_message + '"</div>' : '';
+        return '<div class="data-row">' +
+          '<div class="data-icon">' + (i.listing_type === 'vehicle' ? '🚗' : '🔧') + '</div>' +
+          '<div class="data-main">' +
+            '<div class="data-title">' + (i.listing_title || '(listing #' + i.listing_id + ')') + ' <span class="badge">' + i.status + '</span></div>' +
+            '<div class="data-meta">' +
+              '<span>👤 ' + i.buyer_name + '</span>' +
+              '<span>📞 ' + i.buyer_phone + '</span>' +
+              '<span>' + (i.created_at ? new Date(i.created_at).toLocaleDateString() : '—') + '</span>' +
+            '</div>' +
+            msg +
+          '</div>' +
+          '<a href="https://wa.me/' + (i.buyer_phone || '').replace(/[^0-9]/g, '') + '" target="_blank" rel="noopener" class="action-btn btn-contact" style="text-decoration:none;display:inline-flex;align-items:center;">💬 WhatsApp</a>' +
+        '</div>';
+      }).join('');
+    } catch (err) {
+      el.innerHTML = '<div class="error-box">' + err.message + '</div>';
+    }
+  }
+
+  var tabs = document.querySelectorAll('.tab');
+  var sections = {
+    featured: document.getElementById('section-featured'),
+    users: document.getElementById('section-users'),
+    imports: document.getElementById('section-imports'),
+    inquiries: document.getElementById('section-inquiries')
+  };
+
+  function switchTab(name) {
+    tabs.forEach(function (t) { t.classList.toggle('active', t.dataset.tab === name); });
+    Object.keys(sections).forEach(function (k) { sections[k].classList.toggle('active', k === name); });
+    if (name === 'featured') loadFeatured();
+    else if (name === 'users') loadUsers();
+    else if (name === 'imports') loadImports();
+    else if (name === 'inquiries') loadInquiries();
+  }
+
+  tabs.forEach(function (t) { t.addEventListener('click', function () { switchTab(t.dataset.tab); }); });
+
+  async function initDashboard() {
+    hideError();
+    if (!adminKey) {
+      document.getElementById('admin-key-wrap').style.display = 'flex';
+      document.getElementById('dashboard-content').style.display = 'none';
       return;
     }
-    el.innerHTML = data.map(function(r) {
-      var msg = 'Hi ' + esc(r.customer_name) + ', regarding your import request for ' + esc(r.part_name) + ' (' + esc(r.car_make) + ' ' + esc(r.car_model) + ')...';
-      return '<div class="data-row">' +
-        '<div class="data-main">' +
-        '<div class="data-title">🔍 ' + esc(r.part_name) + ' — ' + esc(r.car_make) + ' ' + esc(r.car_model) + ' (' + esc(r.car_year) + ')</div>' +
-        '<div class="data-meta">👤 ' + esc(r.customer_name) + ' • 📱 ' + esc(r.customer_phone) + ' • 📍 ' + esc(r.customer_location) + ' • ' + timeAgo(r.created_at) + '</div>' +
-        '<div class="data-meta">Qty: ' + r.quantity + ' • Budget: ' + (r.budget_sll ? 'SLL ' + Number(r.budget_sll).toLocaleString() : 'N/A') + ' • Urgency: ' + esc(r.urgency || 'Normal') + '</div>' +
-        '<div class="data-meta" style="margin-top:6px;"><span class="badge ' + r.status + '">' + r.status + '</span></div>' +
-        (r.notes ? '<div class="data-meta" style="margin-top:6px;font-style:italic;">"' + esc(r.notes) + '"</div>' : '') +
-        '</div>' +
-        '<a href="' + waLink(r.customer_phone, msg) + '" target="_blank" class="wa-btn">💬 Quote</a>' +
-        '</div>';
-    }).join('');
-  } catch(e) {
-    el.innerHTML = '<div class="empty">Failed to load.</div>';
-  }
-}
-
-async function loadUsers() {
-  var el = document.getElementById('users-list');
-  el.innerHTML = '<div class="loading">Loading...</div>';
-  try {
-    var res = await fetch('/api/admin/users', {headers:{'Authorization':'Bearer '+token}});
-    var data = await res.json();
-    if (data.length === 0) {
-      el.innerHTML = '<div class="empty">No users registered yet.</div>';
-      return;
+    try {
+      await loadStats();
+      document.getElementById('admin-key-wrap').style.display = 'none';
+      document.getElementById('dashboard-content').style.display = 'block';
+      loadFeatured();
+    } catch (err) {
+      document.getElementById('admin-key-wrap').style.display = 'flex';
+      document.getElementById('dashboard-content').style.display = 'none';
+      showError(err.message);
     }
-    el.innerHTML = data.map(function(u) {
-      var msg = 'Hi ' + esc(u.full_name) + ', welcome to Salon AutoZone! How can we help you today?';
-      return '<div class="data-row">' +
-        '<div class="data-main">' +
-        '<div class="data-title">' + esc(u.full_name) + (u.is_admin ? ' <span class="badge new">ADMIN</span>' : '') + (u.is_vendor ? ' <span class="badge contacted">Vendor</span>' : '') + '</div>' +
-        '<div class="data-meta">📧 ' + esc(u.email) + ' • 📱 ' + esc(u.phone) + '</div>' +
-        '<div class="data-meta">Roles: ' + esc(u.roles || 'buyer') + ' • Joined ' + timeAgo(u.created_at) + '</div>' +
-        '</div>' +
-        '<a href="' + waLink(u.phone, msg) + '" target="_blank" class="wa-btn">💬 Message</a>' +
-        '</div>';
-    }).join('');
-  } catch(e) {
-    el.innerHTML = '<div class="empty">Failed to load.</div>';
   }
-}
 
-checkAuth();
+  initDashboard();
+})();
 </script>
 </body>
 </html>
