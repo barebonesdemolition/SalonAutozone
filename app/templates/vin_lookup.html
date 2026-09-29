@@ -190,7 +190,47 @@ img{max-width:100%;display:block}
   .hero h1{font-size:22px}
   .categories{grid-template-columns:repeat(2,1fr) !important}
   .card-img{width:100px;min-height:100px;font-size:36px}
+}/* ============================================================
+   FEATURED SECTION
+   ============================================================ */
+.featured-scroll{
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(260px, 280px);
+  gap:16px;
+  overflow-x:auto;
+  padding:4px 4px 16px;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:thin;
+  scrollbar-color:var(--slate-300) transparent;
 }
+.featured-scroll::-webkit-scrollbar{height:6px}
+.featured-scroll::-webkit-scrollbar-track{background:transparent}
+.featured-scroll::-webkit-scrollbar-thumb{background:var(--slate-300);border-radius:3px}
+.featured-scroll > .card{
+  scroll-snap-align:start;
+  border:2px solid var(--amber-500);
+  box-shadow:0 4px 12px rgba(255,184,0,0.15);
+}
+.featured-scroll > .card:hover{
+  border-color:var(--amber-600);
+  box-shadow:0 12px 32px rgba(255,184,0,0.25);
+}
+
+/* ============================================================
+   PROFESSIONAL SVG PLACEHOLDERS
+   ============================================================ */
+.card-img svg.placeholder-icon{
+  width:52px;
+  height:52px;
+  color:var(--slate-400);
+  opacity:0.55;
+  stroke-width:1.5;
+}
+.card-img.car-placeholder{background:linear-gradient(135deg,#e0e7ef,#cbd5e1)}
+.card-img.part-placeholder{background:linear-gradient(135deg,#f1f5f9,#e2e8f0)}
+.card-img.catalog-placeholder{background:linear-gradient(135deg,#fff7ed,#fed7aa)}
+.card-img.catalog-placeholder svg.placeholder-icon{color:#c2410c;opacity:0.7}
 </style>
 </head>
 <body>
@@ -216,8 +256,17 @@ img{max-width:100%;display:block}
   <symbol id="icon-electrical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
   <symbol id="icon-tires" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><line x1="12" y1="2" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="22"/></symbol>
   <symbol id="icon-accessories" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 7V4h6v3"/></symbol>
-  <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-li...
+  <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-l...
+  <symbol id="icon-part" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </symbol>
+  <symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="2" y1="12" x2="22" y2="12"/>
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  </symbol>
 </svg>
 
 <!-- TOP BAR -->
@@ -380,6 +429,15 @@ img{max-width:100%;display:block}
   <div class="category" onclick="filterCategory('Electrical')"><svg class="cat-icon"><use href="#icon-electrical"/></svg><div class="category-label">Electrical</div></div>
   <div class="category" onclick="filterCategory('Tires &amp; Wheels')"><svg class="cat-icon"><use href="#icon-tires"/></svg><div class="category-label">Tires</div></div>
   <div class="category" onclick="filterCategory('Accessories')"><svg class="cat-icon"><use href="#icon-accessories"/></svg><div class="category-label">Accessories</div></div>
+</div>
+
+<!-- FEATURED SECTION -->
+<div id="featured-section" class="results-section" style="display:none;margin-top:24px;margin-bottom:32px;">
+  <div class="results-header" style="margin-bottom:16px;">
+    <h2 class="results-title" style="font-size:22px;">⭐ Featured Listings</h2>
+    <div style="font-size:13px;color:var(--slate-500);font-weight:600;">Promoted by sellers · Shown first</div>
+  </div>
+  <div id="featured-scroll" class="featured-scroll"></div>
 </div>
 
 <!-- RESULTS -->
@@ -637,7 +695,7 @@ img{max-width:100%;display:block}
         .then(function (data) {
           var items = Array.isArray(data) ? data : (data.items || []);
           countEl.innerText = items.length + ' car' + (items.length !== 1 ? 's' : '') + ' found';
-          renderVehicleResults(items);
+          renderFeaturedVehicles(items);
         })
         .catch(function (err) {
           console.error('[doSearch vehicles]', err);
@@ -663,17 +721,41 @@ img{max-width:100%;display:block}
         });
     }
   };
+  function renderFeaturedVehicles(items) {
+    var featuredSection = document.getElementById('featured-section');
+    var featuredEl = document.getElementById('featured-scroll');
+    var featured = items.filter(function (v) { return v.is_featured; });
+    var regular = items.filter(function (v) { return !v.is_featured; });
 
-  function renderVehicleResults(items) {
-    var el = document.getElementById('results');
-    if (!items || items.length === 0) { el.innerHTML = '<div class="empty">No cars found. Try a different search.</div>'; return; }
+    if (featured.length > 0) {
+      featuredSection.style.display = 'block';
+      document.getElementById('featured-title').innerText = '⭐ Featured Cars';
+      renderVehicleResults(featured, 'featured-scroll');
+    } else {
+      featuredSection.style.display = 'none';
+    }
+    renderVehicleResults(regular, 'results');
+  }
+
+  
+  function renderVehicleResults(items, targetId) {
+    var el = document.getElementById(targetId || 'results');
+    if (!items || items.length === 0) {
+      if (!targetId) el.innerHTML = '<div class="empty">No cars found. Try a different search.</div>';
+      return;
+    }
     var html = '';
     for (var i = 0; i < items.length; i++) {
       var item = items[i];
       var imgUrl = safeUrl(item.image_url);
-      var imgStyle = imgUrl ? 'background-image:url(\'' + imgUrl + '\');color:transparent;' : '';
+      var cardImgHtml;
+      if (imgUrl) {
+        cardImgHtml = '<div class="card-img" style="background-image:url(\'' + imgUrl + '\');color:transparent;"></div>';
+      } else {
+        cardImgHtml = '<div class="card-img car-placeholder"><svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-car"/></svg></div>';
+      }
       html += '<div class="card" onclick="location.href=\'/vehicle/' + encodeURIComponent(item.id) + '\'">';
-      html += '<div class="card-img" style="' + imgStyle + '">' + (imgUrl ? '' : 'CAR');
+      html += cardImgHtml;
       html += '<div class="card-badges">';
       if (item.is_featured) html += '<span class="badge badge-featured">⭐ FEATURED</span>';
       html += '<span class="badge badge-verified">Verified</span></div>';
@@ -689,7 +771,6 @@ img{max-width:100%;display:block}
     el.innerHTML = html;
     markSavedItems();
   }
-
   function renderPartsResults(data) {
     var el = document.getElementById('results');
     var local = data.local_parts || [];
