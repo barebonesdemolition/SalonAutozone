@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>SalonAutoZone - Sierra Leone Auto Marketplace</title>
-<link rel="preconnect" href="https://fonts.googleapis.cofm">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%2300a8e8' font-family='Arial'>S</text></svg>">
@@ -284,27 +284,27 @@ img{max-width:100%;display:block}
     <p style="color:var(--slate-500);font-size:14px;margin-bottom:20px;">We'll source it from our international suppliers (Dubai, China, UK, USA) and deliver to you in Sierra Leone.</p>
     <form id="import-form">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div><label class="form-label">Your Name *</label><input name="customer_name" required placeholder="Aminata Kamara" class="form-input"></div>
-        <div><label class="form-label">WhatsApp Number *</label><input name="customer_phone" required placeholder="+232 76 123456" class="form-input"></div>
-        <div><label class="form-label">Your Location *</label><select name="customer_location" required class="form-input"><option value="">Select City</option><option>Freetown</option><option>Bo</option><option>Kenema</option><option>Makeni</option><option>Koidu</option><option>Other</option></select></div>
-        <div><label class="form-label">Email (optional)</label><input name="customer_email" type="email" placeholder="you@example.com" class="form-input"></div>
+        <div><label class="form-label" for="imp-name">Your Name *</label><input id="imp-name" name="customer_name" required placeholder="Aminata Kamara" class="form-input"></div>
+        <div><label class="form-label" for="imp-phone">WhatsApp Number *</label><input id="imp-phone" name="customer_phone" required placeholder="+232 76 123456" class="form-input"></div>
+        <div><label class="form-label" for="imp-location">Your Location *</label><select id="imp-location" name="customer_location" required class="form-input"><option value="">Select City</option><option>Freetown</option><option>Bo</option><option>Kenema</option><option>Makeni</option><option>Koidu</option><option>Other</option></select></div>
+        <div><label class="form-label" for="imp-email">Email (optional)</label><input id="imp-email" name="customer_email" type="email" placeholder="you@example.com" class="form-input"></div>
       </div>
       <h3 style="margin-top:20px;margin-bottom:10px;color:var(--navy-800);font-size:15px;font-weight:700;">🔧 Part Details</h3>
-      <label class="form-label">Part Name *</label>
-      <input name="part_name" required placeholder="e.g. Front Bumper, Alternator, Turbo" class="form-input">
+      <label class="form-label" for="imp-part">Part Name *</label>
+      <input id="imp-part" name="part_name" required placeholder="e.g. Front Bumper, Alternator, Turbo" class="form-input">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-        <div><label class="form-label">Car Make *</label><input name="car_make" required placeholder="Toyota" class="form-input"></div>
-        <div><label class="form-label">Model *</label><input name="car_model" required placeholder="Corolla" class="form-input"></div>
-        <div><label class="form-label">Year *</label><input name="car_year" required placeholder="2018" class="form-input"></div>
+        <div><label class="form-label" for="imp-make">Car Make *</label><input id="imp-make" name="car_make" required placeholder="Toyota" class="form-input"></div>
+        <div><label class="form-label" for="imp-model">Model *</label><input id="imp-model" name="car_model" required placeholder="Corolla" class="form-input"></div>
+        <div><label class="form-label" for="imp-year">Year *</label><input id="imp-year" name="car_year" required placeholder="2018" class="form-input"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div><label class="form-label">Quantity</label><input name="quantity" type="number" value="1" min="1" class="form-input"></div>
-        <div><label class="form-label">Budget (SLL, optional)</label><input name="budget_sll" type="number" placeholder="8000000" class="form-input"></div>
+        <div><label class="form-label" for="imp-qty">Quantity</label><input id="imp-qty" name="quantity" type="number" value="1" min="1" class="form-input"></div>
+        <div><label class="form-label" for="imp-budget">Budget (SLL, optional)</label><input id="imp-budget" name="budget_sll" type="number" placeholder="8000000" class="form-input"></div>
       </div>
-      <label class="form-label">Urgency</label>
-      <select name="urgency" class="form-input"><option>Normal</option><option>Urgent (need within 1 week)</option><option>Flexible (can wait 1+ month)</option></select>
-      <label class="form-label">Additional Notes</label>
-      <textarea name="notes" rows="3" placeholder="e.g. Prefer OEM original, any color is fine..." class="form-input"></textarea>
+      <label class="form-label" for="imp-urgency">Urgency</label>
+      <select id="imp-urgency" name="urgency" class="form-input"><option>Normal</option><option>Urgent (need within 1 week)</option><option>Flexible (can wait 1+ month)</option></select>
+      <label class="form-label" for="imp-notes">Additional Notes</label>
+      <textarea id="imp-notes" name="notes" rows="3" placeholder="e.g. Prefer OEM original, any color is fine..." class="form-input"></textarea>
       <button type="submit" class="submit-btn">Submit Request</button>
       <div id="import-status" aria-live="polite" style="margin-top:15px;text-align:center;font-weight:bold;font-size:14px;"></div>
     </form>
@@ -486,8 +486,11 @@ img{max-width:100%;display:block}
 
 <script>
 (function () {
-  </strict>
+  'use strict';
 
+  // ============================================================
+  // DATA
+  // ============================================================
   var CITIES = ["Freetown","Bo","Kenema","Makeni","Koidu","Lunsar","Port Loko","Kabala","Waterloo"];
   var MAKES = ["Toyota","Nissan","Honda","Mitsubishi","Mazda","Suzuki","Subaru","Isuzu","Daihatsu","Lexus","Hyundai","Kia","Genesis","Mercedes-Benz","BMW","Volkswagen","Audi","Porsche","Ford","Chevrolet","Jeep","Peugeot","Renault","Citroen","Land Rover","Jaguar","Volvo","Chery","Geely","Great Wall","BYD","MG","Other"];
   var CATS = ["Fluids","Filters","Batteries","Brakes","Engine","Suspension","Electrical","Tires & Wheels","Transmission","Body","Interior","Exhaust","Lighting","Audio","Accessories"];
@@ -532,15 +535,18 @@ img{max-width:100%;display:block}
   var suggestTimeout = null;
   var identifySelectedFile = null;
 
+  // ============================================================
+  // HELPERS
+  // ============================================================
   function esc(s) {
     if (s === null || s === undefined) return '';
     return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
     });
   }
   function escAttr(s) {
     if (s === null || s === undefined) return '';
-    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
   function safeUrl(url) {
     if (!url) return '';
@@ -577,15 +583,15 @@ img{max-width:100%;display:block}
     }, 2600);
   }
 
+  // ============================================================
+  // SAVE & SHARE
+  // ============================================================
   window.shareItem = function (type, id, title, price) {
     var baseUrl = window.location.origin;
     var listingUrl = (type === 'vehicle') ? baseUrl + '/vehicle/' + id : baseUrl + '/part/' + id;
     var priceText = price ? 'SLL ' + Number(price).toLocaleString() : '';
     var icon = type === 'vehicle' ? '🚗' : '🔧';
-    var message = icon + ' *' + title + '*\n' +
-      (priceText ? '💰 ' + priceText + '\n' : '') +
-      '\nView on SalonAutoZone:\n' + listingUrl + '\n\n' +
-      '_Sierra Leone\'s #1 Auto Marketplace_';
+    var message = icon + ' *' + title + '*\n' + (priceText ? '💰 ' + priceText + '\n' : '') + '\nView on SalonAutoZone:\n' + listingUrl + '\n\n_Sierra Leone\'s #1 Auto Marketplace_';
     window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
   };
 
@@ -650,6 +656,9 @@ img{max-width:100%;display:block}
     el.innerHTML = html;
   }
 
+  // ============================================================
+  // MARKET SWITCH
+  // ============================================================
   window.switchMarket = function (market) {
     currentTab = market;
     var bp = document.getElementById('btn-parts');
@@ -690,6 +699,9 @@ img{max-width:100%;display:block}
     ySel.innerHTML = yHtml;
   }
 
+  // ============================================================
+  // SEARCH
+  // ============================================================
   window.doSearch = function () {
     var resultsEl = document.getElementById('results');
     var countEl = document.getElementById('results-count');
@@ -740,6 +752,9 @@ img{max-width:100%;display:block}
     }
   };
 
+  // ============================================================
+  // RENDERERS
+  // ============================================================
   function renderFeaturedVehicles(items) {
     var featuredSection = document.getElementById('featured-section');
     var featuredEl = document.getElementById('featured-scroll');
@@ -912,6 +927,9 @@ img{max-width:100%;display:block}
     doSearch();
   };
 
+  // ============================================================
+  // FITMENT
+  // ============================================================
   function initFitment() {
     var mSel = document.getElementById('fitment-make');
     var moSel = document.getElementById('fitment-model');
@@ -1025,6 +1043,9 @@ img{max-width:100%;display:block}
     } catch (e) { console.warn('garage sync failed:', e); }
   }
 
+  // ============================================================
+  // PREDICTIVE SEARCH
+  // ============================================================
   function hideSuggestions() {
     var b = document.getElementById('suggestions-box');
     if (b) b.style.display = 'none';
@@ -1083,6 +1104,9 @@ img{max-width:100%;display:block}
 
   window.selectSuggestion = function (url) { hideSuggestions(); window.location.href = url; };
 
+  // ============================================================
+  // MODALS
+  // ============================================================
   window.openImportModal = function () { document.getElementById('import-modal').style.display = 'flex'; };
   window.closeImportModal = function () {
     document.getElementById('import-modal').style.display = 'none';
@@ -1186,6 +1210,9 @@ img{max-width:100%;display:block}
     modelSelect.innerHTML = html;
   };
 
+  // ============================================================
+  // FORMS
+  // ============================================================
   document.getElementById('listing-form').addEventListener('submit', async function (e) {
     e.preventDefault(); e.stopPropagation();
     var form = e.target;
@@ -1241,6 +1268,9 @@ img{max-width:100%;display:block}
     }
   });
 
+  // ============================================================
+  // MOBILE MENU
+  // ============================================================
   window.toggleMobileMenu = function () {
     var menu = document.getElementById('mobile-menu');
     if (menu) menu.classList.toggle('open');
@@ -1250,6 +1280,9 @@ img{max-width:100%;display:block}
     if (menu) menu.classList.remove('open');
   };
 
+  // ============================================================
+  // IDENTIFY CAR (AI)
+  // ============================================================
   window.openIdentifyCar = function () {
     if (!getToken()) { alert('Please log in to use AI car identification.'); window.location.href = '/login'; return; }
     document.getElementById('identify-car-modal').style.display = 'flex';
@@ -1353,6 +1386,9 @@ img{max-width:100%;display:block}
   window.searchPartsForCar = function (make, model) { closeIdentifyCar(); document.getElementById('search-input').value = make + ' ' + model; switchMarket('parts'); setTimeout(function () { doSearch(); }, 100); };
   window.listCarFromIdentify = function (make, model) { closeIdentifyCar(); setTimeout(function () { openModal('vehicle'); }, 100); };
 
+  // ============================================================
+  // INIT
+  // ============================================================
   function init() {
     if (getToken()) {
       var link = document.getElementById('signin-link');
