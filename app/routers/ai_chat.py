@@ -79,11 +79,8 @@ Guidelines:
 """
 
     try:
-        # Build conversation history for the new SDK.
-        # The new SDK uses Content objects with role + parts.
         contents = []
 
-        # Add prior history (last 10 messages)
         for h in request.history[-10:]:
             role = "user" if h.get("role") == "user" else "model"
             text = h.get("content", "")
@@ -96,7 +93,6 @@ Guidelines:
                 )
             )
 
-        # Add the current user message
         contents.append(
             types.Content(
                 role="user",
@@ -104,7 +100,6 @@ Guidelines:
             )
         )
 
-        # Generate the response with system instruction
         response = client.models.generate_content(
             model="gemini-3.8-flash",
             contents=contents,
@@ -132,7 +127,7 @@ Guidelines:
 
 @router.get("/status")
 async def ai_status():
-     return {
+    return {
         "configured": bool(GEMINI_API_KEY),
         "model": "gemini-3.8-flash",
         "key_prefix": GEMINI_API_KEY[:5] if GEMINI_API_KEY else "none",
