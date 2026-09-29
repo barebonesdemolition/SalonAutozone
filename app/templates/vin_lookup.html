@@ -381,12 +381,12 @@ img{max-width:100%;display:block}
 
       <!-- Label wraps the input — tapping anywhere on the label opens the picker -->
       <label class="file-upload-label" style="display:block;">
-        <input
-          type="file"
-          id="identify-file-input"
-          accept="image/*"
-          style="position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0;"
-        >
+              <input
+        type="file"
+        id="identify-file-input"
+        accept="image/*"
+        style="display:block;width:100%;padding:20px;background:var(--slate-100);border:2px dashed var(--slate-300);border-radius:12px;font-size:15px;font-family:inherit;cursor:pointer;margin-bottom:12px;"
+      >
         <span class="icon">📷</span>
         <span>Tap to Take Photo or Upload</span>
         <span class="hint">JPG, PNG, or WEBP • Max 8 MB</span>
