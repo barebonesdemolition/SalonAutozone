@@ -1,6 +1,7 @@
 import os
 import traceback
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,19 +17,22 @@ router = APIRouter(prefix="/api/ai", tags=["AI Assistant"])
 settings = get_settings()
 GEMINI_API_KEY = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")
 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-
 
 class ChatRequest(BaseModel):
     message: str
     history: List[dict] = []
 
 
-@router.post("/chat")
-async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)):
+def get_client():
+    """Create a fresh Gemini client. Raises if no key configured."""
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="AI not configured. Set GEMINI_API_KEY.")
+    return genai.Client(api_key=GEMINI_API_KEY)
+
+
+@router.post("/chat")
+async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)):
+    client = get_client()
 
     vehicles_result = await db.execute(
         select(models.VehicleListing).where(models.VehicleListing.is_sold == False).limit(20)
@@ -75,20 +79,48 @@ Guidelines:
 """
 
     try:
-        model = genai.GenerativeModel(
-            model_name="gemini-3.6-flash",
-            system_instruction=system_prompt,
-        )
+        # Build conversation history for the new SDK.
+        # The new SDK uses Content objects with role + parts.
+        contents = []
 
-        chat_history = []
+        # Add prior history (last 10 messages)
         for h in request.history[-10:]:
             role = "user" if h.get("role") == "user" else "model"
-            chat_history.append({"role": role, "parts": [h.get("content", "")]})
+            text = h.get("content", "")
+            if not text:
+                continue
+            contents.append(
+                types.Content(
+                    role=role,
+                    parts=[types.Part.from_text(text=text)],
+                )
+            )
 
-        chat_session = model.start_chat(history=chat_history)
-        response = chat_session.send_message(request.message)
+        # Add the current user message
+        contents.append(
+            types.Content(
+                role="user",
+                parts=[types.Part.from_text(text=request.message)],
+            )
+        )
 
-        return {"reply": response.text, "success": True}
+        # Generate the response with system instruction
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=system_prompt,
+            ),
+        )
+
+        reply_text = (response.text or "").strip()
+        if not reply_text:
+            reply_text = "I couldn't generate a response. Please try again."
+
+        return {"reply": reply_text, "success": True}
+
+    except HTTPException:
+        raise
     except Exception as e:
         error_detail = f"{type(e).__name__}: {str(e)}"
         print("=" * 60)
@@ -102,7 +134,7 @@ Guidelines:
 async def ai_status():
     return {
         "configured": bool(GEMINI_API_KEY),
-        "model": "gemini-3.6-flash",
+        "model": "gemini-2.5-flash",
         "key_prefix": GEMINI_API_KEY[:5] if GEMINI_API_KEY else "none",
         "key_length": len(GEMINI_API_KEY) if GEMINI_API_KEY else 0,
     }
