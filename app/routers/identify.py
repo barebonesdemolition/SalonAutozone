@@ -71,7 +71,7 @@ async def identify_car(
     user_key = f"user_{user.id}"
     now = datetime.utcnow()
     day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    
+
     if user_key in _rate_limit:
         count, first_time = _rate_limit[user_key]
         if first_time < day_start:
@@ -85,7 +85,7 @@ async def identify_car(
 
     # Validate file
     if file.content_type not in {"image/jpeg", "image/png", "image/webp", "image/jpg"}:
-        raise HTTPException(status_code=400, detail=f"File type not supported. Use JPG, PNG, or WEBP.")
+        raise HTTPException(status_code=400, detail="File type not supported. Use JPG, PNG, or WEBP.")
 
     contents = await file.read()
     if len(contents) > 8 * 1024 * 1024:
@@ -94,9 +94,10 @@ async def identify_car(
     # Use Gemini Vision to identify
     try:
         from google import genai
+        from google.genai import types
+
         if not settings.GEMINI_API_KEY:
             raise HTTPException(status_code=500, detail="AI not configured")
-        genai.configure(api_key=settings.GEMINI_API_KEY)
 
         # Build the vision prompt
         prompt = """You are a car identification expert for the Sierra Leone automotive market.
@@ -123,45 +124,39 @@ Rules:
 - Return ONLY JSON, no markdown, no explanation
 """
 
-        # Save temp file for Gemini
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
-            tmp.write(contents)
-            tmp_path = tmp.name
+        # Create the client with the new SDK
+        # The new SDK sends the key via x-goog-api-key header (required for AQ. keys)
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-        try:
-            # Upload to Gemini
-            gemini_file = genai.upload_file(tmp_path)
-            
-            model = genai.GenerativeModel("gemini-3.6-flash")
-            response = model.generate_content([prompt, gemini_file])
-            
-            # Parse JSON from response
-            text = response.text.strip()
-            # Remove markdown code fences if present
-            text = re.sub(r'^```(?:json)?\s*', '', text)
-            text = re.sub(r'\s*```$', '', text)
-            
-            data = json.loads(text)
-            
-            # Delete temp file
-            try:
-                gemini_file.delete()
-            except Exception:
-                pass
-            
-            return {
-                "success": True,
-                "identification": data,
-            }
-            
-        finally:
-            try:
-                os.unlink(tmp_path)
-            except Exception:
-                pass
+        # Call Gemini Vision directly with image bytes (no temp file, no upload)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[
+                types.Part.from_bytes(
+                    data=contents,
+                    mime_type=file.content_type or "image/jpeg",
+                ),
+                prompt,
+            ],
+        )
 
-    except json.JSONDecodeError as e:
+        # Parse JSON from response
+        text = (response.text or "").strip()
+        # Remove markdown code fences if present
+        text = re.sub(r'^```(?:json)?\s*', '', text)
+        text = re.sub(r'\s*```$', '', text)
+
+        data = json.loads(text)
+
+        return {
+            "success": True,
+            "identification": data,
+        }
+
+    except json.JSONDecodeError:
         raise HTTPException(status_code=500, detail="AI returned invalid response. Please try again.")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Identification failed: {str(e)}")
 
@@ -171,11 +166,11 @@ async def identify_status(user: Optional[models.User] = Depends(get_optional_use
     """Check if user can use identification."""
     if not user:
         return {"available": False, "reason": "login_required"}
-    
+
     user_key = f"user_{user.id}"
     now = datetime.utcnow()
     day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    
+
     if user_key in _rate_limit:
         count, first_time = _rate_limit[user_key]
         if first_time < day_start:
@@ -184,7 +179,7 @@ async def identify_status(user: Optional[models.User] = Depends(get_optional_use
             remaining = max(0, 20 - count)
     else:
         remaining = 20
-    
+
     return {
         "available": remaining > 0,
         "remaining_today": remaining,
