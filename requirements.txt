@@ -11,6 +11,6 @@ python-jose[cryptography]
 pydantic
 python-dotenv
 email-validator
-google-generativeai
+google-genai
 asyncpg
 httpx
