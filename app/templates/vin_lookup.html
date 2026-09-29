@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>SalonAutoZone - Sierra Leone Auto Marketplace</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%2300a8e8' font-family='Arial'>S</text></svg>">
@@ -26,12 +26,12 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--slate-800);background:var(--slate-50);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-0.01em}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--slate-800);background:var(--slate-50);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-0.01em}
 button,input,select,textarea{font-family:inherit;font-size:inherit}
 button{cursor:pointer;border:none;background:none}
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
-.top-bar{background:var(--navy-900);color:var(--slate-400);padding:10px 32px;font-size:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;letter-spacing:0}
+.top-bar{background:var(--navy-900);color:var(--slate-400);padding:10px 32px;font-size:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .top-bar strong{color:#fff;font-weight:600}
 .top-bar a{color:var(--slate-400);transition:color 0.15s}
 .top-bar a:hover{color:#fff}
@@ -42,7 +42,6 @@ img{max-width:100%;display:block}
 .brand-logo .y{color:var(--amber-500)}
 .brand-toggle{display:flex;background:var(--slate-100);border-radius:12px;padding:4px;gap:4px}
 .brand-toggle button{padding:10px 20px;border-radius:8px;font-weight:600;font-size:13px;color:var(--slate-500);transition:all 0.15s;white-space:nowrap}
-.brand-toggle button:hover{color:var(--navy-800)}
 .brand-toggle button.active{background:var(--orange-500);color:#fff;box-shadow:0 2px 8px rgba(255,107,0,0.25)}
 .brand-toggle button.active.cars{background:var(--blue-400);box-shadow:0 2px 8px rgba(0,168,232,0.25)}
 .brand-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
@@ -138,6 +137,25 @@ img{max-width:100%;display:block}
 .form-input:focus{outline:none;border-color:var(--blue-400);box-shadow:0 0 0 4px rgba(0,168,232,0.12)}
 .submit-btn{background:linear-gradient(135deg,var(--orange-500),var(--orange-600));color:#fff;padding:16px;border-radius:10px;width:100%;font-weight:700;font-size:16px;cursor:pointer;margin-top:20px;min-height:52px;transition:transform 0.15s}
 .submit-btn:hover{transform:translateY(-1px)}
+/* File upload label (mobile-safe) */
+.file-upload-label{display:flex;width:100%;background:var(--slate-100);color:var(--navy-800);border:2px dashed var(--slate-300);padding:32px;border-radius:12px;font-weight:700;cursor:pointer;font-size:15px;flex-direction:column;align-items:center;gap:12px;min-height:180px;text-align:center;box-sizing:border-box;transition:background 0.15s,border-color 0.15s}
+.file-upload-label:hover{background:var(--slate-50);border-color:var(--blue-400)}
+.file-upload-label:active{background:var(--slate-200)}
+.file-upload-label .icon{font-size:48px}
+.file-upload-label .hint{font-size:12px;color:var(--slate-400);font-weight:400}
+/* Hidden file input — visually hidden but still focusable/clickable */
+.visually-hidden-file{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.featured-scroll{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,280px);gap:16px;overflow-x:auto;padding:4px 4px 16px;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--slate-300) transparent}
+.featured-scroll::-webkit-scrollbar{height:6px}
+.featured-scroll::-webkit-scrollbar-track{background:transparent}
+.featured-scroll::-webkit-scrollbar-thumb{background:var(--slate-300);border-radius:3px}
+.featured-scroll > .card{scroll-snap-align:start;border:2px solid var(--amber-500);box-shadow:0 4px 12px rgba(255,184,0,0.15)}
+.featured-scroll > .card:hover{border-color:var(--amber-600);box-shadow:0 12px 32px rgba(255,184,0,0.25)}
+.card-img svg.placeholder-icon{width:52px;height:52px;color:var(--slate-400);opacity:0.55;stroke-width:1.5}
+.card-img.car-placeholder{background:linear-gradient(135deg,#e0e7ef,#cbd5e1)}
+.card-img.part-placeholder{background:linear-gradient(135deg,#f1f5f9,#e2e8f0)}
+.card-img.catalog-placeholder{background:linear-gradient(135deg,#fff7ed,#fed7aa)}
+.card-img.catalog-placeholder svg.placeholder-icon{color:#c2410c;opacity:0.7}
 @media (max-width:1100px){.search-row{grid-template-columns:1fr 1fr 1fr}.search-row button{grid-column:1/-1}}
 @media (max-width:900px){.categories{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:768px){
@@ -190,47 +208,7 @@ img{max-width:100%;display:block}
   .hero h1{font-size:22px}
   .categories{grid-template-columns:repeat(2,1fr) !important}
   .card-img{width:100px;min-height:100px;font-size:36px}
-}/* ============================================================
-   FEATURED SECTION
-   ============================================================ */
-.featured-scroll{
-  display:grid;
-  grid-auto-flow:column;
-  grid-auto-columns:minmax(260px, 280px);
-  gap:16px;
-  overflow-x:auto;
-  padding:4px 4px 16px;
-  scroll-snap-type:x mandatory;
-  scrollbar-width:thin;
-  scrollbar-color:var(--slate-300) transparent;
 }
-.featured-scroll::-webkit-scrollbar{height:6px}
-.featured-scroll::-webkit-scrollbar-track{background:transparent}
-.featured-scroll::-webkit-scrollbar-thumb{background:var(--slate-300);border-radius:3px}
-.featured-scroll > .card{
-  scroll-snap-align:start;
-  border:2px solid var(--amber-500);
-  box-shadow:0 4px 12px rgba(255,184,0,0.15);
-}
-.featured-scroll > .card:hover{
-  border-color:var(--amber-600);
-  box-shadow:0 12px 32px rgba(255,184,0,0.25);
-}
-
-/* ============================================================
-   PROFESSIONAL SVG PLACEHOLDERS
-   ============================================================ */
-.card-img svg.placeholder-icon{
-  width:52px;
-  height:52px;
-  color:var(--slate-400);
-  opacity:0.55;
-  stroke-width:1.5;
-}
-.card-img.car-placeholder{background:linear-gradient(135deg,#e0e7ef,#cbd5e1)}
-.card-img.part-placeholder{background:linear-gradient(135deg,#f1f5f9,#e2e8f0)}
-.card-img.catalog-placeholder{background:linear-gradient(135deg,#fff7ed,#fed7aa)}
-.card-img.catalog-placeholder svg.placeholder-icon{color:#c2410c;opacity:0.7}
 </style>
 </head>
 <body>
@@ -256,17 +234,10 @@ img{max-width:100%;display:block}
   <symbol id="icon-electrical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
   <symbol id="icon-tires" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><line x1="12" y1="2" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="22"/></symbol>
   <symbol id="icon-accessories" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-li...
-  <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-l...
-  <symbol id="icon-part" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="3"/>
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-  </symbol>
-  <symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <line x1="2" y1="12" x2="22" y2="12"/>
-    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-  </symbol>
+  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 7V4h6v3"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="icon-part" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
 </svg>
 
 <!-- TOP BAR -->
@@ -407,12 +378,15 @@ img{max-width:100%;display:block}
     <div id="identify-stage-upload">
       <h2 style="color:var(--navy-800);margin-bottom:8px;font-size:20px;">📸 Identify Your Car</h2>
       <p style="color:var(--slate-500);font-size:14px;margin-bottom:20px;line-height:1.5;">Take a clear photo of the front or side of the car. AI will tell you the make, model, year, and estimated price in Sierra Leone Leones.</p>
-      <input type="file" id="identify-file-input" accept="image/*" capture="environment" style="display:none;">
-      <button type="button" onclick="document.getElementById('identify-file-input').click()" style="width:100%;background:var(--slate-100);color:var(--navy-800);border:2px dashed var(--slate-300);padding:32px;border-radius:12px;font-weight:bold;cursor:pointer;font-size:15px;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:12px;min-height:180px;">
-        <span style="font-size:48px;">📷</span>
+
+      <!-- Mobile-safe file upload: label + visually-hidden input -->
+      <input type="file" id="identify-file-input" accept="image/*" capture="environment" class="visually-hidden-file">
+      <label for="identify-file-input" class="file-upload-label">
+        <span class="icon">📷</span>
         <span>Tap to Take Photo or Upload</span>
-        <span style="font-size:12px;color:var(--slate-400);font-weight:normal;">JPG, PNG, or WEBP • Max 8 MB</span>
-      </button>
+        <span class="hint">JPG, PNG, or WEBP • Max 8 MB</span>
+      </label>
+
       <div id="identify-status" aria-live="polite" style="margin-top:16px;text-align:center;font-size:14px;font-weight:600;line-height:1.5;"></div>
     </div>
     <div id="identify-stage-result" style="display:none;">
@@ -434,7 +408,7 @@ img{max-width:100%;display:block}
 <!-- FEATURED SECTION -->
 <div id="featured-section" class="results-section" style="display:none;margin-top:24px;margin-bottom:32px;">
   <div class="results-header" style="margin-bottom:16px;">
-    <h2 class="results-title" style="font-size:22px;">⭐ Featured Listings</h2>
+    <h2 class="results-title" id="featured-title" style="font-size:22px;">⭐ Featured Listings</h2>
     <div style="font-size:13px;color:var(--slate-500);font-weight:600;">Promoted by sellers · Shown first</div>
   </div>
   <div id="featured-scroll" class="featured-scroll"></div>
@@ -530,6 +504,7 @@ img{max-width:100%;display:block}
 
   var currentTab = 'parts';
   var suggestTimeout = null;
+  var identifySelectedFile = null;
 
   function esc(s) {
     if (s === null || s === undefined) return '';
@@ -577,6 +552,7 @@ img{max-width:100%;display:block}
       t.style.opacity = '0';
     }, 2600);
   }
+
   window.saveItem = async function (btn, type, id, title, price) {
     if (!getToken()) {
       showToast('Please log in to save items', 'error');
@@ -614,6 +590,7 @@ img{max-width:100%;display:block}
       btn.disabled = false;
     }
   };
+
   async function markSavedItems() {
     if (!getToken()) return;
     try {
@@ -628,6 +605,7 @@ img{max-width:100%;display:block}
       });
     } catch (e) {}
   }
+
   function showSkeletons(el, count) {
     var html = '';
     for (var i = 0; i < count; i++) {
@@ -649,8 +627,11 @@ img{max-width:100%;display:block}
       document.getElementById('section-title').innerText = 'Latest Cars & Trucks';
       document.getElementById('categories-row').style.display = 'none';
     }
+    var fs = document.getElementById('featured-section');
+    if (fs) fs.style.display = 'none';
     doSearch();
   };
+
   window.updateSearchModels = function () {
     var make = document.getElementById('search-make').value;
     var mSel = document.getElementById('search-model');
@@ -660,6 +641,7 @@ img{max-width:100%;display:block}
     models.forEach(function (m) { html += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
     mSel.innerHTML = html;
   };
+
   function initSearchCascade() {
     var mSel = document.getElementById('search-make');
     var ySel = document.getElementById('search-year');
@@ -721,12 +703,12 @@ img{max-width:100%;display:block}
         });
     }
   };
+
   function renderFeaturedVehicles(items) {
     var featuredSection = document.getElementById('featured-section');
     var featuredEl = document.getElementById('featured-scroll');
     var featured = items.filter(function (v) { return v.is_featured; });
     var regular = items.filter(function (v) { return !v.is_featured; });
-
     if (featured.length > 0) {
       featuredSection.style.display = 'block';
       document.getElementById('featured-title').innerText = '⭐ Featured Cars';
@@ -737,7 +719,6 @@ img{max-width:100%;display:block}
     renderVehicleResults(regular, 'results');
   }
 
-  
   function renderVehicleResults(items, targetId) {
     var el = document.getElementById(targetId || 'results');
     if (!items || items.length === 0) {
@@ -771,10 +752,24 @@ img{max-width:100%;display:block}
     el.innerHTML = html;
     markSavedItems();
   }
+
   function renderPartsResults(data) {
     var el = document.getElementById('results');
+    var featuredEl = document.getElementById('featured-scroll');
+    var featuredSection = document.getElementById('featured-section');
     var local = data.local_parts || [];
     var catalog = data.catalog_parts || [];
+
+    var featuredLocal = local.filter(function (p) { return p.is_featured; });
+    var regularLocal = local.filter(function (p) { return !p.is_featured; });
+
+    if (featuredLocal.length > 0) {
+      featuredSection.style.display = 'block';
+      renderFeaturedParts(featuredLocal, featuredEl);
+    } else {
+      featuredSection.style.display = 'none';
+    }
+
     if (local.length === 0 && catalog.length === 0) {
       el.innerHTML = '<div class="empty">No parts found.<br><br>Try a different search or <a href="#" onclick="openImportModal();return false;" style="color:var(--blue-400);font-weight:bold;">request it from abroad</a>.</div>';
       return;
@@ -784,13 +779,19 @@ img{max-width:100%;display:block}
     var filterOn = false;
     try { filterOn = localStorage.getItem('fitmentFilterOn') === '1'; } catch (e) {}
     var html = '';
-    if (local.length > 0) {
+
+    if (regularLocal.length > 0) {
       var renderedLocal = 0;
       var localHtml = '';
-      for (var i = 0; i < local.length; i++) {
-        var item = local[i];
+      for (var i = 0; i < regularLocal.length; i++) {
+        var item = regularLocal[i];
         var imgUrl = safeUrl(item.image_url);
-        var imgStyle = imgUrl ? 'background-image:url(\'' + imgUrl + '\');color:transparent;' : '';
+        var cardImgHtml;
+        if (imgUrl) {
+          cardImgHtml = '<div class="card-img" style="background-image:url(\'' + imgUrl + '\');color:transparent;"></div>';
+        } else {
+          cardImgHtml = '<div class="card-img part-placeholder"><svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-part"/></svg></div>';
+        }
         var fits = false;
         if (fitment && fitment.make && item.compatible_make) {
           var makeMatch = item.compatible_make.toLowerCase() === fitment.make.toLowerCase();
@@ -800,9 +801,8 @@ img{max-width:100%;display:block}
         if (filterOn && fitment && fitment.make && !fits) continue;
         renderedLocal++;
         localHtml += '<div class="card" onclick="location.href=\'/part/' + encodeURIComponent(item.id) + '\'">';
-        localHtml += '<div class="card-img" style="' + imgStyle + '">' + (imgUrl ? '' : '🔧');
+        localHtml += cardImgHtml;
         localHtml += '<div class="card-badges">';
-        if (item.is_featured) localHtml += '<span class="badge badge-featured">⭐ FEATURED</span>';
         localHtml += '<span class="badge badge-new">' + esc(item.condition || 'New') + '</span>';
         if (fits) localHtml += '<span class="badge badge-fits">✅ Fits your car</span>';
         localHtml += '</div>';
@@ -819,12 +819,13 @@ img{max-width:100%;display:block}
         html += localHtml;
       }
     }
+
     if (catalog.length > 0) {
       html += '<div style="grid-column:1/-1;margin-top:24px;margin-bottom:6px;"><h3 style="color:var(--navy-800);font-size:18px;font-weight:800;">Import from Abroad (7-14 days)</h3></div>';
       for (var j = 0; j < catalog.length; j++) {
         var c = catalog[j];
         html += '<div class="card" onclick="location.href=\'/catalog/' + encodeURIComponent(c.id) + '\'">';
-        html += '<div class="card-img" style="background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#c2410c;font-size:44px;">🌍';
+        html += '<div class="card-img catalog-placeholder"><svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-globe"/></svg>';
         html += '<div class="card-badges"><span class="badge" style="background:#ff6b00;">Import Available</span></div></div>';
         html += '<div class="card-body">';
         html += '<div style="font-family:monospace;font-size:12px;color:var(--slate-400);margin-bottom:6px;">' + esc(c.part_number) + '</div>';
@@ -834,11 +835,40 @@ img{max-width:100%;display:block}
         html += '</div></div>';
       }
     }
+
     if (!html) {
       el.innerHTML = '<div class="empty">No parts fit your car in this category.<br><br><button onclick="onFitmentFilterChange()" style="background:var(--blue-400);color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;">Show all parts</button></div>';
       return;
     }
+
     el.innerHTML = html;
+    markSavedItems();
+  }
+
+  function renderFeaturedParts(items, targetEl) {
+    var html = '';
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      var imgUrl = safeUrl(item.image_url);
+      var cardImgHtml;
+      if (imgUrl) {
+        cardImgHtml = '<div class="card-img" style="background-image:url(\'' + imgUrl + '\');color:transparent;"></div>';
+      } else {
+        cardImgHtml = '<div class="card-img part-placeholder"><svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-part"/></svg></div>';
+      }
+      html += '<div class="card" onclick="location.href=\'/part/' + encodeURIComponent(item.id) + '\'">';
+      html += cardImgHtml;
+      html += '<div class="card-badges">';
+      html += '<span class="badge badge-featured">⭐ FEATURED</span>';
+      html += '</div>';
+      html += '<button type="button" class="save-btn" data-save-type="part" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'part\',' + item.id + ',\'' + escAttr(item.name || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
+      html += '</div>';
+      html += '<div class="card-body"><div class="card-title">' + esc(item.name) + '</div>';
+      html += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
+      html += '<div class="card-meta"><span class="meta-tag">' + esc(item.category) + '</span>';
+      html += '<span class="meta-tag loc">📍 ' + esc(item.location) + '</span></div></div></div>';
+    }
+    targetEl.innerHTML = html;
     markSavedItems();
   }
 
@@ -887,12 +917,14 @@ img{max-width:100%;display:block}
       }
     } catch (e) {}
   }
+
   function updateFitmentLabel(v) {
     var el = document.getElementById('fitment-label');
     if (el) el.innerText = v.year + ' ' + v.make + ' ' + v.model + ' — Showing exact-fit parts';
     var filterLabel = document.getElementById('fitment-filter-label');
     if (filterLabel) filterLabel.style.display = 'inline-flex';
   }
+
   window.onFitmentFilterChange = function () {
     var cb = document.getElementById('fitment-filter');
     try {
@@ -901,6 +933,7 @@ img{max-width:100%;display:block}
     } catch (e) {}
     doSearch();
   };
+
   window.saveFitment = function () {
     var make = document.getElementById('fitment-make').value;
     var model = document.getElementById('fitment-model').value;
@@ -912,6 +945,7 @@ img{max-width:100%;display:block}
     document.getElementById('fitment-clear').style.display = 'inline-block';
     if (currentTab === 'parts') doSearch();
   };
+
   window.clearFitment = function () {
     try { localStorage.removeItem('fitmentVehicle'); } catch (e) {}
     document.getElementById('fitment-label').innerText = 'Not set - select your car for exact-fit parts';
@@ -960,6 +994,7 @@ img{max-width:100%;display:block}
     var b = document.getElementById('suggestions-box');
     if (b) b.style.display = 'none';
   }
+
   function setupPredictiveSearch() {
     var input = document.getElementById('search-input');
     if (!input) return;
@@ -978,6 +1013,7 @@ img{max-width:100%;display:block}
       if (box && !box.contains(e.target) && e.target !== input) hideSuggestions();
     });
   }
+
   function fetchSuggestions(q) {
     var box = document.getElementById('suggestions-box');
     box.innerHTML = '<div style="padding:14px;text-align:center;color:var(--slate-400);font-size:13px">Searching...</div>';
@@ -987,6 +1023,7 @@ img{max-width:100%;display:block}
       .then(function (data) { renderSuggestions(data.suggestions || [], q); })
       .catch(function () { hideSuggestions(); });
   }
+
   function renderSuggestions(suggestions, q) {
     var box = document.getElementById('suggestions-box');
     if (!suggestions || suggestions.length === 0) {
@@ -1008,6 +1045,7 @@ img{max-width:100%;display:block}
     }
     box.innerHTML = html;
   }
+
   window.selectSuggestion = function (url) { hideSuggestions(); window.location.href = url; };
 
   window.openImportModal = function () { document.getElementById('import-modal').style.display = 'flex'; };
@@ -1016,6 +1054,7 @@ img{max-width:100%;display:block}
     document.getElementById('import-form').reset();
     document.getElementById('import-status').innerHTML = '';
   };
+
   window.openModal = function (type, evt) {
     if (evt) { evt.preventDefault(); evt.stopPropagation(); }
     if (!getToken()) {
@@ -1035,6 +1074,7 @@ img{max-width:100%;display:block}
     modal.style.display = 'flex';
     return false;
   };
+
   window.closeModal = function () {
     var modal = document.getElementById('modal-overlay');
     if (modal) modal.style.display = 'none';
@@ -1071,6 +1111,7 @@ img{max-width:100%;display:block}
       + '<label class="form-label">Description</label>'
       + '<textarea name="description" rows="3" class="form-input"></textarea>';
   }
+
   function partFormHTML() {
     var catsOpts = CATS.map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
     var makesOpts = MAKES.map(function (m) { return '<option>' + esc(m) + '</option>'; }).join('');
@@ -1096,6 +1137,7 @@ img{max-width:100%;display:block}
       + '<label class="form-label">Description</label>'
       + '<textarea name="description" rows="3" class="form-input"></textarea>';
   }
+
   window.updateModels = function () {
     var makeSelect = document.getElementById('v-make');
     var modelSelect = document.getElementById('v-model');
@@ -1173,27 +1215,36 @@ img{max-width:100%;display:block}
     if (menu) menu.classList.remove('open');
   };
 
-  var identifySelectedFile = null;
   window.openIdentifyCar = function () {
     if (!getToken()) { alert('Please log in to use AI car identification.'); window.location.href = '/login'; return; }
     document.getElementById('identify-car-modal').style.display = 'flex';
     document.getElementById('identify-stage-upload').style.display = 'block';
     document.getElementById('identify-stage-result').style.display = 'none';
     document.getElementById('identify-status').innerHTML = '';
-    document.getElementById('identify-file-input').value = '';
+    var input = document.getElementById('identify-file-input');
+    if (input) input.value = '';
     identifySelectedFile = null;
   };
   window.closeIdentifyCar = function () {
     document.getElementById('identify-car-modal').style.display = 'none';
-    document.getElementById('identify-file-input').value = '';
+    var input = document.getElementById('identify-file-input');
+    if (input) input.value = '';
     identifySelectedFile = null;
   };
-  document.getElementById('identify-file-input').addEventListener('change', function (e) {
-    if (e.target.files && e.target.files.length > 0) {
-      identifySelectedFile = e.target.files[0];
-      handleIdentifyUpload();
+
+  // ============================================================
+  // EVENT DELEGATION — the file input listener ALWAYS works
+  // This is the fix for "A) nothing happens after picking a photo"
+  // ============================================================
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.id === 'identify-file-input') {
+      if (e.target.files && e.target.files.length > 0) {
+        identifySelectedFile = e.target.files[0];
+        handleIdentifyUpload();
+      }
     }
   });
+
   async function handleIdentifyUpload() {
     if (!identifySelectedFile) return;
     var statusEl = document.getElementById('identify-status');
@@ -1241,6 +1292,7 @@ img{max-width:100%;display:block}
       else { statusEl.innerHTML = '<div style="padding:10px;"><div style="font-size:32px;margin-bottom:8px;">🌐</div><div style="font-weight:700;">Network error</div></div>'; }
     }
   }
+
   function renderIdentifyResult(car) {
     var html = '';
     if (!car || !car.make || !car.model) {
@@ -1266,6 +1318,7 @@ img{max-width:100%;display:block}
     document.getElementById('identify-stage-upload').style.display = 'none';
     document.getElementById('identify-stage-result').style.display = 'block';
   }
+
   window.searchPartsForCar = function (make, model) { closeIdentifyCar(); document.getElementById('search-input').value = make + ' ' + model; switchMarket('parts'); setTimeout(function () { doSearch(); }, 100); };
   window.listCarFromIdentify = function (make, model) { closeIdentifyCar(); setTimeout(function () { openModal('vehicle'); }, 100); };
 
