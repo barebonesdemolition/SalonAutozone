@@ -375,8 +375,15 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
     else if (name === 'inquiries') loadInquiries();
   }
 
-  tabs.forEach(function (t) { t.addEventListener('click', function () { switchTab(t.dataset.tab); }); });
-
+   tabs.forEach(function (t) {
+    t.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var name = t.getAttribute('data-tab');
+      console.log('Tab clicked:', name);
+      switchTab(name);
+    });
+  });
   async function initDashboard() {
     hideError();
     if (!adminKey) {
