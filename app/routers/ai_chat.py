@@ -132,9 +132,9 @@ Guidelines:
 
 @router.get("/status")
 async def ai_status():
-    return {
+     return {
         "configured": bool(GEMINI_API_KEY),
-        "model": "gemini-2.5-flash",
+        "model": "gemini-3.8-flash",
         "key_prefix": GEMINI_API_KEY[:5] if GEMINI_API_KEY else "none",
         "key_length": len(GEMINI_API_KEY) if GEMINI_API_KEY else 0,
     }
