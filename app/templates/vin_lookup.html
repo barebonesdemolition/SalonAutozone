@@ -111,7 +111,8 @@ img{max-width:100%;display:block}
 .save-btn:hover{background:#fff;transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,23,42,0.2)}
 .save-btn.saved{background:var(--green-400);color:#fff;box-shadow:0 2px 8px rgba(34,197,94,0.4)}
 .save-btn.saving{background:var(--amber-500);color:var(--navy-900);cursor:wait}
-.card-body{padding:16px}
+.card-body{padding:16px}.share-btn{position:absolute;bottom:12px;left:12px;background:rgba(37,211,102,0.96);color:#fff;padding:7px 14px;border-radius:9999px;font-weight:700;font-size:12px;box-shadow:0 2px 8px rgba(37,211,102,0.3);transition:all 0.15s;z-index:5;backdrop-filter:blur(8px)}
+.share-btn:hover{background:#25D366;transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,211,102,0.4)}
 .card-title{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--navy-800);line-height:1.35;letter-spacing:-0.01em}
 .card-price{color:var(--blue-500);font-size:21px;font-weight:800;margin-bottom:4px;letter-spacing:-0.02em}
 .card-price-usd{color:var(--slate-400);font-size:12px;margin-bottom:12px;font-weight:500}
@@ -556,8 +557,45 @@ img{max-width:100%;display:block}
       t.style.transform = 'translateX(-50%) translateY(100px)';
       t.style.opacity = '0';
     }, 2600);
-  }
+  }  window.shareItem = function (type, id, title, price) {
+    var baseUrl = window.location.origin;
+    var listingUrl = (type === 'vehicle')
+      ? baseUrl + '/vehicle/' + id
+      : baseUrl + '/part/' + id;
+    var priceText = price ? 'SLL ' + Number(price).toLocaleString() : '';
+    var icon = type === 'vehicle' ? '🚗' : '🔧';
+    var message = icon + ' *' + title + '*\n' +
+      (priceText ? '💰 ' + priceText + '\n' : '') +
+      '\nView on SalonAutoZone:\n' + listingUrl + '\n\n' +
+      '_Sierra Leone\'s #1 Auto Marketplace_';
+    window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
+  };
 
+  // ============================================================
+  // SHARE ON WHATSAPP
+  // ============================================================
+  window.shareItem = function (type, id, title, price) {
+    var baseUrl = window.location.origin;
+    var listingUrl = (type === 'vehicle')
+      ? baseUrl + '/vehicle/' + id
+      : baseUrl + '/part/' + id;
+
+    var priceText = price ? 'SLL ' + Number(price).toLocaleString() : '';
+    var icon = type === 'vehicle' ? '🚗' : '🔧';
+
+    var message =
+      icon + ' *' + title + '*\n' +
+      (priceText ? '💰 ' + priceText + '\n' : '') +
+      '\nView on SalonAutoZone:\n' +
+      listingUrl + '\n\n' +
+      '_Sierra Leone\'s #1 Auto Marketplace_';
+
+    var waUrl = 'https://wa.me/?text=' + encodeURIComponent(message);
+
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  
   window.saveItem = async function (btn, type, id, title, price) {
     if (!getToken()) {
       showToast('Please log in to save items', 'error');
@@ -746,6 +784,7 @@ img{max-width:100%;display:block}
       if (item.is_featured) html += '<span class="badge badge-featured">⭐ FEATURED</span>';
       html += '<span class="badge badge-verified">Verified</span></div>';
       html += '<button type="button" class="save-btn" data-save-type="vehicle" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'vehicle\',' + item.id + ',\'' + escAttr(item.title || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
+      html += '<button type="button" class="share-btn" onclick="event.stopPropagation();shareItem(\'vehicle\',' + item.id + ',\'' + escAttr(item.title || '') + '\',' + (item.price_sll || 0) + ')">📤 Share</button>';
       html += '</div>';
       html += '<div class="card-body"><div class="card-title">' + esc(item.title) + '</div>';
       html += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
@@ -753,7 +792,6 @@ img{max-width:100%;display:block}
       html += '<div class="card-meta"><span class="meta-tag">' + esc(item.year) + '</span>';
       html += '<span class="meta-tag">' + esc(item.transmission) + '</span>';
       html += '<span class="meta-tag loc">' + esc(item.location) + '</span></div></div></div>';
-    }
     el.innerHTML = html;
     markSavedItems();
   }
@@ -812,7 +850,7 @@ img{max-width:100%;display:block}
         if (fits) localHtml += '<span class="badge badge-fits">✅ Fits your car</span>';
         localHtml += '</div>';
         localHtml += '<button type="button" class="save-btn" data-save-type="part" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'part\',' + item.id + ',\'' + escAttr(item.name || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
-        localHtml += '</div>';
+        localHtml += '<button type="button" class="share-btn" onclick="event.stopPropagation();shareItem(\'part\',' + item.id + ',\'' + escAttr(item.name || '') + '\',' + (item.price_sll || 0) + ')">📤 Share</button>';
         localHtml += '<div class="card-body"><div class="card-title">' + esc(item.name) + '</div>';
         localHtml += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
         localHtml += '<div class="card-meta"><span class="meta-tag">' + esc(item.category) + '</span>';
