@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>SalonAutoZone - Sierra Leone Auto Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%2300a8e8' font-family='Arial'>S</text></svg>">
+<style>
+:root{
+  --navy-900:#0a1729;--navy-800:#0b1e3a;--navy-700:#12294d;--navy-600:#1a3a6b;
+  --blue-500:#0091d5;--blue-400:#00a8e8;--blue-300:#4dc3f0;
+  --amber-500:#ffb800;--amber-600:#f59e0b;
+  --orange-500:#ff6b00;--orange-600:#e55a00;
+  --green-500:#16a34a;--green-400:#22c55e;
+  --red-500:#dc2626;--red-400:#ef4444;
+  --slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;
+  --slate-400:#94a3b8;--slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;
+  --slate-800:#1e293b;--slate-900:#0f172a;
+  --shadow-sm:0 1px 2px rgba(15,23,42,0.04),0 1px 3px rgba(15,23,42,0.06);
+  --shadow-md:0 2px 4px rgba(15,23,42,0.04),0 4px 12px rgba(15,23,42,0.06);
+  --shadow-lg:0 4px 8px rgba(15,23,42,0.06),0 12px 28px rgba(15,23,42,0.10);
+  --shadow-xl:0 8px 24px rgba(15,23,42,0.12),0 24px 48px rgba(15,23,42,0.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--slate-800);background:var(--slate-50);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-0.01em}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.top-bar{background:var(--navy-900);color:var(--slate-400);padding:10px 32px;font-size:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.top-bar strong{color:#fff;font-weight:600}
+.top-bar a{color:var(--slate-400);transition:color 0.15s}
+.top-bar a:hover{color:#fff}
+.top-bar .phone{color:var(--amber-500);font-weight:700}
+.brand-bar{background:#fff;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;border-bottom:1px solid var(--slate-200);position:sticky;top:0;z-index:100}
+.brand-logo{font-size:20px;font-weight:800;color:var(--navy-800);letter-spacing:-0.03em}
+.brand-logo span{color:var(--blue-400)}
+.brand-logo .y{color:var(--amber-500)}
+.brand-toggle{display:flex;background:var(--slate-100);border-radius:12px;padding:4px;gap:4px}
+.brand-toggle button{padding:10px 20px;border-radius:8px;font-weight:600;font-size:13px;color:var(--slate-500);transition:all 0.15s;white-space:nowrap}
+.brand-toggle button.active{background:var(--orange-500);color:#fff;box-shadow:0 2px 8px rgba(255,107,0,0.25)}
+.brand-toggle button.active.cars{background:var(--blue-400);box-shadow:0 2px 8px rgba(0,168,232,0.25)}
+.brand-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.brand-actions a{color:var(--slate-700);font-size:14px;font-weight:600;transition:color 0.15s}
+.brand-actions a:hover{color:var(--blue-400)}
+.list-btn{background:linear-gradient(135deg,var(--orange-500),var(--orange-600)) !important;color:#fff !important;padding:10px 20px !important;border-radius:8px !important;font-weight:700 !important;box-shadow:0 4px 12px rgba(255,107,0,0.28);transition:transform 0.15s,box-shadow 0.15s}
+.list-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,107,0,0.35)}
+.fitment-bar{background:linear-gradient(90deg,var(--navy-800) 0%,var(--navy-600) 100%);color:#fff;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.fitment-left{display:flex;align-items:center;gap:16px}
+.fitment-icon{background:var(--orange-500);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(255,107,0,0.3);flex-shrink:0}
+.fitment-label{font-size:10px;color:var(--slate-400);text-transform:uppercase;font-weight:700;letter-spacing:0.08em;margin-bottom:2px}
+.fitment-value{font-size:14px;font-weight:700;line-height:1.3}
+.fitment-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fitment-controls select{padding:9px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);font-size:13px;font-weight:600;background:rgba(255,255,255,0.08);color:#fff;transition:background 0.15s;font-family:inherit}
+.fitment-controls select:hover{background:rgba(255,255,255,0.14)}
+.fitment-controls select:focus{outline:none;background:rgba(255,255,255,0.18);border-color:var(--blue-400)}
+.fitment-controls select option{color:var(--slate-800)}
+.fitment-filter-label{display:none;align-items:center;gap:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;padding:9px 14px;border-radius:8px;background:rgba(255,255,255,0.08);transition:background 0.15s;white-space:nowrap}
+.fitment-filter-label:hover{background:rgba(255,255,255,0.14)}
+.fitment-filter-label input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--green-400)}
+.btn-save{background:var(--blue-400);color:#fff;padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px;transition:background 0.15s}
+.btn-save:hover{background:var(--blue-500)}
+.btn-clear{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px;display:none;transition:background 0.15s}
+.btn-clear:hover{background:rgba(255,255,255,0.18)}
+.hero{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-600) 100%);color:#fff;padding:56px 32px 96px;text-align:center;position:relative;z-index:1;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(0,168,232,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(255,184,0,0.08) 0%,transparent 50%);pointer-events:none}
+.hero > *{position:relative;z-index:1}
+.hero-badge{display:inline-block;background:var(--green-400);color:#fff;padding:7px 18px;border-radius:9999px;font-size:11px;font-weight:800;margin-bottom:20px;letter-spacing:0.08em;box-shadow:0 4px 12px rgba(34,197,94,0.35)}
+.hero h1{font-size:clamp(28px,5vw,44px);font-weight:800;margin-bottom:12px;line-height:1.15;letter-spacing:-0.03em;max-width:800px;margin-left:auto;margin-right:auto}
+.hero p{font-size:16px;opacity:0.82;margin-bottom:32px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.55}
+.search-container{max-width:1100px;margin:0 auto;background:#fff;padding:16px;border-radius:16px;box-shadow:0 20px 60px rgba(10,23,41,0.35),0 8px 24px rgba(10,23,41,0.2)}
+.search-row{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr auto;gap:8px}
+.search-row select,.search-row input{padding:13px 16px;border:1.5px solid var(--slate-200);border-radius:8px;font-size:14px;font-weight:500;color:var(--slate-800);background:#fff;width:100%;transition:border-color 0.15s,box-shadow 0.15s}
+.search-row select:focus,.search-row input:focus{outline:none;border-color:var(--blue-400);box-shadow:0 0 0 4px rgba(0,168,232,0.12)}
+.search-row button{background:linear-gradient(135deg,var(--orange-500),var(--orange-600));color:#fff;padding:13px 28px;border-radius:8px;font-weight:700;font-size:14px;white-space:nowrap;box-shadow:0 4px 12px rgba(255,107,0,0.28);transition:transform 0.15s,box-shadow 0.15s}
+.search-row button:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,107,0,0.35)}
+.search-text-row{position:relative;margin-top:8px}
+.search-text-row input{width:100%;padding:13px 16px;border:1.5px solid var(--slate-200);border-radius:8px;font-size:14px;transition:border-color 0.15s,box-shadow 0.15s}
+.search-text-row input:focus{outline:none;border-color:var(--blue-400);box-shadow:0 0 0 4px rgba(0,168,232,0.12)}
+.suggestions-box{position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:12px;box-shadow:var(--shadow-xl);z-index:1000;margin-top:6px;max-height:420px;overflow-y:auto;display:none;border:1px solid var(--slate-200)}
+.suggestion-item{padding:14px 18px;cursor:pointer;border-bottom:1px solid var(--slate-100);display:flex;align-items:center;gap:14px;transition:background 0.1s}
+.suggestion-item:last-child{border-bottom:none}
+.suggestion-item:hover{background:var(--slate-50)}
+.identify-cta-wrap{max-width:800px;margin:16px auto 24px;padding:0 16px;position:relative;z-index:5}
+.identify-cta{width:100%;background:linear-gradient(135deg,var(--blue-400),var(--blue-500));color:#fff;padding:16px 24px;border-radius:12px;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 24px rgba(0,168,232,0.35);min-height:56px;transition:transform 0.15s,box-shadow 0.15s}
+.identify-cta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,168,232,0.45)}
+.categories{max-width:1200px;margin:-24px auto 48px;padding:0 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:12px;position:relative;z-index:20}
+.category{background:#fff;border-radius:12px;padding:24px 12px;text-align:center;cursor:pointer;box-shadow:var(--shadow-md);transition:transform 0.2s,box-shadow 0.2s;border:1px solid rgba(226,232,240,0.6)}
+.category:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--blue-300)}
+.cat-icon{width:32px;height:32px;margin-bottom:8px;color:var(--blue-400);stroke-width:2}
+.category-label{font-size:13px;font-weight:700;color:var(--navy-800);letter-spacing:-0.01em}
+.results-section{max-width:1300px;margin:32px auto 80px;padding:0 20px}
+.results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.results-title{font-size:26px;color:var(--navy-800);font-weight:800;letter-spacing:-0.02em}
+.results-count{background:rgba(0,168,232,0.1);color:var(--blue-500);padding:7px 16px;border-radius:9999px;font-size:13px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);transition:transform 0.25s,box-shadow 0.25s;cursor:pointer;border:1px solid rgba(226,232,240,0.7);position:relative}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:rgba(0,168,232,0.3)}
+.card-img{height:190px;background:linear-gradient(135deg,var(--slate-100),var(--slate-200));display:flex;align-items:center;justify-content:center;font-size:56px;color:var(--slate-300);background-size:cover;background-position:center;position:relative}
+.card-badges{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:2}
+.badge{padding:5px 11px;border-radius:9999px;font-size:11px;font-weight:700;color:#fff;backdrop-filter:blur(8px)}
+.badge-verified{background:var(--green-400);box-shadow:0 2px 6px rgba(34,197,94,0.3)}
+.badge-new{background:var(--blue-400);box-shadow:0 2px 6px rgba(0,168,232,0.3)}
+.badge-fits{background:var(--green-400);color:#fff;font-weight:800;box-shadow:0 2px 6px rgba(34,197,94,0.35)}
+.badge-featured{background:var(--amber-500);color:var(--navy-900);font-weight:800;box-shadow:0 2px 6px rgba(255,184,0,0.4)}
+.save-btn{position:absolute;bottom:12px;right:12px;background:rgba(255,255,255,0.96);color:var(--navy-800);padding:7px 14px;border-radius:9999px;font-weight:700;font-size:12px;box-shadow:0 2px 8px rgba(15,23,42,0.15);transition:all 0.15s;z-index:5;backdrop-filter:blur(8px)}
+.save-btn:hover{background:#fff;transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,23,42,0.2)}
+.save-btn.saved{background:var(--green-400);color:#fff;box-shadow:0 2px 8px rgba(34,197,94,0.4)}
+.save-btn.saving{background:var(--amber-500);color:var(--navy-900);cursor:wait}
+.share-btn{position:absolute;bottom:12px;left:12px;background:rgba(37,211,102,0.96);color:#fff;padding:7px 14px;border-radius:9999px;font-weight:700;font-size:12px;box-shadow:0 2px 8px rgba(37,211,102,0.3);transition:all 0.15s;z-index:5;backdrop-filter:blur(8px)}
+.share-btn:hover{background:#25D366;transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,211,102,0.4)}
+.card-body{padding:16px}
+.card-title{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--navy-800);line-height:1.35;letter-spacing:-0.01em}
+.card-price{color:var(--blue-500);font-size:21px;font-weight:800;margin-bottom:4px;letter-spacing:-0.02em}
+.card-price-usd{color:var(--slate-400);font-size:12px;margin-bottom:12px;font-weight:500}
+.card-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.meta-tag{background:var(--slate-100);color:var(--slate-600);padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600}
+.meta-tag.loc{background:#fef3c7;color:#92400e}
+.empty,.loading{text-align:center;padding:80px 20px;color:var(--slate-400);font-size:15px;line-height:1.6;grid-column:1/-1}
+.hamburger{display:none;background:transparent;padding:10px;border-radius:8px;color:#fff}
+.mobile-menu{display:none;background:var(--navy-800);padding:12px 20px;flex-direction:column;gap:4px;box-shadow:0 8px 24px rgba(10,23,41,0.3);border-top:1px solid rgba(255,255,255,0.06)}
+.mobile-menu.open{display:flex}
+.mobile-menu a{color:#fff;padding:14px 12px;border-radius:8px;font-size:15px;font-weight:600;display:flex;align-items:center;gap:12px;transition:background 0.15s}
+.mobile-menu a:hover{background:rgba(255,255,255,0.06)}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,23,41,0.65);z-index:3000;align-items:center;justify-content:center;padding:20px;overflow-y:auto;backdrop-filter:blur(4px)}
+.modal-box{background:#fff;border-radius:16px;max-width:640px;width:100%;padding:28px;position:relative;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-xl)}
+.modal-box.wide{max-width:680px}
+.modal-close{position:absolute;top:16px;right:20px;font-size:28px;cursor:pointer;color:var(--slate-400);line-height:1;transition:color 0.15s}
+.modal-close:hover{color:var(--slate-800)}
+.modal-title{margin-bottom:20px;color:var(--navy-800);font-size:22px;font-weight:800;letter-spacing:-0.02em}
+.form-label{display:block;font-size:13px;color:var(--slate-600);margin:12px 0 6px;font-weight:600}
+.form-input{width:100%;padding:12px;border:1.5px solid var(--slate-200);border-radius:8px;font-size:15px;transition:border-color 0.15s,box-shadow 0.15s}
+.form-input:focus{outline:none;border-color:var(--blue-400);box-shadow:0 0 0 4px rgba(0,168,232,0.12)}
+.submit-btn{background:linear-gradient(135deg,var(--orange-500),var(--orange-600));color:#fff;padding:16px;border-radius:10px;width:100%;font-weight:700;font-size:16px;cursor:pointer;margin-top:20px;min-height:52px;transition:transform 0.15s}
+.submit-btn:hover{transform:translateY(-1px)}
+.file-upload-label{display:flex;width:100%;background:var(--slate-100);color:var(--navy-800);border:2px dashed var(--slate-300);padding:32px;border-radius:12px;font-weight:700;cursor:pointer;font-size:15px;flex-direction:column;align-items:center;gap:12px;min-height:180px;text-align:center;transition:background 0.15s,border-color 0.15s;position:relative}
+.file-upload-label:hover{background:var(--slate-50);border-color:var(--blue-400)}
+.file-upload-label:active{background:var(--slate-200)}
+.file-upload-label .icon{font-size:48px}
+.file-upload-label .hint{font-size:12px;color:var(--slate-400);font-weight:400}
+.file-upload-label input[type="file"]{position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
+.featured-scroll{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,280px);gap:16px;overflow-x:auto;padding:4px 4px 16px;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--slate-300) transparent}
+.featured-scroll::-webkit-scrollbar{height:6px}
+.featured-scroll::-webkit-scrollbar-track{background:transparent}
+.featured-scroll::-webkit-scrollbar-thumb{background:var(--slate-300);border-radius:3px}
+.featured-scroll > .card{scroll-snap-align:start;border:2px solid var(--amber-500);box-shadow:0 4px 12px rgba(255,184,0,0.15)}
+.featured-scroll > .card:hover{border-color:var(--amber-600);box-shadow:0 12px 32px rgba(255,184,0,0.25)}
+.card-img svg.placeholder-icon{width:52px;height:52px;color:var(--slate-400);opacity:0.55;stroke-width:1.5}
+.card-img.car-placeholder{background:linear-gradient(135deg,#e0e7ef,#cbd5e1)}
+.card-img.part-placeholder{background:linear-gradient(135deg,#f1f5f9,#e2e8f0)}
+.card-img.catalog-placeholder{background:linear-gradient(135deg,#fff7ed,#fed7aa)}
+.card-img.catalog-placeholder svg.placeholder-icon{color:#c2410c;opacity:0.7}
+@media (max-width:1100px){.search-row{grid-template-columns:1fr 1fr 1fr}.search-row button{grid-column:1/-1}}
+@media (max-width:900px){.categories{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:768px){
+  .top-bar{padding:10px 16px;font-size:11px;flex-direction:column;gap:6px;text-align:center}
+  .top-bar > div{justify-content:center !important;display:flex;flex-wrap:wrap;gap:14px}
+  .brand-bar{padding:12px 16px;flex-direction:column;gap:12px;position:relative}
+  .brand-logo{font-size:18px}
+  .brand-toggle{width:100%}
+  .brand-toggle button{padding:11px 8px;font-size:12px;flex:1;min-height:44px}
+  .brand-actions{width:100%;justify-content:center;gap:10px}
+  .brand-actions a{font-size:13px;padding:8px 12px;background:var(--slate-100);border-radius:8px;color:var(--navy-800)}
+  .hamburger{display:flex;align-items:center;justify-content:center;background:var(--navy-800);position:absolute;top:14px;right:16px;z-index:10}
+  .fitment-bar{padding:14px 16px;flex-direction:column;gap:12px}
+  .fitment-left{width:100%}
+  .fitment-controls{width:100%;flex-direction:column;gap:8px}
+  .fitment-controls select{width:100%;min-height:44px;font-size:14px}
+  .fitment-controls button{min-height:44px;font-size:14px;width:100%}
+  .fitment-filter-label{width:100%;justify-content:center}
+  .hero{padding:40px 16px 80px}
+  .hero h1{font-size:26px;line-height:1.2}
+  .hero p{font-size:14px;padding:0 8px}
+  .hero-badge{font-size:10px;padding:6px 14px}
+  .search-container{padding:14px;border-radius:12px}
+  .search-row{grid-template-columns:1fr !important;gap:8px !important}
+  .search-row select,.search-row input,.search-row button{padding:13px !important;font-size:16px !important;min-height:48px}
+  .search-text-row input{font-size:16px !important;padding:13px !important;min-height:48px}
+  .identify-cta-wrap{padding:0 16px;margin:16px auto 20px}
+  .identify-cta{font-size:14px;padding:14px 16px}
+  .categories{grid-template-columns:repeat(3,1fr) !important;gap:8px;margin-top:-24px;padding:0 12px;margin-bottom:32px}
+  .category{padding:16px 8px;border-radius:8px}
+  .cat-icon{width:26px;height:26px;margin-bottom:6px}
+  .category-label{font-size:11px}
+  .results-section{padding:0 16px;margin-top:24px;margin-bottom:48px}
+  .results-header{flex-direction:column;align-items:flex-start;gap:10px}
+  .results-title{font-size:20px}
+  .results-count{font-size:12px;padding:6px 14px}
+  .grid{grid-template-columns:1fr !important;gap:14px}
+  .card{border-radius:12px;display:flex;flex-direction:row;align-items:stretch}
+  .card-img{width:120px;height:auto;min-height:120px;font-size:44px;flex-shrink:0;border-radius:12px 0 0 12px}
+  .card-badges{top:8px;left:8px}
+  .badge{font-size:9px;padding:3px 8px}
+  .save-btn{top:8px;right:8px;bottom:auto;padding:6px 10px;font-size:11px}
+  .share-btn{top:8px;left:8px;bottom:auto;padding:6px 10px;font-size:11px}
+  .card-body{padding:14px;display:flex;flex-direction:column;justify-content:center;flex:1}
+  .card-title{font-size:14px;line-height:1.35;margin-bottom:6px}
+  .card-price{font-size:18px;margin-bottom:4px}
+  .card-price-usd{font-size:11px;margin-bottom:10px}
+  .meta-tag{font-size:10px;padding:3px 8px}
+}
+@media (max-width:400px){
+  .hero h1{font-size:22px}
+  .categories{grid-template-columns:repeat(2,1fr) !important}
+  .card-img{width:100px;min-height:100px;font-size:36px}
+}
+</style>
+</head>
+<body>
+
+<div id="modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <span class="modal-close" onclick="closeModal()">&times;</span>
+    <h2 id="modal-title" class="modal-title">List Item</h2>
+    <form id="listing-form">
+      <div id="form-fields"></div>
+      <button type="submit" class="submit-btn">Publish Listing</button>
+      <div id="form-status" aria-live="polite" style="margin-top:15px;text-align:center;font-weight:bold;font-size:14px;"></div>
+    </form>
+  </div>
+</div>
+
+<div id="identify-car-modal" class="modal-overlay" style="display:none;">
+  <div class="modal-box" style="max-width:520px;">
+    <span class="modal-close" onclick="closeIdentifyCar()">&times;</span>
+    <div id="identify-stage-upload">
+      <h2 style="color:var(--navy-800);margin-bottom:8px;font-size:20px;">📸 Identify Your Car</h2>
+      <p style="color:var(--slate-500);font-size:14px;margin-bottom:20px;line-height:1.5;">Take a clear photo of the front or side of the car. AI will tell you the make, model, year, and estimated price in Sierra Leone Leones.</p>
+      <label class="file-upload-label" for="identify-file-input">
+        <input type="file" id="identify-file-input" accept="image/*">
+        <span class="icon">📷</span>
+        <span>Tap to Take Photo or Upload</span>
+        <span class="hint">JPG, PNG, or WEBP • Max 8 MB</span>
+      </label>
+      <div id="identify-status" aria-live="polite" style="margin-top:16px;text-align:center;font-size:14px;font-weight:600;line-height:1.5;"></div>
+    </div>
+    <div id="identify-stage-result" style="display:none;">
+      <div id="identify-result-content"></div>
+    </div>
+  </div>
+</div>
+
+<div id="import-modal" class="modal-overlay" style="display:none;z-index:2000;">
+  <div class="modal-box wide">
+    <span class="modal-close" onclick="closeImportModal()">&times;</span>
+    <h2 class="modal-title">🌍 Request a Part from Abroad</h2>
+    <p style="color:var(--slate-500);font-size:14px;margin-bottom:20px;">We'll source it from our international suppliers (Dubai, China, UK, USA) and deliver to you in Sierra Leone.</p>
+    <form id="import-form">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label class="form-label" for="imp-name">Your Name *</label><input id="imp-name" name="customer_name" required placeholder="Aminata Kamara" class="form-input"></div>
+        <div><label class="form-label" for="imp-phone">WhatsApp Number *</label><input id="imp-phone" name="customer_phone" required placeholder="+232 76 123456" class="form-input"></div>
+        <div><label class="form-label" for="imp-location">Your Location *</label><select id="imp-location" name="customer_location" required class="form-input"><option value="">Select City</option><option>Freetown</option><option>Bo</option><option>Kenema</option><option>Makeni</option><option>Koidu</option><option>Other</option></select></div>
+        <div><label class="form-label" for="imp-email">Email (optional)</label><input id="imp-email" name="customer_email" type="email" placeholder="you@example.com" class="form-input"></div>
+      </div>
+      <h3 style="margin-top:20px;margin-bottom:10px;color:var(--navy-800);font-size:15px;font-weight:700;">🔧 Part Details</h3>
+      <label class="form-label" for="imp-part">Part Name *</label>
+      <input id="imp-part" name="part_name" required placeholder="e.g. Front Bumper, Alternator, Turbo" class="form-input">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div><label class="form-label" for="imp-make">Car Make *</label><input id="imp-make" name="car_make" required placeholder="Toyota" class="form-input"></div>
+        <div><label class="form-label" for="imp-model">Model *</label><input id="imp-model" name="car_model" required placeholder="Corolla" class="form-input"></div>
+        <div><label class="form-label" for="imp-year">Year *</label><input id="imp-year" name="car_year" required placeholder="2018" class="form-input"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label class="form-label" for="imp-qty">Quantity</label><input id="imp-qty" name="quantity" type="number" value="1" min="1" class="form-input"></div>
+        <div><label class="form-label" for="imp-budget">Budget (SLL, optional)</label><input id="imp-budget" name="budget_sll" type="number" placeholder="8000000" class="form-input"></div>
+      </div>
+      <label class="form-label" for="imp-urgency">Urgency</label>
+      <select id="imp-urgency" name="urgency" class="form-input"><option>Normal</option><option>Urgent (need within 1 week)</option><option>Flexible (can wait 1+ month)</option></select>
+      <label class="form-label" for="imp-notes">Additional Notes</label>
+      <textarea id="imp-notes" name="notes" rows="3" placeholder="e.g. Prefer OEM original, any color is fine..." class="form-input"></textarea>
+      <button type="submit" class="submit-btn">Submit Request</button>
+      <div id="import-status" aria-live="polite" style="margin-top:15px;text-align:center;font-weight:bold;font-size:14px;"></div>
+    </form>
+  </div>
+</div>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-brakes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></symbol>
+  <symbol id="icon-engine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l2-4h6l2 4h3"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M5 12v6M19 12v6"/></symbol>
+  <symbol id="icon-suspension" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4"/><path d="M8 6h8M8 18h8"/><path d="M9 9h6M9 15h6"/><path d="M10 12h4"/></symbol>
+  <symbol id="icon-electrical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="icon-tires" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><line x1="12" y1="2" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="22"/></symbol>
+  <symbol id="icon-accessories" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 7V4h6v3"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="icon-part" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+</svg>
+
+<div class="top-bar">
+  <div><strong>Salon AutoZone HQ - Freetown, Sierra Leone</strong></div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
+    <a href="tel:+23276123456" class="phone">+232 76 123456</a>
+    <a href="#">Store Locator</a>
+    <a href="/login" id="signin-link">Sign In / Register</a>
+  </div>
+</div>
+
+<div class="brand-bar">
+  <div class="brand-logo">Salon<span>AutoZone</span> <span class="y">&amp; AutoTrader</span></div>
+  <div class="brand-toggle">
+    <button id="btn-parts" class="active" onclick="switchMarket('parts')">AutoZone Parts Store</button>
+    <button id="btn-vehicles" class="cars" onclick="switchMarket('vehicles')">AutoTrader Cars &amp; Trucks</button>
+  </div>
+  <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+    <svg style="width:24px;height:24px" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-menu"/></svg>
+  </button>
+  <div class="brand-actions">
+    <a href="/vin-tool">VIN Lookup</a>
+    <a href="/garage">🚗 My Garage</a>
+    <a href="/login">Login</a>
+    <a href="#" onclick="event.preventDefault();openModal('parts', event)" class="list-btn">+ List Item</a>
+  </div>
+</div>
+
+<div id="mobile-menu" class="mobile-menu">
+  <a href="/">🏠 Home</a>
+  <a href="/vin-tool">🔍 VIN Lookup</a>
+  <a href="/garage">🚗 My Garage</a>
+  <a href="/login">👤 Login / Register</a>
+  <a href="#" onclick="event.preventDefault();closeMobileMenu();openModal('vehicle', event)">🚗 + List Your Car</a>
+  <a href="#" onclick="event.preventDefault();closeMobileMenu();openModal('parts', event)">🔧 + List a Part</a>
+</div>
+
+<div class="fitment-bar">
+  <div class="fitment-left">
+    <div class="fitment-icon"><svg style="width:24px;height:24px;" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-car"/></svg></div>
+    <div>
+      <div class="fitment-label">Your Vehicle</div>
+      <div class="fitment-value" id="fitment-label">Not set - select your car for exact-fit parts</div>
+    </div>
+  </div>
+  <div class="fitment-controls">
+    <select id="fitment-make"><option value="">Select Make</option></select>
+    <select id="fitment-model"><option value="">Select Model</option></select>
+    <select id="fitment-year"><option value="">Select Year</option></select>
+    <button type="button" class="btn-save" onclick="saveFitment()">Save</button>
+    <button type="button" class="btn-clear" id="fitment-clear" onclick="clearFitment()">Clear</button>
+    <label id="fitment-filter-label" class="fitment-filter-label">
+      <input type="checkbox" id="fitment-filter" onchange="onFitmentFilterChange()">
+      Only show parts that fit
+    </label>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-badge">SIERRA LEONE VERIFIED VENDORS</div>
+  <h1>Find Your Next Car or Part in Sierra Leone</h1>
+  <p>Buy and sell cars &amp; parts across Freetown, Bo, Kenema, Makeni and beyond.</p>
+
+  <div class="search-container">
+    <div class="search-row">
+      <select id="search-category">
+        <option value="">All Categories</option>
+        <optgroup label="Fluids &amp; Oils">
+          <option value="Fluids">All Fluids &amp; Oils</option>
+          <option value="Engine Oil">Engine Oil</option>
+          <option value="Transmission Fluid">Transmission Fluid</option>
+          <option value="Power Steering Fluid">Power Steering Fluid</option>
+          <option value="Brake Fluid">Brake Fluid</option>
+          <option value="Coolant / Antifreeze">Coolant / Antifreeze</option>
+          <option value="Differential Oil">Differential Oil</option>
+          <option value="Windshield Washer">Windshield Washer Fluid</option>
+          <option value="Grease">Grease</option>
+        </optgroup>
+        <optgroup label="Parts">
+          <option value="Filters">Filters</option>
+          <option value="Batteries">Batteries</option>
+          <option value="Brakes">Brakes</option>
+          <option value="Engine">Engine</option>
+          <option value="Suspension">Suspension</option>
+          <option value="Electrical">Electrical</option>
+          <option value="Tires &amp; Wheels">Tires &amp; Wheels</option>
+          <option value="Transmission">Transmission</option>
+          <option value="Body">Body</option>
+          <option value="Interior">Interior</option>
+          <option value="Exhaust">Exhaust</option>
+          <option value="Lighting">Lighting</option>
+          <option value="Audio">Audio</option>
+          <option value="Accessories">Accessories</option>
+        </optgroup>
+      </select>
+      <select id="search-make" onchange="updateSearchModels()"><option value="">Any Make</option></select>
+      <select id="search-model"><option value="">Any Model</option></select>
+      <select id="search-year"><option value="">Any Year</option></select>
+      <select id="filter-location">
+        <option value="">All Locations</option>
+        <option value="Freetown">Freetown</option>
+        <option value="Bo">Bo</option>
+        <option value="Kenema">Kenema</option>
+        <option value="Makeni">Makeni</option>
+        <option value="Koidu">Koidu</option>
+      </select>
+      <button onclick="doSearch()">Search</button>
+    </div>
+    <div class="search-text-row">
+      <input type="text" id="search-input" placeholder="Or type a part name..." autocomplete="off">
+      <div class="suggestions-box" id="suggestions-box"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:18px;text-align:center;">
+    <button type="button" onclick="openImportModal()" style="background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;border:none;padding:16px 28px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:15px;box-shadow:0 8px 20px rgba(255,107,0,0.35);">
+      🌍 Can't find it locally? Request from Abroad
+    </button>
+  </div>
+</div>
+
+<div class="identify-cta-wrap">
+  <button type="button" class="identify-cta" onclick="openIdentifyCar()">
+    <span style="font-size:20px;">📸</span> Identify Your Car from a Photo — AI Powered
+  </button>
+</div>
+
+<div class="categories" id="categories-row">
+  <div class="category" onclick="filterCategory('Brakes')"><svg class="cat-icon"><use href="#icon-brakes"/></svg><div class="category-label">Brakes</div></div>
+  <div class="category" onclick="filterCategory('Engine')"><svg class="cat-icon"><use href="#icon-engine"/></svg><div class="category-label">Engine</div></div>
+  <div class="category" onclick="filterCategory('Suspension')"><svg class="cat-icon"><use href="#icon-suspension"/></svg><div class="category-label">Suspension</div></div>
+  <div class="category" onclick="filterCategory('Electrical')"><svg class="cat-icon"><use href="#icon-electrical"/></svg><div class="category-label">Electrical</div></div>
+  <div class="category" onclick="filterCategory('Tires &amp; Wheels')"><svg class="cat-icon"><use href="#icon-tires"/></svg><div class="category-label">Tires</div></div>
+  <div class="category" onclick="filterCategory('Accessories')"><svg class="cat-icon"><use href="#icon-accessories"/></svg><div class="category-label">Accessories</div></div>
+</div>
+
+<div id="featured-section" class="results-section" style="display:none;margin-top:24px;margin-bottom:32px;">
+  <div class="results-header" style="margin-bottom:16px;">
+    <h2 class="results-title" id="featured-title" style="font-size:22px;">⭐ Featured Listings</h2>
+    <div style="font-size:13px;color:var(--slate-500);font-weight:600;">Promoted by sellers · Shown first</div>
+  </div>
+  <div id="featured-scroll" class="featured-scroll"></div>
+</div>
+
+<div class="results-section">
+  <div class="results-header">
+    <h2 class="results-title" id="section-title">Latest Auto Parts</h2>
+    <div class="results-count" id="results-count">Loading...</div>
+  </div>
+  <div id="results" class="grid"></div>
+</div>
+
+{% raw %}
+<script>
+(function () {
+  'use strict';
+
+  var CITIES = ["Freetown","Bo","Kenema","Makeni","Koidu","Lunsar","Port Loko","Kabala","Waterloo"];
+  var MAKES = ["Toyota","Nissan","Honda","Mitsubishi","Mazda","Suzuki","Subaru","Isuzu","Daihatsu","Lexus","Hyundai","Kia","Genesis","Mercedes-Benz","BMW","Volkswagen","Audi","Porsche","Ford","Chevrolet","Jeep","Peugeot","Renault","Citroen","Land Rover","Jaguar","Volvo","Chery","Geely","Great Wall","BYD","MG","Other"];
+  var CATS = ["Fluids","Filters","Batteries","Brakes","Engine","Suspension","Electrical","Tires & Wheels","Transmission","Body","Interior","Exhaust","Lighting","Audio","Accessories"];
+  var MODELS = {
+    "Toyota":["Corolla","Camry","Hilux","RAV4","Land Cruiser","Prado","Vitz","Yaris","Avensis","Prius","Highlander","Fortuner","Hiace"],
+    "Nissan":["X-Trail","Altima","Sunny","Patrol","Navara","Qashqai","Juke","Note","Murano","Sentra"],
+    "Honda":["Civic","Accord","CR-V","Fit","Jazz","City","Pilot","HR-V"],
+    "Mitsubishi":["Pajero","Lancer","Outlander","L200","ASX"],
+    "Mazda":["CX-5","CX-9","Mazda3","Mazda6","BT-50"],
+    "Suzuki":["Swift","Vitara","Jimny","SX4","Alto"],
+    "Subaru":["Forester","Outback","Impreza","Legacy"],
+    "Isuzu":["D-Max","MU-X","Trooper"],
+    "Daihatsu":["Terios","Sirion","Cuore"],
+    "Lexus":["RX","NX","ES","IS","GX","LX"],
+    "Hyundai":["Tucson","Santa Fe","Elantra","Sonata","i10","i20","Accent","Creta","Kona"],
+    "Kia":["Sportage","Sorento","Rio","Cerato","Soul","Seltos","Picanto"],
+    "Genesis":["G70","G80","G90"],
+    "Mercedes-Benz":["C-Class","E-Class","S-Class","GLC","GLE","GLS","A-Class","ML","G-Class","Sprinter"],
+    "BMW":["3 Series","5 Series","7 Series","X1","X3","X5","X6","X7"],
+    "Volkswagen":["Golf","Passat","Tiguan","Polo","Jetta","Touareg"],
+    "Audi":["A3","A4","A6","Q3","Q5","Q7"],
+    "Porsche":["911","Cayenne","Macan","Panamera"],
+    "Ford":["Focus","Fiesta","F-150","Ranger","Explorer","Escape","Mustang"],
+    "Chevrolet":["Silverado","Cruze","Malibu","Equinox","Tahoe","Spark"],
+    "Jeep":["Wrangler","Grand Cherokee","Cherokee","Compass"],
+    "Peugeot":["208","308","3008","5008","Partner"],
+    "Renault":["Clio","Megane","Duster","Captur","Logan"],
+    "Citroen":["C3","C4","C5","Berlingo"],
+    "Land Rover":["Defender","Discovery","Range Rover","Range Rover Sport","Evoque"],
+    "Jaguar":["XE","XF","XJ","F-Pace","E-Pace"],
+    "Volvo":["XC40","XC60","XC90","S60","S90"],
+    "Chery":["Tiggo 4","Tiggo 7","Tiggo 8","Arrizo 5"],
+    "Geely":["Coolray","Azkarra","Tugella","Emgrand"],
+    "Great Wall":["Wingle","Poer","Haval H6","Haval Jolion"],
+    "BYD":["Atto 3","Han","Tang","Song","Seal"],
+    "MG":["ZS","HS","MG5","MG6"],
+    "Other":["Other"]
+  };
+  var YEARS = (function () { var a = []; for (var y = 2026; y >= 1980; y--) a.push(y); return a; })();
+
+  var currentTab = 'parts';
+  var suggestTimeout = null;
+  var identifySelectedFile = null;
+
+  function esc(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+  function escAttr(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function safeUrl(url) {
+    if (!url) return '';
+    var u = String(url).trim();
+    if (/^https?:\/\//i.test(u) || /^data:image\//i.test(u) || /^\//.test(u)) return u;
+    return '';
+  }
+  function getToken() {
+    try { return localStorage.getItem('token') || ''; } catch (e) { return ''; }
+  }
+  function fetchWithTimeout(url, ms, options) {
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, ms);
+    var opts = options || {};
+    opts.signal = controller.signal;
+    return fetch(url, opts).finally(function () { clearTimeout(timer); });
+  }
+  function showToast(msg, type) {
+    var t = document.getElementById('app-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'app-toast';
+      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#0b1e3a;color:white;padding:14px 24px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform 0.3s,opacity 0.3s;opacity:0;z-index:9999;pointer-events:none;max-width:90vw;text-align:center';
+      document.body.appendChild(t);
+    }
+    t.innerText = msg;
+    t.style.background = type === 'success' ? '#16a34a' : type === 'error' ? '#dc2626' : '#0b1e3a';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    t.style.opacity = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () {
+      t.style.transform = 'translateX(-50%) translateY(100px)';
+      t.style.opacity = '0';
+    }, 2600);
+  }
+
+  window.shareItem = function (type, id, title, price) {
+    var baseUrl = window.location.origin;
+    var listingUrl = (type === 'vehicle') ? baseUrl + '/vehicle/' + id : baseUrl + '/part/' + id;
+    var priceText = price ? 'SLL ' + Number(price).toLocaleString() : '';
+    var icon = type === 'vehicle' ? '🚗' : '🔧';
+    var message = icon + ' *' + title + '*\n' + (priceText ? '💰 ' + priceText + '\n' : '') + '\nView on SalonAutoZone:\n' + listingUrl + '\n\n_Sierra Leone\'s #1 Auto Marketplace_';
+    window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
+  };
+
+  window.saveItem = async function (btn, type, id, title, price) {
+    if (!getToken()) {
+      showToast('Please log in to save items', 'error');
+      setTimeout(function () { window.location.href = '/login?next=/'; }, 1200);
+      return;
+    }
+    var prevText = btn.innerText;
+    btn.innerText = '⏳ Saving...';
+    btn.className = 'save-btn saving';
+    btn.disabled = true;
+    try {
+      var res = await fetch('/api/my-account/saved', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+        body: JSON.stringify({ listing_type: type, listing_id: id })
+      });
+      if (!res.ok) {
+        if (res.status === 401) {
+          showToast('Please log in to save', 'error');
+          setTimeout(function () { window.location.href = '/login?next=/'; }, 1200);
+          return;
+        }
+        var err = await res.json().catch(function () { return {}; });
+        throw new Error(err.detail || 'Failed to save');
+      }
+      var data = await res.json();
+      btn.innerText = '✅ Saved';
+      btn.className = 'save-btn saved';
+      showToast(data.already_saved ? 'Already in saved items' : '💾 Saved to your account', 'success');
+    } catch (e) {
+      showToast('❌ ' + e.message, 'error');
+      btn.innerText = prevText;
+      btn.className = 'save-btn';
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  async function markSavedItems() {
+    if (!getToken()) return;
+    try {
+      var res = await fetch('/api/my-account/saved', { headers: { 'Authorization': 'Bearer ' + getToken() } });
+      if (!res.ok) return;
+      var data = await res.json();
+      var saved = {};
+      (data.items || []).forEach(function (s) { saved[s.listing_type + '-' + s.listing_id] = true; });
+      document.querySelectorAll('.save-btn').forEach(function (btn) {
+        var key = btn.dataset.saveType + '-' + btn.dataset.saveId;
+        if (saved[key]) { btn.innerText = '✅ Saved'; btn.classList.add('saved'); }
+      });
+    } catch (e) {}
+  }
+
+  function showSkeletons(el, count) {
+    var html = '';
+    for (var i = 0; i < count; i++) {
+      html += '<div class="card" style="pointer-events:none;opacity:0.6;"><div class="card-img" style="background:linear-gradient(90deg,#f0f4f8 0%,#e0e6ed 50%,#f0f4f8 100%);color:transparent;">…</div><div class="card-body"><div style="height:16px;background:#f0f4f8;border-radius:6px;margin-bottom:8px;"></div><div style="height:22px;background:#f0f4f8;border-radius:6px;width:60%;margin-bottom:8px;"></div><div style="height:12px;background:#f0f4f8;border-radius:6px;width:40%;"></div></div></div>';
+    }
+    el.innerHTML = html;
+  }
+
+  window.switchMarket = function (market) {
+    currentTab = market;
+    var bp = document.getElementById('btn-parts');
+    var bv = document.getElementById('btn-vehicles');
+    if (market === 'parts') {
+      bp.className = 'active'; bv.className = 'cars';
+      document.getElementById('section-title').innerText = 'Latest Auto Parts';
+      document.getElementById('categories-row').style.display = 'grid';
+    } else {
+      bp.className = ''; bv.className = 'cars active';
+      document.getElementById('section-title').innerText = 'Latest Cars & Trucks';
+      document.getElementById('categories-row').style.display = 'none';
+    }
+    var fs = document.getElementById('featured-section');
+    if (fs) fs.style.display = 'none';
+    doSearch();
+  };
+
+  window.updateSearchModels = function () {
+    var make = document.getElementById('search-make').value;
+    var mSel = document.getElementById('search-model');
+    if (!make) { mSel.innerHTML = '<option value="">Any Model</option>'; return; }
+    var models = MODELS[make] || ['Other'];
+    var html = '<option value="">Any Model</option>';
+    models.forEach(function (m) { html += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
+    mSel.innerHTML = html;
+  };
+
+  function initSearchCascade() {
+    var mSel = document.getElementById('search-make');
+    var ySel = document.getElementById('search-year');
+    if (!mSel) return;
+    var mHtml = '<option value="">Any Make</option>';
+    MAKES.forEach(function (m) { mHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
+    mSel.innerHTML = mHtml;
+    var yHtml = '<option value="">Any Year</option>';
+    YEARS.forEach(function (y) { yHtml += '<option value="' + y + '">' + y + '</option>'; });
+    ySel.innerHTML = yHtml;
+  }
+
+  window.doSearch = function () {
+    var resultsEl = document.getElementById('results');
+    var countEl = document.getElementById('results-count');
+    countEl.innerText = 'Loading...';
+    showSkeletons(resultsEl, 6);
+    var sv = document.getElementById('search-input').value.trim();
+    var cat = document.getElementById('search-category').value;
+    var mk = document.getElementById('search-make').value;
+    var md = document.getElementById('search-model').value;
+    var yr = document.getElementById('search-year').value;
+    var loc = document.getElementById('filter-location').value;
+    var p = new URLSearchParams();
+    if (loc) p.append('location', loc);
+    if (mk) p.append('make', mk);
+    if (md) p.append('model', md);
+    if (yr) p.append('year', yr);
+    if (currentTab === 'vehicles') {
+      if (sv) p.append('q', sv);
+      fetchWithTimeout('/api/vehicles/?' + p.toString(), 10000)
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function (data) {
+          var items = Array.isArray(data) ? data : (data.items || []);
+          countEl.innerText = items.length + ' car' + (items.length !== 1 ? 's' : '') + ' found';
+          renderFeaturedVehicles(items);
+        })
+        .catch(function (err) {
+          console.error('[doSearch vehicles]', err);
+          countEl.innerText = 'Error';
+          resultsEl.innerHTML = '<div class="empty">Could not load cars.<br><br><button onclick="doSearch()" style="background:var(--blue-400);color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;">🔄 Retry</button></div>';
+        });
+    } else {
+      if (cat) p.append('category', cat);
+      if (sv) p.append('q', sv);
+      fetchWithTimeout('/api/unified/parts?' + p.toString(), 10000)
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function (data) {
+          var total = data.total || 0;
+          var localCount = data.local_count || 0;
+          var catCount = data.catalog_count || 0;
+          countEl.innerText = total + ' result' + (total !== 1 ? 's' : '') + ' (' + localCount + ' local, ' + catCount + ' importable)';
+          renderPartsResults(data);
+        })
+        .catch(function (err) {
+          console.error('[doSearch parts]', err);
+          countEl.innerText = 'Error';
+          resultsEl.innerHTML = '<div class="empty">Could not load parts.<br><br><button onclick="doSearch()" style="background:var(--blue-400);color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;">🔄 Retry</button></div>';
+        });
+    }
+  };
+
+  function renderFeaturedVehicles(items) {
+    var featuredSection = document.getElementById('featured-section');
+    var featuredEl = document.getElementById('featured-scroll');
+    var featured = items.filter(function (v) { return v.is_featured; });
+    var regular = items.filter(function (v) { return !v.is_featured; });
+    if (featured.length > 0) {
+      featuredSection.style.display = 'block';
+      document.getElementById('featured-title').innerText = '⭐ Featured Cars';
+      renderVehicleResults(featured, 'featured-scroll');
+    } else {
+      featuredSection.style.display = 'none';
+    }
+    renderVehicleResults(regular, 'results');
+  }
+
+  function renderVehicleResults(items, targetId) {
+    var el = document.getElementById(targetId || 'results');
+    if (!items || items.length === 0) {
+      if (!targetId) el.innerHTML = '<div class="empty">No cars found. Try a different search.</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      var imgUrl = safeUrl(item.image_url);
+      var cardImgHtml;
+      if (imgUrl) {
+        cardImgHtml = '<div class="card-img" style="background-image:url(\'' + imgUrl + '\');color:transparent;"></div>';
+      } else {
+        cardImgHtml = '<div class="card-img car-placeholder"><svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-car"/></svg></div>';
+      }
+      html += '<div class="card" onclick="location.href=\'/vehicle/' + encodeURIComponent(item.id) + '\'">';
+      html += cardImgHtml;
+      html += '<div class="card-badges">';
+      if (item.is_featured) html += '<span class="badge badge-featured">⭐ FEATURED</span>';
+      html += '<span class="badge badge-verified">Verified</span></div>';
+      html += '<button type="button" class="save-btn" data-save-type="vehicle" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'vehicle\',' + item.id + ',\'' + escAttr(item.title || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
+      html += '<button type="button" class="share-btn" onclick="event.stopPropagation();shareItem(\'vehicle\',' + item.id + ',\'' + escAttr(item.title || '') + '\',' + (item.price_sll || 0) + ')">📤 Share</button>';
+      html += '</div>';
+      html += '<div class="card-body"><div class="card-title">' + esc(item.title) + '</div>';
+      html += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
+      if (item.price_usd) html += '<div class="card-price-usd">Approx $' + Number(item.price_usd).toLocaleString() + ' USD</div>';
+      html += '<div class="card-meta"><span class="meta-tag">' + esc(item.year) + '</span>';
+      html += '<span class="meta-tag">' + esc(item.transmission) + '</span>';
+      html += '<span class="meta-tag loc">' + esc(item.location) + '</span></div></div></div>';
+    }
+    el.innerHTML = html;
+    markSavedItems();
+  }
+
+  function renderPartsResults(data) {
+    var el = document.getElementById('results');
+    var featuredEl = document.getElementById('featured-scroll');
+    var featuredSection = document.getElementById('featured-section');
+    var local = data.local_parts || [];
+    var catalog = data.catalog_parts || [];
+
+    var featuredLocal = local.filter(function (p) { return p.is_featured; });
+    var regularLocal = local.filter(function (p) { return !p.is_featured; });
+
+    if (featuredLocal.length > 0) {
+      featuredSection.style.display = 'block';
+      renderFeaturedParts(featuredLocal, featuredEl);
+    } else {
+      featuredSection.style.display = 'none';
+    }
+
+    if (local.length === 0 && catalog.length === 0) {
+      el.innerHTML = '<div class="empty">No parts found.<br><br>Try a different search or <a href="#" onclick="openImportModal();return false;" style="color:var(--blue-400);font-weight:bold;">request it from abroad</a>.</div>';
+      return;
+    }
+    var fitment = null;
+    try { fitment = JSON.parse(localStorage.getItem('fitmentVehicle') || 'null'); } catch (e) {}
+    var filterOn = false;
+    try { filterOn = localStorage.getItem('fitmentFilterOn') === '1'; } catch (e) {}
+    var html = '';
+
+    if (regularLocal.length > 0) {
+      var renderedLocal = 0;
+      var localHtml = '';
+      for (var i = 0; i < regularLocal.length; i++) {
+        var item = regularLocal[i];
+        var imgUrl = safeUrl(item.image_url);
+        var cardImgHtml;
+        if (imgUrl) {
+          cardImgHtml = '<div class="card-img" style="background-image:url(\'' + imgUrl + '\');color:transparent;"></div>';
+        } else {
+          cardImgHtml = '<div class="card-img part-placeholder"><svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-part"/></svg></div>';
+        }
+        var fits = false;
+        if (fitment && fitment.make && item.compatible_make) {
+          var makeMatch = item.compatible_make.toLowerCase() === fitment.make.toLowerCase();
+          var modelMatch = !item.compatible_model || !fitment.model || item.compatible_model.toLowerCase().indexOf(String(fitment.model).toLowerCase()) !== -1;
+          fits = makeMatch && modelMatch;
+        }
+        if (filterOn && fitment && fitment.make && !fits) continue;
+        renderedLocal++;
+        localHtml += '<div class="card" onclick="location.href=\'/part/' + encodeURIComponent(item.id) + '\'">';
+        localHtml += cardImgHtml;
+        localHtml += '<div class="card-badges">';
+        localHtml += '<span class="badge badge-new">' + esc(item.condition || 'New') + '</span>';
+        if (fits) localHtml += '<span class="badge badge-fits">✅ Fits your car</span>';
+        localHtml += '</div>';
+        localHtml += '<button type="button" class="save-btn" data-save-type="part" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'part\',' + item.id + ',\'' + escAttr(item.name || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
+        localHtml += '<button type="button" class="share-btn" onclick="event.stopPropagation();shareItem(\'part\',' + item.id + ',\'' + escAttr(item.name || '') + '\',' + (item.price_sll || 0) + ')">📤 Share</button>';
+        localHtml += '<div class="card-body"><div class="card-title">' + esc(item.name) + '</div>';
+        localHtml += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
+        localHtml += '<div class="card-meta"><span class="meta-tag">' + esc(item.category) + '</span>';
+        localHtml += '<span class="meta-tag">Stock: ' + (item.stock_quantity || 0) + '</span>';
+        localHtml += '<span class="meta-tag loc">📍 ' + esc(item.location) + '</span></div></div></div>';
+      }
+      if (renderedLocal > 0) {
+        html += '<div style="grid-column:1/-1;margin-top:10px;margin-bottom:6px;"><h3 style="color:var(--navy-800);font-size:18px;font-weight:800;">Available Locally in Sierra Leone</h3></div>';
+        html += localHtml;
+      }
+    }
+
+    if (catalog.length > 0) {
+      html += '<div style="grid-column:1/-1;margin-top:24px;margin-bottom:6px;"><h3 style="color:var(--navy-800);font-size:18px;font-weight:800;">Import from Abroad (7-14 days)</h3></div>';
+      for (var j = 0; j < catalog.length; j++) {
+        var c = catalog[j];
+        html += '<div class="card" onclick="location.href=\'/catalog/' + encodeURIComponent(c.id) + '\'">';
+        html += '<div class="card-img catalog-placeholder"><svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-globe"/></svg>';
+        html += '<div class="card-badges"><span class="badge" style="background:#ff6b00;">Import Available</span></div></div>';
+        html += '<div class="card-body">';
+        html += '<div style="font-family:monospace;font-size:12px;color:var(--slate-400);margin-bottom:6px;">' + esc(c.part_number) + '</div>';
+        html += '<div class="card-title">' + esc(c.category || 'Part') + '</div>';
+        html += '<div style="font-size:13px;color:var(--slate-500);margin-bottom:6px;">Fits: ' + esc(c.vehicle_compatibility || 'Universal') + '</div>';
+        html += '<div style="color:#ff6b00;font-weight:700;font-size:13px;">Request Quote</div>';
+        html += '</div></div>';
+      }
+    }
+
+    if (!html) {
+      el.innerHTML = '<div class="empty">No parts fit your car in this category.<br><br><button onclick="onFitmentFilterChange()" style="background:var(--blue-400);color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;">Show all parts</button></div>';
+      return;
+    }
+
+    el.innerHTML = html;
+    markSavedItems();
+  }
+
+  function renderFeaturedParts(items, targetEl) {
+    var html = '';
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      var imgUrl = safeUrl(item.image_url);
+      var cardImgHtml;
+      if (imgUrl) {
+        cardImgHtml = '<div class="card-img" style="background-image:url(\'' + imgUrl + '\');color:transparent;"></div>';
+      } else {
+        cardImgHtml = '<div class="card-img part-placeholder"><svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-part"/></svg></div>';
+      }
+      html += '<div class="card" onclick="location.href=\'/part/' + encodeURIComponent(item.id) + '\'">';
+      html += cardImgHtml;
+      html += '<div class="card-badges"><span class="badge badge-featured">⭐ FEATURED</span></div>';
+      html += '<button type="button" class="save-btn" data-save-type="part" data-save-id="' + item.id + '" onclick="event.stopPropagation();saveItem(this,\'part\',' + item.id + ',\'' + escAttr(item.name || '') + '\',' + (item.price_sll || 0) + ')">💾 Save</button>';
+      html += '</div>';
+      html += '<div class="card-body"><div class="card-title">' + esc(item.name) + '</div>';
+      html += '<div class="card-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</div>';
+      html += '<div class="card-meta"><span class="meta-tag">' + esc(item.category) + '</span>';
+      html += '<span class="meta-tag loc">📍 ' + esc(item.location) + '</span></div></div></div>';
+    }
+    targetEl.innerHTML = html;
+    markSavedItems();
+  }
+
+  window.filterCategory = function (cat) {
+    document.getElementById('search-category').value = cat;
+    doSearch();
+  };
+
+  function initFitment() {
+    var mSel = document.getElementById('fitment-make');
+    var moSel = document.getElementById('fitment-model');
+    var ySel = document.getElementById('fitment-year');
+    if (!mSel) return;
+    var mHtml = '<option value="">Select Make</option>';
+    MAKES.forEach(function (m) { mHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
+    mSel.innerHTML = mHtml;
+    var yHtml = '<option value="">Select Year</option>';
+    YEARS.forEach(function (y) { yHtml += '<option value="' + y + '">' + y + '</option>'; });
+    ySel.innerHTML = yHtml;
+    mSel.addEventListener('change', function () {
+      var make = this.value;
+      var models = MODELS[make] || ['Other'];
+      var moHtml = '<option value="">Select Model</option>';
+      models.forEach(function (m) { moHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
+      moSel.innerHTML = moHtml;
+    });
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem('fitmentVehicle') || 'null'); } catch (e) {}
+    if (saved) {
+      mSel.value = saved.make || '';
+      if (saved.make) {
+        var models = MODELS[saved.make] || [];
+        var moHtml = '<option value="">Select Model</option>';
+        models.forEach(function (m) { moHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
+        moSel.innerHTML = moHtml;
+      }
+      moSel.value = saved.model || '';
+      ySel.value = saved.year || '';
+      updateFitmentLabel(saved);
+      document.getElementById('fitment-clear').style.display = 'inline-block';
+    }
+    try {
+      if (localStorage.getItem('fitmentFilterOn') === '1') {
+        var cb = document.getElementById('fitment-filter');
+        if (cb) cb.checked = true;
+      }
+    } catch (e) {}
+  }
+
+  function updateFitmentLabel(v) {
+    var el = document.getElementById('fitment-label');
+    if (el) el.innerText = v.year + ' ' + v.make + ' ' + v.model + ' — Showing exact-fit parts';
+    var filterLabel = document.getElementById('fitment-filter-label');
+    if (filterLabel) filterLabel.style.display = 'inline-flex';
+  }
+
+  window.onFitmentFilterChange = function () {
+    var cb = document.getElementById('fitment-filter');
+    try {
+      if (cb && cb.checked) localStorage.setItem('fitmentFilterOn', '1');
+      else localStorage.removeItem('fitmentFilterOn');
+    } catch (e) {}
+    doSearch();
+  };
+
+  window.saveFitment = function () {
+    var make = document.getElementById('fitment-make').value;
+    var model = document.getElementById('fitment-model').value;
+    var year = document.getElementById('fitment-year').value;
+    if (!make || !model || !year) { alert('Please select Make, Model, and Year'); return; }
+    var v = { make: make, model: model, year: year };
+    try { localStorage.setItem('fitmentVehicle', JSON.stringify(v)); } catch (e) {}
+    updateFitmentLabel(v);
+    document.getElementById('fitment-clear').style.display = 'inline-block';
+    if (currentTab === 'parts') doSearch();
+  };
+
+  window.clearFitment = function () {
+    try { localStorage.removeItem('fitmentVehicle'); } catch (e) {}
+    document.getElementById('fitment-label').innerText = 'Not set - select your car for exact-fit parts';
+    document.getElementById('fitment-make').value = '';
+    document.getElementById('fitment-model').innerHTML = '<option value="">Select Model</option>';
+    document.getElementById('fitment-year').value = '';
+    document.getElementById('fitment-clear').style.display = 'none';
+    var filterLabel = document.getElementById('fitment-filter-label');
+    if (filterLabel) filterLabel.style.display = 'none';
+    var cb = document.getElementById('fitment-filter');
+    if (cb) cb.checked = false;
+    try { localStorage.removeItem('fitmentFilterOn'); } catch (e) {}
+    if (currentTab === 'parts') doSearch();
+  };
+
+  async function syncGarageFromBackend() {
+    if (!getToken()) return;
+    try {
+      var res = await fetch('/api/garage/', { headers: { 'Authorization': 'Bearer ' + getToken() } });
+      if (!res.ok) return;
+      var cars = await res.json();
+      var primary = cars.find(function (c) { return c.is_primary; }) || cars[0];
+      if (!primary) return;
+      try { localStorage.setItem('fitmentVehicle', JSON.stringify({ make: primary.make, model: primary.model, year: String(primary.year) })); } catch (e) {}
+      var mSel = document.getElementById('fitment-make');
+      var moSel = document.getElementById('fitment-model');
+      var ySel = document.getElementById('fitment-year');
+      if (!mSel || !moSel || !ySel) return;
+      mSel.value = primary.make || '';
+      if (primary.make) {
+        var models = MODELS[primary.make] || [];
+        var moHtml = '<option value="">Select Model</option>';
+        models.forEach(function (m) { moHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
+        moSel.innerHTML = moHtml;
+      }
+      moSel.value = primary.model || '';
+      ySel.value = String(primary.year || '');
+      updateFitmentLabel({ make: primary.make, model: primary.model, year: String(primary.year) });
+      var clearBtn = document.getElementById('fitment-clear');
+      if (clearBtn) clearBtn.style.display = 'inline-block';
+      if (typeof doSearch === 'function') doSearch();
+    } catch (e) { console.warn('garage sync failed:', e); }
+  }
+
+  function hideSuggestions() {
+    var b = document.getElementById('suggestions-box');
+    if (b) b.style.display = 'none';
+  }
+
+  function setupPredictiveSearch() {
+    var input = document.getElementById('search-input');
+    if (!input) return;
+    input.addEventListener('input', function (e) {
+      var q = e.target.value.trim();
+      clearTimeout(suggestTimeout);
+      if (q.length < 2) { hideSuggestions(); return; }
+      suggestTimeout = setTimeout(function () { fetchSuggestions(q); }, 200);
+    });
+    input.addEventListener('focus', function () {
+      var q = input.value.trim();
+      if (q.length >= 2) fetchSuggestions(q);
+    });
+    document.addEventListener('click', function (e) {
+      var box = document.getElementById('suggestions-box');
+      if (box && !box.contains(e.target) && e.target !== input) hideSuggestions();
+    });
+  }
+
+  function fetchSuggestions(q) {
+    var box = document.getElementById('suggestions-box');
+    box.innerHTML = '<div style="padding:14px;text-align:center;color:var(--slate-400);font-size:13px">Searching...</div>';
+    box.style.display = 'block';
+    fetchWithTimeout('/api/unified/suggest?q=' + encodeURIComponent(q), 5000)
+      .then(function (r) { return r.json(); })
+      .then(function (data) { renderSuggestions(data.suggestions || [], q); })
+      .catch(function () { hideSuggestions(); });
+  }
+
+  function renderSuggestions(suggestions, q) {
+    var box = document.getElementById('suggestions-box');
+    if (!suggestions || suggestions.length === 0) {
+      box.innerHTML = '<div style="padding:14px;text-align:center;color:var(--slate-400);font-size:13px">No results for "' + esc(q) + '"</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < suggestions.length; i++) {
+      var s = suggestions[i];
+      var icon = s.icon || (s.type === 'vehicle' ? '🚗' : (s.type === 'catalog' ? '🌍' : '🔧'));
+      html += '<div class="suggestion-item" onclick="selectSuggestion(\'' + escAttr(s.url) + '\')">';
+      html += '<div style="width:32px;height:32px;border-radius:8px;background:#f0f9ff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">' + icon + '</div>';
+      html += '<div style="flex:1;min-width:0;">';
+      html += '<div style="font-weight:600;color:var(--navy-800);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(s.label) + '</div>';
+      html += '<div style="color:var(--slate-400);font-size:12px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(s.sublabel) + '</div>';
+      html += '</div>';
+      html += '<div style="color:var(--blue-400);font-size:16px;flex-shrink:0;">→</div>';
+      html += '</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  window.selectSuggestion = function (url) { hideSuggestions(); window.location.href = url; };
+
+  window.openImportModal = function () { document.getElementById('import-modal').style.display = 'flex'; };
+  window.closeImportModal = function () {
+    document.getElementById('import-modal').style.display = 'none';
+    document.getElementById('import-form').reset();
+    document.getElementById('import-status').innerHTML = '';
+  };
+
+  window.openModal = function (type, evt) {
+    if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+    if (!getToken()) {
+      if (confirm('Please login or register to list items. Go to login page?')) window.location.href = '/login?next=/';
+      return false;
+    }
+    var modal = document.getElementById('modal-overlay');
+    if (!modal) { alert('Error: Modal not found.'); return false; }
+    var form = document.getElementById('listing-form');
+    if (form) { form.reset(); form.dataset.type = type; }
+    var statusEl = document.getElementById('form-status');
+    if (statusEl) statusEl.innerHTML = '';
+    var titleEl = document.getElementById('modal-title');
+    if (titleEl) titleEl.innerText = type === 'vehicle' ? '🚗 List Your Car' : '🔧 List a Part';
+    var fieldsEl = document.getElementById('form-fields');
+    if (fieldsEl) fieldsEl.innerHTML = type === 'vehicle' ? vehicleFormHTML() : partFormHTML();
+    modal.style.display = 'flex';
+    return false;
+  };
+
+  window.closeModal = function () {
+    var modal = document.getElementById('modal-overlay');
+    if (modal) modal.style.display = 'none';
+    var statusEl = document.getElementById('form-status');
+    if (statusEl) statusEl.innerHTML = '';
+  };
+
+  function vehicleFormHTML() {
+    var makesOpts = MAKES.map(function (m) { return '<option value="' + esc(m) + '">' + esc(m) + '</option>'; }).join('');
+    var yearsOpts = YEARS.map(function (y) { return '<option value="' + y + '">' + y + '</option>'; }).join('');
+    var citiesOpts = CITIES.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+    return '<label class="form-label">Car Title *</label>'
+      + '<input name="title" required placeholder="2015 Toyota Corolla" class="form-input">'
+      + '<label class="form-label">Make *</label>'
+      + '<select name="make" id="v-make" required onchange="updateModels()" class="form-input"><option value="">Select Make</option>' + makesOpts + '</select>'
+      + '<label class="form-label">Model *</label>'
+      + '<select name="model" id="v-model" required class="form-input"><option value="">Select Make First</option></select>'
+      + '<label class="form-label">Year *</label>'
+      + '<select name="year" required class="form-input"><option value="">Select Year</option>' + yearsOpts + '</select>'
+      + '<label class="form-label">Price (SLL) *</label>'
+      + '<input name="price_sll" type="number" required placeholder="150000000" class="form-input">'
+      + '<label class="form-label">Price (USD, optional)</label>'
+      + '<input name="price_usd" type="number" placeholder="6500" class="form-input">'
+      + '<label class="form-label">Mileage (km) *</label>'
+      + '<input name="mileage_km" type="number" required placeholder="85000" class="form-input">'
+      + '<label class="form-label">Fuel *</label>'
+      + '<select name="fuel_type" required class="form-input"><option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option></select>'
+      + '<label class="form-label">Transmission *</label>'
+      + '<select name="transmission" required class="form-input"><option>Automatic</option><option>Manual</option></select>'
+      + '<label class="form-label">Location *</label>'
+      + '<select name="location" required class="form-input"><option value="">Select City</option>' + citiesOpts + '</select>'
+      + '<label class="form-label">📱 WhatsApp Number *</label>'
+      + '<input name="contact_phone" required placeholder="+232 76 123456" class="form-input">'
+      + '<label class="form-label">Description</label>'
+      + '<textarea name="description" rows="3" class="form-input"></textarea>';
+  }
+
+  function partFormHTML() {
+    var catsOpts = CATS.map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
+    var makesOpts = MAKES.map(function (m) { return '<option>' + esc(m) + '</option>'; }).join('');
+    var citiesOpts = CITIES.map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
+    return '<label class="form-label">Part Name *</label>'
+      + '<input name="name" required placeholder="Toyota Corolla Brake Pads" class="form-input">'
+      + '<label class="form-label">Category *</label>'
+      + '<select name="category" required class="form-input"><option value="">Select</option>' + catsOpts + '</select>'
+      + '<label class="form-label">Compatible Make</label>'
+      + '<select name="compatible_make" class="form-input"><option value="">Any</option>' + makesOpts + '</select>'
+      + '<label class="form-label">Compatible Model</label>'
+      + '<input name="compatible_model" placeholder="Corolla" class="form-input">'
+      + '<label class="form-label">Price (SLL) *</label>'
+      + '<input name="price_sll" type="number" required placeholder="450000" class="form-input">'
+      + '<label class="form-label">Stock Quantity *</label>'
+      + '<input name="stock_quantity" type="number" required value="1" class="form-input">'
+      + '<label class="form-label">Condition *</label>'
+      + '<select name="condition" required class="form-input"><option>New</option><option>Used</option><option>Refurbished</option></select>'
+      + '<label class="form-label">Location *</label>'
+      + '<select name="location" required class="form-input"><option value="">Select City</option>' + citiesOpts + '</select>'
+      + '<label class="form-label">📱 WhatsApp Number *</label>'
+      + '<input name="contact_phone" required placeholder="+232 76 123456" class="form-input">'
+      + '<label class="form-label">Description</label>'
+      + '<textarea name="description" rows="3" class="form-input"></textarea>';
+  }
+
+  window.updateModels = function () {
+    var makeSelect = document.getElementById('v-make');
+    var modelSelect = document.getElementById('v-model');
+    if (!makeSelect || !modelSelect) return;
+    var make = makeSelect.value;
+    if (!make) { modelSelect.innerHTML = '<option value="">Select Make First</option>'; return; }
+    var models = MODELS[make] || ['Other'];
+    var html = '<option value="">Select Model</option>';
+    for (var i = 0; i < models.length; i++) { html += '<option value="' + esc(models[i]) + '">' + esc(models[i]) + '</option>'; }
+    html += '<option value="Other">Other (not listed)</option>';
+    modelSelect.innerHTML = html;
+  };
+
+  document.getElementById('listing-form').addEventListener('submit', async function (e) {
+    e.preventDefault(); e.stopPropagation();
+    var form = e.target;
+    var statusEl = document.getElementById('form-status');
+    var type = form.dataset.type || 'vehicle';
+    statusEl.style.color = 'var(--blue-400)';
+    statusEl.innerText = 'Publishing...';
+    var userId = 1;
+    try { var userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}'); if (userInfo.id) userId = userInfo.id; } catch (err) {}
+    var formData = new FormData(form);
+    var payload = {};
+    formData.forEach(function (value, key) {
+      if (value === '' || value === null) return;
+      var numeric = ['year', 'price_sll', 'price_usd', 'mileage_km', 'stock_quantity'];
+      if (numeric.indexOf(key) > -1) { var num = parseFloat(value); if (!isNaN(num)) { payload[key] = num; return; } }
+      payload[key] = value;
+    });
+    if (type === 'vehicle') payload.seller_id = userId; else payload.vendor_id = userId;
+    var url = (type === 'vehicle') ? '/api/vehicles/' : '/api/parts/';
+    try {
+      var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }, body: JSON.stringify(payload) });
+      var responseText = await res.text();
+      var data;
+      try { data = JSON.parse(responseText); } catch (err) { throw new Error('Server returned invalid response'); }
+      if (!res.ok) { var errMsg = data.detail || 'Failed to publish'; if (res.status === 401) errMsg = 'Please login first (session expired)'; throw new Error(errMsg); }
+      statusEl.style.color = 'var(--green-400)';
+      statusEl.innerText = '✅ Listing published successfully!';
+      setTimeout(function () { closeModal(); doSearch(); window.scrollTo({ top: 0, behavior: 'smooth' }); }, 800);
+    } catch (err) {
+      statusEl.style.color = 'var(--red-500)';
+      statusEl.innerText = '❌ ' + err.message;
+    }
+  });
+
+  document.getElementById('import-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var statusEl = document.getElementById('import-status');
+    statusEl.style.color = 'var(--blue-400)';
+    statusEl.innerText = 'Submitting...';
+    var fd = new FormData(e.target);
+    var payload = {};
+    fd.forEach(function (v, k) { if (v === '') return; if (k === 'quantity' || k === 'budget_sll') payload[k] = Number(v); else payload[k] = v; });
+    try {
+      var res = await fetch('/api/import-requests/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!res.ok) { var err = await res.json(); throw new Error(JSON.stringify(err)); }
+      var data = await res.json();
+      statusEl.style.color = 'green';
+      statusEl.innerHTML = '✅ Request received! We\'ll contact you on WhatsApp within 24 hours.';
+      setTimeout(function () { closeImportModal(); }, 4000);
+    } catch (err) {
+      statusEl.style.color = 'red';
+      statusEl.innerText = '❌ ' + err.message;
+    }
+  });
+
+  window.toggleMobileMenu = function () {
+    var menu = document.getElementById('mobile-menu');
+    if (menu) menu.classList.toggle('open');
+  };
+  window.closeMobileMenu = function () {
+    var menu = document.getElementById('mobile-menu');
+    if (menu) menu.classList.remove('open');
+  };
+
+  window.openIdentifyCar = function () {
+    if (!getToken()) { alert('Please log in to use AI car identification.'); window.location.href = '/login'; return; }
+    document.getElementById('identify-car-modal').style.display = 'flex';
+    document.getElementById('identify-stage-upload').style.display = 'block';
+    document.getElementById('identify-stage-result').style.display = 'none';
+    document.getElementById('identify-status').innerHTML = '';
+    var input = document.getElementById('identify-file-input');
+    if (input) input.value = '';
+    identifySelectedFile = null;
+  };
+  window.closeIdentifyCar = function () {
+    document.getElementById('identify-car-modal').style.display = 'none';
+    var input = document.getElementById('identify-file-input');
+    if (input) input.value = '';
+    identifySelectedFile = null;
+  };
+
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.id === 'identify-file-input') {
+      if (e.target.files && e.target.files.length > 0) {
+        identifySelectedFile = e.target.files[0];
+        handleIdentifyUpload();
+      }
+    }
+  });
+
+  async function handleIdentifyUpload() {
+    if (!identifySelectedFile) return;
+    var statusEl = document.getElementById('identify-status');
+    var file = identifySelectedFile;
+    if (file.size > 8 * 1024 * 1024) { statusEl.style.color = 'var(--red-500)'; statusEl.innerText = '❌ Image too large (max 8 MB).'; return; }
+    var startTime = Date.now();
+    statusEl.style.color = 'var(--blue-400)';
+    statusEl.innerHTML = '<div style="padding:10px;"><div style="font-size:32px;margin-bottom:8px;">🔍</div><div style="font-weight:700;">Analyzing your photo...</div><div style="font-size:13px;color:var(--slate-500);margin-top:6px;" id="identify-progress">Starting up (0s)</div></div>';
+    var progressInterval = setInterval(function () {
+      var elapsed = Math.floor((Date.now() - startTime) / 1000);
+      var progressEl = document.getElementById('identify-progress');
+      if (progressEl) {
+        if (elapsed < 10) progressEl.innerText = 'Uploading photo... (' + elapsed + 's)';
+        else if (elapsed < 25) progressEl.innerText = 'AI is analyzing... (' + elapsed + 's)';
+        else progressEl.innerText = 'Almost done... (' + elapsed + 's)';
+      }
+    }, 1000);
+    var fd = new FormData();
+    fd.append('file', file);
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function () { controller.abort(); }, 120000);
+    try {
+      var res = await fetch('/api/identify/car', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getToken() }, body: fd, signal: controller.signal });
+      clearTimeout(timeoutId); clearInterval(progressInterval);
+      var responseText = await res.text();
+      var data;
+      try { data = JSON.parse(responseText); } catch (err) {
+        statusEl.style.color = 'var(--red-500)';
+        statusEl.innerHTML = '<div style="padding:10px;"><div style="font-size:32px;margin-bottom:8px;">⚠️</div><div style="font-weight:700;">Server error</div></div>';
+        return;
+      }
+      if (!res.ok) {
+        statusEl.style.color = 'var(--red-500)';
+        var errMsg = data.detail || 'Identification failed';
+        if (res.status === 401) errMsg = 'Please log in again (session expired)';
+        if (res.status === 429) errMsg = 'Daily limit reached (20/day). Try again tomorrow.';
+        statusEl.innerHTML = '<div style="padding:10px;"><div style="font-size:32px;margin-bottom:8px;">❌</div><div style="font-weight:700;">' + esc(errMsg) + '</div></div>';
+        return;
+      }
+      renderIdentifyResult(data.identification);
+    } catch (err) {
+      clearTimeout(timeoutId); clearInterval(progressInterval);
+      statusEl.style.color = 'var(--red-500)';
+      if (err.name === 'AbortError') { statusEl.innerHTML = '<div style="padding:10px;"><div style="font-size:32px;margin-bottom:8px;">⏱️</div><div style="font-weight:700;">Request timed out</div></div>'; }
+      else { statusEl.innerHTML = '<div style="padding:10px;"><div style="font-size:32px;margin-bottom:8px;">🌐</div><div style="font-weight:700;">Network error</div></div>'; }
+    }
+  }
+
+  function renderIdentifyResult(car) {
+    var html = '';
+    if (!car || !car.make || !car.model) {
+      html = '<div style="text-align:center;padding:20px;"><div style="font-size:48px;margin-bottom:12px;">😕</div><h3 style="color:var(--navy-800);margin-bottom:8px;">Could Not Identify</h3><p style="color:var(--slate-500);font-size:14px;">Please try a clearer photo.</p><button onclick="closeIdentifyCar();openIdentifyCar()" style="margin-top:16px;background:var(--blue-400);color:white;border:none;padding:12px 24px;border-radius:8px;font-weight:bold;cursor:pointer;">Try Another Photo</button></div>';
+    } else {
+      var priceRange = '';
+      if (car.estimated_price_sll_low && car.estimated_price_sll_high) priceRange = 'SLL ' + Math.round(car.estimated_price_sll_low).toLocaleString() + ' – ' + Math.round(car.estimated_price_sll_high).toLocaleString();
+      var partsList = '';
+      if (car.common_parts && car.common_parts.length > 0) {
+        partsList = car.common_parts.map(function (p) { return '<span style="display:inline-block;background:#f0f9ff;color:#0369a1;padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;margin:4px 4px 0 0;">' + esc(p) + '</span>'; }).join('');
+      }
+      html = '<div style="text-align:center;margin-bottom:20px;"><div style="font-size:48px;margin-bottom:8px;">🚗</div><h2 style="color:var(--navy-800);font-size:22px;margin-bottom:4px;">' + esc(car.make) + ' ' + esc(car.model) + '</h2><div style="color:var(--slate-500);font-size:14px;">' + esc(car.year_range || '') + ' • ' + esc(car.body_type || '') + ' • ' + esc(car.color || '') + '</div></div>' +
+        (priceRange ? '<div style="background:#dcfce7;padding:16px;border-radius:12px;text-align:center;margin-bottom:16px;"><div style="font-size:11px;color:#166534;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Estimated Price</div><div style="font-size:20px;color:#166534;font-weight:900;">' + priceRange + '</div></div>' : '') +
+        (partsList ? '<div style="margin-bottom:16px;"><div style="font-size:12px;color:var(--slate-500);font-weight:700;text-transform:uppercase;margin-bottom:8px;">Common Parts</div><div>' + partsList + '</div></div>' : '') +
+        (car.description ? '<div style="background:var(--slate-50);padding:12px;border-radius:8px;font-size:13px;color:var(--slate-600);line-height:1.5;margin-bottom:16px;">' + esc(car.description) + '</div>' : '') +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;">' +
+        '<button onclick="searchPartsForCar(\'' + escAttr(car.make) + '\', \'' + escAttr(car.model) + '\')" style="background:var(--blue-400);color:white;border:none;padding:14px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;min-height:48px;">🔧 Find Parts</button>' +
+        '<button onclick="listCarFromIdentify(\'' + escAttr(car.make) + '\', \'' + escAttr(car.model) + '\')" style="background:var(--orange-500);color:white;border:none;padding:14px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;min-height:48px;">📝 List for Sale</button>' +
+        '</div>' +
+        '<button onclick="closeIdentifyCar();openIdentifyCar()" style="width:100%;margin-top:10px;background:var(--slate-100);color:var(--navy-800);border:1px solid var(--slate-200);padding:12px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;">Try Another Photo</button>';
+    }
+    document.getElementById('identify-result-content').innerHTML = html;
+    document.getElementById('identify-stage-upload').style.display = 'none';
+    document.getElementById('identify-stage-result').style.display = 'block';
+  }
+
+  window.searchPartsForCar = function (make, model) { closeIdentifyCar(); document.getElementById('search-input').value = make + ' ' + model; switchMarket('parts'); setTimeout(function () { doSearch(); }, 100); };
+  window.listCarFromIdentify = function (make, model) { closeIdentifyCar(); setTimeout(function () { openModal('vehicle'); }, 100); };
+
+  function init() {
+    if (getToken()) {
+      var link = document.getElementById('signin-link');
+      if (link) { link.innerText = 'My Dashboard'; link.href = '/my-account'; }
+    }
+    switchMarket('parts');
+    setupPredictiveSearch();
+    initFitment();
+    initSearchCascade();
+    syncGarageFromBackend();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+{% endraw %}
+</body>
+</html>
