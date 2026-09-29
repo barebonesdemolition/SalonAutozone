@@ -87,7 +87,18 @@ a{color:inherit;text-decoration:none}
 </style>
 </head>
 <body>
-
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 17h14v-5l-2-5H7l-2 5v5z"/>
+    <circle cx="7" cy="17" r="2"/>
+    <circle cx="17" cy="17" r="2"/>
+    <path d="M9 7V4h6v3"/>
+  </symbol>
+  <symbol id="icon-part" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </symbol>
+</svg>
 <div class="navbar">
   <a href="/" class="logo">Salon<span>AutoZone</span></a>
   <div class="nav-links">
@@ -99,7 +110,7 @@ a{color:inherit;text-decoration:none}
 
 <div class="container">
   <div class="garage-hero">
-    <h1>🚗 My Garage</h1>
+    <h1><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:36px;height:36px;display:inline-block;vertical-align:middle;margin-right:12px;color:var(--blue-300);"><use href="#icon-car"/></svg>My Garage</h1>
     <p>Save your vehicles to get exact-fit parts and personalized recommendations</p>
   </div>
 
@@ -242,7 +253,7 @@ a{color:inherit;text-decoration:none}
     cars.forEach(function (c) {
       html += '<div class="car-card' + (c.is_primary ? ' primary' : '') + '">';
       if (c.is_primary) html += '<span class="primary-badge">PRIMARY</span>';
-      html += '<div class="car-icon">🚗</div>';
+            html += '<div class="car-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:44px;height:44px;color:var(--blue-400);"><use href="#icon-car"/></svg></div>';
       html += '<div class="car-title">' + esc(c.year + ' ' + c.make + ' ' + c.model) + '</div>';
       if (c.nickname) html += '<div class="car-nickname">"' + esc(c.nickname) + '"</div>';
       html += '<div class="car-meta">';
