@@ -2,219 +2,197 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My Account · SalonAutoZone</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%2300a8e8' font-family='Arial'>S</text></svg>">
 <style>
-:root{
-  --navy-900:#0a1729;--navy-800:#0b1e3a;--navy-700:#12294d;--navy-600:#1a3a6b;
-  --blue-500:#0091d5;--blue-400:#00a8e8;--blue-300:#4dc3f0;
-  --amber-500:#ffb800;--amber-600:#f59e0b;
-  --orange-500:#ff6b00;--orange-600:#e55a00;
-  --green-500:#16a34a;--green-400:#22c55e;
-  --red-500:#dc2626;--red-400:#ef4444;
-  --slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;
-  --slate-400:#94a3b8;--slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;
-  --slate-800:#1e293b;--slate-900:#0f172a;
-  --shadow-sm:0 1px 2px rgba(15,23,42,0.04),0 1px 3px rgba(15,23,42,0.06);
-  --shadow-md:0 2px 4px rgba(15,23,42,0.04),0 4px 12px rgba(15,23,42,0.06);
-  --shadow-lg:0 4px 8px rgba(15,23,42,0.06),0 12px 28px rgba(15,23,42,0.10);
-}
+:root{--n9:#0a1729;--n8:#0b1e3a;--b5:#0091d5;--b4:#00a8e8;--am:#ffb800;--o5:#ff6b00;--g5:#16a34a;--r5:#dc2626;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s600:#475569;--s800:#1e293b;--sh:0 1px 2px rgba(15,23,42,.05),0 2px 8px rgba(15,23,42,.05)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--slate-800);background:var(--slate-50);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-0.01em}
-button,input,select,textarea{font-family:inherit;font-size:inherit}
-button{cursor:pointer;border:none;background:none}
+body{font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--s800);background:var(--s50);-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;border:0;background:none}
 a{color:inherit;text-decoration:none}
-.navbar{background:var(--navy-800);color:#fff;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.logo{font-size:18px;font-weight:800;color:var(--blue-400);text-decoration:none;letter-spacing:-0.03em}
-.logo span{color:var(--amber-500)}
-.nav-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.navbar a{color:#fff;text-decoration:none;font-size:13px;font-weight:600;padding:9px 14px;border-radius:8px;background:rgba(255,255,255,0.08);transition:background 0.15s}
-.navbar a:hover{background:rgba(255,255,255,0.18)}
-.navbar a.logout{background:var(--red-500)}
-.navbar a.logout:hover{background:#b91c1c}
-.container{max-width:1200px;margin:24px auto;padding:0 20px}
-.welcome{background:#fff;border-radius:16px;padding:24px 28px;box-shadow:var(--shadow-sm);margin-bottom:20px;border:1px solid var(--slate-200)}
-.welcome h1{font-size:22px;color:var(--navy-800);font-weight:800;letter-spacing:-0.02em}
-.welcome p{font-size:14px;color:var(--slate-500);margin-top:4px}
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow-sm);border-left:4px solid var(--blue-400);transition:transform 0.15s,box-shadow 0.15s;border-top:1px solid var(--slate-200);border-right:1px solid var(--slate-200);border-bottom:1px solid var(--slate-200)}
-.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.stat-label{font-size:10px;color:var(--slate-400);text-transform:uppercase;font-weight:700;letter-spacing:0.08em}
-.stat-value{font-size:28px;color:var(--navy-800);font-weight:800;margin-top:6px;letter-spacing:-0.03em}
-.tabs{display:flex;gap:6px;margin-bottom:18px;background:#fff;padding:6px;border-radius:12px;box-shadow:var(--shadow-sm);overflow-x:auto;scrollbar-width:none;border:1px solid var(--slate-200)}
+:focus-visible{outline:3px solid var(--b4);outline-offset:2px}
+.ic{width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-4px}
+.nav{background:var(--n8);color:#fff;padding:12px 32px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:18px;font-weight:800;color:var(--b4);letter-spacing:-.03em}.logo span{color:var(--am)}
+.nav div{display:flex;gap:6px;align-items:center}
+.nav a{display:inline-flex;gap:8px;align-items:center;color:#fff;font-size:13px;font-weight:600;padding:9px 14px;border-radius:8px;min-height:40px}
+.nav a:hover{background:rgba(255,255,255,.12)}.nav a.out{color:#fca5a5}
+.wrap{max-width:1100px;margin:24px auto;padding:0 20px}
+.hello{background:#fff;border:1px solid var(--s200);border-radius:16px;padding:22px 26px;box-shadow:var(--sh);margin-bottom:18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.avatar{width:56px;height:56px;border-radius:50%;background:var(--n8);color:#fff;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hello .who{flex:1;min-width:200px}
+.hello h1{font-size:22px;font-weight:800;color:var(--n8);letter-spacing:-.02em}
+.hello p{font-size:14px;color:var(--s500)}
+.hello .cta{display:flex;gap:8px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:#fff;border:1px solid var(--s200);border-radius:14px;padding:16px 18px;text-align:left;box-shadow:var(--sh);width:100%}
+.stat:hover{border-color:var(--b4)}
+.stat small{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--s500);font-weight:600}
+.stat small .ic{color:var(--b4);width:16px;height:16px}
+.stat b{display:block;font-size:28px;font-weight:800;color:var(--n8);letter-spacing:-.03em;margin-top:4px}
+.stat b.zero{color:var(--s300)}
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:#fff;padding:5px;border-radius:12px;border:1px solid var(--s200);overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:12px 18px;background:transparent;border:none;border-radius:8px;font-weight:600;cursor:pointer;color:var(--slate-500);font-size:13px;white-space:nowrap;flex-shrink:0;font-family:inherit;min-height:44px;transition:all 0.15s}
-.tab:hover{color:var(--navy-800)}
-.tab.active{background:var(--navy-800);color:#fff}
-.section{background:#fff;border-radius:16px;padding:24px;box-shadow:var(--shadow-sm);display:none;border:1px solid var(--slate-200)}
-.section.active{display:block}
-.section h2{color:var(--navy-800);font-size:20px;margin-bottom:20px;font-weight:800;letter-spacing:-0.02em}
-.listing-card{display:flex;gap:16px;padding:16px;border-bottom:1px solid var(--slate-100);align-items:center;flex-wrap:wrap;transition:background 0.15s;border-radius:12px}
-.listing-card:last-child{border-bottom:none}
-.listing-card:hover{background:var(--slate-50)}
-.listing-card.featured{border-left:4px solid var(--amber-500);background:linear-gradient(90deg,#fffbeb,#ffffff);padding-left:12px}
-.listing-img{width:80px;height:80px;border-radius:12px;background:linear-gradient(135deg,var(--slate-100),var(--slate-200));display:flex;align-items:center;justify-content:center;font-size:34px;flex-shrink:0;overflow:hidden}
-.listing-img img{width:100%;height:100%;object-fit:cover}
-.listing-info{flex:1;min-width:0}
-.listing-title{font-weight:700;color:var(--navy-800);font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;letter-spacing:-0.01em}
-.listing-price{color:var(--blue-500);font-size:17px;font-weight:800;margin-bottom:6px;letter-spacing:-0.02em}
-.listing-meta{font-size:12px;color:var(--slate-500);display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;align-items:center}
-.badge{background:var(--slate-100);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;display:inline-block;color:var(--slate-600)}
-.badge-featured{background:var(--amber-500);color:var(--navy-900);font-weight:900;box-shadow:0 2px 6px rgba(255,184,0,0.35)}
-.badge.sold{background:var(--green-400);color:#fff}
-.badge.inquiry{background:#fef3c7;color:#92400e}
-.actions{display:flex;gap:6px;flex-wrap:wrap}
-.action-btn{padding:10px 16px;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;font-family:inherit;min-height:40px;transition:opacity 0.15s,transform 0.15s}
-.action-btn:hover:not(:disabled){opacity:0.9;transform:translateY(-1px)}
-.action-btn:disabled{opacity:0.5;cursor:wait}
-.edit-btn{background:var(--blue-400);color:#fff}
-.promote-btn{background:var(--amber-500);color:var(--navy-900);font-weight:800}
-.unpromote-btn{background:#fef3c7;color:#92400e;font-weight:800}
-.sold-btn{background:var(--green-400);color:#fff}
-.delete-btn{background:#fef2f2;color:var(--red-500)}
-.empty{text-align:center;padding:60px 20px;color:var(--slate-400);font-size:14px;line-height:1.6}
-.empty-icon{font-size:56px;margin-bottom:16px;opacity:0.4}
-.loading{text-align:center;padding:40px;color:var(--blue-400);font-weight:600;font-size:14px}
-.error{text-align:center;padding:24px;color:var(--red-500);background:#fef2f2;border-radius:12px;font-size:14px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--navy-800);color:#fff;padding:14px 24px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:var(--shadow-lg);transition:transform 0.3s,opacity 0.3s;opacity:0;z-index:9999;pointer-events:none;max-width:90vw;text-align:center}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.success{background:var(--green-500)}
-.toast.error{background:var(--red-500)}
-@media (max-width:768px){
-  .navbar{padding:12px 16px;flex-direction:column}
-  .nav-links{width:100%;justify-content:center}
-  .container{margin:16px auto;padding:0 14px}
-  .stats-row{grid-template-columns:repeat(2,1fr);gap:10px}
-  .stat-value{font-size:22px}
-  .listing-card{padding:14px;gap:12px}
-  .listing-img{width:70px;height:70px}
-  .actions{width:100%;margin-top:8px}
-  .action-btn{flex:1}
-}
+.tab{display:inline-flex;gap:8px;align-items:center;padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;color:var(--s500);white-space:nowrap;min-height:44px}
+.tab:hover{color:var(--n8)}.tab[aria-selected=true]{background:var(--n8);color:#fff}
+.sec{background:#fff;border:1px solid var(--s200);border-radius:16px;padding:22px;box-shadow:var(--sh);display:none}
+.sec.on{display:block}
+.sec h2{font-size:19px;font-weight:800;color:var(--n8);letter-spacing:-.02em;margin-bottom:14px}
+.item{display:flex;gap:16px;padding:14px;border-bottom:1px solid var(--s100);align-items:center;flex-wrap:wrap}
+.item:last-child{border-bottom:0}
+.item.feat{border-left:3px solid var(--am);padding-left:12px}
+.thumb{width:76px;height:76px;border-radius:12px;background:var(--s100);color:var(--s400);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.thumb .ic{width:32px;height:32px;stroke-width:1.5}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.info{flex:1;min-width:180px}
+.ttl{font-weight:700;color:var(--n8);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.price{color:var(--b5);font-size:17px;font-weight:800;letter-spacing:-.02em;margin:2px 0 6px}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tag{display:inline-flex;gap:4px;align-items:center;background:var(--s100);color:var(--s600);padding:3px 9px;border-radius:6px;font-size:12px;font-weight:600}
+.tag .ic{width:13px;height:13px}
+.tag.f{background:var(--am);color:var(--n9);font-weight:800}.tag.s{background:var(--g5);color:#fff}.tag.q{background:#fef3c7;color:#92400e}
+.acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;gap:6px;align-items:center;justify-content:center;padding:9px 14px;border-radius:8px;font-weight:700;font-size:13px;min-height:40px;border:1.5px solid transparent}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn.p{background:var(--b4);color:#fff}.btn.p:hover:not(:disabled){background:var(--b5)}
+.btn.g{border-color:var(--s300);color:var(--n8);background:#fff}.btn.g:hover:not(:disabled){border-color:var(--n8)}
+.btn.g .ic{color:var(--am)}.btn.g.ok .ic{color:var(--g5)}
+.btn.d{color:var(--r5)}.btn.d:hover:not(:disabled){background:#fef2f2}
+.btn.o{background:var(--o5);color:#fff}
+.empty{text-align:center;padding:48px 16px;color:var(--s500)}
+.empty .ic{width:44px;height:44px;stroke-width:1.5;color:var(--s300);margin-bottom:10px}
+.empty p{margin-bottom:14px}
+.load{text-align:center;padding:36px;color:var(--s500);font-weight:600}
+.err{text-align:center;padding:20px;color:var(--r5);background:#fef2f2;border-radius:12px}
+.quote{background:#dcfce7;color:#166534;padding:10px 12px;border-radius:8px;margin-top:10px;font-size:13px;font-weight:600}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:var(--n8);color:#fff;padding:13px 22px;border-radius:10px;font-weight:600;transition:transform .25s;z-index:99;max-width:90vw;text-align:center}
+.toast.show{transform:translate(-50%,0)}.toast.success{background:var(--g5)}.toast.error{background:var(--r5)}
+@media (max-width:768px){.nav{padding:10px 14px}.wrap{margin:14px auto;padding:0 14px}.hello{padding:18px}.stats{grid-template-columns:repeat(2,1fr)}.stat b{font-size:24px}.sec{padding:16px}.acts{width:100%}.acts .btn{flex:1}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
+<symbol id="i-part" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+<symbol id="i-save" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="M3 5h18v14H3zM3 6l9 7 9-7"/></symbol>
+</svg>
 
-<div class="navbar">
+<header class="nav">
   <a href="/" class="logo">Salon<span>AutoZone</span></a>
-  <div class="nav-links">
-    <a href="/">🏠 Home</a>
-    <a href="/garage">🚗 My Garage</a>
-    <a href="#" class="logout" id="logoutBtn">Logout</a>
+  <div>
+    <a href="/"><svg class="ic"><use href="#i-home"/></svg>Marketplace</a>
+    <a href="/garage"><svg class="ic"><use href="#i-car"/></svg>My Garage</a>
+    <a href="#" class="out" id="logoutBtn">Log out</a>
   </div>
-</div>
+</header>
 
-<div class="container">
-  <div class="welcome">
-    <h1 id="greeting">Welcome back!</h1>
-    <p id="user-info">Loading…</p>
-  </div>
+<main class="wrap">
+  <section class="hello">
+    <div class="avatar" id="avatar">?</div>
+    <div class="who"><h1 id="greeting">Welcome back</h1><p id="user-info">Loading...</p></div>
+    <div class="cta">
+      <a class="btn o" href="/?action=list-car"><svg class="ic"><use href="#i-plus"/></svg>List a car</a>
+      <a class="btn g" href="/?action=list-part"><svg class="ic"><use href="#i-plus"/></svg>List a part</a>
+    </div>
+  </section>
 
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">My Cars</div><div class="stat-value" id="stat-cars">—</div></div>
-    <div class="stat-card" style="border-left-color:var(--green-400)"><div class="stat-label">Cars Sold</div><div class="stat-value" id="stat-sold">—</div></div>
-    <div class="stat-card" style="border-left-color:#a855f7"><div class="stat-label">My Parts</div><div class="stat-value" id="stat-parts">—</div></div>
-    <div class="stat-card" style="border-left-color:var(--amber-500)"><div class="stat-label">Featured</div><div class="stat-value" id="stat-featured">—</div></div>
-    <div class="stat-card" style="border-left-color:var(--slate-400)"><div class="stat-label">Saved</div><div class="stat-value" id="stat-saved">—</div></div>
-    <div class="stat-card" style="border-left-color:var(--red-500)"><div class="stat-label">Imports</div><div class="stat-value" id="stat-imports">—</div></div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="cars">🚗 My Cars</button>
-    <button class="tab" data-tab="parts">🔧 My Parts</button>
-    <button class="tab" data-tab="saved">💾 Saved</button>
-    <button class="tab" data-tab="inquiries">💬 Inquiries</button>
-    <button class="tab" data-tab="imports">🌍 Imports</button>
+  <div class="stats">
+    <button class="stat" data-tab="cars"><small><svg class="ic"><use href="#i-car"/></svg>My cars</small><b id="stat-cars">-</b></button>
+    <button class="stat" data-tab="cars"><small><svg class="ic"><use href="#i-check"/></svg>Cars sold</small><b id="stat-sold">-</b></button>
+    <button class="stat" data-tab="parts"><small><svg class="ic"><use href="#i-part"/></svg>My parts</small><b id="stat-parts">-</b></button>
+    <button class="stat" data-tab="cars"><small><svg class="ic"><use href="#i-star"/></svg>Featured</small><b id="stat-featured">-</b></button>
+    <button class="stat" data-tab="saved"><small><svg class="ic"><use href="#i-save"/></svg>Saved</small><b id="stat-saved">-</b></button>
+    <button class="stat" data-tab="imports"><small><svg class="ic"><use href="#i-globe"/></svg>Imports</small><b id="stat-imports">-</b></button>
   </div>
 
-  <div id="section-cars" class="section active">
-    <h2>My Car Listings</h2>
-    <div id="cars-list"><div class="loading">Loading…</div></div>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="cars" aria-selected="true"><svg class="ic"><use href="#i-car"/></svg>My cars</button>
+    <button class="tab" role="tab" data-tab="parts" aria-selected="false"><svg class="ic"><use href="#i-part"/></svg>My parts</button>
+    <button class="tab" role="tab" data-tab="saved" aria-selected="false"><svg class="ic"><use href="#i-save"/></svg>Saved</button>
+    <button class="tab" role="tab" data-tab="inquiries" aria-selected="false"><svg class="ic"><use href="#i-chat"/></svg>Inquiries</button>
+    <button class="tab" role="tab" data-tab="imports" aria-selected="false"><svg class="ic"><use href="#i-globe"/></svg>Imports</button>
   </div>
 
-  <div id="section-parts" class="section">
-    <h2>My Part Listings</h2>
-    <div id="parts-list"><div class="loading">Loading…</div></div>
-  </div>
+  <section id="section-cars" class="sec on"><h2>My car listings</h2><div id="cars-list"><div class="load">Loading...</div></div></section>
+  <section id="section-parts" class="sec"><h2>My part listings</h2><div id="parts-list"><div class="load">Loading...</div></div></section>
+  <section id="section-saved" class="sec"><h2>Saved items</h2><div id="saved-list"><div class="load">Loading...</div></div></section>
+  <section id="section-inquiries" class="sec"><h2>Inquiries I sent</h2><div id="inquiries-list"><div class="load">Loading...</div></div></section>
+  <section id="section-imports" class="sec"><h2>My import requests</h2><div id="imports-list"><div class="load">Loading...</div></div></section>
+</main>
 
-  <div id="section-saved" class="section">
-    <h2>💾 Saved Items</h2>
-    <div id="saved-list"><div class="loading">Loading…</div></div>
-  </div>
-
-  <div id="section-inquiries" class="section">
-    <h2>My Inquiries (Sent)</h2>
-    <div id="inquiries-list"><div class="loading">Loading…</div></div>
-  </div>
-
-  <div id="section-imports" class="section">
-    <h2>My Import Requests</h2>
-    <div id="imports-list"><div class="loading">Loading…</div></div>
-  </div>
-</div>
-
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" role="status"></div>
 
 <script>
 (function () {
   'use strict';
-  var TOKEN_KEY = 'token';
-  var USER_KEY = 'userInfo';
-  var token = '';
+  var TOKEN_KEY = 'token', USER_KEY = 'userInfo', NL = String.fromCharCode(10), token = '';
   try { token = localStorage.getItem(TOKEN_KEY) || ''; } catch (e) {}
   if (!token) { window.location.href = '/login?next=/my-account'; return; }
 
-  function esc(s) {
-    if (s === null || s === undefined) return '';
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-  function safeUrl(url) {
-    if (!url) return '';
-    var u = String(url).trim();
-    if (/^https?:\/\//i.test(u) || /^data:image\//i.test(u) || /^\//.test(u)) return u;
-    return '';
-  }
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function safeUrl(u) { u = String(u || '').trim(); var l = u.toLowerCase(); return (l.indexOf('http://') === 0 || l.indexOf('https://') === 0 || l.indexOf('data:image/') === 0 || (u.charAt(0) === '/' && u.charAt(1) !== '/')) ? u : ''; }
+  function cap(s) { return String(s || '').split(' ').map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' '); }
+  function ic(n) { return '<svg class="ic"><use href="#i-' + n + '"/></svg>'; }
+  function money(n) { return 'SLL ' + Number(n || 0).toLocaleString(); }
   function timeAgo(iso) {
     if (!iso) return '';
-    var diff = (Date.now() - new Date(iso).getTime()) / 1000;
-    if (diff < 60) return 'just now';
-    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+    var d = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (d < 60) return 'just now';
+    if (d < 3600) return Math.floor(d / 60) + 'm ago';
+    if (d < 86400) return Math.floor(d / 3600) + 'h ago';
+    if (d < 604800) return Math.floor(d / 86400) + 'd ago';
     return new Date(iso).toLocaleDateString();
   }
-  function showToast(msg, type) {
-    var t = document.getElementById('toast');
-    t.innerText = msg;
-    t.className = 'toast show ' + (type || '');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(function () { t.className = 'toast'; }, 3000);
+  function toast(msg, type) {
+    var t = $('toast'); t.textContent = msg; t.className = 'toast show ' + (type || '');
+    clearTimeout(t._t); t._t = setTimeout(function () { t.className = 'toast'; }, 3000);
   }
-  function authHeaders() { return { 'Authorization': 'Bearer ' + token }; }
-  async function apiFetch(url, options) {
-    var opts = options || {};
-    opts.headers = Object.assign({}, opts.headers || {}, authHeaders());
-    var res = await fetch(url, opts);
+  async function api(url, options) {
+    var o = options || {};
+    o.headers = Object.assign({}, o.headers || {}, { 'Authorization': 'Bearer ' + token });
+    var res = await fetch(url, o);
     if (res.status === 401) {
       try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch (e) {}
       window.location.href = '/login?next=/my-account';
       throw new Error('Unauthorized');
     }
-    if (!res.ok) {
-      var err = await res.json().catch(function() { return {}; });
-      throw new Error(err.detail || 'Request failed: ' + res.status);
-    }
+    if (!res.ok) { var err = await res.json().catch(function () { return {}; }); throw new Error(typeof err.detail === 'string' ? err.detail : 'Request failed: ' + res.status); }
     return res.json();
   }
-  function setBusy(btn, busy) { if (btn) btn.disabled = busy; }
+  function busy(b, on) { if (b) b.disabled = on; }
+  function thumb(url, fallback) {
+    var u = safeUrl(url);
+    return '<div class="thumb">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" data-fb="' + fallback + '">' : ic(fallback)) + '</div>';
+  }
+  function empty(icon, text, href, label) {
+    return '<div class="empty">' + ic(icon) + '<p>' + text + '</p>' + (href ? '<a class="btn p" href="' + href + '">' + ic('plus') + label + '</a>' : '') + '</div>';
+  }
+  function fail(what, e) { return '<div class="err">Could not load ' + what + ': ' + esc(e.message) + '</div>'; }
+  function setStat(id, n) { var el = $(id); el.textContent = n; el.className = n ? '' : 'zero'; }
 
-  document.getElementById('logoutBtn').addEventListener('click', function (e) {
+  document.addEventListener('error', function (e) {
+    var img = e.target;
+    if (img && img.tagName === 'IMG' && img.dataset.fb) img.parentNode.innerHTML = ic(img.dataset.fb);
+  }, true);
+
+  $('logoutBtn').addEventListener('click', function (e) {
     e.preventDefault();
     try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch (err) {}
     window.location.href = '/';
@@ -222,299 +200,143 @@ a{color:inherit;text-decoration:none}
 
   async function loadUser() {
     try {
-      var u = await apiFetch('/api/auth/me');
-      document.getElementById('greeting').textContent = 'Welcome back, ' + (u.full_name || 'User') + '!';
-      var parts = [];
-      if (u.email) parts.push(u.email);
-      if (u.phone) parts.push(u.phone);
-      document.getElementById('user-info').textContent = parts.join(' • ') || 'No contact info';
+      var u = await api('/api/auth/me'), name = cap(u.full_name || 'there');
+      $('greeting').textContent = 'Welcome back, ' + name;
+      $('avatar').textContent = name.split(' ').filter(Boolean).slice(0, 2).map(function (w) { return w.charAt(0); }).join('') || '?';
+      $('user-info').textContent = [u.email, u.phone].filter(Boolean).join('  |  ') || 'No contact info';
       try { localStorage.setItem(USER_KEY, JSON.stringify(u)); } catch (e) {}
     } catch (e) { console.warn('loadUser failed', e); }
   }
-
   async function loadStats() {
     try {
-      var d = await apiFetch('/api/my-account/stats');
-      document.getElementById('stat-cars').textContent = d.total_cars ?? 0;
-      document.getElementById('stat-sold').textContent = d.cars_sold ?? 0;
-      document.getElementById('stat-parts').textContent = d.total_parts ?? 0;
-      document.getElementById('stat-featured').textContent = (d.featured_parts ?? 0) + (d.featured_cars ?? 0);
-      document.getElementById('stat-saved').textContent = d.saved_items ?? 0;
-      document.getElementById('stat-imports').textContent = d.total_import_requests ?? 0;
+      var d = await api('/api/my-account/stats');
+      setStat('stat-cars', d.total_cars || 0); setStat('stat-sold', d.cars_sold || 0); setStat('stat-parts', d.total_parts || 0);
+      setStat('stat-featured', (d.featured_parts || 0) + (d.featured_cars || 0));
+      setStat('stat-saved', d.saved_items || 0); setStat('stat-imports', d.total_import_requests || 0);
     } catch (e) { console.warn('loadStats failed', e); }
   }
-
+  function promoBtn(on, kind, id) {
+    return on ? '<button type="button" class="btn g" data-action="unpromote-' + kind + '" data-id="' + id + '">' + ic('star') + 'Unfeature</button>'
+              : '<button type="button" class="btn g" data-action="promote-' + kind + '" data-id="' + id + '">' + ic('star') + 'Promote</button>';
+  }
   async function loadCars() {
-    var el = document.getElementById('cars-list');
-    el.innerHTML = '<div class="loading">Loading…</div>';
+    var el = $('cars-list'); el.innerHTML = '<div class="load">Loading...</div>';
     try {
-      var data = await apiFetch('/api/my-account/my-cars');
-      if (!data.count || data.count === 0) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">🚗</div>You haven\'t listed any cars yet.<br><br><a href="/?action=list-car" style="color:var(--blue-400);font-weight:700;">+ List Your First Car</a></div>';
-        return;
-      }
+      var data = await api('/api/my-account/my-cars');
+      if (!data.count) { el.innerHTML = empty('car', "You haven't listed any cars yet.", '/?action=list-car', 'List your first car'); return; }
       el.innerHTML = data.vehicles.map(function (v) {
-        var imgUrl = safeUrl(v.image_url);
-        var imgHtml = imgUrl ? '<img src="' + esc(imgUrl) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.textContent=\'🚗\';">' : '🚗';
-        var featuredBadge = v.is_featured ? ' <span class="badge badge-featured">⭐ FEATURED</span>' : '';
-        var soldBadge = v.is_sold ? ' <span class="badge sold">SOLD</span>' : '';
-        var inqBadge = (v.inquiry_count > 0) ? '<span class="badge inquiry">📩 ' + v.inquiry_count + '</span>' : '';
-        var soldBtn = v.is_sold ? '' : '<button type="button" class="action-btn sold-btn" data-action="sold" data-id="' + v.id + '">✅ Sold</button>';
-        var promoteBtn = v.is_featured ? '<button type="button" class="action-btn unpromote-btn" data-action="unpromote-car" data-id="' + v.id + '">⭐ Unfeature</button>' : '<button type="button" class="action-btn promote-btn" data-action="promote-car" data-id="' + v.id + '">⭐ Promote</button>';
-        return '<div class="listing-card' + (v.is_featured ? ' featured' : '') + '">' +
-          '<div class="listing-img">' + imgHtml + '</div>' +
-          '<div class="listing-info">' +
-            '<div class="listing-title">' + esc(v.title) + featuredBadge + soldBadge + '</div>' +
-            '<div class="listing-price">SLL ' + Number(v.price_sll || 0).toLocaleString() + '</div>' +
-            '<div class="listing-meta"><span class="badge">' + esc(v.year) + '</span><span class="badge">📍 ' + esc(v.location) + '</span>' + inqBadge + '<span class="badge">' + timeAgo(v.created_at) + '</span></div>' +
-          '</div>' +
-          '<div class="actions">' + promoteBtn + soldBtn +
-            '<button type="button" class="action-btn edit-btn" data-action="edit-vehicle" data-id="' + v.id + '">✏️ Edit</button>' +
-            '<button type="button" class="action-btn delete-btn" data-action="delete-car" data-id="' + v.id + '">🗑 Delete</button>' +
-          '</div>' +
-        '</div>';
+        return '<div class="item' + (v.is_featured ? ' feat' : '') + '">' + thumb(v.image_url, 'car') +
+          '<div class="info"><div class="ttl">' + esc(cap(v.title)) + (v.is_featured ? '<span class="tag f">Featured</span>' : '') + (v.is_sold ? '<span class="tag s">Sold</span>' : '') + '</div>' +
+          '<div class="price">' + money(v.price_sll) + '</div>' +
+          '<div class="meta"><span class="tag">' + esc(v.year) + '</span><span class="tag">' + ic('pin') + esc(v.location) + '</span>' +
+          (v.inquiry_count > 0 ? '<span class="tag q">' + ic('mail') + v.inquiry_count + '</span>' : '') + '<span class="tag">' + timeAgo(v.created_at) + '</span></div></div>' +
+          '<div class="acts">' + promoBtn(v.is_featured, 'car', v.id) +
+          (v.is_sold ? '' : '<button type="button" class="btn g ok" data-action="sold" data-id="' + v.id + '">' + ic('check') + 'Mark sold</button>') +
+          '<button type="button" class="btn p" data-action="edit-vehicle" data-id="' + v.id + '">' + ic('edit') + 'Edit</button>' +
+          '<button type="button" class="btn d" data-action="delete-car" data-id="' + v.id + '">' + ic('trash') + 'Delete</button></div></div>';
       }).join('');
-    } catch (e) { el.innerHTML = '<div class="error">Failed to load cars: ' + esc(e.message) + '</div>'; }
+    } catch (e) { el.innerHTML = fail('cars', e); }
   }
-
   async function loadParts() {
-    var el = document.getElementById('parts-list');
-    el.innerHTML = '<div class="loading">Loading…</div>';
+    var el = $('parts-list'); el.innerHTML = '<div class="load">Loading...</div>';
     try {
-      var data = await apiFetch('/api/my-account/my-parts');
-      if (!data.count || data.count === 0) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">🔧</div>You haven\'t listed any parts yet.<br><br><a href="/?action=list-part" style="color:var(--blue-400);font-weight:700;">+ List Your First Part</a></div>';
-        return;
-      }
+      var data = await api('/api/my-account/my-parts');
+      if (!data.count) { el.innerHTML = empty('part', "You haven't listed any parts yet.", '/?action=list-part', 'List your first part'); return; }
       el.innerHTML = data.parts.map(function (p) {
-        var imgUrl = safeUrl(p.image_url);
-        var imgHtml = imgUrl ? '<img src="' + esc(imgUrl) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.textContent=\'🔧\';">' : '🔧';
-        var featuredBadge = p.is_featured ? ' <span class="badge badge-featured">⭐ FEATURED</span>' : '';
-        var inqBadge = (p.inquiry_count > 0) ? '<span class="badge inquiry">📩 ' + p.inquiry_count + '</span>' : '';
-        var promoteBtn = p.is_featured ? '<button type="button" class="action-btn unpromote-btn" data-action="unpromote-part" data-id="' + p.id + '">⭐ Unfeature</button>' : '<button type="button" class="action-btn promote-btn" data-action="promote-part" data-id="' + p.id + '">⭐ Promote</button>';
-        return '<div class="listing-card' + (p.is_featured ? ' featured' : '') + '">' +
-          '<div class="listing-img">' + imgHtml + '</div>' +
-          '<div class="listing-info">' +
-            '<div class="listing-title">' + esc(p.name) + featuredBadge + '</div>' +
-            '<div class="listing-price">SLL ' + Number(p.price_sll || 0).toLocaleString() + '</div>' +
-            '<div class="listing-meta"><span class="badge">' + esc(p.category) + '</span><span class="badge">📍 ' + esc(p.location) + '</span><span class="badge">Stock: ' + (p.stock_quantity ?? 0) + '</span>' + inqBadge + '</div>' +
-          '</div>' +
-          '<div class="actions">' + promoteBtn +
-            '<button type="button" class="action-btn edit-btn" data-action="edit-part" data-id="' + p.id + '">✏️ Edit</button>' +
-            '<button type="button" class="action-btn delete-btn" data-action="delete-part" data-id="' + p.id + '">🗑 Delete</button>' +
-          '</div>' +
-        '</div>';
+        return '<div class="item' + (p.is_featured ? ' feat' : '') + '">' + thumb(p.image_url, 'part') +
+          '<div class="info"><div class="ttl">' + esc(cap(p.name)) + (p.is_featured ? '<span class="tag f">Featured</span>' : '') + '</div>' +
+          '<div class="price">' + money(p.price_sll) + '</div>' +
+          '<div class="meta"><span class="tag">' + esc(p.category) + '</span><span class="tag">' + ic('pin') + esc(p.location) + '</span><span class="tag">Stock: ' + (p.stock_quantity || 0) + '</span>' +
+          (p.inquiry_count > 0 ? '<span class="tag q">' + ic('mail') + p.inquiry_count + '</span>' : '') + '</div></div>' +
+          '<div class="acts">' + promoBtn(p.is_featured, 'part', p.id) +
+          '<button type="button" class="btn p" data-action="edit-part" data-id="' + p.id + '">' + ic('edit') + 'Edit</button>' +
+          '<button type="button" class="btn d" data-action="delete-part" data-id="' + p.id + '">' + ic('trash') + 'Delete</button></div></div>';
       }).join('');
-    } catch (e) { el.innerHTML = '<div class="error">Failed to load parts: ' + esc(e.message) + '</div>'; }
+    } catch (e) { el.innerHTML = fail('parts', e); }
   }
-
   async function loadSaved() {
-    var el = document.getElementById('saved-list');
-    el.innerHTML = '<div class="loading">Loading…</div>';
+    var el = $('saved-list'); el.innerHTML = '<div class="load">Loading...</div>';
     try {
-      var data = await apiFetch('/api/my-account/saved');
-      if (!data.count || data.count === 0) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">💾</div>You haven\'t saved any items yet.<br><br><span style="color:var(--slate-500);">Save parts and cars you\'re interested in by clicking the <b>💾 Save</b> button on any listing card.</span></div>';
-        return;
-      }
+      var data = await api('/api/my-account/saved');
+      if (!data.count) { el.innerHTML = empty('save', 'Nothing saved yet. Tap Save on any listing to keep it here.', '/', 'Browse listings'); return; }
       el.innerHTML = data.items.map(function (s) {
-        var imgUrl = safeUrl(s.listing_image_url);
-        var imgHtml = imgUrl ? '<img src="' + esc(imgUrl) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.textContent=\'💾\';">' : (s.listing_type === 'vehicle' ? '🚗' : '🔧');
-        var href = s.listing_type === 'vehicle' ? '/vehicle/' + s.listing_id : '/part/' + s.listing_id;
-        return '<div class="listing-card">' +
-          '<div class="listing-img">' + imgHtml + '</div>' +
-          '<div class="listing-info">' +
-            '<div class="listing-title">' + esc(s.listing_title || '(listing #' + s.listing_id + ')') + '</div>' +
-            (s.listing_price_sll ? '<div class="listing-price">SLL ' + Number(s.listing_price_sll).toLocaleString() + '</div>' : '') +
-            '<div class="listing-meta"><span class="badge">' + esc(s.listing_type) + '</span><span class="badge">' + timeAgo(s.created_at) + '</span></div>' +
-          '</div>' +
-          '<div class="actions">' +
-            '<button type="button" class="action-btn edit-btn" data-action="view-saved" data-href="' + href + '">👁 View</button>' +
-            '<button type="button" class="action-btn delete-btn" data-action="unsave" data-id="' + s.id + '">🗑 Remove</button>' +
-          '</div>' +
-        '</div>';
+        var car = s.listing_type === 'vehicle', href = (car ? '/vehicle/' : '/part/') + s.listing_id;
+        return '<div class="item">' + thumb(s.listing_image_url, car ? 'car' : 'part') +
+          '<div class="info"><div class="ttl">' + esc(cap(s.listing_title) || '(listing #' + s.listing_id + ')') + '</div>' +
+          (s.listing_price_sll ? '<div class="price">' + money(s.listing_price_sll) + '</div>' : '') +
+          '<div class="meta"><span class="tag">' + (car ? 'Car' : 'Part') + '</span><span class="tag">' + timeAgo(s.created_at) + '</span></div></div>' +
+          '<div class="acts"><button type="button" class="btn p" data-action="view-saved" data-href="' + esc(href) + '">' + ic('eye') + 'View</button>' +
+          '<button type="button" class="btn d" data-action="unsave" data-id="' + s.id + '">' + ic('trash') + 'Remove</button></div></div>';
       }).join('');
-    } catch (e) { el.innerHTML = '<div class="error">Failed to load saved items: ' + esc(e.message) + '</div>'; }
+    } catch (e) { el.innerHTML = fail('saved items', e); }
   }
-
   async function loadInquiries() {
-    var el = document.getElementById('inquiries-list');
-    el.innerHTML = '<div class="loading">Loading…</div>';
+    var el = $('inquiries-list'); el.innerHTML = '<div class="load">Loading...</div>';
     try {
-      var data = await apiFetch('/api/my-account/my-inquiries');
-      if (!data.count || data.count === 0) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">💬</div>You haven\'t sent any inquiries yet.<br><br><a href="/" style="color:var(--blue-400);font-weight:700;">Browse listings →</a></div>';
-        return;
-      }
+      var data = await api('/api/my-account/my-inquiries');
+      if (!data.count) { el.innerHTML = empty('chat', "You haven't sent any inquiries yet.", '/', 'Browse listings'); return; }
       el.innerHTML = data.inquiries.map(function (i) {
-        var msg = i.buyer_message ? '<div style="font-size:13px;color:var(--slate-600);margin-top:6px;font-style:italic;">"' + esc(i.buyer_message) + '"</div>' : '';
-        return '<div class="listing-card">' +
-          '<div class="listing-img">' + (i.listing_type === 'vehicle' ? '🚗' : '🔧') + '</div>' +
-          '<div class="listing-info">' +
-            '<div class="listing-title">' + esc(i.listing_title || '(listing #' + i.listing_id + ')') + '</div>' +
-            msg +
-            '<div class="listing-meta"><span class="badge">' + esc(i.status) + '</span><span class="badge">' + timeAgo(i.created_at) + '</span></div>' +
-          '</div>' +
-        '</div>';
+        return '<div class="item"><div class="thumb">' + ic(i.listing_type === 'vehicle' ? 'car' : 'part') + '</div><div class="info">' +
+          '<div class="ttl">' + esc(cap(i.listing_title) || '(listing #' + i.listing_id + ')') + '</div>' +
+          (i.buyer_message ? '<div style="font-size:13px;color:var(--s600);margin:4px 0">"' + esc(i.buyer_message) + '"</div>' : '') +
+          '<div class="meta"><span class="tag">' + esc(i.status) + '</span><span class="tag">' + timeAgo(i.created_at) + '</span></div></div></div>';
       }).join('');
-    } catch (e) { el.innerHTML = '<div class="error">Failed to load inquiries: ' + esc(e.message) + '</div>'; }
+    } catch (e) { el.innerHTML = fail('inquiries', e); }
   }
-
   async function loadImports() {
-    var el = document.getElementById('imports-list');
-    el.innerHTML = '<div class="loading">Loading…</div>';
+    var el = $('imports-list'); el.innerHTML = '<div class="load">Loading...</div>';
     try {
-      var data = await apiFetch('/api/my-account/my-import-requests');
-      if (!data.count || data.count === 0) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">🌍</div>You haven\'t requested any imports yet.<br><br><a href="/" style="color:var(--blue-400);font-weight:700;">Request a part →</a></div>';
-        return;
-      }
+      var data = await api('/api/my-account/my-import-requests');
+      if (!data.count) { el.innerHTML = empty('globe', "You haven't requested any imports yet.", '/', 'Request a part'); return; }
       el.innerHTML = data.requests.map(function (r) {
-        var quoteHtml = '';
-        if (r.quoted_price_sll) {
-          quoteHtml = '<div style="background:#dcfce7;padding:12px;border-radius:8px;margin-top:10px;font-size:13px;font-weight:600;color:#166534;">💰 Quoted: SLL ' + Number(r.quoted_price_sll).toLocaleString() + '</div>';
-        }
-        return '<div class="listing-card">' +
-          '<div class="listing-img">🌍</div>' +
-          '<div class="listing-info">' +
-            '<div class="listing-title">' + esc(r.part_name) + '</div>' +
-            '<div style="font-size:13px;color:var(--slate-600);">' + esc(r.car_make) + ' ' + esc(r.car_model) + ' (' + esc(r.car_year) + ')</div>' +
-            '<div class="listing-meta"><span class="badge">' + esc(r.status) + '</span><span class="badge">' + timeAgo(r.created_at) + '</span></div>' +
-            quoteHtml +
-          '</div>' +
-        '</div>';
+        return '<div class="item"><div class="thumb">' + ic('globe') + '</div><div class="info"><div class="ttl">' + esc(cap(r.part_name)) + '</div>' +
+          '<div style="font-size:13px;color:var(--s600)">' + esc(r.car_make) + ' ' + esc(r.car_model) + ' (' + esc(r.car_year) + ')</div>' +
+          '<div class="meta" style="margin-top:6px"><span class="tag">' + esc(r.status) + '</span><span class="tag">' + timeAgo(r.created_at) + '</span></div>' +
+          (r.quoted_price_sll ? '<div class="quote">Quoted: ' + money(r.quoted_price_sll) + '</div>' : '') + '</div></div>';
       }).join('');
-    } catch (e) { el.innerHTML = '<div class="error">Failed to load imports: ' + esc(e.message) + '</div>'; }
+    } catch (e) { el.innerHTML = fail('imports', e); }
   }
 
-  async function markSold(id, btn) {
-    if (!confirm('Mark this car as sold?')) return;
-    setBusy(btn, true);
-    try {
-      await apiFetch('/api/vehicles/' + encodeURIComponent(id) + '/sold', { method: 'POST' });
-      showToast('✅ Marked as sold', 'success');
-      await Promise.all([loadCars(), loadStats()]);
-    } catch (e) { showToast('❌ ' + e.message, 'error'); }
-    finally { setBusy(btn, false); }
+  async function run(btn, ask, url, opts, okMsg, reload) {
+    if (ask && !confirm(ask)) return;
+    busy(btn, true);
+    try { await api(url, opts); toast(okMsg, 'success'); await Promise.all(reload.concat([loadStats()])); }
+    catch (e) { toast(e.message, 'error'); }
+    finally { busy(btn, false); }
   }
-  function editListing(type, id) {
-    window.location.href = '/?action=' + (type === 'vehicle' ? 'edit-vehicle' : 'edit-part') + '&id=' + encodeURIComponent(id);
-  }
-  async function deleteCar(id, btn) {
-    if (!confirm('Delete this car listing permanently?')) return;
-    setBusy(btn, true);
-    try {
-      await apiFetch('/api/my-account/vehicle/' + encodeURIComponent(id), { method: 'DELETE' });
-      showToast('🗑 Car deleted', 'success');
-      await Promise.all([loadCars(), loadStats()]);
-    } catch (e) { showToast('❌ ' + e.message, 'error'); }
-    finally { setBusy(btn, false); }
-  }
-  async function deletePart(id, btn) {
-    if (!confirm('Delete this part listing permanently?')) return;
-    setBusy(btn, true);
-    try {
-      await apiFetch('/api/my-account/part/' + encodeURIComponent(id), { method: 'DELETE' });
-      showToast('🗑 Part deleted', 'success');
-      await Promise.all([loadParts(), loadStats()]);
-    } catch (e) { showToast('❌ ' + e.message, 'error'); }
-    finally { setBusy(btn, false); }
-  }
-  async function promotePart(id, btn) {
-    var msg = '⭐ Feature this part listing for 7 days?\n\nPrice: SLL 150,000\nPay via Orange Money to: +232 76 123456\n\nAfter sending payment, click OK.';
-    if (!confirm(msg)) return;
-    setBusy(btn, true);
-    try {
-      await apiFetch('/api/parts/' + encodeURIComponent(id) + '/promote?days=7', { method: 'POST' });
-      showToast('⭐ Listing featured for 7 days!', 'success');
-      await Promise.all([loadParts(), loadStats()]);
-    } catch (e) { showToast('❌ ' + e.message, 'error'); }
-    finally { setBusy(btn, false); }
-  }
-  async function unpromotePart(id, btn) {
-    if (!confirm('Remove featured status?')) return;
-    setBusy(btn, true);
-    try {
-      await apiFetch('/api/parts/' + encodeURIComponent(id) + '/unpromote', { method: 'POST' });
-      showToast('Featured status removed', 'success');
-      await Promise.all([loadParts(), loadStats()]);
-    } catch (e) { showToast('❌ ' + e.message, 'error'); }
-    finally { setBusy(btn, false); }
-  }
-  async function promoteCar(id, btn) {
-    var msg = '⭐ Feature this car listing for 7 days?\n\nPrice: SLL 150,000\nPay via Orange Money to: +232 76 123456\n\nAfter sending payment, click OK.';
-    if (!confirm(msg)) return;
-    setBusy(btn, true);
-    try {
-      await apiFetch('/api/vehicles/' + encodeURIComponent(id) + '/promote?days=7', { method: 'POST' });
-      showToast('⭐ Listing featured for 7 days!', 'success');
-      await Promise.all([loadCars(), loadStats()]);
-    } catch (e) { showToast('❌ ' + e.message, 'error'); }
-    finally { setBusy(btn, false); }
-  }
-  async function unpromoteCar(id, btn) {
-    if (!confirm('Remove featured status?')) return;
-    setBusy(btn, true);
-    try {
-      await apiFetch('/api/vehicles/' + encodeURIComponent(id) + '/unpromote', { method: 'POST' });
-      showToast('Featured status removed', 'success');
-      await Promise.all([loadCars(), loadStats()]);
-    } catch (e) { showToast('❌ ' + e.message, 'error'); }
-    finally { setBusy(btn, false); }
-  }
-  async function unsave(id, btn) {
-    if (!confirm('Remove this item from your saved list?')) return;
-    setBusy(btn, true);
-    try {
-      await apiFetch('/api/my-account/saved/' + encodeURIComponent(id), { method: 'DELETE' });
-      showToast('🗑 Removed from saved', 'success');
-      await Promise.all([loadSaved(), loadStats()]);
-    } catch (e) { showToast('❌ ' + e.message, 'error'); }
-    finally { setBusy(btn, false); }
-  }
-
+  function promoteMsg(what) { return 'Feature this ' + what + ' listing for 7 days?' + NL + NL + 'Price: SLL 150,000' + NL + 'Pay via Orange Money to: +232 76 123456' + NL + NL + 'After sending payment, click OK.'; }
+  var P = { method: 'POST' }, D = { method: 'DELETE' };
+  var actions = {
+    'sold': function (id, b) { run(b, 'Mark this car as sold?', '/api/vehicles/' + encodeURIComponent(id) + '/sold', P, 'Marked as sold', [loadCars()]); },
+    'edit-vehicle': function (id) { window.location.href = '/?action=edit-vehicle&id=' + encodeURIComponent(id); },
+    'edit-part': function (id) { window.location.href = '/?action=edit-part&id=' + encodeURIComponent(id); },
+    'delete-car': function (id, b) { run(b, 'Delete this car listing permanently?', '/api/my-account/vehicle/' + encodeURIComponent(id), D, 'Car deleted', [loadCars()]); },
+    'delete-part': function (id, b) { run(b, 'Delete this part listing permanently?', '/api/my-account/part/' + encodeURIComponent(id), D, 'Part deleted', [loadParts()]); },
+    'promote-part': function (id, b) { run(b, promoteMsg('part'), '/api/parts/' + encodeURIComponent(id) + '/promote?days=7', P, 'Listing featured for 7 days', [loadParts()]); },
+    'unpromote-part': function (id, b) { run(b, 'Remove featured status?', '/api/parts/' + encodeURIComponent(id) + '/unpromote', P, 'Featured status removed', [loadParts()]); },
+    'promote-car': function (id, b) { run(b, promoteMsg('car'), '/api/vehicles/' + encodeURIComponent(id) + '/promote?days=7', P, 'Listing featured for 7 days', [loadCars()]); },
+    'unpromote-car': function (id, b) { run(b, 'Remove featured status?', '/api/vehicles/' + encodeURIComponent(id) + '/unpromote', P, 'Featured status removed', [loadCars()]); },
+    'unsave': function (id, b) { run(b, 'Remove this item from your saved list?', '/api/my-account/saved/' + encodeURIComponent(id), D, 'Removed from saved', [loadSaved()]); }
+  };
   document.addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-action]');
-    if (!btn) return;
+    var b = e.target.closest('[data-action]');
+    if (!b) return;
     e.preventDefault();
-    e.stopPropagation();
-    var action = btn.dataset.action;
-    var id = btn.dataset.id;
-    if (action === 'sold') markSold(id, btn);
-    else if (action === 'edit-vehicle') editListing('vehicle', id);
-    else if (action === 'edit-part') editListing('part', id);
-    else if (action === 'delete-car') deleteCar(id, btn);
-    else if (action === 'delete-part') deletePart(id, btn);
-    else if (action === 'promote-part') promotePart(id, btn);
-    else if (action === 'unpromote-part') unpromotePart(id, btn);
-    else if (action === 'promote-car') promoteCar(id, btn);
-    else if (action === 'unpromote-car') unpromoteCar(id, btn);
-    else if (action === 'unsave') unsave(id, btn);
-    else if (action === 'view-saved') window.location.href = btn.dataset.href;
+    if (b.dataset.action === 'view-saved') { window.location.href = b.dataset.href; return; }
+    if (actions[b.dataset.action]) actions[b.dataset.action](b.dataset.id, b);
   });
 
-  var tabs = document.querySelectorAll('.tab');
-  var sections = {
-    cars: document.getElementById('section-cars'),
-    parts: document.getElementById('section-parts'),
-    saved: document.getElementById('section-saved'),
-    inquiries: document.getElementById('section-inquiries'),
-    imports: document.getElementById('section-imports')
-  };
-  function switchTab(tabName) {
-    tabs.forEach(function (t) { t.classList.toggle('active', t.dataset.tab === tabName); });
-    Object.keys(sections).forEach(function (key) { sections[key].classList.toggle('active', key === tabName); });
-    if (tabName === 'cars') loadCars();
-    else if (tabName === 'parts') loadParts();
-    else if (tabName === 'saved') loadSaved();
-    else if (tabName === 'inquiries') loadInquiries();
-    else if (tabName === 'imports') loadImports();
+  var loaders = { cars: loadCars, parts: loadParts, saved: loadSaved, inquiries: loadInquiries, imports: loadImports };
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.tab === name); });
+    Object.keys(loaders).forEach(function (k) { $('section-' + k).classList.toggle('on', k === name); });
+    loaders[name]();
   }
-  tabs.forEach(function (t) { t.addEventListener('click', function () { switchTab(t.dataset.tab); }); });
+  document.querySelectorAll('[data-tab]').forEach(function (t) {
+    t.addEventListener('click', function () { switchTab(t.dataset.tab); if (t.classList.contains('stat')) window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  });
 
-  loadUser();
-  loadStats();
-  loadCars();
+  loadUser(); loadStats(); loadCars();
 })();
 </script>
 </body>
