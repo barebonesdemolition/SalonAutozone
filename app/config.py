@@ -1,32 +1,26 @@
-import os
-from pathlib import Path
-
-ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
-
-if ENV_PATH.exists():
-    with open(ENV_PATH, "r") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if "=" in line:
-                key, value = line.split("=", 1)
-                key = key.strip()
-                value = value.strip().strip('"').strip("'")
-                if key and key not in os.environ:
-                    os.environ[key] = value
+# app/config.py
+from functools import lru_cache
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings:
-    APP_NAME = "Salon AutoZone & AutoTrader"
-    APP_VERSION = "1.0.0"
-    DEFAULT_CURRENCY = "SLL"
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./saloncarparts.db")
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "salon-autozone-secret-change-in-prod")
-    # Read GEMINI_API_KEY from environment (works for both AIzaSy and AQ. formats)
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-    ADMIN_WHATSAPP = os.getenv("ADMIN_WHATSAPP", "23276570104")
+class Settings(BaseSettings):
+    APP_NAME: str = "Salon AutoZone & AutoTrader"
+    APP_VERSION: str = "1.0.0"
+    DEFAULT_CURRENCY: str = "SLL"
+
+    DATABASE_URL: str = "sqlite+aiosqlite:///./saloncarparts.db"
+    JWT_SECRET_KEY: str = "salon-autozone-secret-change-in-prod"
+
+    GEMINI_API_KEY: str = ""
+    ADMIN_WHATSAPP: str = "23276570104"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 
-def get_settings():
+@lru_cache
+def get_settings() -> Settings:
     return Settings()
