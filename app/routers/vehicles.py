@@ -1,25 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import or_
+from sqlalchemy import or_, update
 from typing import List, Optional
 from datetime import datetime, timedelta
 
 from app.db import get_db
 from app import models, schemas
-
-# ---------------------------------------------------------------------------
-# Auth dependencies – adjust these imports to match your actual auth module
-# ---------------------------------------------------------------------------
-# Example assumptions:
-#   get_current_user  → returns models.User (must have .id and optionally .is_admin)
-#   get_current_admin → same, but raises 403 if not admin
-#
-# If you don't have these yet, create them or temporarily replace with:
-#   async def get_current_user(): ...
-from app.auth import get_current_user, get_current_admin   # ← change if needed
+from app.auth import get_current_user, get_current_admin
 
 router = APIRouter(prefix="/api/vehicles", tags=["Vehicles"])
+
+# Fields a seller must never set themselves (payment/ownership/stats controlled by the server)
+PROTECTED_FIELDS = {"seller_id", "is_featured", "featured_until", "views", "is_sold"}
 
 
 # ============================================================
@@ -47,8 +40,22 @@ def _ensure_owner_or_admin(vehicle: models.VehicleListing, user) -> None:
         )
 
 
+async def _expire_featured(db: AsyncSession) -> None:
+    """Turn off 'featured' on listings whose paid period has ended."""
+    await db.execute(
+        update(models.VehicleListing)
+        .where(
+            models.VehicleListing.is_featured == True,  # noqa: E712
+            models.VehicleListing.featured_until != None,  # noqa: E711
+            models.VehicleListing.featured_until < datetime.utcnow(),
+        )
+        .values(is_featured=False, featured_until=None)
+    )
+    await db.commit()
+
+
 # ============================================================
-# SEARCH (paginated, featured first)
+# SEARCH (paginated, featured first, unsold by default)
 # ============================================================
 
 @router.get("/", response_model=List[schemas.VehicleResponse])
@@ -58,11 +65,12 @@ async def search_vehicles(
     year: Optional[str] = Query(None),
     location: Optional[str] = Query(None),
     q: Optional[str] = Query(None),
-    sold: Optional[bool] = Query(None, description="Filter by sold status"),
+    sold: Optional[bool] = Query(False, description="False (default) hides sold cars; true shows only sold"),
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
 ):
+    await _expire_featured(db)
     query = select(models.VehicleListing)
 
     if q:
@@ -113,8 +121,8 @@ async def create_vehicle(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    data = vehicle.model_dump(exclude={"seller_id"}, exclude_unset=True)
-    # Force seller_id from the authenticated user – never trust the client
+    data = vehicle.model_dump(exclude=PROTECTED_FIELDS, exclude_unset=True)
+    # Ownership always comes from the login token, never from the client
     data["seller_id"] = current_user.id
 
     new_vehicle = models.VehicleListing(**data)
@@ -150,7 +158,7 @@ async def update_vehicle(
     existing = await _get_vehicle_or_404(db, vehicle_id)
     _ensure_owner_or_admin(existing, current_user)
 
-    update_data = vehicle.model_dump(exclude={"seller_id"}, exclude_unset=True)
+    update_data = vehicle.model_dump(exclude=PROTECTED_FIELDS, exclude_unset=True)
     for key, value in update_data.items():
         setattr(existing, key, value)
 
@@ -196,7 +204,7 @@ async def mark_vehicle_sold(
 
 
 # ============================================================
-# PROMOTE / UNPROMOTE
+# PROMOTE (ADMIN ONLY, after payment is confirmed) / UNPROMOTE
 # ============================================================
 
 @router.post("/{vehicle_id}/promote")
@@ -204,15 +212,10 @@ async def promote_vehicle(
     vehicle_id: int,
     days: int = Query(7, ge=1, le=90),
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    admin=Depends(get_current_admin),
 ):
-    """
-    Feature a listing.
-    Currently only checks ownership/admin.
-    TODO: Add real payment verification (Orange Money) or make this admin-only.
-    """
+    """Feature a listing. Admin only: call this once the Orange Money payment has arrived."""
     vehicle = await _get_vehicle_or_404(db, vehicle_id)
-    _ensure_owner_or_admin(vehicle, current_user)
 
     now = datetime.utcnow()
     base = vehicle.featured_until if (vehicle.featured_until and vehicle.featured_until > now) else now
