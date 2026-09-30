@@ -674,6 +674,9 @@ a{color:inherit;text-decoration:none}
     if (token()) { var l = $('signin'); l.textContent = 'My dashboard'; l.href = '/my-account'; }
     switchMarket('parts');
     syncGarage();
+    var act = new URLSearchParams(location.search).get('action');
+    if (act === 'list-car') openListing('vehicle');
+    else if (act === 'list-part') openListing('parts');
   }
   init();
 })();
