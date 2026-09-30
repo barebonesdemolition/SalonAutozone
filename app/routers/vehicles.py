@@ -1,19 +1,56 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import func
+from sqlalchemy import or_
 from typing import List, Optional
 from datetime import datetime, timedelta
 
 from app.db import get_db
 from app import models, schemas
 
+# ---------------------------------------------------------------------------
+# Auth dependencies – adjust these imports to match your actual auth module
+# ---------------------------------------------------------------------------
+# Example assumptions:
+#   get_current_user  → returns models.User (must have .id and optionally .is_admin)
+#   get_current_admin → same, but raises 403 if not admin
+#
+# If you don't have these yet, create them or temporarily replace with:
+#   async def get_current_user(): ...
+from app.auth import get_current_user, get_current_admin   # ← change if needed
+
 router = APIRouter(prefix="/api/vehicles", tags=["Vehicles"])
+
+
+# ============================================================
+# Helpers
+# ============================================================
+
+async def _get_vehicle_or_404(db: AsyncSession, vehicle_id: int) -> models.VehicleListing:
+    result = await db.execute(
+        select(models.VehicleListing).where(models.VehicleListing.id == vehicle_id)
+    )
+    vehicle = result.scalars().first()
+    if not vehicle:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vehicle not found")
+    return vehicle
+
+
+def _ensure_owner_or_admin(vehicle: models.VehicleListing, user) -> None:
+    """Raise 403 unless the user owns the listing or is an admin."""
+    is_owner = getattr(vehicle, "seller_id", None) == user.id
+    is_admin = getattr(user, "is_admin", False)
+    if not (is_owner or is_admin):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to modify this listing",
+        )
 
 
 # ============================================================
 # SEARCH (paginated, featured first)
 # ============================================================
+
 @router.get("/", response_model=List[schemas.VehicleResponse])
 async def search_vehicles(
     make: Optional[str] = Query(None),
@@ -21,6 +58,7 @@ async def search_vehicles(
     year: Optional[str] = Query(None),
     location: Optional[str] = Query(None),
     q: Optional[str] = Query(None),
+    sold: Optional[bool] = Query(None, description="Filter by sold status"),
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
@@ -30,9 +68,11 @@ async def search_vehicles(
     if q:
         like = f"%{q}%"
         query = query.where(
-            models.VehicleListing.title.ilike(like)
-            | models.VehicleListing.make.ilike(like)
-            | models.VehicleListing.model.ilike(like)
+            or_(
+                models.VehicleListing.title.ilike(like),
+                models.VehicleListing.make.ilike(like),
+                models.VehicleListing.model.ilike(like),
+            )
         )
     if make:
         query = query.where(models.VehicleListing.make.ilike(f"%{make}%"))
@@ -45,6 +85,8 @@ async def search_vehicles(
             pass
     if location:
         query = query.where(models.VehicleListing.location.ilike(f"%{location}%"))
+    if sold is not None:
+        query = query.where(models.VehicleListing.is_sold == sold)
 
     offset = (page - 1) * limit
     query = (
@@ -64,12 +106,18 @@ async def search_vehicles(
 # ============================================================
 # CREATE
 # ============================================================
-@router.post("/", response_model=schemas.VehicleResponse)
+
+@router.post("/", response_model=schemas.VehicleResponse, status_code=status.HTTP_201_CREATED)
 async def create_vehicle(
     vehicle: schemas.VehicleCreate,
     db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
-    new_vehicle = models.VehicleListing(**vehicle.model_dump())
+    data = vehicle.model_dump(exclude={"seller_id"}, exclude_unset=True)
+    # Force seller_id from the authenticated user – never trust the client
+    data["seller_id"] = current_user.id
+
+    new_vehicle = models.VehicleListing(**data)
     db.add(new_vehicle)
     await db.commit()
     await db.refresh(new_vehicle)
@@ -79,40 +127,31 @@ async def create_vehicle(
 # ============================================================
 # GET ONE
 # ============================================================
+
 @router.get("/{vehicle_id}", response_model=schemas.VehicleResponse)
 async def get_vehicle(
     vehicle_id: int,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        select(models.VehicleListing).where(models.VehicleListing.id == vehicle_id)
-    )
-    vehicle = result.scalars().first()
-    if not vehicle:
-        raise HTTPException(status_code=404, detail="Vehicle not found")
-    return vehicle
+    return await _get_vehicle_or_404(db, vehicle_id)
 
 
 # ============================================================
 # UPDATE
 # ============================================================
+
 @router.put("/{vehicle_id}", response_model=schemas.VehicleResponse)
 async def update_vehicle(
     vehicle_id: int,
     vehicle: schemas.VehicleCreate,
     db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
-    result = await db.execute(
-        select(models.VehicleListing).where(models.VehicleListing.id == vehicle_id)
-    )
-    existing = result.scalars().first()
-    if not existing:
-        raise HTTPException(status_code=404, detail="Vehicle not found")
+    existing = await _get_vehicle_or_404(db, vehicle_id)
+    _ensure_owner_or_admin(existing, current_user)
 
-    update_data = vehicle.model_dump(exclude_unset=True)
+    update_data = vehicle.model_dump(exclude={"seller_id"}, exclude_unset=True)
     for key, value in update_data.items():
-        if key == "seller_id":
-            continue
         setattr(existing, key, value)
 
     await db.commit()
@@ -123,37 +162,33 @@ async def update_vehicle(
 # ============================================================
 # DELETE
 # ============================================================
-@router.delete("/{vehicle_id}")
+
+@router.delete("/{vehicle_id}", status_code=status.HTTP_200_OK)
 async def delete_vehicle(
     vehicle_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
-    result = await db.execute(
-        select(models.VehicleListing).where(models.VehicleListing.id == vehicle_id)
-    )
-    vehicle = result.scalars().first()
-    if not vehicle:
-        raise HTTPException(status_code=404, detail="Vehicle not found")
+    vehicle = await _get_vehicle_or_404(db, vehicle_id)
+    _ensure_owner_or_admin(vehicle, current_user)
 
     await db.delete(vehicle)
     await db.commit()
-    return {"message": "Vehicle deleted"}
+    return {"message": "Vehicle deleted", "vehicle_id": vehicle_id}
 
 
 # ============================================================
 # MARK AS SOLD
 # ============================================================
+
 @router.post("/{vehicle_id}/sold")
 async def mark_vehicle_sold(
     vehicle_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
-    result = await db.execute(
-        select(models.VehicleListing).where(models.VehicleListing.id == vehicle_id)
-    )
-    vehicle = result.scalars().first()
-    if not vehicle:
-        raise HTTPException(status_code=404, detail="Vehicle not found")
+    vehicle = await _get_vehicle_or_404(db, vehicle_id)
+    _ensure_owner_or_admin(vehicle, current_user)
 
     vehicle.is_sold = True
     await db.commit()
@@ -161,20 +196,23 @@ async def mark_vehicle_sold(
 
 
 # ============================================================
-# PROMOTE (FEATURE) A VEHICLE LISTING
+# PROMOTE / UNPROMOTE
 # ============================================================
+
 @router.post("/{vehicle_id}/promote")
 async def promote_vehicle(
     vehicle_id: int,
-    days: int = 7,
+    days: int = Query(7, ge=1, le=90),
     db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
-    result = await db.execute(
-        select(models.VehicleListing).where(models.VehicleListing.id == vehicle_id)
-    )
-    vehicle = result.scalars().first()
-    if not vehicle:
-        raise HTTPException(status_code=404, detail="Vehicle not found")
+    """
+    Feature a listing.
+    Currently only checks ownership/admin.
+    TODO: Add real payment verification (Orange Money) or make this admin-only.
+    """
+    vehicle = await _get_vehicle_or_404(db, vehicle_id)
+    _ensure_owner_or_admin(vehicle, current_user)
 
     now = datetime.utcnow()
     base = vehicle.featured_until if (vehicle.featured_until and vehicle.featured_until > now) else now
@@ -183,11 +221,12 @@ async def promote_vehicle(
 
     await db.commit()
     await db.refresh(vehicle)
+
     return {
         "success": True,
         "vehicle_id": vehicle.id,
         "is_featured": vehicle.is_featured,
-        "featured_until": vehicle.featured_until.isoformat(),
+        "featured_until": vehicle.featured_until.isoformat() if vehicle.featured_until else None,
     }
 
 
@@ -195,33 +234,27 @@ async def promote_vehicle(
 async def unpromote_vehicle(
     vehicle_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
-    result = await db.execute(
-        select(models.VehicleListing).where(models.VehicleListing.id == vehicle_id)
-    )
-    vehicle = result.scalars().first()
-    if not vehicle:
-        raise HTTPException(status_code=404, detail="Vehicle not found")
+    vehicle = await _get_vehicle_or_404(db, vehicle_id)
+    _ensure_owner_or_admin(vehicle, current_user)
 
     vehicle.is_featured = False
     vehicle.featured_until = None
     await db.commit()
-    return {"success": True}
+    return {"success": True, "vehicle_id": vehicle.id, "is_featured": False}
 
 
 # ============================================================
-# TRACK VIEW
+# TRACK VIEW (public – no auth needed)
 # ============================================================
+
 @router.post("/{vehicle_id}/view")
 async def track_vehicle_view(
     vehicle_id: int,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        select(models.VehicleListing).where(models.VehicleListing.id == vehicle_id)
-    )
-    vehicle = result.scalars().first()
-    if vehicle:
-        vehicle.views = (vehicle.views or 0) + 1
-        await db.commit()
+    vehicle = await _get_vehicle_or_404(db, vehicle_id)
+    vehicle.views = (vehicle.views or 0) + 1
+    await db.commit()
     return {"ok": True}
