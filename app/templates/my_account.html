@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -148,7 +148,7 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 18px;
+  padding: 20px;
   display: none;
 }
 .sec.on { display: block; }
@@ -161,29 +161,38 @@ a { color: inherit; text-decoration: none; }
 /* Listing cards grid */
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
 }
 @media (min-width: 560px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (min-width: 900px) {
-  .grid { grid-template-columns: repeat(3, 1fr); }
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 .card {
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
   background: #fff;
   display: flex;
+  min-width: 0;
   flex-direction: column;
-  transition: box-shadow .15s, border-color .15s;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
-.card:hover { border-color: #cbd5e1; box-shadow: var(--shadow); }
-.card.feat { border-color: #fcd34d; box-shadow: 0 0 0 1px #fcd34d; }
+.card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 28px rgba(15,23,42,.08);
+  transform: translateY(-1px);
+}
+.card.feat {
+  border-color: var(--line);
+  box-shadow: 0 4px 16px rgba(15,23,42,.05);
+}
 .card-photo {
-  height: 140px;
+  height: 180px;
   background: #f8fafc;
   display: flex; align-items: center; justify-content: center;
   color: #94a3b8;
@@ -202,10 +211,16 @@ a { color: inherit; text-decoration: none; }
   font-size: 10px; font-weight: 700; text-transform: uppercase;
   padding: 3px 8px; border-radius: 6px; letter-spacing: .02em;
 }
-.badge.feat { background: var(--amber); color: #0f172a; }
+.badge.feat { background: #fff7ed; color: #b45309; border: 1px solid #fed7aa; }
 .badge.sold { background: var(--green); color: #fff; }
 
-.card-body { padding: 12px 14px 14px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.card-body {
+  padding: 14px 16px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
 .card-title {
   font-weight: 700; font-size: 14px; line-height: 1.3;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
@@ -218,14 +233,32 @@ a { color: inherit; text-decoration: none; }
   color: var(--muted); font-size: 12px;
 }
 .pill {
-  background: #f1f5f9; color: var(--muted);
-  padding: 2px 8px; border-radius: 6px; font-weight: 600; font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 7px;
+  font-weight: 600;
+  font-size: 11px;
 }
+.pill .ic { width: 13px; height: 13px; }
 .card-actions {
-  display: flex; flex-wrap: wrap; gap: 6px;
-  margin-top: auto; padding-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 12px;
   border-top: 1px solid var(--line);
 }
+.card-actions .danger {
+  margin-left: auto;
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+}
+.card-actions .danger .ic { width: 17px; height: 17px; }
 
 /* Buttons */
 .btn {
@@ -294,8 +327,20 @@ a { color: inherit; text-decoration: none; }
   .page { padding: 14px 12px 40px; }
   .welcome { padding: 16px; }
   .stat-value { font-size: 20px; }
-  .card-actions .btn { flex: 1; }
+  .sec { padding: 14px; }
+  .card-photo { height: 165px; }
+  .card-actions .btn:not(.danger) { flex: 1; }
+  .card-actions .danger { flex: 0 0 36px; }
 }
+/* Shared marketplace polish */
+.welcome-actions .btn { min-height: 40px; }
+.stat { cursor: pointer; }
+.stat:focus-visible, .tab:focus-visible, .btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.sec-head { padding-bottom: 2px; }
+.card-title { min-height: 36px; }
 </style>
 </head>
 <body>
@@ -757,4 +802,4 @@ a { color: inherit; text-decoration: none; }
 })();
 </script>
 </body>
-</html>
+</html>  
