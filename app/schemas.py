@@ -1,8 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from datetime import datetime
 from typing import Optional
 
+
 # --- Vehicle Schemas ---
+
 class VehicleBase(BaseModel):
     title: str
     make: str
@@ -20,12 +22,16 @@ class VehicleBase(BaseModel):
 
 
 class VehicleCreate(VehicleBase):
-    seller_id: int
+    # seller_id is set by the backend from the logged-in user — do not require it
+    seller_id: Optional[int] = None
 
 
 class VehicleResponse(VehicleBase):
     id: int
-    is_sold: bool
+    is_sold: bool = False
+    is_featured: bool = False
+    featured_until: Optional[datetime] = None
+    views: int = 0
     seller_id: Optional[int] = None
     created_at: datetime
 
@@ -34,6 +40,7 @@ class VehicleResponse(VehicleBase):
 
 
 # --- Part Schemas ---
+
 class PartBase(BaseModel):
     name: str
     category: str
@@ -49,18 +56,24 @@ class PartBase(BaseModel):
 
 
 class PartCreate(PartBase):
-    vendor_id: int
+    # vendor_id is set by the backend from the logged-in user
+    vendor_id: Optional[int] = None
 
 
 class PartResponse(PartBase):
     id: int
+    is_featured: bool = False
+    featured_until: Optional[datetime] = None
+    views: int = 0
     vendor_id: Optional[int] = None
     created_at: datetime
 
     class Config:
         from_attributes = True
 
+
 # --- Import Request Schemas ---
+
 class ImportRequestCreate(BaseModel):
     customer_name: str
     customer_phone: str
