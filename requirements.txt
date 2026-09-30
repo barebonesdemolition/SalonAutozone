@@ -14,4 +14,4 @@ email-validator
 google-genai
 asyncpg
 httpx
-pillow
+Pillow
