@@ -63,6 +63,12 @@ button{border:0;background:none;cursor:pointer}
 .bnav a.active{color:var(--primary);background:var(--primary-light)}
 .bnav svg{width:22px;height:22px}
 .tip{background:var(--primary-light);border-radius:10px;padding:12px 14px;font-size:13px;color:#0f766e;margin-bottom:16px;font-weight:500}
+.fit-tool{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--sh);margin-top:18px}
+.fit-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}.fit-head h2{font-size:16px;color:var(--navy)}
+.fit-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}.fit-car{background:linear-gradient(160deg,#e8f3ef,#f8fafc);border-radius:10px;padding:18px 12px 8px;min-height:150px;display:grid;place-items:center}.fit-car svg{width:100%;height:auto}.fit-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fit-controls label{font-size:12px;font-weight:700;color:var(--muted)}.fit-controls select{width:100%;margin-top:5px;padding:10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text)}
+.fit-colors{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.fit-color{width:30px;height:30px;border-radius:50%;border:2px solid var(--border)}.fit-color[aria-pressed=true]{outline:3px solid var(--primary);outline-offset:2px}.fit-vin{display:flex;gap:8px;margin-top:12px}.fit-vin input{flex:1;min-width:0;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:monospace;text-transform:uppercase}.fit-vin button{background:var(--primary);color:#fff;border-radius:8px;padding:9px 12px;font-weight:700}.fit-status{min-height:22px;margin-top:8px;font-size:12px;color:var(--muted)}
+.fit-parts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.fit-part{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--border);border-radius:9px;min-width:0}.fit-part>span{flex:1;min-width:0;font-size:12px;font-weight:700}.fit-part small{display:block;font-weight:500;color:var(--muted)}.fit-part button{width:32px;height:32px;border-radius:7px;background:var(--primary-light);color:var(--primary);font-weight:800}.fit-order{border-top:1px solid var(--border);margin-top:14px;padding-top:12px}.fit-order-row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:13px}.fit-total{display:flex;justify-content:space-between;font-weight:800;padding:10px 0}.fit-links{display:flex;gap:8px;flex-wrap:wrap}.fit-note{font-size:12px;color:var(--muted);margin-top:10px}
+@media(max-width:620px){.fit-grid{grid-template-columns:1fr}.fit-parts{grid-template-columns:1fr}.fit-head{align-items:flex-start}}
 </style>
 </head>
 <body>
@@ -74,6 +80,7 @@ button{border:0;background:none;cursor:pointer}
   <a class="logo" href="/">Salon<span>AutoZone</span></a>
   <nav class="nav">
     <a href="/">Home</a>
+    <a href="/vin-tool">VIN Lookup</a>
     <a href="/my-account">Account</a>
   </nav>
 </header>
@@ -132,6 +139,28 @@ button{border:0;background:none;cursor:pointer}
     <div class="sk"></div>
     <div class="sk"></div>
   </div>
+
+  <section class="fit-tool" id="parts-for-my-car" aria-labelledby="fit-title">
+    <div class="fit-head"><h2 id="fit-title">Parts for my car</h2><a class="btn btn-ghost btn-sm" href="/vin-tool">Full VIN report</a></div>
+    <div class="fit-grid">
+      <div>
+        <div class="fit-car" id="fit-car-art" aria-label="Selected car illustration"></div>
+        <label class="lbl" for="fit-car-select" style="margin-top:12px">Choose a saved vehicle</label>
+        <select class="inp" id="fit-car-select" aria-label="Choose a saved vehicle"><option value="">Add a vehicle to your garage first</option></select>
+        <div class="fit-colors" id="fit-colors" role="group" aria-label="Car colour"></div>
+        <form class="fit-vin" id="fit-vin-form"><input id="fit-vin" maxlength="17" autocomplete="off" placeholder="Enter a 17-character VIN" aria-label="Vehicle identification number"><button type="submit">Decode VIN</button></form>
+        <p class="fit-note">Auto.dev is used when the site has an API key configured; otherwise the official NHTSA decoder is used.</p>
+        <div class="fit-status" id="fit-status" aria-live="polite"></div>
+        <button class="btn btn-primary btn-sm" type="button" id="fit-save-decoded" hidden>Save decoded car to Garage</button>
+      </div>
+      <div>
+        <strong id="fit-car-name">Select a vehicle</strong>
+        <div class="fit-parts" id="fit-parts"></div>
+        <div class="fit-order"><strong>Sample order</strong><div id="fit-order-lines"></div><div class="fit-total"><span>Estimated total</span><span id="fit-total">Le 0</span></div><div class="fit-links"><a class="btn btn-primary btn-sm" id="fit-browse" href="/">Browse live listings</a><a class="btn btn-ghost btn-sm" href="/vin-tool">VIN details</a></div></div>
+        <p class="fit-note">Checklist prices are examples, not live inventory or verified fitment. Confirm compatibility and price with the seller.</p>
+      </div>
+    </div>
+  </section>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -218,6 +247,7 @@ button{border:0;background:none;cursor:pointer}
       })
       .then(function (cars) {
         cars = Array.isArray(cars) ? cars : (cars.items || []);
+        window.dispatchEvent(new Event('garage-cars-updated'));
         if (!cars.length) {
           list.innerHTML = '<div class="empty"><strong>No vehicles yet</strong>Add your car above to get better part matches.</div>';
           return;
@@ -287,26 +317,12 @@ button{border:0;background:none;cursor:pointer}
   }
 
   function setPrimary(id, car) {
-    var body = {
-      make: car.make,
-      model: car.model,
-      year: car.year,
-      nickname: car.nickname || null,
-      is_primary: true
-    };
-    fetch('/api/garage/' + id, {
+    fetch('/api/garage/' + id + '/primary', {
       method: 'PUT',
-      headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
-      body: JSON.stringify(body)
+      headers: auth()
     }).then(function (r) {
       if (r.status === 401) { goLogin(); return null; }
-      if (!r.ok) {
-        return fetch('/api/garage/' + id, {
-          method: 'PATCH',
-          headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
-          body: JSON.stringify({ is_primary: true })
-        });
-      }
+      if (!r.ok) throw new Error();
       return r;
     }).then(function (r) {
       if (!r) return;
@@ -359,6 +375,89 @@ button{border:0;background:none;cursor:pointer}
   });
 
   load();
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var colors = [['White','#f4f4f2'],['Silver','#b8bfc4'],['Grey','#5f686e'],['Black','#1f2326'],['Red','#c2262e'],['Blue','#2b5fa8'],['Gold','#b99a5b']];
+  var parts = [['pads','Front brake pads','Set of 4',450],['oil','Oil filter','Spin-on',90],['air','Air filter','Engine intake',140],['plugs','Spark plugs','Set of 4',320],['belt','Serpentine belt','Drive belt',260],['battery','Battery 12V 60Ah','Sealed',1500]];
+  var state = {car:null, color:'#f4f4f2', cart:{}, decoded:null};
+  var savedCars = [];
+  var select = document.getElementById('fit-car-select');
+  var vinInput = document.getElementById('fit-vin');
+  var status = document.getElementById('fit-status');
+  var saveDecodedButton = document.getElementById('fit-save-decoded');
+  function $(id) { return document.getElementById(id); }
+  function token() { try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; } }
+  function auth() { var value = token(); return value ? {Authorization:'Bearer '+value} : {}; }
+  function esc(value) { return String(value == null ? '' : value).replace(/[&<>"']/g,function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function money(value) { return 'Le '+Number(value || 0).toLocaleString('en-US'); }
+  function saveLocal(key,value) { try { localStorage.setItem(key,value); } catch (e) {} }
+  function setCar(car) {
+    state.car = car;
+    if (!car) { $('fit-car-name').textContent = 'Select a vehicle'; $('fit-car-art').innerHTML = ''; $('fit-browse').href = '/'; renderParts(); renderCart(); return; }
+    $('fit-car-name').textContent = car.year+' '+car.make+' '+car.model;
+    $('fit-car-art').innerHTML = '<svg viewBox="0 0 400 160" role="img" aria-label="'+esc(car.year+' '+car.make+' '+car.model)+'"><ellipse cx="200" cy="151" rx="185" ry="7" fill="#000" opacity=".12"/><path d="M16 124V104q4-12 30-15l68-9 27-27q10-10 30-10h75q21 2 37 22l23 25 46 6q27 4 27 19v9H16z" fill="'+state.color+'" stroke="#485b54" stroke-width="3"/><path d="m145 82 29-32h34v33zm73 1V50h26q16 2 29 20l10 13z" fill="#bcd7e2" stroke="#485b54" stroke-width="3"/><circle cx="96" cy="124" r="29" fill="#20272a"/><circle cx="96" cy="124" r="16" fill="#c9d1d4"/><circle cx="312" cy="124" r="29" fill="#20272a"/><circle cx="312" cy="124" r="16" fill="#c9d1d4"/></svg>';
+    var query = new URLSearchParams({make:car.make,model:car.model,year:String(car.year)});
+    $('fit-browse').href = '/?'+query.toString();
+    saveLocal('fitmentVehicle',JSON.stringify({make:car.make,model:car.model,year:String(car.year)}));
+    renderParts();
+    renderCart();
+  }
+  function renderParts() {
+    $('fit-parts').innerHTML = parts.map(function (part) { return '<div class="fit-part"><span>'+esc(part[1])+'<small>'+esc(part[2])+' · confirm exact fit</small></span><strong>'+money(part[3])+'</strong><button type="button" data-add="'+part[0]+'" aria-label="Add '+esc(part[1])+'">+</button></div>'; }).join('');
+  }
+  function renderCart() {
+    var selected = parts.filter(function (part) { return Number(state.cart[part[0]]) > 0; });
+    var total = 0;
+    $('fit-order-lines').innerHTML = selected.length ? selected.map(function (part) { var count = Number(state.cart[part[0]]); total += count*part[3]; return '<div class="fit-order-row"><span>'+count+' × '+esc(part[1])+'</span><span>'+money(count*part[3])+' <button type="button" data-remove="'+part[0]+'" aria-label="Remove one '+esc(part[1])+'">−</button></span></div>'; }).join('') : '<p class="fit-note">Your sample order is empty.</p>';
+    $('fit-total').textContent = money(total);
+  }
+  function renderColors() {
+    $('fit-colors').innerHTML = colors.map(function (color) { return '<button type="button" class="fit-color" data-color="'+color[1]+'" style="background:'+color[1]+'" aria-label="'+color[0]+'" aria-pressed="'+(state.color===color[1])+'"></button>'; }).join('');
+  }
+  function loadCars(preferred) {
+    fetch('/api/garage/',{headers:auth()}).then(function (response) {
+      if (response.status===401) throw new Error('Sign in again to load your Garage.');
+      if (!response.ok) throw new Error('Could not load Garage vehicles.');
+      return response.json();
+    }).then(function (cars) {
+      cars = Array.isArray(cars) ? cars : [];
+      savedCars = cars;
+      select.replaceChildren(new Option(cars.length?'Choose a saved car':'Add a vehicle above or decode a VIN',''));
+      cars.forEach(function (car) { select.add(new Option(car.year+' '+car.make+' '+car.model+(car.nickname?' · '+car.nickname:''),String(car.id))); });
+      var current = preferred && cars.find(function (car) { return String(car.id)===String(preferred.id); });
+      if (!current) {
+        var local = null;
+        try { local=JSON.parse(localStorage.getItem('fitmentVehicle')||'null'); } catch(e) {}
+        if (local) current=cars.find(function (car) { return car.make===local.make&&car.model===local.model&&String(car.year)===String(local.year); });
+      }
+      current = current || cars.find(function (car) { return car.is_primary; }) || cars[0] || null;
+      if (current) { select.value=String(current.id); setCar(current); }
+      else setCar(null);
+    }).catch(function (error) { status.textContent=error.message; });
+  }
+  window.addEventListener('garage-cars-updated',function(){loadCars(state.car)});
+  select.addEventListener('change',function () { setCar(savedCars.find(function(car){return String(car.id)===select.value})||null); });
+  $('fit-colors').addEventListener('click',function(event){var button=event.target.closest('[data-color]');if(!button)return;state.color=button.dataset.color;renderColors();if(state.car)setCar(state.car)});
+  $('fit-parts').addEventListener('click',function(event){var button=event.target.closest('[data-add]');if(!button)return;state.cart[button.dataset.add]=Number(state.cart[button.dataset.add]||0)+1;saveLocal('garageSampleCart',JSON.stringify(state.cart));renderCart()});
+  $('fit-order-lines').addEventListener('click',function(event){var button=event.target.closest('[data-remove]');if(!button)return;state.cart[button.dataset.remove]=Math.max(0,Number(state.cart[button.dataset.remove]||0)-1);saveLocal('garageSampleCart',JSON.stringify(state.cart));renderCart()});
+  vinInput.addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,'').slice(0,17)});
+  $('fit-vin-form').addEventListener('submit',async function(event){
+    event.preventDefault();var vin=vinInput.value.trim();state.decoded=null;saveDecodedButton.hidden=true;
+    if(!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)){status.textContent='Enter a valid 17-character VIN.';return}
+    status.textContent='Decoding VIN…';var button=this.querySelector('button');button.disabled=true;
+    try{var response=await fetch('/api/nhtsa/decode-vin/'+encodeURIComponent(vin));var data=await response.json();if(!response.ok)throw new Error(data.detail||'VIN lookup failed.');
+      var decoded={vin:data.vin||vin,make:data.make,model:data.model,year:Number(data.year),ai_insights:data.ai_insights};if(!decoded.make||!decoded.model||!decoded.year)throw new Error('VIN decoder did not return a complete make, model, and year.');
+      var saved=savedCars.find(function(car){return car.make.toLowerCase()===decoded.make.toLowerCase()&&car.model.toLowerCase()===decoded.model.toLowerCase()&&Number(car.year)===decoded.year});
+      if(saved){select.value=String(saved.id);setCar(saved);status.textContent='VIN decoded. Selected the matching vehicle already in your Garage.';}
+      else{state.decoded=decoded;status.textContent='Decoded '+decoded.year+' '+decoded.make+' '+decoded.model+'. Save it to your Garage to use it here.'+(decoded.ai_insights?' '+decoded.ai_insights:'');saveDecodedButton.hidden=false;}
+    }catch(error){status.textContent=error.message||'VIN lookup failed.'}finally{button.disabled=false}
+  });
+  saveDecodedButton.addEventListener('click',async function(){if(!state.decoded)return;this.disabled=true;try{var response=await fetch('/api/garage/',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},auth()),body:JSON.stringify({make:state.decoded.make,model:state.decoded.model,year:state.decoded.year,vin:state.decoded.vin,nickname:'VIN lookup',is_primary:false})});var data=await response.json();if(!response.ok)throw new Error(data.detail||'Could not save this vehicle.');state.decoded=null;this.hidden=true;status.textContent='Vehicle saved to Garage.';await loadCars(data);}catch(error){status.textContent=error.message||'Could not save this vehicle.'}finally{this.disabled=false}});
+  try{state.cart=JSON.parse(localStorage.getItem('garageSampleCart')||'{}')||{}}catch(e){}
+  renderColors();renderParts();renderCart();loadCars();
 })();
 </script>
 </body>

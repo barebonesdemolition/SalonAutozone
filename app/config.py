@@ -1,6 +1,10 @@
 # app/config.py
 from functools import lru_cache
+
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -12,6 +16,8 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = "salon-autozone-secret-change-in-prod"
 
     GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-3.6-flash"
+    AUTODEV_API_KEY: str = ""
     ADMIN_WHATSAPP: str = "23276570104"
 
     model_config = SettingsConfigDict(

@@ -1,4 +1,5 @@
 import os
+import re
 import traceback
 from google import genai
 from google.genai import types
@@ -11,6 +12,7 @@ from typing import List
 from app.db import get_db
 from app import models
 from app.config import get_settings
+from app.routers.nhtsa import decode_vin_official
 
 router = APIRouter(prefix="/api/ai", tags=["AI Assistant"])
 
@@ -53,6 +55,15 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)):
         for p in parts
     ]) or "No parts currently listed."
 
+    vin_context = ""
+    vin_match = re.search(r"\b[A-HJ-NPR-Z0-9]{17}\b", request.message.upper())
+    if vin_match:
+        try:
+            decoded_vin = await decode_vin_official(vin_match.group(0))
+            vin_context = f"\n\nOFFICIAL VIN DECODE:\n{decoded_vin}"
+        except HTTPException:
+            vin_context = "\n\nVIN NOTE: The official VIN decoder could not verify this VIN. Do not guess its vehicle details."
+
     system_prompt = f"""You are the Salon AutoZone AI Assistant for Sierra Leone's #1 automotive marketplace.
 
 You help buyers and sellers with:
@@ -68,6 +79,7 @@ Vehicles:
 
 Parts:
 {part_summary}
+{vin_context}
 
 Guidelines:
 - Prices are in Sierra Leone Leone (SLL). 1 USD is about 23,000 SLL in 2026.
@@ -101,7 +113,7 @@ Guidelines:
         )
 
         response = client.models.generate_content(
-            model="gemini-3.8-flash",
+            model=settings.GEMINI_MODEL,
             contents=contents,
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
@@ -129,7 +141,7 @@ Guidelines:
 async def ai_status():
     return {
         "configured": bool(GEMINI_API_KEY),
-        "model": "gemini-3.8-flash",
+        "model": settings.GEMINI_MODEL,
         "key_prefix": GEMINI_API_KEY[:5] if GEMINI_API_KEY else "none",
         "key_length": len(GEMINI_API_KEY) if GEMINI_API_KEY else 0,
     }

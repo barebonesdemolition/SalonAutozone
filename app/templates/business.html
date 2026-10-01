@@ -43,7 +43,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
 </style>
 </head>
 <body>
-<header><a class="logo" href="/">Salon<span>AutoZone</span></a><a class="back" href="/">Back to marketplace</a></header>
+<header><a class="logo" href="/">Salon<span>AutoZone</span></a><div><a class="back" href="/vin-tool">VIN Lookup</a> <a class="back" href="/">Back to marketplace</a></div></header>
 <main><div class="card" id="root"><p>Loading...</p></div></main>
 
 <script>
@@ -89,10 +89,12 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
   function showStore(slug) {
     api('/api/businesses/' + encodeURIComponent(slug)).then(function (b) {
       document.title = b.name + ' · SalonAutoZone';
-      var wa = 'https://wa.me/' + encodeURIComponent(b.whatsapp) + '?text=' + encodeURIComponent('Hello ' + b.name + ', I found you on SalonAutoZone.');
+      var contact = b.whatsapp
+        ? '<a class="btn wa full" href="https://wa.me/' + encodeURIComponent(b.whatsapp) + '?text=' + encodeURIComponent('Hello ' + b.name + ', I found you on SalonAutoZone.') + '" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>'
+        : '<div class="note">This business has not added a WhatsApp contact yet.</div>';
       root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta"><span class="pill ok">Verified</span><span class="pill t">' + esc(b.type_label) + '</span><span class="pill t">' + esc(b.city) + ', ' + esc(b.country) + '</span></div></div></div>' +
         (b.description ? '<p>' + esc(b.description) + '</p>' : '') +
-        '<a class="btn wa full" href="' + esc(wa) + '" target="_blank" rel="noopener">Message on WhatsApp</a>' +
+        contact +
         '<div class="note">Listings from this business will appear here soon. Never pay a deposit before you have checked the seller and seen the item.</div>';
     }).catch(function () {
       root.innerHTML = '<h1>Business not found</h1><p class="sub">This page does not exist or has not been approved yet.</p><a class="btn" href="/">Back to marketplace</a>';

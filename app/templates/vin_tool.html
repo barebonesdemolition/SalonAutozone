@@ -110,6 +110,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
   <a href="/" class="logo">Salon<span>AutoZone</span> & <span>AutoTrader</span></a>
   <div class="nav-links">
     <a href="/">🏠 Home</a>
+    <a href="/vin-tool">🔍 VIN Lookup</a>
     <a href="/my-account">👤 My Account</a>
   </div>
 </div>
@@ -172,6 +173,12 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
     if (e.key === 'Enter') lookupVIN();
   });
 
+  var queryVin = new URLSearchParams(window.location.search).get('vin');
+  if (queryVin) {
+    inputEl.value = queryVin.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, 17);
+    if (inputEl.value.length === 17) setTimeout(function () { lookupVIN(); }, 0);
+  }
+
   window.lookupVIN = async function () {
     var vin = (inputEl.value || '').trim().toUpperCase();
     hide(resultEl);
@@ -200,17 +207,16 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
     try {
       var controller = new AbortController();
       var timeoutId = setTimeout(function () { controller.abort(); }, 15000);
-      var url = 'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/' + encodeURIComponent(vin) + '?format=json';
+      var url = '/api/nhtsa/decode-vin/' + encodeURIComponent(vin);
       var res = await fetch(url, { signal: controller.signal });
       clearTimeout(timeoutId);
 
-      if (!res.ok) throw new Error('NHTSA API returned HTTP ' + res.status);
-      var data = await res.json();
-      var row = (data.Results && data.Results[0]) || null;
-      if (!row) throw new Error('No data returned from NHTSA.');
+      var row = await res.json();
+      if (!res.ok) throw new Error(row.detail || ('VIN lookup returned HTTP ' + res.status));
+      if (!row || !row.valid) throw new Error('No data returned from NHTSA.');
 
-      var make = (row.Make || '').trim();
-      var model = (row.Model || '').trim();
+      var make = (row.make || '').trim();
+      var model = (row.model || '').trim();
       if (!make && !model) {
         errorEl.innerHTML = '❌ NHTSA could not decode this VIN. Please double-check the number and try again.';
         show(errorEl);
@@ -233,21 +239,21 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
   };
 
   function renderResult(vin, row) {
-    var make = (row.Make || '').trim();
-    var model = (row.Model || '').trim();
-    var year = (row.ModelYear || '').trim();
-    var bodyClass = (row.BodyClass || '').trim();
-    var vehicleType = (row.VehicleType || '').trim();
-    var series = (row.Series || '').trim();
-    var trim = (row.Trim || '').trim();
-    var engineCyl = (row.EngineCylinders || '').trim();
-    var engineDisp = (row.DisplacementL || '').trim();
-    var fuel = (row.FuelTypePrimary || '').trim();
-    var drive = (row.DriveType || '').trim();
-    var transmission = (row.TransmissionStyle || '').trim();
-    var manufacturer = (row.Manufacturer || '').trim();
-    var plantCountry = (row.PlantCountry || '').trim();
-    var plantCity = (row.PlantCity || '').trim();
+    var make = (row.make || '').trim();
+    var model = (row.model || '').trim();
+    var year = (row.year || '').trim();
+    var bodyClass = (row.body_class || '').trim();
+    var vehicleType = (row.vehicle_type || '').trim();
+    var series = (row.series || '').trim();
+    var trim = (row.trim || '').trim();
+    var engineCyl = (row.engine_cylinders || '').trim();
+    var engineDisp = (row.engine_displacement_l || '').trim();
+    var fuel = (row.fuel_type || '').trim();
+    var drive = (row.drive_type || '').trim();
+    var transmission = (row.transmission || '').trim();
+    var manufacturer = (row.manufacturer || '').trim();
+    var plantCountry = (row.plant_country || '').trim();
+    var plantCity = (row.plant_city || '').trim();
 
     var title = (year ? year + ' ' : '') + (make || '') + (model ? ' ' + model : '');
     if (!title.trim()) title = 'Unknown Vehicle';
@@ -288,7 +294,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
       '<div class="parts-section">' +
         '<div class="parts-title">🔧 Common Parts to Check</div>' +
         '<div class="parts-list">' + partsList.map(function (p) { return '<span class="part-tag">' + esc(p) + '</span>'; }).join('') + '</div>' +
-      '</div>';
+      '</div>' +
+      (row.ai_insights ? '<div class="parts-section" style="margin-top:16px"><div class="parts-title">AI vehicle guidance</div><p>' + esc(row.ai_insights) + '</p></div>' : '');
 
     show(resultEl);
   }

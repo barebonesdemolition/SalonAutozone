@@ -92,7 +92,7 @@ async def admin_stats(_: dict = Depends(require_admin), db: AsyncSession = Depen
         "total_inquiries": await count(models.Inquiry.id),
         "total_imports": await count(models.ImportRequest.id),
         "total_saved": await count(models.SavedListing.id),
-        "total_garages": await count(models.Garage.id),
+        "total_garages": await count(models.UserCar.id),
         "featured_parts": featured_parts,
         "featured_vehicles": featured_vehicles,
         "featured_revenue_sll": (featured_parts + featured_vehicles) * FEATURE_PRICE_SLL,

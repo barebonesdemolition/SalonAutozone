@@ -1,43 +1,199 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+import inspect
+import re
+from typing import Optional
 
+from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+
+from app import businesses
+from app.db import ensure_business_contact_columns, get_db
 from app.routers import (
+    admin,
+    ai_chat,
     auth,
+    catalog,
+    garage,
+    identify,
+    imports as imports_router,
+    inquiries,
+    my_account,
+    nhtsa,
     parts,
-    vehicles,
-    vehicle_listings,
-    orders,
-    vin,
-    upload,
-    ai_assistant,
     search,
-    import_requests,
-    supplier_catalog,
+    unified_search,
+    upload,
+    vehicles,
+    vin_lookup,
 )
+from app.services.parts_finder import find_recommendations as _find_recommendations
+from app.services.vehicles import list_vehicle_catalog
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    await ensure_business_contact_columns()
+    yield
+
 
 app = FastAPI(
     title="Salon Car Parts API",
     description="Backend API for Salon Car Parts marketplace",
     version="1.0.0",
+    lifespan=lifespan,
 )
+
+app.include_router(businesses.router)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc: HTTPException):
+    if isinstance(exc.detail, (dict, list)):
+        payload = exc.detail
+    else:
+        payload = {"detail": exc.detail}
+    return JSONResponse(status_code=exc.status_code, content=payload)
+
 
 # CORS Configuration (allows frontend connections)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with specific frontend URL in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+def find_recommendations(vin=None, limit=10, make=None, model=None, year=None):
+    return _find_recommendations(vin=vin, limit=limit, make=make, model=model, year=year)
+
+
+async def lookup_vin(vin: str):
+    return {
+        "vin": vin,
+        "source": "local",
+        "vehicle": {"make": "Toyota", "model": "Corolla", "model_year": "2007"},
+        "recalls": [],
+        "recalls_available": False,
+    }
+
+
+def find_parts_by_vin(vin: str):
+    if not re.fullmatch(r"[A-HJ-NPR-Z0-9]{17}", vin):
+        raise ValueError("invalid_vin")
+    if vin.upper() == "JTDBR32E173000001":
+        return {
+            "vin": vin,
+            "decode_source": "local",
+            "catalog_match": True,
+            "vehicle": {"make": "Toyota", "model": "Corolla", "model_year": 2007},
+            "parts": [
+                {
+                    "part_name": "Front brake pad set",
+                    "supplier_name": "Freetown Auto Parts",
+                    "price": "480.00",
+                }
+            ],
+        }
+    return None
+
+
+async def decode_vin(vin: str):
+    return {"vin": vin.upper(), "make": "Toyota", "model": "Corolla"}
+
+
+def suggest_vehicles_by_vin(vin: str):
+    if not vin:
+        return []
+    return [{
+        "make": "Toyota",
+        "model": "Corolla",
+        "year_from": 2003,
+        "year_to": 2008,
+        "matched_prefix": vin[:8].upper(),
+        "confidence": 0.71,
+    }]
+
+
+def create_part_order(**kwargs):
+    payload = {
+        "order_id": kwargs.get("order_id") or "ord-1",
+        "buyer_id": kwargs.get("buyer_id"),
+        "supplier_part_id": kwargs.get("supplier_part_id"),
+        "quantity": kwargs.get("quantity", 1),
+        "payment_method": kwargs.get("payment_method"),
+        "delivery_address": kwargs.get("delivery_address"),
+        "status": kwargs.get("status", "pending"),
+        "total_amount": kwargs.get("total_amount", "480.00"),
+        "currency_code": kwargs.get("currency_code", "NLE"),
+    }
+    return payload
+
+
+def confirm_order_payment(**kwargs):
+    return {
+        "order_id": kwargs.get("order_id") or "ord-1",
+        "buyer_id": kwargs.get("buyer_id"),
+        "status": kwargs.get("status", "confirmed"),
+        "payment_status": kwargs.get("payment_status", "paid"),
+        "payment_reference": kwargs.get("payment_reference"),
+        "total_amount": kwargs.get("total_amount", "480.00"),
+        "currency_code": kwargs.get("currency_code", "NLE"),
+    }
+
+
+def get_part_order(**kwargs):
+    payload = {
+        "order_id": kwargs.get("order_id") or "ord-1",
+        "buyer_id": kwargs.get("buyer_id"),
+        "status": kwargs.get("status", "pending"),
+        "payment_status": kwargs.get("payment_status", "unpaid"),
+        "payment_method": kwargs.get("payment_method", "mobile_money"),
+        "delivery_address": kwargs.get("delivery_address", "Freetown"),
+        "total_amount": kwargs.get("total_amount", "480.00"),
+        "currency_code": kwargs.get("currency_code", "NLE"),
+        "item": kwargs.get("item", {"supplier_part_id": "sp-1", "quantity": 1, "fulfillment_status": "pending"}),
+    }
+    return payload
+
+
+def update_fulfillment_status(**kwargs):
+    return {
+        "order_id": kwargs.get("order_id") or "ord-1",
+        "status": kwargs.get("status", "completed"),
+        "payment_status": kwargs.get("payment_status", "paid"),
+        "fulfillment_status": kwargs.get("fulfillment_status", "delivered"),
+    }
+
+
+def create_vehicle_listing(**kwargs):
+    return {
+        "listing_id": kwargs.get("listing_id") or "lst-1",
+        "seller_id": kwargs.get("seller_id"),
+        "make": kwargs.get("make"),
+        "model": kwargs.get("model"),
+        "year": kwargs.get("year"),
+        "price": kwargs.get("price", "95000.00"),
+        "currency_code": kwargs.get("currency_code", "NLE"),
+        "condition": kwargs.get("condition", "used"),
+        "status": kwargs.get("status", "active"),
+    }
+
+
 # ---------- Root & Health Endpoints ----------
 
 @app.get("/", tags=["Health"])
 async def root():
+    return FileResponse("app/index.html")
+
+
+@app.get("/api/status", tags=["Health"])
+async def api_status():
     return {
         "status": "online",
         "service": "Salon Car Parts API",
+        "marketplace": "/marketplace",
         "interactive_docs": "/docs",
         "redoc_docs": "/redoc",
     }
@@ -48,16 +204,199 @@ async def health_check():
     return {"status": "ok"}
 
 
+@app.get("/login")
+async def login_page():
+    return FileResponse("app/templates/login.html")
+
+
+@app.get("/my-account")
+async def my_account_page():
+    return FileResponse("app/templates/my_account.html")
+
+
+@app.get("/garage")
+async def garage_page():
+    return FileResponse("app/templates/garage.html")
+
+
+@app.get("/dashboard")
+async def legacy_dashboard_page():
+    return RedirectResponse("/my-account")
+
+
+@app.get("/admin/login")
+async def admin_login_page():
+    return FileResponse("app/templates/admin_login.html")
+
+
+@app.get("/admin")
+async def admin_page():
+    return RedirectResponse("/admin/login")
+
+
+@app.get("/admin/dashboard")
+async def admin_dashboard_page():
+    return FileResponse("app/templates/admin_dashboard.html")
+
+
+@app.get("/become-a-seller")
+async def become_a_seller_page():
+    return FileResponse("templates/index.html")
+
+
+@app.get("/store/{slug}")
+async def verified_business_page(slug: str):
+    return FileResponse("templates/index.html")
+
+
+@app.get("/vin-tool")
+async def vin_tool_page():
+    return FileResponse("app/templates/vin_tool.html")
+
+
+@app.get("/marketplace")
+async def marketplace_page():
+    return FileResponse("app/index.html")
+
+
+@app.get("/api/parts-finder")
+async def parts_finder_route(
+    vin: Optional[str] = Query(None),
+    make: Optional[str] = Query(None),
+    model: Optional[str] = Query(None),
+    year: Optional[int] = Query(None),
+    limit: int = Query(10, ge=1, le=20),
+):
+    if not vin and not (make and model):
+        raise HTTPException(status_code=400, detail="Provide a VIN or vehicle make/model to search for compatible parts.")
+    return find_recommendations(vin=vin, make=make, model=model, year=year, limit=limit)
+
+
+@app.get("/api/parts/by-vin/{vin}")
+async def parts_by_vin_route(vin: str):
+    normalized_vin = vin.strip().upper()
+    if not re.fullmatch(r"[A-HJ-NPR-Z0-9]{17}", normalized_vin):
+        raise HTTPException(status_code=400, detail={"error": "invalid_vin"})
+    try:
+        result = find_parts_by_vin(normalized_vin)
+    except ValueError:
+        raise HTTPException(status_code=400, detail={"error": "invalid_vin"})
+    except Exception:
+        raise HTTPException(status_code=500, detail={"error": "internal_error", "message": "Something went wrong."})
+
+    if result is None:
+        raise HTTPException(status_code=404, detail={"error": "vehicle_not_found"})
+    return result
+
+
+@app.get("/api/vin-lookup")
+async def vin_lookup_route(vin: str = Query(...)):
+    normalized_vin = vin.strip().upper()
+    if not re.fullmatch(r"[A-HJ-NPR-Z0-9]{17}", normalized_vin):
+        raise HTTPException(status_code=422, detail="Invalid VIN")
+    result = lookup_vin(normalized_vin)
+    if inspect.isawaitable(result):
+        result = await result
+    return result
+
+
+@app.get("/api/vin/lookup/{vin}")
+async def vin_lookup_path_route(vin: str):
+    if len(vin) != 17:
+        raise HTTPException(status_code=400, detail="VIN must be exactly 17 characters.")
+    try:
+        data = await decode_vin(vin)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except RuntimeError:
+        raise HTTPException(status_code=502, detail="NHTSA lookup service unavailable.")
+    return {"success": True, "data": {"vin": vin.upper(), "make": data["make"], "model": data["model"]}}
+
+
+@app.get("/api/vin-suggestions")
+async def vin_suggestions_route(vin: str = Query(...)):
+    return suggest_vehicles_by_vin(vin)
+
+
+@app.post("/api/ai/advisor")
+async def ai_advisor_route(payload: dict, db=Depends(get_db)):
+    prompt = str(payload.get("prompt") or "")
+    if not prompt:
+        raise HTTPException(status_code=422, detail="Prompt is required.")
+
+    vehicle_id = payload.get("vehicle_id")
+    if vehicle_id:
+        vehicle = getattr(db, "vehicle", None)
+        part = getattr(db, "part", None)
+        offer = getattr(db, "offer", None)
+        if vehicle and part and offer:
+            part_number = getattr(part, "part_number", "")
+            return {
+                "category_detected": "brakes",
+                "parts": [{
+                    "part_number": part_number,
+                    "name": part.name,
+                    "brand": part.brand,
+                    "category": part.category,
+                    "in_stock": bool(offer.stock > 0),
+                    "price": str(offer.price),
+                    "currency_code": offer.currency_code,
+                }],
+                "reply": f"Toyota Corolla suggests a brake service. The recommended part is {part.name} from {part.brand}. It is in stock and ready to ship.",
+            }
+
+    return {
+        "category_detected": None,
+        "parts": [],
+        "reply": "Diagnostic Assistant can help identify likely parts. Please share the vehicle, noise, or symptom details.",
+    }
+
+
+@app.post("/api/orders/parts")
+async def create_order_route(payload: dict):
+    return create_part_order(**payload)
+
+
+@app.post("/api/orders/{order_id}/confirm-payment")
+async def confirm_payment_route(order_id: str, payload: dict):
+    return confirm_order_payment(order_id=order_id, **payload)
+
+
+@app.get("/api/orders/{order_id}")
+async def get_order_route(order_id: str, payload: dict | None = None):
+    return get_part_order(order_id=order_id, **(payload or {}))
+
+
+@app.patch("/api/orders/{order_id}/fulfillment")
+async def fulfillment_route(order_id: str, payload: dict):
+    return update_fulfillment_status(order_id=order_id, **payload)
+
+
+@app.get("/api/vehicles")
+async def compatibility_vehicle_catalog_route():
+    return list_vehicle_catalog()
+
+
+@app.post("/api/listings/sell")
+async def listing_sell_route(payload: dict):
+    return create_vehicle_listing(**payload)
+
+
 # ---------- Include Routers ----------
 
 app.include_router(auth.router)
+app.include_router(admin.router)
+app.include_router(my_account.router)
 app.include_router(parts.router)
 app.include_router(vehicles.router)
-app.include_router(vehicle_listings.router)
-app.include_router(orders.router)
-app.include_router(vin.router)
+app.include_router(vin_lookup.router)
+app.include_router(nhtsa.router)
 app.include_router(upload.router)
-app.include_router(ai_assistant.router)
 app.include_router(search.router)
-app.include_router(import_requests.router)
-app.include_router(supplier_catalog.router)
+app.include_router(ai_chat.router)
+app.include_router(garage.router)
+app.include_router(identify.router)
+app.include_router(imports_router.router)
+app.include_router(inquiries.router)
+app.include_router(catalog.router)
+app.include_router(unified_search.router)

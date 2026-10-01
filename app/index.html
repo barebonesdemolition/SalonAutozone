@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%2300a8e8' font-family='Arial'>S</text></svg>">
 <style>
-:root{--n9:#0a1729;--n8:#0b1e3a;--n6:#1a3a6b;--b5:#0091d5;--b4:#00a8e8;--am:#ffb800;--o5:#ff6b00;--o6:#e55a00;--g4:#22c55e;--r5:#dc2626;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s600:#475569;--s800:#1e293b;--sh:0 2px 4px rgba(15,23,42,.05),0 4px 12px rgba(15,23,42,.07)}
+:root{--n9:#0f172a;--n8:#0f172a;--n6:#1e293b;--b5:#0f766e;--b4:#0d9488;--am:#e8a317;--o5:#0f766e;--o6:#0d9488;--g4:#15803d;--r5:#b91c1c;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s600:#475569;--s800:#1e293b;--tl:#ccfbf1;--sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--s800);background:var(--s50);-webkit-font-smoothing:antialiased}
@@ -26,7 +26,7 @@ a{color:inherit;text-decoration:none}
 .tabs button{padding:10px 20px;border-radius:8px;font-weight:600;font-size:13px;color:var(--s500);white-space:nowrap;min-height:44px}
 .tabs button[aria-selected=true]{background:var(--o5);color:#fff}.tabs button[aria-selected=true].cars{background:var(--b4)}
 .nav{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.nav a{font-size:14px;font-weight:600;color:var(--s600)}.nav a:hover{color:var(--b4)}
-.btn-o{background:linear-gradient(135deg,var(--o5),var(--o6));color:#fff!important;padding:11px 20px;border-radius:8px;font-weight:700;box-shadow:0 4px 12px rgba(255,107,0,.28)}
+.btn-o{background:linear-gradient(135deg,var(--o5),var(--o6));color:#fff!important;padding:11px 20px;border-radius:8px;font-weight:700;box-shadow:0 4px 12px rgba(13,148,136,.2)}
 .fit{background:linear-gradient(90deg,var(--n8),var(--n6));color:#fff;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
 .fit small{display:block;font-size:11px;color:var(--s400);font-weight:700}.fit b{font-size:14px}
 .fit .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -41,15 +41,15 @@ a{color:inherit;text-decoration:none}
 .sbox{max-width:1100px;margin:0 auto;background:#fff;padding:16px;border-radius:16px;box-shadow:0 20px 60px rgba(10,23,41,.35);text-align:left}
 .srow{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr auto;gap:8px}
 .sbox select,.sbox input{padding:13px 14px;border:1.5px solid var(--s200);border-radius:8px;font-weight:500;color:var(--s800);background:#fff;width:100%;min-height:48px}
-.sbox select:focus,.sbox input:focus,.inp:focus{outline:0;border-color:var(--b4);box-shadow:0 0 0 4px rgba(0,168,232,.14)}
+.sbox select:focus,.sbox input:focus,.inp:focus{outline:0;border-color:var(--b4);box-shadow:0 0 0 4px rgba(13,148,136,.14)}
 .go{background:linear-gradient(135deg,var(--o5),var(--o6));color:#fff;padding:13px 28px;border-radius:8px;font-weight:700;min-height:48px}
 .trow{position:relative;margin-top:8px}
 .sug{position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.18);z-index:50;margin-top:6px;max-height:380px;overflow-y:auto;display:none;border:1px solid var(--s200)}
 .sug button{width:100%;text-align:left;padding:12px 16px;border-bottom:1px solid var(--s100);display:flex;gap:12px;align-items:center}
 .sug button:hover{background:var(--s50)}.sug b{display:block;font-size:14px;color:var(--n8)}.sug small{color:var(--s400)}
-.abroad{margin-top:18px;background:linear-gradient(135deg,var(--o5),var(--o6));color:#fff;padding:15px 26px;border-radius:10px;font-weight:700;box-shadow:0 8px 20px rgba(255,107,0,.35)}
+.abroad{margin-top:18px;background:linear-gradient(135deg,var(--o5),var(--o6));color:#fff;padding:15px 26px;border-radius:10px;font-weight:700;box-shadow:0 8px 20px rgba(13,148,136,.22)}
 .idw{max-width:800px;margin:16px auto 0;padding:0 16px}
-.id{width:100%;background:linear-gradient(135deg,var(--b4),var(--b5));color:#fff;padding:16px;border-radius:12px;font-weight:700;min-height:56px;box-shadow:0 8px 24px rgba(0,168,232,.3)}
+.id{width:100%;background:linear-gradient(135deg,var(--b4),var(--b5));color:#fff;padding:16px;border-radius:12px;font-weight:700;min-height:56px;box-shadow:0 8px 24px rgba(13,148,136,.22)}
 .cats{max-width:1200px;margin:24px auto 8px;padding:0 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
 .cat{background:#fff;border-radius:12px;padding:20px 8px;text-align:center;box-shadow:var(--sh);border:1px solid var(--s200);font-weight:700;font-size:13px;color:var(--n8)}
 .cat:hover{border-color:var(--b4)}.cat svg{width:30px;height:30px;color:var(--b4);display:block;margin:0 auto 6px}
@@ -57,7 +57,7 @@ a{color:inherit;text-decoration:none}
 .rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
 .rh h2{font-size:24px;font-weight:800;color:var(--n8);letter-spacing:-.02em}
 .rh .r{display:flex;gap:10px;align-items:center}
-.cnt{background:rgba(0,168,232,.1);color:var(--b5);padding:7px 16px;border-radius:99px;font-size:13px;font-weight:700}
+.cnt{background:var(--tl);color:var(--b5);padding:7px 16px;border-radius:99px;font-size:13px;font-weight:700}
 .rh select{padding:8px 12px;border:1.5px solid var(--s200);border-radius:8px;background:#fff;font-weight:600;font-size:13px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
 .grid h3.grp{grid-column:1/-1;font-size:18px;font-weight:800;color:var(--n8);margin-top:8px}
@@ -67,7 +67,7 @@ a{color:inherit;text-decoration:none}
 .card:hover{border-color:var(--b4)}
 .card-img{height:190px;background:linear-gradient(135deg,var(--s100),var(--s200));background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .card-img svg{width:52px;height:52px;color:var(--s400);opacity:.6}
-.card-img.imp{background:linear-gradient(135deg,#fff7ed,#fed7aa)}.card-img.imp svg{color:#c2410c}
+.card-img.imp{background:linear-gradient(135deg,#f0fdfa,#ccfbf1)}.card-img.imp svg{color:var(--b5)}
 .badges{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap}
 .bd{padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;color:#fff;background:var(--b4)}
 .bd.g{background:#16a34a}.bd.f{background:var(--am);color:var(--n9)}.bd.o{background:var(--o5)}
@@ -96,7 +96,7 @@ a{color:inherit;text-decoration:none}
 .submit:disabled{opacity:.6;cursor:wait}
 .stat{margin-top:14px;text-align:center;font-weight:700;font-size:14px}
 .drop{display:flex;flex-direction:column;align-items:center;gap:8px;min-height:170px;justify-content:center;background:var(--s100);border:2px dashed var(--s300);border-radius:12px;font-weight:700;cursor:pointer;text-align:center;padding:20px}
-.chip{display:inline-block;background:#f0f9ff;color:#0369a1;padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;margin:4px 4px 0 0}
+.chip{display:inline-block;background:var(--tl);color:var(--b5);padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;margin:4px 4px 0 0}
 .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:var(--n8);color:#fff;padding:13px 22px;border-radius:10px;font-weight:600;transition:transform .25s;z-index:9999;max-width:90vw;text-align:center}
 .toast.show{transform:translate(-50%,0)}.toast.success{background:#16a34a}.toast.error{background:var(--r5)}
 @media (max-width:1100px){.srow{grid-template-columns:1fr 1fr 1fr}.go{grid-column:1/-1}}
@@ -131,7 +131,7 @@ a{color:inherit;text-decoration:none}
 
 <div class="top">
   <strong>Salon AutoZone HQ, Freetown, Sierra Leone</strong>
-  <div><a href="tel:+23276123456" class="ph">+232 76 123456</a><a href="/login" id="signin">Sign in / Register</a></div>
+  <div><a href="tel:+23276123456" class="ph">+232 76 123456</a><a href="/login" id="signin">Sign in / Register</a><a href="/admin/login">Admin sign in</a></div>
 </div>
 
 <header class="brand">
@@ -142,6 +142,7 @@ a{color:inherit;text-decoration:none}
   </div>
   <nav class="nav">
     <a href="/vin-tool">VIN Lookup</a><a href="/garage">My Garage</a>
+    <a href="/become-a-seller">Sell as a business · Get a verified page</a>
     <a href="#" data-act="list" data-v="vehicle">Sell a car</a>
     <a href="#" data-act="list" data-v="parts" class="btn-o">+ List a part</a>
   </nav>
@@ -495,6 +496,7 @@ a{color:inherit;text-decoration:none}
   }
   function syncGarage() {
     if (!token()) return;
+    if (new URLSearchParams(location.search).has('make')) return;
     fetch('/api/garage/', { headers: auth() }).then(function (r) { return r.ok ? r.json() : []; }).then(function (cars) {
       var c = (cars || []).find(function (x) { return x.is_primary; }) || (cars || [])[0];
       if (!c) return;
@@ -639,6 +641,26 @@ a{color:inherit;text-decoration:none}
 
     var saved = json('fitmentVehicle');
     if (saved && saved.make) { setFitSelects(saved); fitLabel(saved); }
+    var requested = new URLSearchParams(location.search);
+    var requestedMake = requested.get('make');
+    var requestedModel = requested.get('model');
+    var requestedYear = requested.get('year');
+    if (requestedMake) {
+      if (MAKES.indexOf(requestedMake) < 0) { MAKES.push(requestedMake); MODELS[requestedMake] = []; }
+      if (requestedModel && MODELS[requestedMake].indexOf(requestedModel) < 0) MODELS[requestedMake].push(requestedModel);
+      if (!Array.from($('s-make').options).some(function (option) { return option.value === requestedMake; })) $('s-make').add(new Option(requestedMake, requestedMake));
+      if (!Array.from($('f-make').options).some(function (option) { return option.value === requestedMake; })) $('f-make').add(new Option(requestedMake, requestedMake));
+      $('s-make').value = requestedMake;
+      fillModels($('s-model'), requestedMake, 'Any model');
+      $('s-model').value = requestedModel || '';
+      $('s-year').value = requestedYear || '';
+      if (requestedModel && requestedYear) {
+        var requestedVehicle = {make:requestedMake,model:requestedModel,year:requestedYear};
+        setFitSelects(requestedVehicle);
+        fitLabel(requestedVehicle);
+        ls.set('fitmentVehicle', JSON.stringify(requestedVehicle));
+      }
+    }
     $('f-filter').checked = ls.get('fitmentFilterOn') === '1';
 
     $('f-make').addEventListener('change', function () { fillModels($('f-model'), this.value, 'Model'); });

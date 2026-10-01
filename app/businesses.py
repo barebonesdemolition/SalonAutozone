@@ -7,14 +7,14 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, field_validator
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, desc, or_
+from sqlalchemy import desc, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app import models
 from app.auth import get_current_user
-from app.db import Base, get_db
+from app.db import get_db
 from app.routers.admin import require_admin
 
 router = APIRouter(prefix="/api/businesses", tags=["Businesses"])
@@ -27,23 +27,7 @@ BUSINESS_TYPES = {
 }
 STATUSES = {"pending", "verified", "rejected", "suspended"}
 
-
-class Business(Base):
-    __tablename__ = "businesses"
-
-    id = Column(Integer, primary_key=True, index=True)
-    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=True)
-    business_type = Column(String, nullable=False)
-    name = Column(String, nullable=False)
-    slug = Column(String, nullable=False, unique=True, index=True)
-    country = Column(String, nullable=False, default="Sierra Leone")
-    city = Column(String, nullable=False)
-    whatsapp = Column(String, nullable=False)
-    email = Column(String)
-    description = Column(Text)
-    logo_url = Column(String)
-    status = Column(String, nullable=False, default="pending", index=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+Business = models.Business
 
 
 # ---------- helpers ----------
@@ -283,4 +267,47 @@ async def get_business(slug: str, db: AsyncSession = Depends(get_db)):
     biz = (await db.execute(select(Business).where(Business.slug == slug, Business.status == "verified"))).scalars().first()
     if not biz:
         raise HTTPException(status_code=404, detail="Business not found")
-    return _public(biz)
+
+    vehicle_rows = (await db.execute(
+        select(models.VehicleListing)
+        .where(
+            models.VehicleListing.is_sold.is_(False),
+            or_(
+                models.VehicleListing.business_id == biz.id,
+                models.VehicleListing.seller_id == biz.owner_id,
+            ),
+        )
+        .order_by(desc(models.VehicleListing.created_at))
+        .limit(50)
+    )).scalars().all()
+    part_rows = (await db.execute(
+        select(models.PartListing)
+        .where(
+            or_(
+                models.PartListing.seller_id == biz.owner_id,
+                models.PartListing.vendor_id == biz.owner_id,
+            ),
+            models.PartListing.stock_quantity > 0,
+        )
+        .order_by(desc(models.PartListing.created_at))
+        .limit(100)
+    )).scalars().all()
+
+    result = _public(biz)
+    result["listings"] = {
+        "vehicles": [{
+            "type": "vehicle", "id": item.id, "title": item.title,
+            "make": item.make, "model": item.model, "year": item.year,
+            "price_sll": item.price_sll, "location": item.location,
+            "image_url": item.image_url, "condition": item.condition,
+            "availability": item.availability,
+        } for item in vehicle_rows],
+        "parts": [{
+            "type": "part", "id": item.id, "name": item.name,
+            "category": item.category, "compatible_make": item.compatible_make,
+            "compatible_model": item.compatible_model, "price_sll": item.price_sll,
+            "location": item.location, "image_url": item.image_url,
+            "condition": item.condition, "stock_quantity": item.stock_quantity,
+        } for item in part_rows],
+    }
+    return result

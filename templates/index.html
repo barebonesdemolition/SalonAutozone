@@ -39,6 +39,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
 .logo-box img{width:100%;height:100%;object-fit:cover}
 .meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
 .note{background:#f0fdfa;border:1px solid #99f6e4;color:var(--t2);padding:12px 14px;border-radius:10px;font-size:14px;margin-top:16px}
+.inventory{margin-top:24px}.inventory h2{font-size:17px;font-weight:800;color:var(--n);margin-bottom:10px}.inventory-grid{display:grid;gap:10px}.inventory-item{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px;border:1px solid var(--s200);border-radius:12px;background:#fff;align-items:center}.inventory-photo{width:96px;height:72px;border-radius:8px;object-fit:cover;background:var(--s100)}.inventory-photo.placeholder{display:grid;place-items:center;color:var(--t);font-weight:800;font-size:18px}.inventory-title{font-weight:800;color:var(--n)}.inventory-meta{font-size:12px;color:var(--s500);margin-top:3px}.inventory-price{font-weight:800;color:var(--t);margin-top:5px}
 @media (max-width:560px){.row,.types{grid-template-columns:1fr}}
 </style>
 </head>
@@ -96,15 +97,35 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
     return '<div class="logo-box">' + (u ? '<img src="' + esc(u) + '" alt="Logo">' : esc((b.name || '?').charAt(0).toUpperCase())) + '</div>';
   }
 
+  function inventorySection(title, items, type) {
+    if (!items || !items.length) return '';
+    return '<section class="inventory"><h2>' + title + '</h2><div class="inventory-grid">' + items.map(function (item) {
+      var name = type === 'vehicle' ? (item.title || [item.year, item.make, item.model].filter(Boolean).join(' ')) : item.name;
+      var image = safeUrl(item.image_url);
+      var imageHtml = image ? '<img class="inventory-photo" src="' + esc(image) + '" alt="">' : '<div class="inventory-photo placeholder" aria-hidden="true">' + (type === 'vehicle' ? 'Car' : 'Part') + '</div>';
+      var detail = type === 'vehicle'
+        ? [item.year, item.condition, item.availability, item.location].filter(Boolean).join(' · ')
+        : [item.category, item.compatible_make, item.compatible_model, item.stock_quantity ? 'In stock: ' + item.stock_quantity : '', item.location].filter(Boolean).join(' · ');
+      var href = '/' + (type === 'vehicle' ? 'vehicle/' : 'part/') + encodeURIComponent(item.id);
+      return '<a class="inventory-item" href="' + href + '">' + imageHtml + '<span><span class="inventory-title">' + esc(name) + '</span><span class="inventory-meta">' + esc(detail) + '</span><span class="inventory-price">SLL ' + Number(item.price_sll || 0).toLocaleString() + '</span></span></a>';
+    }).join('') + '</div></section>';
+  }
+
   // ---------- storefront ----------
   function showStore(slug) {
     api('/api/businesses/' + encodeURIComponent(slug)).then(function (b) {
       document.title = esc(b.name) + ' · SalonAutoZone';
-      var wa = 'https://wa.me/' + encodeURIComponent(b.whatsapp) + '?text=' + encodeURIComponent('Hello ' + b.name + ', I found you on SalonAutoZone.');
+      var contact = b.whatsapp
+        ? '<a class="btn wa full" href="https://wa.me/' + encodeURIComponent(b.whatsapp) + '?text=' + encodeURIComponent('Hello ' + b.name + ', I found you on SalonAutoZone.') + '" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>'
+        : '<div class="note">This business has not added a WhatsApp contact yet.</div>';
+      var listings = b.listings || {};
+      var inventory = inventorySection('Vehicles', listings.vehicles, 'vehicle') + inventorySection('Parts', listings.parts, 'part');
+      if (!inventory) inventory = '<div class="note">This verified business has no active listings yet.</div>';
       root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta"><span class="pill ok">Verified</span><span class="pill t">' + esc(b.type_label) + '</span><span class="pill t">' + esc(b.city) + ', ' + esc(b.country) + '</span></div></div></div>' +
         (b.description ? '<p>' + esc(b.description) + '</p>' : '') +
-        '<a class="btn wa full" href="' + esc(wa) + '" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>' +
-        '<div class="note">Listings from this business will appear here soon. Never pay a deposit before you have checked the seller and seen the item.</div>';
+        contact +
+        inventory +
+        '<div class="note">Confirm availability, fitment, and price with the seller before paying.</div>';
     }).catch(function () {
       root.innerHTML = '<h1>Business not found</h1><p class="sub">This page does not exist or has not been approved yet.</p><a class="btn" href="/">Back to marketplace</a>';
     });

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Admin – {{ app_name or 'SalonAutoZone' }}</title>
+<title>Admin dashboard · SalonAutoZone</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -20,7 +20,7 @@ button{cursor:pointer;border:0;background:none}
 :focus-visible{outline:3px solid var(--primary-hover);outline-offset:2px}
 
 .shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
-@media(max-width:860px){.shell{grid-template-columns:1fr}.side{position:sticky;top:0;z-index:40}}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.side{position:sticky;top:0;z-index:40;flex-direction:row;align-items:center;overflow-x:auto;white-space:nowrap;padding:8px}.side .logo{padding:8px 10px}.side button,.side a{width:auto;white-space:nowrap}.side .foot{display:none}.main{max-width:none;width:100%}}
 
 .side{background:var(--navy);color:#94a3b8;padding:20px 14px;display:flex;flex-direction:column;gap:6px}
 .side .logo{color:#fff;font-weight:800;font-size:16px;padding:8px 10px 18px}.side .logo span{color:#5eead4}
@@ -70,8 +70,11 @@ td{font-size:13px}
     <button type="button" data-view="parts">Part listings</button>
     <button type="button" data-view="imports">Import requests</button>
     <button type="button" data-view="inquiries">Inquiries</button>
+    <button type="button" data-view="businesses">Business applications</button>
     <a href="/admin/catalog">Supplier catalog</a>
+    <a href="/vin-tool">VIN lookup</a>
     <a href="/">← Back to site</a>
+    <button type="button" id="btn-admin-logout">Sign out</button>
     <div class="foot">Admin panel · protect this URL</div>
   </aside>
 
@@ -92,7 +95,8 @@ td{font-size:13px}
         <div class="bar"><h2>Quick actions</h2></div>
         <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap">
           <a class="btn btn-primary" href="/admin/catalog">Manage catalog</a>
-          <a class="btn btn-ghost" href="/admin/run-migration-xyz" target="_blank">Run migrations</a>
+          <button class="btn btn-ghost" type="button" data-view-link="businesses">Review business applications</button>
+          <a class="btn btn-ghost" href="/docs">API docs</a>
           <a class="btn btn-ghost" href="/health" target="_blank">Health check</a>
         </div>
       </div>
@@ -139,6 +143,23 @@ td{font-size:13px}
         </tr></thead><tbody id="tb-inquiries"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
       </div>
     </div>
+
+    <div id="view-businesses" class="hidden">
+      <div class="panel">
+        <div class="bar">
+          <h2>Business applications</h2>
+          <select class="inp" id="q-businesses" aria-label="Application status">
+            <option value="pending">Pending review</option>
+            <option value="verified">Verified</option>
+            <option value="rejected">Rejected</option>
+            <option value="all">All applications</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table><thead><tr>
+          <th>Business</th><th>Type</th><th>Owner</th><th>Contact</th><th>Status</th><th>Storefront</th><th>Review</th>
+        </tr></thead><tbody id="tb-businesses"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+      </div>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -156,7 +177,9 @@ td{font-size:13px}
   }
   function auth() {
     var t = token();
-    return t ? { Authorization: 'Bearer ' + t } : {};
+    var headers = t ? { Authorization: 'Bearer ' + t } : {};
+    try { var key = sessionStorage.getItem('adminKey'); if (key) headers['X-Admin-Key'] = key; } catch (e) {}
+    return headers;
   }
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -168,7 +191,8 @@ td{font-size:13px}
     vehicles: 'Vehicle listings',
     parts: 'Part listings',
     imports: 'Import requests',
-    inquiries: 'Inquiries'
+    inquiries: 'Inquiries',
+    businesses: 'Business applications'
   };
 
   document.querySelectorAll('.side [data-view]').forEach(function (btn) {
@@ -177,7 +201,7 @@ td{font-size:13px}
       btn.classList.add('active');
       var v = btn.dataset.view;
       $('page-title').textContent = titles[v] || v;
-      ['overview','vehicles','parts','imports','inquiries'].forEach(function (name) {
+      ['overview','vehicles','parts','imports','inquiries','businesses'].forEach(function (name) {
         var el = $('view-' + name);
         if (el) el.classList.toggle('hidden', name !== v);
       });
@@ -196,28 +220,26 @@ td{font-size:13px}
     if (v === 'parts') loadParts();
     if (v === 'imports') loadImports();
     if (v === 'inquiries') loadInquiries();
+    if (v === 'businesses') loadBusinesses();
   }
 
-  function loadOverview() {
-    // Best-effort counts from list endpoints
-    Promise.all([
-      fetch('/api/vehicles/?limit=1', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
-      fetch('/api/parts/?limit=1', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
-      fetch('/api/import-requests/', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
-      fetch('/api/inquiries/', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
-    ]).then(function (arr) {
-      function count(d) {
-        if (!d) return '—';
-        if (typeof d.total === 'number') return d.total;
-        if (Array.isArray(d)) return d.length;
-        if (Array.isArray(d.items)) return d.items.length;
-        return '—';
-      }
-      $('s-vehicles').textContent = count(arr[0]);
-      $('s-parts').textContent = count(arr[1]);
-      $('s-imports').textContent = count(arr[2]);
-      $('s-inquiries').textContent = count(arr[3]);
+  document.querySelectorAll('[data-view-link]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var target = document.querySelector('.side [data-view="' + button.dataset.viewLink + '"]');
+      if (target) target.click();
     });
+  });
+
+  function loadOverview() {
+    fetch('/api/admin/stats', { headers: auth() })
+      .then(function (r) { if (r.status === 403) throw new Error('Admin session expired'); return r.json(); })
+      .then(function (data) {
+        $('s-vehicles').textContent = fmt(data.total_vehicles);
+        $('s-parts').textContent = fmt(data.total_parts);
+        $('s-imports').textContent = fmt(data.total_imports);
+        $('s-inquiries').textContent = fmt(data.total_inquiries);
+      })
+      .catch(function () { requireAdmin(); });
   }
 
   function rowsOrEmpty(tbody, items, render) {
@@ -286,10 +308,10 @@ td{font-size:13px}
 
   function loadImports() {
     var tb = $('tb-imports');
-    fetch('/api/import-requests/', { headers: auth() })
+    fetch('/api/admin/imports', { headers: auth() })
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (d) {
-        var items = d.items || d || [];
+        var items = d.imports || [];
         if (!Array.isArray(items)) items = [];
         rowsOrEmpty(tb, items, function (i) {
           return '<tr><td>' + (i.id || '—') + '</td><td>' + esc(i.customer_phone || i.phone || '—') +
@@ -303,10 +325,10 @@ td{font-size:13px}
 
   function loadInquiries() {
     var tb = $('tb-inquiries');
-    fetch('/api/inquiries/', { headers: auth() })
+    fetch('/api/admin/inquiries', { headers: auth() })
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (d) {
-        var items = d.items || d || [];
+        var items = d.inquiries || [];
         if (!Array.isArray(items)) items = [];
         rowsOrEmpty(tb, items, function (i) {
           return '<tr><td>' + (i.id || '—') + '</td><td>' + esc(i.inquiry_type || i.type || '—') +
@@ -318,7 +340,60 @@ td{font-size:13px}
       .catch(function () { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load inquiries.</td></tr>'; });
   }
 
-  loadOverview();
+  function loadBusinesses() {
+    var tb = $('tb-businesses');
+    var filter = $('q-businesses').value;
+    tb.innerHTML = '<tr><td colspan="7" class="empty">Loading applications…</td></tr>';
+    fetch('/api/businesses/admin/list?status=' + encodeURIComponent(filter), { headers: auth() })
+      .then(function (response) { if (!response.ok) throw new Error('Could not load applications'); return response.json(); })
+      .then(function (data) {
+        var items = data.businesses || [];
+        if (!items.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">No business applications in this view.</td></tr>'; return; }
+        tb.innerHTML = items.map(function (business) {
+          var owner = business.owner || {};
+          var actions = business.status === 'pending'
+            ? '<button class="btn btn-primary" data-business-status="verified" data-business-id="' + business.id + '">Approve</button> <button class="btn btn-danger" data-business-status="rejected" data-business-id="' + business.id + '">Reject</button>'
+            : '<span class="badge off">Reviewed</span>';
+          var store = business.status === 'verified'
+            ? '<a class="btn btn-ghost" href="/store/' + encodeURIComponent(business.slug) + '" target="_blank" rel="noopener">Open page</a>'
+            : '<span class="badge warn">Not public</span>';
+          return '<tr><td><strong>' + esc(business.name) + '</strong><br><small>' + esc(business.city || '') + ', ' + esc(business.country || '') + '</small></td>' +
+            '<td>' + esc(business.type_label || business.business_type || '') + '</td>' +
+            '<td>' + esc(owner.name || '—') + '<br><small>' + esc(owner.email || '') + '</small></td>' +
+            '<td>' + esc(business.whatsapp || owner.phone || '—') + '</td>' +
+            '<td><span class="badge ' + (business.status === 'verified' ? 'ok' : business.status === 'rejected' ? 'bad' : 'warn') + '">' + esc(business.status) + '</span></td>' +
+            '<td>' + store + '</td><td>' + actions + '</td></tr>';
+        }).join('');
+      })
+      .catch(function (error) { tb.innerHTML = '<tr><td colspan="7" class="empty">' + esc(error.message) + '.</td></tr>'; });
+  }
+
+  $('q-businesses').addEventListener('change', loadBusinesses);
+  $('tb-businesses').addEventListener('click', function (event) {
+    var button = event.target.closest('[data-business-status]');
+    if (!button) return;
+    button.disabled = true;
+    fetch('/api/businesses/admin/' + encodeURIComponent(button.dataset.businessId) + '/status?status=' + encodeURIComponent(button.dataset.businessStatus), {
+      method: 'POST', headers: auth()
+    }).then(function (response) { if (!response.ok) throw new Error('Could not update business status'); return response.json(); })
+      .then(function () { loadBusinesses(); toast('Business status updated', true); })
+      .catch(function (error) { button.disabled = false; toast(error.message, false); });
+  });
+
+  function requireAdmin() {
+    fetch('/api/admin/stats', { headers: auth() }).then(function (response) {
+      if (!response.ok) throw new Error('Admin access required');
+      loadOverview();
+    }).catch(function () {
+      try { sessionStorage.removeItem('adminKey'); } catch (e) {}
+      location.replace('/admin/login');
+    });
+  }
+  $('btn-admin-logout').addEventListener('click', function () {
+    try { sessionStorage.removeItem('adminKey'); } catch (e) {}
+    location.replace('/admin/login');
+  });
+  requireAdmin();
 })();
 </script>
 </body>

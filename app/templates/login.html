@@ -34,7 +34,7 @@ button{border:0;cursor:pointer}
 </style>
 </head>
 <body>
-<div class="top"><strong>Salon AutoZone</strong> · Sierra Leone</div>
+<div class="top"><strong>Salon AutoZone</strong> · Sierra Leone <a href="/vin-tool" style="float:right">VIN Lookup</a></div>
 <div class="wrap">
   <div class="card">
     <div class="logo">Salon<span>AutoZone</span></div>
@@ -51,13 +51,13 @@ button{border:0;cursor:pointer}
       <label class="lbl">Phone *</label>
       <input class="inp" name="phone" type="tel" required autocomplete="tel" placeholder="+232 76 123456">
       <label class="lbl">Email</label>
-      <input class="inp" name="email" type="email" autocomplete="email" placeholder="optional@email.com">
+      <input class="inp" name="email" type="email" autocomplete="email" placeholder="Email for registration">
       <label class="lbl">Password *</label>
       <input class="inp" name="password" type="password" required autocomplete="current-password" placeholder="••••••••">
       <button class="btn" type="submit" id="submit">Sign in</button>
       <div class="msg" id="msg" aria-live="polite"></div>
     </form>
-    <p class="foot"><a href="/">← Back to marketplace</a></p>
+    <p class="foot"><a href="/admin/login">Admin sign in</a> · <a href="/">Back to marketplace</a></p>
   </div>
 </div>
 <script>
@@ -68,7 +68,12 @@ button{border:0;cursor:pointer}
   var submit = document.getElementById('submit');
   var nameWrap = document.getElementById('name-wrap');
   var params = new URLSearchParams(location.search);
-  var next = params.get('next') || '/my-account';
+  var requestedNext = params.get('next') || '/my-account';
+  var next = requestedNext.charAt(0) === '/' && requestedNext.charAt(1) !== '/' ? requestedNext : '/my-account';
+  var emailInput = form.elements.namedItem('email');
+  var nameInput = form.elements.namedItem('full_name');
+  emailInput.required = false;
+  nameInput.required = false;
 
   document.querySelectorAll('.tabs button').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -76,6 +81,8 @@ button{border:0;cursor:pointer}
       b.classList.add('active');
       mode = b.dataset.mode;
       nameWrap.hidden = mode !== 'register';
+      nameInput.required = mode === 'register';
+      emailInput.required = mode === 'register';
       submit.textContent = mode === 'login' ? 'Sign in' : 'Create account';
       form.password.autocomplete = mode === 'login' ? 'current-password' : 'new-password';
       msg.textContent = '';

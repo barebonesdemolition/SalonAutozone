@@ -1,8 +1,10 @@
+import re
+
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import update
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import List, Optional
 from datetime import datetime
 from jose import jwt, JWTError
@@ -22,15 +24,27 @@ class GarageCar(BaseModel):
     make: str
     model: str
     year: int
+    vin: Optional[str] = None
     nickname: Optional[str] = None
     is_primary: bool = False
 
+    @field_validator("vin")
+    @classmethod
+    def validate_vin(cls, value):
+        if value is None or not value.strip():
+            return None
+        vin = value.strip().upper()
+        if not re.fullmatch(r"[A-HJ-NPR-Z0-9]{17}", vin):
+            raise ValueError("VIN must be 17 valid characters; I, O, and Q are not allowed.")
+        return vin
+
 
 class GarageCarResponse(BaseModel):
-    id: int
+    id: str
     make: str
     model: str
     year: int
+    vin: Optional[str] = None
     nickname: Optional[str] = None
     is_primary: bool
     created_at: datetime
@@ -108,6 +122,7 @@ async def add_car(
         make=car.make.strip(),
         model=car.model.strip(),
         year=car.year,
+        vin=car.vin,
         nickname=(car.nickname or '').strip() or None,
         is_primary=car.is_primary or is_first,
     )
@@ -122,7 +137,7 @@ async def add_car(
 # ============================================================
 @router.delete("/{car_id}")
 async def delete_car(
-    car_id: int,
+    car_id: str,
     user: models.User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -161,7 +176,7 @@ async def delete_car(
 # ============================================================
 @router.put("/{car_id}/primary", response_model=GarageCarResponse)
 async def set_primary(
-    car_id: int,
+    car_id: str,
     user: models.User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -194,7 +209,7 @@ async def set_primary(
 # ============================================================
 @router.put("/{car_id}", response_model=GarageCarResponse)
 async def update_car(
-    car_id: int,
+    car_id: str,
     car: GarageCar,
     user: models.User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -212,6 +227,7 @@ async def update_car(
     existing.make = car.make.strip()
     existing.model = car.model.strip()
     existing.year = car.year
+    existing.vin = car.vin
     existing.nickname = (car.nickname or '').strip() or None
 
     await db.commit()

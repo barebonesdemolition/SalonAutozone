@@ -13,6 +13,7 @@ python-dotenv
 email-validator
 google-genai
 asyncpg
+psycopg[binary]
 httpx
 Pillow
 pydantic-settings>=2.0.0
