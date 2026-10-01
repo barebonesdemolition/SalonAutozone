@@ -1,805 +1,342 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>My Account · SalonAutoZone</title>
+<title>My Account – {{ app_name or 'SalonAutoZone' }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><text x='50' y='68' font-size='55' font-weight='900' text-anchor='middle' fill='%232563eb' font-family='Arial'>S</text></svg>">
 <style>
-:root {
-  --bg: #f1f5f9;
-  --card: #ffffff;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --line: #e2e8f0;
-  --accent: #2563eb;
-  --accent-soft: #eff6ff;
-  --amber: #f59e0b;
-  --green: #16a34a;
-  --red: #dc2626;
-  --shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.04);
-  --radius: 16px;
+:root{
+  --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
+  --navy:#0f172a;--slate:#1e293b;--text:#1e293b;--muted:#64748b;
+  --border:#e2e8f0;--bg:#f8fafc;--surface:#fff;--success:#15803d;--danger:#b91c1c;
+  --sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06);
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  font-size: 14px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
-button { font: inherit; cursor: pointer; border: 0; background: none; }
-a { color: inherit; text-decoration: none; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,sans-serif;font-size:15px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--primary-hover);outline-offset:2px}
 
-.ic { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.top{background:var(--navy);color:#94a3b8;padding:10px 24px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.top strong{color:#fff}.top a{color:#99f6e4;font-weight:700}
+.brand{background:#fff;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:var(--sh)}
+.logo{font-size:18px;font-weight:800;color:var(--navy)}.logo span{color:var(--primary)}
+.nav{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.nav a{font-size:14px;font-weight:600;color:#475569}.nav a:hover{color:var(--primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:8px;font-weight:700;font-size:14px;min-height:44px}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
+.btn-ghost{background:#f1f5f9;color:var(--text)}.btn-ghost:hover{background:#e2e8f0}
+.btn-danger{background:#fef2f2;color:var(--danger)}
 
-/* Top bar */
-.top {
-  background: var(--ink);
-  color: #fff;
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  position: sticky;
-  top: 0;
-  z-index: 40;
-}
-.logo { font-weight: 800; font-size: 17px; letter-spacing: -.03em; }
-.logo span { color: #60a5fa; }
-.top-nav { display: flex; gap: 4px; align-items: center; }
-.top-nav a {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; color: #e2e8f0;
-}
-.top-nav a:hover { background: rgba(255,255,255,.1); color: #fff; }
-.top-nav a.out { color: #fca5a5; }
+.wrap{max-width:1100px;margin:0 auto;padding:24px 20px 64px}
+.hero{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+.hero h1{font-size:26px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
+.hero p{color:var(--muted);margin-top:4px}
 
-/* Layout */
-.page { max-width: 1120px; margin: 0 auto; padding: 20px 16px 48px; }
+.tabs{display:flex;gap:6px;background:#f1f5f9;padding:4px;border-radius:10px;margin-bottom:20px;flex-wrap:wrap}
+.tabs button{padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;color:var(--muted);min-height:42px}
+.tabs button.active{background:var(--primary);color:#fff}
 
-/* Welcome */
-.welcome {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 20px 22px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.avatar {
-  width: 52px; height: 52px; border-radius: 50%;
-  background: linear-gradient(135deg, #1e293b, #2563eb);
-  color: #fff; font-weight: 800; font-size: 18px;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.welcome-text { flex: 1; min-width: 180px; }
-.welcome-text h1 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
-.welcome-text p { color: var(--muted); font-size: 13px; margin-top: 2px; }
-.welcome-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--sh)}
+.card h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.card .meta{font-size:13px;color:var(--muted)}
+.card .price{font-size:18px;font-weight:800;color:var(--primary);margin:8px 0}
+.card .acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.card .acts a,.card .acts button{flex:1;text-align:center;padding:9px;border-radius:8px;font-weight:700;font-size:12px;background:#f1f5f9;min-height:40px}
 
-/* Stats */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 18px;
-}
-@media (min-width: 720px) {
-  .stats { grid-template-columns: repeat(6, 1fr); }
-}
-.stat {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 14px 14px 12px;
-  text-align: left;
-  box-shadow: var(--shadow);
-  transition: border-color .15s, transform .15s;
-}
-.stat:hover { border-color: #bfdbfe; transform: translateY(-1px); }
-.stat-label {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .03em;
-}
-.stat-label .ic { width: 14px; height: 14px; color: var(--accent); }
-.stat-value {
-  display: block; margin-top: 6px;
-  font-size: 24px; font-weight: 800; letter-spacing: -.03em; color: var(--ink);
-}
-.stat-value.zero { color: #cbd5e1; }
+.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--sh);margin-bottom:16px}
+.panel h2{font-size:16px;font-weight:800;margin-bottom:14px;color:var(--navy)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lbl{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:6px}
+.inp{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;min-height:44px}
+.inp:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty a{color:var(--primary);font-weight:700}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:var(--primary-light);color:var(--primary)}
+.badge.off{background:#f1f5f9;color:var(--muted)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;font-weight:600;z-index:99;transition:transform .25s;max-width:90vw}
+.toast.show{transform:translate(-50%,0)}.toast.ok{background:var(--success)}.toast.err{background:var(--danger)}
+.sk{height:120px;border-radius:12px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+@media(max-width:700px){.row{grid-template-columns:1fr}.hero h1{font-size:22px}}
 
-/* Tabs */
-.tabs {
-  display: flex; gap: 4px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 14px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.tabs::-webkit-scrollbar { display: none; }
-.tab {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 10px 14px; border-radius: 8px;
-  font-weight: 600; font-size: 13px; color: var(--muted);
-  white-space: nowrap; min-height: 40px;
-}
-.tab:hover { color: var(--ink); }
-.tab[aria-selected="true"] {
-  background: var(--ink); color: #fff;
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px);box-shadow:0 -4px 16px rgba(15,23,42,.06)}
+.bnav nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:500px;margin:0 auto}
+.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center}
+.bnav a svg{width:22px;height:22px}
+.bnav a.active,.bnav a:hover{color:var(--primary);background:var(--primary-light)}
+@media(max-width:768px){
+  .bnav{display:block}
+  body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 }
 
-/* Section */
-.sec {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 20px;
-  display: none;
-}
-.sec.on { display: block; }
-.sec-head {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 14px; gap: 10px; flex-wrap: wrap;
-}
-.sec-head h2 { font-size: 17px; font-weight: 800; letter-spacing: -.02em; }
-
-/* Listing cards grid */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 16px;
-  align-items: stretch;
-}
-@media (min-width: 560px) {
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (min-width: 900px) {
-  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
-.card {
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  overflow: hidden;
-  background: #fff;
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
-.card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 10px 28px rgba(15,23,42,.08);
-  transform: translateY(-1px);
-}
-.card.feat {
-  border-color: var(--line);
-  box-shadow: 0 4px 16px rgba(15,23,42,.05);
-}
-.card-photo {
-  height: 180px;
-  background: #f8fafc;
-  display: flex; align-items: center; justify-content: center;
-  color: #94a3b8;
-  position: relative;
-  overflow: hidden;
-}
-.card-photo img {
-  width: 100%; height: 100%; object-fit: cover;
-}
-.card-photo .ic { width: 36px; height: 36px; stroke-width: 1.5; }
-.badges {
-  position: absolute; top: 8px; left: 8px;
-  display: flex; gap: 4px; flex-wrap: wrap;
-}
-.badge {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  padding: 3px 8px; border-radius: 6px; letter-spacing: .02em;
-}
-.badge.feat { background: #fff7ed; color: #b45309; border: 1px solid #fed7aa; }
-.badge.sold { background: var(--green); color: #fff; }
-
-.card-body {
-  padding: 14px 16px 16px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.card-title {
-  font-weight: 700; font-size: 14px; line-height: 1.3;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-.card-price {
-  font-size: 16px; font-weight: 800; color: var(--accent); letter-spacing: -.02em;
-}
-.card-meta {
-  display: flex; flex-wrap: wrap; gap: 4px;
-  color: var(--muted); font-size: 12px;
-}
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #f1f5f9;
-  color: var(--muted);
-  padding: 4px 8px;
-  border-radius: 7px;
-  font-weight: 600;
-  font-size: 11px;
-}
-.pill .ic { width: 13px; height: 13px; }
-.card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-}
-.card-actions .danger {
-  margin-left: auto;
-  width: 36px;
-  min-width: 36px;
-  padding: 0;
-}
-.card-actions .danger .ic { width: 17px; height: 17px; }
-
-/* Buttons */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-  padding: 8px 12px; border-radius: 8px;
-  font-weight: 600; font-size: 12px; min-height: 36px;
-  border: 1px solid transparent;
-}
-.btn:disabled { opacity: .5; cursor: wait; }
-.btn.primary { background: var(--accent); color: #fff; }
-.btn.primary:hover:not(:disabled) { background: #1d4ed8; }
-.btn.ghost {
-  background: #fff; border-color: var(--line); color: var(--ink);
-}
-.btn.ghost:hover:not(:disabled) { border-color: #94a3b8; }
-.btn.danger { color: var(--red); }
-.btn.danger:hover:not(:disabled) { background: #fef2f2; }
-.btn.amber .ic { color: var(--amber); }
-
-/* List style for inquiries/imports */
-.row {
-  display: flex; gap: 12px; align-items: flex-start;
-  padding: 12px 0;
-  border-bottom: 1px solid #f1f5f9;
-}
-.row:last-child { border-bottom: 0; }
-.row-icon {
-  width: 40px; height: 40px; border-radius: 10px;
-  background: #f8fafc; color: #94a3b8;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.row-body { flex: 1; min-width: 0; }
-.row-title { font-weight: 700; font-size: 14px; }
-.row-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
-.quote {
-  margin-top: 8px; padding: 8px 10px;
-  background: #dcfce7; color: #166534;
-  border-radius: 8px; font-size: 12px; font-weight: 600;
-}
-
-.empty {
-  text-align: center; padding: 48px 16px; color: var(--muted);
-}
-.empty .ic { width: 40px; height: 40px; stroke-width: 1.5; color: #cbd5e1; margin-bottom: 10px; }
-.empty p { margin-bottom: 14px; }
-
-.load { text-align: center; padding: 40px; color: var(--muted); font-weight: 600; }
-.err {
-  text-align: center; padding: 16px;
-  color: var(--red); background: #fef2f2; border-radius: 12px;
-}
-
-.toast {
-  position: fixed; bottom: 24px; left: 50%;
-  transform: translate(-50%, 120px);
-  background: var(--ink); color: #fff;
-  padding: 12px 20px; border-radius: 10px;
-  font-weight: 600; z-index: 99; max-width: 90vw; text-align: center;
-  transition: transform .25s;
-}
-.toast.show { transform: translate(-50%, 0); }
-.toast.success { background: var(--green); }
-.toast.error { background: var(--red); }
-
-@media (max-width: 560px) {
-  .page { padding: 14px 12px 40px; }
-  .welcome { padding: 16px; }
-  .stat-value { font-size: 20px; }
-  .sec { padding: 14px; }
-  .card-photo { height: 165px; }
-  .card-actions .btn:not(.danger) { flex: 1; }
-  .card-actions .danger { flex: 0 0 36px; }
-}
-/* Shared marketplace polish */
-.welcome-actions .btn { min-height: 40px; }
-.stat { cursor: pointer; }
-.stat:focus-visible, .tab:focus-visible, .btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-.sec-head { padding-bottom: 2px; }
-.card-title { min-height: 36px; }
 </style>
 </head>
 <body>
-<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
-  <symbol id="i-part" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
-  <symbol id="i-save" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
-  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
-  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></symbol>
-  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
-  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
-  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
-  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></symbol>
-  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24"><path d="M3 5h18v14H3zM3 6l9 7 9-7"/></symbol>
-</svg>
-
-<header class="top">
-  <a href="/" class="logo">Salon<span>AutoZone</span></a>
-  <nav class="top-nav">
-    <a href="/"><svg class="ic"><use href="#i-home"/></svg> Marketplace</a>
-    <a href="/garage"><svg class="ic"><use href="#i-car"/></svg> Garage</a>
-    <a href="#" class="out" id="logoutBtn">Log out</a>
+<div class="top">
+  <strong>Salon AutoZone · Freetown</strong>
+  <a href="tel:+23276123456">+232 76 123456</a>
+</div>
+<header class="brand">
+  <a class="logo" href="/">Salon<span>AutoZone</span></a>
+  <nav class="nav">
+    <a href="/">Home</a>
+    <a href="/garage">My Garage</a>
+    <a href="/">Sell</a>
+    <button type="button" class="btn btn-ghost" id="btn-logout">Log out</button>
   </nav>
 </header>
 
-<main class="page">
-  <section class="welcome">
-    <div class="avatar" id="avatar">?</div>
-    <div class="welcome-text">
-      <h1 id="greeting">Welcome back</h1>
-      <p id="user-info">Loading...</p>
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <h1>My account</h1>
+      <p id="user-line">Loading your profile…</p>
     </div>
-    <div class="welcome-actions">
-      <a class="btn primary" href="/?action=list-car"><svg class="ic"><use href="#i-plus"/></svg> List a car</a>
-      <a class="btn ghost" href="/?action=list-part"><svg class="ic"><use href="#i-plus"/></svg> List a part</a>
-    </div>
-  </section>
-
-  <div class="stats">
-    <button class="stat" data-tab="cars"><span class="stat-label"><svg class="ic"><use href="#i-car"/></svg> Cars</span><span class="stat-value" id="stat-cars">-</span></button>
-    <button class="stat" data-tab="cars"><span class="stat-label"><svg class="ic"><use href="#i-check"/></svg> Sold</span><span class="stat-value" id="stat-sold">-</span></button>
-    <button class="stat" data-tab="parts"><span class="stat-label"><svg class="ic"><use href="#i-part"/></svg> Parts</span><span class="stat-value" id="stat-parts">-</span></button>
-    <button class="stat" data-tab="cars"><span class="stat-label"><svg class="ic"><use href="#i-star"/></svg> Featured</span><span class="stat-value" id="stat-featured">-</span></button>
-    <button class="stat" data-tab="saved"><span class="stat-label"><svg class="ic"><use href="#i-save"/></svg> Saved</span><span class="stat-value" id="stat-saved">-</span></button>
-    <button class="stat" data-tab="imports"><span class="stat-label"><svg class="ic"><use href="#i-globe"/></svg> Imports</span><span class="stat-value" id="stat-imports">-</span></button>
+    <a class="btn btn-primary" href="/?action=list-car">+ List something</a>
   </div>
 
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="cars" aria-selected="true"><svg class="ic"><use href="#i-car"/></svg> My cars</button>
-    <button class="tab" role="tab" data-tab="parts" aria-selected="false"><svg class="ic"><use href="#i-part"/></svg> My parts</button>
-    <button class="tab" role="tab" data-tab="saved" aria-selected="false"><svg class="ic"><use href="#i-save"/></svg> Saved</button>
-    <button class="tab" role="tab" data-tab="inquiries" aria-selected="false"><svg class="ic"><use href="#i-chat"/></svg> Inquiries</button>
-    <button class="tab" role="tab" data-tab="imports" aria-selected="false"><svg class="ic"><use href="#i-globe"/></svg> Imports</button>
+    <button type="button" class="active" data-tab="saved">Saved</button>
+    <button type="button" data-tab="garage">Garage</button>
+    <button type="button" data-tab="profile">Profile</button>
   </div>
 
-  <section id="section-cars" class="sec on">
-    <div class="sec-head"><h2>My car listings</h2></div>
-    <div id="cars-list"><div class="load">Loading...</div></div>
+  <section id="tab-saved">
+    <div class="grid" id="saved-grid"><div class="sk"></div><div class="sk"></div></div>
   </section>
-  <section id="section-parts" class="sec">
-    <div class="sec-head"><h2>My part listings</h2></div>
-    <div id="parts-list"><div class="load">Loading...</div></div>
+
+  <section id="tab-garage" hidden>
+    <div class="panel">
+      <h2>Add a vehicle to your garage</h2>
+      <form id="garage-form">
+        <div class="row">
+          <div><label class="lbl">Make *</label><input class="inp" name="make" required placeholder="Toyota"></div>
+          <div><label class="lbl">Model *</label><input class="inp" name="model" required placeholder="Corolla"></div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div><label class="lbl">Year *</label><input class="inp" name="year" type="number" min="1980" max="2030" required placeholder="2015"></div>
+          <div><label class="lbl">Nickname</label><input class="inp" name="nickname" placeholder="My daily"></div>
+        </div>
+        <label style="display:flex;gap:8px;align-items:center;margin:14px 0;font-size:14px;font-weight:600">
+          <input type="checkbox" name="is_primary"> Set as primary vehicle
+        </label>
+        <button type="submit" class="btn btn-primary">Save to garage</button>
+      </form>
+    </div>
+    <div class="grid" id="garage-grid"></div>
   </section>
-  <section id="section-saved" class="sec">
-    <div class="sec-head"><h2>Saved items</h2></div>
-    <div id="saved-list"><div class="load">Loading...</div></div>
-  </section>
-  <section id="section-inquiries" class="sec">
-    <div class="sec-head"><h2>Inquiries I sent</h2></div>
-    <div id="inquiries-list"><div class="load">Loading...</div></div>
-  </section>
-  <section id="section-imports" class="sec">
-    <div class="sec-head"><h2>My import requests</h2></div>
-    <div id="imports-list"><div class="load">Loading...</div></div>
+
+  <section id="tab-profile" hidden>
+    <div class="panel">
+      <h2>Profile</h2>
+      <div id="profile-body"><div class="sk"></div></div>
+    </div>
   </section>
 </main>
 
-<div id="toast" class="toast" role="status"></div>
+<div class="toast" id="toast"></div>
 
 <script>
 (function () {
-  'use strict';
-  var TOKEN_KEY = 'token', USER_KEY = 'userInfo', NL = String.fromCharCode(10), token = '';
-  try { token = localStorage.getItem(TOKEN_KEY) || ''; } catch (e) {}
-  if (!token) { window.location.href = '/login?next=/my-account'; return; }
-
   function $(id) { return document.getElementById(id); }
-  function esc(s) {
-    return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-  function safeUrl(u) {
-    u = String(u || '').trim();
-    var l = u.toLowerCase();
-    return (l.indexOf('http://') === 0 || l.indexOf('https://') === 0 || l.indexOf('data:image/') === 0 || (u.charAt(0) === '/' && u.charAt(1) !== '/')) ? u : '';
-  }
-  function cap(s) {
-    return String(s || '').split(' ').map(function (w) {
-      return w.charAt(0).toUpperCase() + w.slice(1);
-    }).join(' ');
-  }
-  function ic(n) { return '<svg class="ic"><use href="#i-' + n + '"/></svg>'; }
-  function money(n) { return 'SLL ' + Number(n || 0).toLocaleString(); }
-  function timeAgo(iso) {
-    if (!iso) return '';
-    var d = (Date.now() - new Date(iso).getTime()) / 1000;
-    if (d < 60) return 'just now';
-    if (d < 3600) return Math.floor(d / 60) + 'm ago';
-    if (d < 86400) return Math.floor(d / 3600) + 'h ago';
-    if (d < 604800) return Math.floor(d / 86400) + 'd ago';
-    return new Date(iso).toLocaleDateString();
-  }
-  function toast(msg, type) {
+  function toast(msg, ok) {
     var t = $('toast');
     t.textContent = msg;
-    t.className = 'toast show ' + (type || '');
-    clearTimeout(t._t);
-    t._t = setTimeout(function () { t.className = 'toast'; }, 3000);
+    t.className = 'toast show ' + (ok ? 'ok' : 'err');
+    setTimeout(function () { t.classList.remove('show'); }, 2800);
   }
-  async function api(url, options) {
-    var o = options || {};
-    o.headers = Object.assign({}, o.headers || {}, { 'Authorization': 'Bearer ' + token });
-    var res = await fetch(url, o);
-    if (res.status === 401) {
-      try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch (e) {}
-      window.location.href = '/login?next=/my-account';
-      throw new Error('Unauthorized');
-    }
-    if (!res.ok) {
-      var err = await res.json().catch(function () { return {}; });
-      throw new Error(typeof err.detail === 'string' ? err.detail : 'Request failed: ' + res.status);
-    }
-    return res.json();
+  function token() {
+    try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; }
   }
-  function busy(b, on) { if (b) b.disabled = on; }
-  function photo(url, fallback) {
-    var u = safeUrl(url);
-    return '<div class="card-photo">' +
-      (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" data-fb="' + fallback + '">' : ic(fallback)) +
-      '</div>';
+  function auth() {
+    var t = token();
+    return t ? { Authorization: 'Bearer ' + t } : {};
   }
-  function empty(icon, text, href, label) {
-    return '<div class="empty">' + ic(icon) + '<p>' + text + '</p>' +
-      (href ? '<a class="btn primary" href="' + href + '">' + ic('plus') + ' ' + label + '</a>' : '') +
-      '</div>';
-  }
-  function fail(what, e) {
-    return '<div class="err">Could not load ' + what + ': ' + esc(e.message) + '</div>';
-  }
-  function setStat(id, n) {
-    var el = $(id);
-    el.textContent = n;
-    el.className = 'stat-value' + (n ? '' : ' zero');
+  function goLogin() { location.href = '/login?next=' + encodeURIComponent(location.pathname); }
+
+  if (!token()) { goLogin(); return; }
+
+  // Tabs
+  document.querySelectorAll('.tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      ['saved', 'garage', 'profile'].forEach(function (name) {
+        var el = $('tab-' + name);
+        if (el) el.hidden = name !== b.dataset.tab;
+      });
+      if (b.dataset.tab === 'garage') loadGarage();
+      if (b.dataset.tab === 'profile') loadProfile();
+    });
+  });
+
+  $('btn-logout').addEventListener('click', function () {
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('userInfo');
+    } catch (e) {}
+    location.href = '/';
+  });
+
+  function fmt(n) {
+    try { return Number(n).toLocaleString(); } catch (e) { return n; }
   }
 
-  document.addEventListener('error', function (e) {
-    var img = e.target;
-    if (img && img.tagName === 'IMG' && img.dataset.fb) {
-      img.parentNode.innerHTML = ic(img.dataset.fb);
-    }
-  }, true);
+  function loadSaved() {
+    var grid = $('saved-grid');
+    fetch('/api/my-account/saved', { headers: auth() })
+      .then(function (r) {
+        if (r.status === 401) { goLogin(); throw null; }
+        return r.ok ? r.json() : { items: [] };
+      })
+      .then(function (d) {
+        var items = d.items || d || [];
+        if (!items.length) {
+          grid.innerHTML = '<div class="empty">No saved listings yet.<br><a href="/">Browse cars &amp; parts</a></div>';
+          return;
+        }
+        grid.innerHTML = items.map(function (i) {
+          var href = (i.listing_type === 'vehicle' ? '/vehicle/' : '/part/') + i.listing_id;
+          var price = i.listing_price_sll ? 'SLL ' + fmt(i.listing_price_sll) : '';
+          return '<div class="card">' +
+            '<h3>' + esc(i.listing_title || (i.listing_type + ' #' + i.listing_id)) + '</h3>' +
+            '<div class="meta">' + esc(i.listing_type || '') + '</div>' +
+            (price ? '<div class="price">' + price + '</div>' : '') +
+            '<div class="acts"><a href="' + href + '">View</a>' +
+            '<button type="button" data-unsave="' + i.id + '">Remove</button></div></div>';
+        }).join('');
+        grid.querySelectorAll('[data-unsave]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            fetch('/api/my-account/saved/' + btn.dataset.unsave, { method: 'DELETE', headers: auth() })
+              .then(function (r) {
+                if (r.ok) { toast('Removed', true); loadSaved(); }
+                else toast('Could not remove', false);
+              });
+          });
+        });
+      })
+      .catch(function (e) { if (e !== null) grid.innerHTML = '<div class="empty">Could not load saved items.</div>'; });
+  }
 
-  $('logoutBtn').addEventListener('click', function (e) {
+  function loadGarage() {
+    var grid = $('garage-grid');
+    grid.innerHTML = '<div class="sk"></div>';
+    fetch('/api/garage/', { headers: auth() })
+      .then(function (r) {
+        if (r.status === 401) { goLogin(); throw null; }
+        return r.ok ? r.json() : [];
+      })
+      .then(function (cars) {
+        cars = cars || [];
+        if (!cars.length) {
+          grid.innerHTML = '<div class="empty">No vehicles in your garage yet. Add one above.</div>';
+          return;
+        }
+        grid.innerHTML = cars.map(function (c) {
+          return '<div class="card">' +
+            '<h3>' + esc(c.year + ' ' + c.make + ' ' + c.model) + '</h3>' +
+            '<div class="meta">' + esc(c.nickname || 'No nickname') +
+            (c.is_primary ? ' · <span class="badge">Primary</span>' : '') + '</div>' +
+            '<div class="acts">' +
+            '<a href="/?make=' + encodeURIComponent(c.make) + '&model=' + encodeURIComponent(c.model) + '&year=' + c.year + '">Find parts</a>' +
+            '<button type="button" data-del-garage="' + c.id + '">Remove</button></div></div>';
+        }).join('');
+        grid.querySelectorAll('[data-del-garage]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            if (!confirm('Remove this vehicle from your garage?')) return;
+            fetch('/api/garage/' + btn.dataset.delGarage, { method: 'DELETE', headers: auth() })
+              .then(function (r) {
+                if (r.ok) { toast('Removed', true); loadGarage(); }
+                else toast('Could not remove', false);
+              });
+          });
+        });
+      })
+      .catch(function (e) { if (e !== null) grid.innerHTML = '<div class="empty">Could not load garage.</div>'; });
+  }
+
+  $('garage-form').addEventListener('submit', function (e) {
     e.preventDefault();
-    try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch (err) {}
-    window.location.href = '/';
+    var fd = new FormData(e.target);
+    var body = {
+      make: fd.get('make'),
+      model: fd.get('model'),
+      year: parseInt(fd.get('year'), 10),
+      nickname: fd.get('nickname') || null,
+      is_primary: !!fd.get('is_primary')
+    };
+    fetch('/api/garage/', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      if (r.status === 401) { goLogin(); return; }
+      if (!r.ok) throw new Error('Could not save');
+      toast('Vehicle saved', true);
+      e.target.reset();
+      loadGarage();
+    }).catch(function () { toast('Could not save vehicle', false); });
   });
 
-  async function loadUser() {
-    try {
-      var u = await api('/api/auth/me');
-      var name = cap(u.full_name || 'there');
-      $('greeting').textContent = 'Welcome back, ' + name;
-      $('avatar').textContent = name.split(' ').filter(Boolean).slice(0, 2).map(function (w) {
-        return w.charAt(0);
-      }).join('') || '?';
-      $('user-info').textContent = [u.email, u.phone].filter(Boolean).join(' · ') || 'No contact info';
-      try { localStorage.setItem(USER_KEY, JSON.stringify(u)); } catch (e) {}
-    } catch (e) { console.warn('loadUser failed', e); }
+  function loadProfile() {
+    var box = $('profile-body');
+    var u = null;
+    try { u = JSON.parse(localStorage.getItem('userInfo') || 'null'); } catch (e) {}
+    fetch('/api/my-account/me', { headers: auth() })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        u = d || u || {};
+        $('user-line').textContent = (u.full_name || u.name || u.phone || 'Member') + (u.email ? ' · ' + u.email : '');
+        box.innerHTML =
+          '<p><strong>Name</strong><br>' + esc(u.full_name || u.name || '—') + '</p>' +
+          '<p style="margin-top:12px"><strong>Phone</strong><br>' + esc(u.phone || '—') + '</p>' +
+          '<p style="margin-top:12px"><strong>Email</strong><br>' + esc(u.email || '—') + '</p>' +
+          '<p style="margin-top:12px"><strong>Role</strong><br><span class="badge">' + esc(u.role || 'buyer') + '</span></p>';
+      })
+      .catch(function () {
+        if (u) {
+          $('user-line').textContent = u.full_name || u.phone || 'Member';
+          box.innerHTML = '<p>Signed in. Profile details unavailable offline.</p>';
+        } else box.innerHTML = '<p class="empty">Could not load profile.</p>';
+      });
   }
 
-  async function loadStats() {
-    try {
-      var d = await api('/api/my-account/stats');
-      setStat('stat-cars', d.total_cars || 0);
-      setStat('stat-sold', d.cars_sold || 0);
-      setStat('stat-parts', d.total_parts || 0);
-      setStat('stat-featured', (d.featured_parts || 0) + (d.featured_cars || 0));
-      setStat('stat-saved', d.saved_items || 0);
-      setStat('stat-imports', d.total_import_requests || 0);
-    } catch (e) { console.warn('loadStats failed', e); }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  function promoBtn(on, kind, id) {
-    return on
-      ? '<button type="button" class="btn ghost amber" data-action="unpromote-' + kind + '" data-id="' + id + '">' + ic('star') + ' Unfeature</button>'
-      : '<button type="button" class="btn ghost amber" data-action="promote-' + kind + '" data-id="' + id + '">' + ic('star') + ' Promote</button>';
-  }
-
-  async function loadCars() {
-    var el = $('cars-list');
-    el.innerHTML = '<div class="load">Loading...</div>';
-    try {
-      var data = await api('/api/my-account/my-cars');
-      if (!data.count) {
-        el.innerHTML = empty('car', "You haven't listed any cars yet.", '/?action=list-car', 'List your first car');
-        return;
-      }
-      el.innerHTML = '<div class="grid">' + data.vehicles.map(function (v) {
-        var badges = '';
-        if (v.is_featured) badges += '<span class="badge feat">Featured</span>';
-        if (v.is_sold) badges += '<span class="badge sold">Sold</span>';
-        return '<article class="card' + (v.is_featured ? ' feat' : '') + '">' +
-          '<div class="card-photo">' +
-            (safeUrl(v.image_url)
-              ? '<img src="' + esc(safeUrl(v.image_url)) + '" alt="" loading="lazy" data-fb="car">'
-              : ic('car')) +
-            (badges ? '<div class="badges">' + badges + '</div>' : '') +
-          '</div>' +
-          '<div class="card-body">' +
-            '<div class="card-title">' + esc(cap(v.title)) + '</div>' +
-            '<div class="card-price">' + money(v.price_sll) + '</div>' +
-            '<div class="card-meta">' +
-              '<span class="pill">' + esc(v.year) + '</span>' +
-              '<span class="pill">' + ic('pin') + ' ' + esc(v.location) + '</span>' +
-              (v.inquiry_count > 0 ? '<span class="pill">' + ic('mail') + ' ' + v.inquiry_count + '</span>' : '') +
-              '<span class="pill">' + timeAgo(v.created_at) + '</span>' +
-            '</div>' +
-            '<div class="card-actions">' +
-              promoBtn(v.is_featured, 'car', v.id) +
-              (v.is_sold ? '' : '<button type="button" class="btn ghost" data-action="sold" data-id="' + v.id + '">' + ic('check') + ' Sold</button>') +
-              '<button type="button" class="btn primary" data-action="edit-vehicle" data-id="' + v.id + '">' + ic('edit') + ' Edit</button>' +
-              '<button type="button" class="btn danger" data-action="delete-car" data-id="' + v.id + '">' + ic('trash') + '</button>' +
-            '</div>' +
-          '</div></article>';
-      }).join('') + '</div>';
-    } catch (e) { el.innerHTML = fail('cars', e); }
-  }
-
-  async function loadParts() {
-    var el = $('parts-list');
-    el.innerHTML = '<div class="load">Loading...</div>';
-    try {
-      var data = await api('/api/my-account/my-parts');
-      if (!data.count) {
-        el.innerHTML = empty('part', "You haven't listed any parts yet.", '/?action=list-part', 'List your first part');
-        return;
-      }
-      el.innerHTML = '<div class="grid">' + data.parts.map(function (p) {
-        var badges = p.is_featured ? '<span class="badge feat">Featured</span>' : '';
-        return '<article class="card' + (p.is_featured ? ' feat' : '') + '">' +
-          '<div class="card-photo">' +
-            (safeUrl(p.image_url)
-              ? '<img src="' + esc(safeUrl(p.image_url)) + '" alt="" loading="lazy" data-fb="part">'
-              : ic('part')) +
-            (badges ? '<div class="badges">' + badges + '</div>' : '') +
-          '</div>' +
-          '<div class="card-body">' +
-            '<div class="card-title">' + esc(cap(p.name)) + '</div>' +
-            '<div class="card-price">' + money(p.price_sll) + '</div>' +
-            '<div class="card-meta">' +
-              '<span class="pill">' + esc(p.category) + '</span>' +
-              '<span class="pill">' + ic('pin') + ' ' + esc(p.location) + '</span>' +
-              '<span class="pill">Stock ' + (p.stock_quantity || 0) + '</span>' +
-              (p.inquiry_count > 0 ? '<span class="pill">' + ic('mail') + ' ' + p.inquiry_count + '</span>' : '') +
-            '</div>' +
-            '<div class="card-actions">' +
-              promoBtn(p.is_featured, 'part', p.id) +
-              '<button type="button" class="btn primary" data-action="edit-part" data-id="' + p.id + '">' + ic('edit') + ' Edit</button>' +
-              '<button type="button" class="btn danger" data-action="delete-part" data-id="' + p.id + '">' + ic('trash') + '</button>' +
-            '</div>' +
-          '</div></article>';
-      }).join('') + '</div>';
-    } catch (e) { el.innerHTML = fail('parts', e); }
-  }
-
-  async function loadSaved() {
-    var el = $('saved-list');
-    el.innerHTML = '<div class="load">Loading...</div>';
-    try {
-      var data = await api('/api/my-account/saved');
-      if (!data.count) {
-        el.innerHTML = empty('save', 'Nothing saved yet. Tap Save on any listing to keep it here.', '/', 'Browse listings');
-        return;
-      }
-      el.innerHTML = '<div class="grid">' + data.items.map(function (s) {
-        var car = s.listing_type === 'vehicle';
-        var href = (car ? '/vehicle/' : '/part/') + s.listing_id;
-        return '<article class="card">' +
-          '<div class="card-photo">' +
-            (safeUrl(s.listing_image_url)
-              ? '<img src="' + esc(safeUrl(s.listing_image_url)) + '" alt="" loading="lazy" data-fb="' + (car ? 'car' : 'part') + '">'
-              : ic(car ? 'car' : 'part')) +
-          '</div>' +
-          '<div class="card-body">' +
-            '<div class="card-title">' + esc(cap(s.listing_title) || '(listing #' + s.listing_id + ')') + '</div>' +
-            (s.listing_price_sll ? '<div class="card-price">' + money(s.listing_price_sll) + '</div>' : '') +
-            '<div class="card-meta">' +
-              '<span class="pill">' + (car ? 'Car' : 'Part') + '</span>' +
-              '<span class="pill">' + timeAgo(s.created_at) + '</span>' +
-            '</div>' +
-            '<div class="card-actions">' +
-              '<button type="button" class="btn primary" data-action="view-saved" data-href="' + esc(href) + '">' + ic('eye') + ' View</button>' +
-              '<button type="button" class="btn danger" data-action="unsave" data-id="' + s.id + '">' + ic('trash') + ' Remove</button>' +
-            '</div>' +
-          '</div></article>';
-      }).join('') + '</div>';
-    } catch (e) { el.innerHTML = fail('saved items', e); }
-  }
-
-  async function loadInquiries() {
-    var el = $('inquiries-list');
-    el.innerHTML = '<div class="load">Loading...</div>';
-    try {
-      var data = await api('/api/my-account/my-inquiries');
-      if (!data.count) {
-        el.innerHTML = empty('chat', "You haven't sent any inquiries yet.", '/', 'Browse listings');
-        return;
-      }
-      el.innerHTML = data.inquiries.map(function (i) {
-        return '<div class="row">' +
-          '<div class="row-icon">' + ic(i.listing_type === 'vehicle' ? 'car' : 'part') + '</div>' +
-          '<div class="row-body">' +
-            '<div class="row-title">' + esc(cap(i.listing_title) || '(listing #' + i.listing_id + ')') + '</div>' +
-            (i.buyer_message ? '<div class="row-sub">"' + esc(i.buyer_message) + '"</div>' : '') +
-            '<div class="card-meta" style="margin-top:6px">' +
-              '<span class="pill">' + esc(i.status) + '</span>' +
-              '<span class="pill">' + timeAgo(i.created_at) + '</span>' +
-            '</div>' +
-          '</div></div>';
-      }).join('');
-    } catch (e) { el.innerHTML = fail('inquiries', e); }
-  }
-
-  async function loadImports() {
-    var el = $('imports-list');
-    el.innerHTML = '<div class="load">Loading...</div>';
-    try {
-      var data = await api('/api/my-account/my-import-requests');
-      if (!data.count) {
-        el.innerHTML = empty('globe', "You haven't requested any imports yet.", '/', 'Request a part');
-        return;
-      }
-      el.innerHTML = data.requests.map(function (r) {
-        return '<div class="row">' +
-          '<div class="row-icon">' + ic('globe') + '</div>' +
-          '<div class="row-body">' +
-            '<div class="row-title">' + esc(cap(r.part_name)) + '</div>' +
-            '<div class="row-sub">' + esc(r.car_make) + ' ' + esc(r.car_model) + ' (' + esc(r.car_year) + ')</div>' +
-            '<div class="card-meta" style="margin-top:6px">' +
-              '<span class="pill">' + esc(r.status) + '</span>' +
-              '<span class="pill">' + timeAgo(r.created_at) + '</span>' +
-            '</div>' +
-            (r.quoted_price_sll ? '<div class="quote">Quoted: ' + money(r.quoted_price_sll) + '</div>' : '') +
-          '</div></div>';
-      }).join('');
-    } catch (e) { el.innerHTML = fail('imports', e); }
-  }
-
-  async function run(btn, ask, url, opts, okMsg, reload) {
-    if (ask && !confirm(ask)) return;
-    busy(btn, true);
-    try {
-      await api(url, opts);
-      toast(okMsg, 'success');
-      await Promise.all(reload.concat([loadStats()]));
-    } catch (e) {
-      toast(e.message, 'error');
-    } finally {
-      busy(btn, false);
-    }
-  }
-
-  function promoteMsg(what) {
-    return 'Feature this ' + what + ' listing for 7 days?' + NL + NL +
-      'Price: SLL 150,000' + NL +
-      'Pay via Orange Money to: +232 76 123456' + NL + NL +
-      'After sending payment, click OK.';
-  }
-
-  var P = { method: 'POST' }, D = { method: 'DELETE' };
-  var actions = {
-    'sold': function (id, b) {
-      run(b, 'Mark this car as sold?', '/api/vehicles/' + encodeURIComponent(id) + '/sold', P, 'Marked as sold', [loadCars()]);
-    },
-    'edit-vehicle': function (id) {
-      window.location.href = '/?action=edit-vehicle&id=' + encodeURIComponent(id);
-    },
-    'edit-part': function (id) {
-      window.location.href = '/?action=edit-part&id=' + encodeURIComponent(id);
-    },
-    'delete-car': function (id, b) {
-      run(b, 'Delete this car listing permanently?', '/api/my-account/vehicle/' + encodeURIComponent(id), D, 'Car deleted', [loadCars()]);
-    },
-    'delete-part': function (id, b) {
-      run(b, 'Delete this part listing permanently?', '/api/my-account/part/' + encodeURIComponent(id), D, 'Part deleted', [loadParts()]);
-    },
-    'promote-part': function (id, b) {
-      run(b, promoteMsg('part'), '/api/parts/' + encodeURIComponent(id) + '/promote?days=7', P, 'Listing featured for 7 days', [loadParts()]);
-    },
-    'unpromote-part': function (id, b) {
-      run(b, 'Remove featured status?', '/api/parts/' + encodeURIComponent(id) + '/unpromote', P, 'Featured status removed', [loadParts()]);
-    },
-    'promote-car': function (id, b) {
-      run(b, promoteMsg('car'), '/api/vehicles/' + encodeURIComponent(id) + '/promote?days=7', P, 'Listing featured for 7 days', [loadCars()]);
-    },
-    'unpromote-car': function (id, b) {
-      run(b, 'Remove featured status?', '/api/vehicles/' + encodeURIComponent(id) + '/unpromote', P, 'Featured status removed', [loadCars()]);
-    },
-    'unsave': function (id, b) {
-      run(b, 'Remove this item from your saved list?', '/api/my-account/saved/' + encodeURIComponent(id), D, 'Removed from saved', [loadSaved()]);
-    }
-  };
-
-  document.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-action]');
-    if (!b) return;
-    e.preventDefault();
-    if (b.dataset.action === 'view-saved') {
-      window.location.href = b.dataset.href;
-      return;
-    }
-    if (actions[b.dataset.action]) actions[b.dataset.action](b.dataset.id, b);
-  });
-
-  var loaders = {
-    cars: loadCars,
-    parts: loadParts,
-    saved: loadSaved,
-    inquiries: loadInquiries,
-    imports: loadImports
-  };
-
-  function switchTab(name) {
-    document.querySelectorAll('.tab').forEach(function (t) {
-      t.setAttribute('aria-selected', t.dataset.tab === name);
-    });
-    Object.keys(loaders).forEach(function (k) {
-      $('section-' + k).classList.toggle('on', k === name);
-    });
-    loaders[name]();
-  }
-
-  document.querySelectorAll('[data-tab]').forEach(function (t) {
-    t.addEventListener('click', function () {
-      switchTab(t.dataset.tab);
-      if (t.classList.contains('stat')) window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  });
-
-  loadUser();
-  loadStats();
-  loadCars();
+  loadSaved();
+  loadProfile();
 })();
 </script>
+
+<div class="bnav" role="navigation" aria-label="Main">
+  <nav>
+    <a href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+      Home
+    </a>
+    <a href="/garage">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+      Garage
+    </a>
+    <a href="/my-account" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>
+      Saved
+    </a>
+    <a href="/my-account" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
+      Account
+    </a>
+  </nav>
+</div>
+
 </body>
-</html>  
+</html>
