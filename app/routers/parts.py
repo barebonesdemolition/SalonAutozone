@@ -1,19 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import func, or_
+from sqlalchemy import func, update
 from typing import List, Optional
 from datetime import datetime, timedelta
 
 from app.db import get_db
 from app import models, schemas
-
-# ---------------------------------------------------------------------------
-# Auth – change this import to match your real auth module
-# ---------------------------------------------------------------------------
-from app.auth import get_current_user   # must return an object with .id and optionally .is_admin
+from app.auth import get_current_user, get_current_admin
 
 router = APIRouter(prefix="/api/parts", tags=["Parts Marketplace"])
+
+# Fields a vendor must never set themselves (ownership/payment/stats are controlled by the server)
+PROTECTED_FIELDS = {"vendor_id", "is_featured", "featured_until", "views"}
 
 
 # ============================================================
@@ -41,6 +40,20 @@ def _ensure_owner_or_admin(part: models.PartListing, user) -> None:
         )
 
 
+async def _expire_featured(db: AsyncSession) -> None:
+    """Turn off 'featured' on listings whose paid period has ended."""
+    await db.execute(
+        update(models.PartListing)
+        .where(
+            models.PartListing.is_featured == True,  # noqa: E712
+            models.PartListing.featured_until != None,  # noqa: E711
+            models.PartListing.featured_until < datetime.utcnow(),
+        )
+        .values(is_featured=False, featured_until=None)
+    )
+    await db.commit()
+
+
 # ============================================================
 # CREATE
 # ============================================================
@@ -51,8 +64,8 @@ async def create_part_listing(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    data = part.model_dump(exclude={"vendor_id"}, exclude_unset=True)
-    # Never trust vendor_id from the client
+    data = part.model_dump(exclude=PROTECTED_FIELDS, exclude_unset=True)
+    # Ownership always comes from the login token, never from the client
     data["vendor_id"] = current_user.id
 
     new_part = models.PartListing(**data)
@@ -81,6 +94,7 @@ async def search_parts(
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
 ):
+    await _expire_featured(db)
     query = select(models.PartListing)
 
     if name:
@@ -153,7 +167,7 @@ async def update_part(
     existing = await _get_part_or_404(db, part_id)
     _ensure_owner_or_admin(existing, current_user)
 
-    update_data = part.model_dump(exclude={"vendor_id"}, exclude_unset=True)
+    update_data = part.model_dump(exclude=PROTECTED_FIELDS, exclude_unset=True)
     for key, value in update_data.items():
         setattr(existing, key, value)
 
@@ -181,7 +195,7 @@ async def delete_part(
 
 
 # ============================================================
-# PROMOTE / UNPROMOTE
+# PROMOTE (ADMIN ONLY, after payment is confirmed) / UNPROMOTE
 # ============================================================
 
 @router.post("/{part_id}/promote")
@@ -189,15 +203,10 @@ async def promote_part(
     part_id: int,
     days: int = Query(7, ge=1, le=90),
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    admin=Depends(get_current_admin),
 ):
-    """
-    Feature a part listing.
-    Currently only checks ownership/admin.
-    TODO: Gate behind real payment verification (Orange Money) or make admin-only.
-    """
+    """Feature a part listing. Admin only: call this once the Orange Money payment has arrived."""
     part = await _get_part_or_404(db, part_id)
-    _ensure_owner_or_admin(part, current_user)
 
     now = datetime.utcnow()
     base = part.featured_until if (part.featured_until and part.featured_until > now) else now
