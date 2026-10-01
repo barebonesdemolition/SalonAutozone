@@ -420,3 +420,5 @@ app.include_router(imports_router.router)
 app.include_router(inquiries.router)
 app.include_router(catalog.router)
 app.include_router(unified_search.router)
+from app.routers import authme
+app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
