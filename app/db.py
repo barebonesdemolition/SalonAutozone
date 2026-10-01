@@ -67,7 +67,7 @@ def _seed_legacy_schema():
     from app.models import User, Vehicle, Part, Supplier, SupplierPart, PartFitment, Listing, ListingPhoto, Order, OrderItem
 
     if __import__("os").getenv("AUTO_CREATE_TABLES", "false").lower() == "true":
-        Base.metadata.create_all(bind=sync_engine)
+            Base.metadata.create_all(bind=sync_engine)
 
     with SessionLocal() as session:
         user_count = session.execute(select(func.count()).select_from(User)).scalar() or 0

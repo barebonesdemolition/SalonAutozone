@@ -403,7 +403,7 @@ def seed_legacy_data():
     from app.db import SessionLocal
 
     if __import__("os").getenv("AUTO_CREATE_TABLES", "false").lower() == "true":
-            Base.metadata.create_all(bind=SessionLocal.kw["bind"])
+                Base.metadata.create_all(bind=SessionLocal.kw["bind"])
 
     with SessionLocal() as session:
         user_count = session.execute(select(func.count()).select_from(User)).scalar() or 0
