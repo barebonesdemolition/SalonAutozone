@@ -2,341 +2,108 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>My Garage · SalonAutoZone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%2300a8e8' font-family='Arial'>S</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Garage – SalonAutoZone</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --navy-900:#0a1729;--navy-800:#0b1e3a;--navy-700:#12294d;--navy-600:#1a3a6b;
-  --blue-500:#0091d5;--blue-400:#00a8e8;--blue-300:#4dc3f0;
-  --amber-500:#ffb800;--amber-600:#f59e0b;
-  --orange-500:#ff6b00;--orange-600:#e55a00;
-  --green-500:#16a34a;--green-400:#22c55e;
-  --red-500:#dc2626;
-  --slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;
-  --slate-400:#94a3b8;--slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;
-  --slate-800:#1e293b;--slate-900:#0f172a;
-  --shadow-sm:0 1px 2px rgba(15,23,42,0.04),0 1px 3px rgba(15,23,42,0.06);
-  --shadow-md:0 2px 4px rgba(15,23,42,0.04),0 4px 12px rgba(15,23,42,0.06);
-  --shadow-lg:0 4px 8px rgba(15,23,42,0.06),0 12px 28px rgba(15,23,42,0.10);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--slate-800);background:var(--slate-50);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-0.01em}
-button,input,select,textarea{font-family:inherit;font-size:inherit}
-button{cursor:pointer;border:none;background:none}
-a{color:inherit;text-decoration:none}
-.navbar{background:var(--navy-800);color:#fff;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.logo{font-size:18px;font-weight:800;color:var(--blue-400);text-decoration:none;letter-spacing:-0.03em}
-.logo span{color:var(--amber-500)}
-.nav-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.navbar a{color:#fff;text-decoration:none;font-size:13px;font-weight:600;padding:9px 14px;border-radius:8px;background:rgba(255,255,255,0.08);transition:background 0.15s}
-.navbar a:hover{background:rgba(255,255,255,0.18)}
-.container{max-width:1000px;margin:24px auto;padding:0 20px}
-.garage-hero{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-600) 100%);color:#fff;padding:44px 32px;border-radius:20px;margin-bottom:28px;text-align:center;position:relative;overflow:hidden}
-.garage-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(0,168,232,0.2) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(255,184,0,0.1) 0%,transparent 50%);pointer-events:none}
-.garage-hero > *{position:relative;z-index:1}
-.garage-hero h1{font-size:32px;margin-bottom:8px;font-weight:800;letter-spacing:-0.03em}
-.garage-hero p{opacity:0.85;font-size:15px}
-.add-card{background:#fff;border-radius:16px;padding:28px;box-shadow:var(--shadow-sm);margin-bottom:28px;border:1px solid var(--slate-200)}
-.add-card h2{color:var(--navy-800);font-size:18px;margin-bottom:20px;font-weight:800;letter-spacing:-0.02em}
-.form-row{display:grid;grid-template-columns:1.2fr 1.2fr 0.8fr 1.2fr auto;gap:12px;align-items:end}
-.form-field label{display:block;font-size:11px;font-weight:700;color:var(--slate-500);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em}
-.form-field select,.form-field input{width:100%;padding:13px 14px;border:1.5px solid var(--slate-200);border-radius:8px;font-size:15px;font-family:inherit;background:#fff;transition:border-color 0.15s,box-shadow 0.15s}
-.form-field select:focus,.form-field input:focus{outline:none;border-color:var(--blue-400);box-shadow:0 0 0 4px rgba(0,168,232,0.12)}
-.btn-primary{background:linear-gradient(135deg,var(--orange-500),var(--orange-600));color:#fff;border:none;padding:14px 28px;border-radius:8px;font-weight:700;cursor:pointer;font-size:15px;min-height:48px;white-space:nowrap;box-shadow:0 4px 12px rgba(255,107,0,0.28);transition:transform 0.15s,box-shadow 0.15s}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,107,0,0.35)}
-.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
-.cars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.car-card{background:#fff;border-radius:16px;padding:24px;box-shadow:var(--shadow-sm);position:relative;border-left:4px solid var(--blue-400);transition:transform 0.15s,box-shadow 0.15s;border-top:1px solid var(--slate-200);border-right:1px solid var(--slate-200);border-bottom:1px solid var(--slate-200)}
-.car-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
-.car-card.primary{border-left-color:var(--green-400);background:linear-gradient(135deg,#ffffff,#f0fdf4)}
-.car-card .primary-badge{position:absolute;top:14px;right:14px;background:var(--green-400);color:#fff;padding:5px 12px;border-radius:9999px;font-size:10px;font-weight:800;letter-spacing:0.06em}
-.car-icon{font-size:36px;margin-bottom:10px}
-.car-title{font-size:19px;font-weight:800;color:var(--navy-800);margin-bottom:6px;letter-spacing:-0.02em}
-.car-nickname{font-size:13px;color:var(--slate-500);font-style:italic;margin-bottom:12px}
-.car-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
-.car-meta .tag{background:var(--slate-100);color:var(--slate-600);padding:5px 11px;border-radius:6px;font-size:11px;font-weight:700}
-.car-actions{display:flex;gap:6px;flex-wrap:wrap}
-.car-actions button{flex:1;min-width:110px;padding:11px 14px;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;min-height:44px;transition:opacity 0.15s,transform 0.15s}
-.car-actions button:hover:not(:disabled){opacity:0.9;transform:translateY(-1px)}
-.btn-primary-action{background:var(--green-400);color:#fff}
-.btn-remove{background:#fef2f2;color:var(--red-500)}
-.empty-state{text-align:center;padding:64px 24px;background:#fff;border-radius:16px;box-shadow:var(--shadow-sm);border:1px solid var(--slate-200)}
-.empty-icon{font-size:64px;margin-bottom:16px;opacity:0.4}
-.empty-state h3{font-size:20px;color:var(--navy-800);margin-bottom:8px;font-weight:800;letter-spacing:-0.02em}
-.empty-state p{color:var(--slate-500);font-size:14px;margin-bottom:24px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--navy-800);color:#fff;padding:14px 24px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:var(--shadow-lg);transition:transform 0.3s,opacity 0.3s;opacity:0;z-index:9999;pointer-events:none;max-width:90vw;text-align:center}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.success{background:var(--green-500)}
-.toast.error{background:var(--red-500)}
-@media (max-width:768px){
-  .navbar{padding:12px 16px;flex-direction:column}
-  .nav-links{width:100%;justify-content:center}
-  .container{padding:0 14px}
-  .garage-hero{padding:32px 20px;border-radius:16px}
-  .garage-hero h1{font-size:24px}
-  .garage-hero p{font-size:14px}
-  .add-card{padding:20px}
-  .form-row{grid-template-columns:1fr;gap:10px}
-  .btn-primary{width:100%}
-  .cars-grid{grid-template-columns:1fr}
-}
+:root{--primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;--navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;--sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px}
+a{color:inherit;text-decoration:none}button,input{font:inherit}button{border:0;background:none;cursor:pointer}
+.top{background:var(--navy);color:#94a3b8;padding:10px 20px;font-size:12px;display:flex;justify-content:space-between}
+.top strong{color:#fff}
+.brand{background:#fff;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.logo{font-weight:800;font-size:18px}.logo span{color:var(--primary)}
+.wrap{max-width:800px;margin:0 auto;padding:24px 16px}
+h1{font-size:24px;font-weight:800;margin-bottom:6px}
+.sub{color:var(--muted);margin-bottom:20px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--sh);margin-bottom:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+.lbl{font-size:13px;font-weight:600;color:#475569;display:block;margin-bottom:6px}
+.inp{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;min-height:44px}
+.btn{display:inline-flex;padding:12px 18px;border-radius:8px;font-weight:700;min-height:44px}
+.btn-primary{background:var(--primary);color:#fff}
+.grid{display:grid;gap:12px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--sh)}
+.card h3{font-size:16px;font-weight:700}
+.meta{font-size:13px;color:var(--muted);margin-top:4px}
+.acts{display:flex;gap:8px;margin-top:12px}
+.acts a,.acts button{flex:1;text-align:center;padding:10px;border-radius:8px;font-weight:700;font-size:13px;background:#f1f5f9;min-height:40px}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;background:var(--primary-light);color:var(--primary)}
+.empty{text-align:center;padding:32px;color:var(--muted)}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px)}
+.bnav nav{display:grid;grid-template-columns:repeat(4,1fr);max-width:500px;margin:0 auto}
+.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center}
+.bnav a.active{color:var(--primary);background:var(--primary-light);border-radius:10px}
+.bnav svg{width:22px;height:22px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-weight:600;transition:transform .25s;z-index:99}
+.toast.show{transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
-<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M5 17h14v-5l-2-5H7l-2 5v5z"/>
-    <circle cx="7" cy="17" r="2"/>
-    <circle cx="17" cy="17" r="2"/>
-    <path d="M9 7V4h6v3"/>
-  </symbol>
-  <symbol id="icon-part" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="3"/>
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-  </symbol>
-</svg>
-<div class="navbar">
-  <a href="/" class="logo">Salon<span>AutoZone</span></a>
-  <div class="nav-links">
-    <a href="/">🏠 Home</a>
-    <a href="/my-account">👤 My Account</a>
-    <a href="/garage">🚗 My Garage</a>
-  </div>
-</div>
-
-<div class="container">
-  <div class="garage-hero">
-    <h1><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:36px;height:36px;display:inline-block;vertical-align:middle;margin-right:12px;color:var(--blue-300);"><use href="#icon-car"/></svg>My Garage</h1>
-    <p>Save your vehicles to get exact-fit parts and personalized recommendations</p>
-  </div>
-
-  <div class="add-card">
-    <h2>➕ Add a Vehicle</h2>
-    <form id="add-car-form">
-      <div class="form-row">
-        <div class="form-field">
-          <label>Make</label>
-          <select id="garage-make" required>
-            <option value="">Select Make</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Model</label>
-          <select id="garage-model" required>
-            <option value="">Select Make First</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Year</label>
-          <select id="garage-year" required>
-            <option value="">Select Year</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Nickname (optional)</label>
-          <input type="text" id="garage-nickname" placeholder="e.g. Daily Driver" maxlength="40">
-        </div>
-        <button type="submit" class="btn-primary" id="add-car-btn">Add Car</button>
+<div class="top"><strong>Salon AutoZone</strong><span>Freetown</span></div>
+<header class="brand">
+  <a class="logo" href="/">Salon<span>AutoZone</span></a>
+  <a href="/my-account" style="font-weight:600;color:#475569">Account</a>
+</header>
+<main class="wrap">
+  <h1>My Garage</h1>
+  <p class="sub">Save your cars so parts search shows what fits.</p>
+  <div class="panel">
+    <form id="f">
+      <div class="row">
+        <div><label class="lbl">Make *</label><input class="inp" name="make" required placeholder="Toyota"></div>
+        <div><label class="lbl">Model *</label><input class="inp" name="model" required placeholder="Corolla"></div>
       </div>
+      <div class="row" style="margin-top:10px">
+        <div><label class="lbl">Year *</label><input class="inp" name="year" type="number" required min="1980" max="2030" placeholder="2015"></div>
+        <div><label class="lbl">Nickname</label><input class="inp" name="nickname" placeholder="My daily"></div>
+      </div>
+      <label style="display:flex;gap:8px;align-items:center;margin:12px 0;font-weight:600;font-size:14px">
+        <input type="checkbox" name="is_primary"> Primary vehicle
+      </label>
+      <button class="btn btn-primary" type="submit">Add to garage</button>
     </form>
   </div>
-
-  <div id="garage-content">
-    <div class="empty-state">
-      <div class="empty-icon">⏳</div>
-      <h3>Loading your cars…</h3>
-    </div>
-  </div>
-</div>
-
-<div id="toast" class="toast"></div>
-
+  <div class="grid" id="list"></div>
+</main>
+<div class="bnav"><nav>
+  <a href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
+  <a href="/garage" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
+  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>Saved</a>
+  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
+</nav></div>
+<div class="toast" id="toast"></div>
 <script>
-(function () {
-  'use strict';
-
-  var MAKES = ["Toyota","Nissan","Honda","Mitsubishi","Mazda","Suzuki","Subaru","Isuzu","Daihatsu","Lexus","Hyundai","Kia","Genesis","Mercedes-Benz","BMW","Volkswagen","Audi","Porsche","Ford","Chevrolet","Jeep","Peugeot","Renault","Citroen","Land Rover","Jaguar","Volvo","Chery","Geely","Great Wall","BYD","MG","Other"];
-  var MODELS = {
-    "Toyota":["Corolla","Camry","Hilux","RAV4","Land Cruiser","Prado","Vitz","Yaris","Avensis","Prius","Highlander","Fortuner","Hiace"],
-    "Nissan":["X-Trail","Altima","Sunny","Patrol","Navara","Qashqai","Juke","Note","Murano","Sentra"],
-    "Honda":["Civic","Accord","CR-V","Fit","Jazz","City","Pilot","HR-V"],
-    "Mitsubishi":["Pajero","Lancer","Outlander","L200","ASX"],
-    "Mazda":["CX-5","CX-9","Mazda3","Mazda6","BT-50"],
-    "Suzuki":["Swift","Vitara","Jimny","SX4","Alto"],
-    "Subaru":["Forester","Outback","Impreza","Legacy"],
-    "Isuzu":["D-Max","MU-X","Trooper"],
-    "Daihatsu":["Terios","Sirion","Cuore"],
-    "Lexus":["RX","NX","ES","IS","GX","LX"],
-    "Hyundai":["Tucson","Santa Fe","Elantra","Sonata","i10","i20","Accent","Creta","Kona"],
-    "Kia":["Sportage","Sorento","Rio","Cerato","Soul","Seltos","Picanto"],
-    "Genesis":["G70","G80","G90"],
-    "Mercedes-Benz":["C-Class","E-Class","S-Class","GLC","GLE","GLS","A-Class","ML","G-Class","Sprinter"],
-    "BMW":["3 Series","5 Series","7 Series","X1","X3","X5","X6","X7"],
-    "Volkswagen":["Golf","Passat","Tiguan","Polo","Jetta","Touareg"],
-    "Audi":["A3","A4","A6","Q3","Q5","Q7"],
-    "Porsche":["911","Cayenne","Macan","Panamera"],
-    "Ford":["Focus","Fiesta","F-150","Ranger","Explorer","Escape","Mustang"],
-    "Chevrolet":["Silverado","Cruze","Malibu","Equinox","Tahoe","Spark"],
-    "Jeep":["Wrangler","Grand Cherokee","Cherokee","Compass"],
-    "Peugeot":["208","308","3008","5008","Partner"],
-    "Renault":["Clio","Megane","Duster","Captur","Logan"],
-    "Citroen":["C3","C4","C5","Berlingo"],
-    "Land Rover":["Defender","Discovery","Range Rover","Range Rover Sport","Evoque"],
-    "Jaguar":["XE","XF","XJ","F-Pace","E-Pace"],
-    "Volvo":["XC40","XC60","XC90","S60","S90"],
-    "Chery":["Tiggo 4","Tiggo 7","Tiggo 8","Arrizo 5"],
-    "Geely":["Coolray","Azkarra","Tugella","Emgrand"],
-    "Great Wall":["Wingle","Poer","Haval H6","Haval Jolion"],
-    "BYD":["Atto 3","Han","Tang","Song","Seal"],
-    "MG":["ZS","HS","MG5","MG6"],
-    "Other":["Other"]
+(function(){
+  function token(){try{return localStorage.getItem('token')||localStorage.getItem('access_token')||''}catch(e){return ''}}
+  function auth(){var t=token();return t?{Authorization:'Bearer '+t}:{}}
+  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
+  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+  if(!token()){location.href='/login?next=/garage';return}
+  function load(){
+    fetch('/api/garage/',{headers:auth()}).then(function(r){if(r.status===401){location.href='/login';return[]}return r.ok?r.json():[]}).then(function(cars){
+      var el=document.getElementById('list');
+      cars=cars||[];
+      if(!cars.length){el.innerHTML='<div class="empty">No vehicles yet. Add your car above.</div>';return}
+      el.innerHTML=cars.map(function(c){
+        return '<div class="card"><h3>'+esc(c.year+' '+c.make+' '+c.model)+'</h3><div class="meta">'+esc(c.nickname||'')+(c.is_primary?' · <span class="badge">Primary</span>':'')+'</div><div class="acts"><a href="/">Find parts</a><button type="button" data-id="'+c.id+'">Remove</button></div></div>'
+      }).join('');
+      el.querySelectorAll('[data-id]').forEach(function(b){b.onclick=function(){
+        if(!confirm('Remove?'))return;
+        fetch('/api/garage/'+b.dataset.id,{method:'DELETE',headers:auth()}).then(function(r){if(r.ok){toast('Removed');load()}else toast('Failed')})
+      }})
+    })
+  }
+  document.getElementById('f').onsubmit=function(e){
+    e.preventDefault();
+    var fd=new FormData(e.target);
+    var body={make:fd.get('make'),model:fd.get('model'),year:parseInt(fd.get('year'),10),nickname:fd.get('nickname')||null,is_primary:!!fd.get('is_primary')};
+    fetch('/api/garage/',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},auth()),body:JSON.stringify(body)})
+      .then(function(r){if(!r.ok)throw 0;toast('Saved');e.target.reset();load()}).catch(function(){toast('Could not save')})
   };
-  var YEARS = (function () { var a = []; for (var y = 2026; y >= 1980; y--) a.push(y); return a; })();
-
-  function esc(s) {
-    if (s === null || s === undefined) return '';
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-  function getToken() { try { return localStorage.getItem('token') || ''; } catch (e) { return ''; } }
-  function showToast(msg, type) {
-    var t = document.getElementById('toast');
-    t.innerText = msg;
-    t.className = 'toast show ' + (type || '');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(function () { t.className = 'toast'; }, 2600);
-  }
-  async function apiFetch(url, options) {
-    var opts = options || {};
-    opts.headers = Object.assign({}, opts.headers || {}, { 'Authorization': 'Bearer ' + getToken() });
-    var res = await fetch(url, opts);
-    if (res.status === 401) { window.location.href = '/login?next=/garage'; throw new Error('Unauthorized'); }
-    if (!res.ok) {
-      var err = await res.json().catch(function() { return {}; });
-      throw new Error(err.detail || 'Request failed: ' + res.status);
-    }
-    return res.json();
-  }
-
-  function initSelects() {
-    var makeSel = document.getElementById('garage-make');
-    var modelSel = document.getElementById('garage-model');
-    var yearSel = document.getElementById('garage-year');
-    var mHtml = '<option value="">Select Make</option>';
-    MAKES.forEach(function (m) { mHtml += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
-    makeSel.innerHTML = mHtml;
-    var yHtml = '<option value="">Select Year</option>';
-    YEARS.forEach(function (y) { yHtml += '<option value="' + y + '">' + y + '</option>'; });
-    yearSel.innerHTML = yHtml;
-    makeSel.addEventListener('change', function () {
-      var make = this.value;
-      if (!make) { modelSel.innerHTML = '<option value="">Select Make First</option>'; return; }
-      var models = MODELS[make] || ['Other'];
-      var html = '<option value="">Select Model</option>';
-      models.forEach(function (m) { html += '<option value="' + esc(m) + '">' + esc(m) + '</option>'; });
-      modelSel.innerHTML = html;
-    });
-  }
-
-  function renderCars(cars) {
-    var el = document.getElementById('garage-content');
-    if (!cars || cars.length === 0) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-icon">🚗</div><h3>Your garage is empty</h3><p>Add your first vehicle above to start finding exact-fit parts.</p></div>';
-      return;
-    }
-    var html = '<div class="cars-grid">';
-    cars.forEach(function (c) {
-      html += '<div class="car-card' + (c.is_primary ? ' primary' : '') + '">';
-      if (c.is_primary) html += '<span class="primary-badge">PRIMARY</span>';
-            html += '<div class="car-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:44px;height:44px;color:var(--blue-400);"><use href="#icon-car"/></svg></div>';
-      html += '<div class="car-title">' + esc(c.year + ' ' + c.make + ' ' + c.model) + '</div>';
-      if (c.nickname) html += '<div class="car-nickname">"' + esc(c.nickname) + '"</div>';
-      html += '<div class="car-meta">';
-      html += '<span class="tag">' + esc(c.make) + '</span>';
-      html += '<span class="tag">' + esc(c.model) + '</span>';
-      html += '<span class="tag">' + c.year + '</span>';
-      html += '</div>';
-      html += '<div class="car-actions">';
-      if (!c.is_primary) html += '<button class="btn-primary-action" data-action="set-primary" data-id="' + c.id + '">⭐ Set as Primary</button>';
-      html += '<button class="btn-remove" data-action="delete" data-id="' + c.id + '">🗑 Remove</button>';
-      html += '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    el.innerHTML = html;
-  }
-
-  async function loadCars() {
-    try {
-      var cars = await apiFetch('/api/garage/');
-      renderCars(cars);
-      var primary = cars.find(function (c) { return c.is_primary; });
-      if (primary) {
-        try {
-          localStorage.setItem('fitmentVehicle', JSON.stringify({ make: primary.make, model: primary.model, year: primary.year }));
-        } catch (e) {}
-      }
-    } catch (err) {
-      document.getElementById('garage-content').innerHTML =
-        '<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Could not load your garage</h3><p>' + esc(err.message) + '</p><button class="btn-primary" onclick="location.reload()">Retry</button></div>';
-    }
-  }
-
-  document.getElementById('add-car-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    var btn = document.getElementById('add-car-btn');
-    var make = document.getElementById('garage-make').value;
-    var model = document.getElementById('garage-model').value;
-    var year = parseInt(document.getElementById('garage-year').value, 10);
-    var nickname = document.getElementById('garage-nickname').value.trim();
-    if (!make || !model || !year) { showToast('Please select make, model, and year', 'error'); return; }
-    btn.disabled = true;
-    btn.innerText = 'Adding…';
-    try {
-      await apiFetch('/api/garage/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ make: make, model: model, year: year, nickname: nickname || null, is_primary: false })
-      });
-      document.getElementById('add-car-form').reset();
-      document.getElementById('garage-model').innerHTML = '<option value="">Select Make First</option>';
-      showToast('✅ Car added to your garage', 'success');
-      await loadCars();
-    } catch (err) { showToast('❌ ' + err.message, 'error'); }
-    finally { btn.disabled = false; btn.innerText = 'Add Car'; }
-  });
-
-  document.addEventListener('click', async function (e) {
-    var btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    e.preventDefault();
-    var action = btn.dataset.action;
-    var id = btn.dataset.id;
-    if (action === 'delete') {
-      if (!confirm('Remove this car from your garage?')) return;
-      btn.disabled = true;
-      try {
-        await apiFetch('/api/garage/' + encodeURIComponent(id), { method: 'DELETE' });
-        showToast('🗑 Car removed', 'success');
-        await loadCars();
-      } catch (err) { showToast('❌ ' + err.message, 'error'); btn.disabled = false; }
-    } else if (action === 'set-primary') {
-      btn.disabled = true;
-      try {
-        await apiFetch('/api/garage/' + encodeURIComponent(id) + '/primary', { method: 'PUT' });
-        showToast('⭐ Primary car updated', 'success');
-        await loadCars();
-      } catch (err) { showToast('❌ ' + err.message, 'error'); btn.disabled = false; }
-    }
-  });
-
-  if (!getToken()) window.location.href = '/login?next=/garage';
-  else { initSelects(); loadCars(); }
+  load();
 })();
 </script>
 </body>
