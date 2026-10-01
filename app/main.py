@@ -221,7 +221,7 @@ async def garage_page():
 
 @app.get("/dashboard")
 async def legacy_dashboard_page():
-    return RedirectResponse("/my-account")
+    return FileResponse("app/templates/dashboard.html")
 
 
 @app.get("/admin/login")

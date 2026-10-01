@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.concurrency import run_in_threadpool
@@ -37,6 +37,7 @@ class RegisterRequest(BaseModel):
     phone: str = Field(min_length=7, max_length=30)
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+    account_type: Literal["buyer", "seller", "business"] = "buyer"
 
 
 def _user_payload(user: models.User) -> dict:
@@ -48,6 +49,8 @@ def _user_payload(user: models.User) -> dict:
         "is_vendor": user.is_vendor,
         "is_admin": user.is_admin,
         "is_active": user.is_active,
+        "roles": user.roles,
+        "account_type": user.roles,
     }
 
 
@@ -66,7 +69,8 @@ async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db))
         phone=phone,
         email=email,
         hashed_password=await run_in_threadpool(pwd_context.hash, request.password),
-        roles="buyer",
+        roles=request.account_type,
+        is_vendor=request.account_type == "seller",
         is_active=True,
         is_admin=False,
     )

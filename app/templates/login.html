@@ -48,6 +48,14 @@ button{border:0;cursor:pointer}
         <label class="lbl">Full name</label>
         <input class="inp" name="full_name" autocomplete="name" placeholder="Your name">
       </div>
+      <div id="account-type-wrap" hidden>
+        <label class="lbl" for="account-type">Account type</label>
+        <select class="inp" id="account-type" name="account_type">
+          <option value="buyer">Buyer</option>
+          <option value="seller">Seller</option>
+          <option value="business">Business</option>
+        </select>
+      </div>
       <label class="lbl">Phone *</label>
       <input class="inp" name="phone" type="tel" required autocomplete="tel" placeholder="+232 76 123456">
       <label class="lbl">Email</label>
@@ -67,9 +75,11 @@ button{border:0;cursor:pointer}
   var msg = document.getElementById('msg');
   var submit = document.getElementById('submit');
   var nameWrap = document.getElementById('name-wrap');
+  var accountTypeWrap = document.getElementById('account-type-wrap');
+  var accountType = form.elements.namedItem('account_type');
   var params = new URLSearchParams(location.search);
-  var requestedNext = params.get('next') || '/my-account';
-  var next = requestedNext.charAt(0) === '/' && requestedNext.charAt(1) !== '/' ? requestedNext : '/my-account';
+  var requestedNext = params.get('next') || '';
+  var next = requestedNext.charAt(0) === '/' && requestedNext.charAt(1) !== '/' ? requestedNext : '';
   var emailInput = form.elements.namedItem('email');
   var nameInput = form.elements.namedItem('full_name');
   emailInput.required = false;
@@ -81,8 +91,10 @@ button{border:0;cursor:pointer}
       b.classList.add('active');
       mode = b.dataset.mode;
       nameWrap.hidden = mode !== 'register';
+      accountTypeWrap.hidden = mode !== 'register';
       nameInput.required = mode === 'register';
       emailInput.required = mode === 'register';
+      accountType.required = mode === 'register';
       submit.textContent = mode === 'login' ? 'Sign in' : 'Create account';
       form.password.autocomplete = mode === 'login' ? 'current-password' : 'new-password';
       msg.textContent = '';
@@ -115,7 +127,12 @@ button{border:0;cursor:pointer}
         } catch (err) {}
         msg.className = 'msg ok';
         msg.textContent = 'Success — redirecting…';
-        location.href = next;
+        var user = data.user || {};
+        var accountRole = mode === 'register' ? accountType.value : (user.account_type || user.roles || (user.is_vendor ? 'seller' : 'buyer'));
+        var roles = String(accountRole).toLowerCase().split(',').map(function (role) { return role.trim(); });
+        var dashboard = roles.indexOf('business') !== -1 ? '/become-a-seller' :
+          (roles.indexOf('seller') !== -1 || user.is_vendor ? '/dashboard' : '/my-account');
+        location.href = mode === 'login' && next ? next : dashboard;
         return;
       }
       msg.className = 'msg err';
