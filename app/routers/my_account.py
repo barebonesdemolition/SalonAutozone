@@ -48,9 +48,10 @@ def _phone_is(column, phone):
     """Match a phone column ignoring spaces, +, dashes. Returns None if the user has no phone,
     so callers return nothing instead of matching every row with an empty phone."""
     d = _digits(phone)
-    if not d:
+    if len(d) < 7:
         return None
-    return func.regexp_replace(column, r"[^0-9]", "", "g") == d
+    # Compare the last 8 digits so +232 76 123456, 076123456 and 76123456 all match
+    return func.right(func.regexp_replace(column, r"[^0-9]", "", "g"), 8) == d[-8:]
 
 
 def _active_featured(obj, now) -> bool:
