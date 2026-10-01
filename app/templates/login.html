@@ -2,338 +2,147 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>{{ app_name }} - Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign in – {{ app_name or 'SalonAutoZone' }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+:root{--primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;--navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;--danger:#b91c1c;--sh:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.08)}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;min-height:100vh}
-body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#0b1e3a 0%,#1a3a6b 100%);display:flex;align-items:center;justify-content:center;padding:16px}
-
-.login-card{background:white;border-radius:20px;padding:32px 24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
-
-.logo{text-align:center;font-size:24px;font-weight:900;color:#0b1e3a;margin-bottom:24px}
-.logo span{color:#00a8e8}
-.logo .y{color:#ffb800}
-
-.tabs{display:flex;background:#f0f4f8;border-radius:12px;padding:5px;margin-bottom:24px;gap:5px}
-.tabs button{flex:1;padding:12px;border:none;background:transparent;border-radius:9px;font-weight:700;cursor:pointer;color:#64748b;font-size:14px;font-family:inherit;transition:all 0.15s}
-.tabs button.active{background:white;color:#0b1e3a;box-shadow:0 2px 6px rgba(0,0,0,0.08)}
-
-h2{text-align:center;color:#0b1e3a;margin-bottom:24px;font-size:22px;font-weight:700}
-
-form{display:block}
-label{display:block;font-size:13px;color:#475569;margin-bottom:6px;margin-top:16px;font-weight:600}
-label:first-child{margin-top:0}
-
-input{width:100%;padding:14px;border:1px solid #e0e6ed;border-radius:10px;font-size:16px;font-family:inherit;outline:none;transition:border-color 0.15s}
-input:focus{border-color:#00a8e8}
-
-.pw-wrapper{position:relative;width:100%}
-.pw-wrapper input{padding-right:48px}
-.pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:8px;font-size:18px;line-height:1;color:#64748b;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
-
-.submit-btn{width:100%;padding:16px;background:#00a8e8;color:white;border:none;border-radius:12px;font-weight:700;font-size:16px;cursor:pointer;margin-top:24px;font-family:inherit;min-height:52px;transition:background 0.15s}
-.submit-btn:hover{background:#0088c0}
-.submit-btn:disabled{opacity:0.7;cursor:not-allowed}
-
-.status{margin-top:16px;text-align:center;font-weight:600;font-size:14px;line-height:1.5}
-.status.success{color:#22c55e}
-.status.error{color:#dc2626}
-.status.info{color:#00a8e8}
-.status.warning{color:#f59e0b}
-
-.back-link{text-align:center;margin-top:20px;font-size:14px}
-.back-link a{color:#00a8e8;text-decoration:none;font-weight:600}
-
-.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.role-opt{display:flex;align-items:center;gap:8px;padding:12px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;cursor:pointer;font-weight:500;color:#334155;min-height:48px}
-.role-opt:hover{background:#f0f9ff;border-color:#00a8e8}
-.role-opt input[type="checkbox"]{width:18px;height:18px;cursor:pointer;accent-color:#00a8e8;flex-shrink:0}
-
-.hidden{display:none}
-
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-@media (max-width:500px){
-    body{padding:12px}
-    .login-card{padding:28px 20px;border-radius:16px}
-    .logo{font-size:22px;margin-bottom:20px}
-    h2{font-size:20px;margin-bottom:20px}
-    .tabs button{padding:11px;font-size:13px}
-    label{font-size:13px;margin-top:14px}
-    input{padding:13px 12px;font-size:16px}
-    .pw-wrapper input{padding-right:48px}
-    .submit-btn{padding:15px;font-size:15px;margin-top:20px}
-}
-
-@media (max-width:360px){
-    .role-grid{grid-template-columns:1fr}
-    .login-card{padding:24px 16px}
-}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--primary);font-weight:600;text-decoration:none}
+button,input{font:inherit}
+button{border:0;cursor:pointer}
+.top{background:var(--navy);color:#94a3b8;padding:10px 20px;font-size:12px;text-align:center}
+.top strong{color:#fff}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;box-shadow:var(--sh)}
+.logo{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px;color:var(--navy)}
+.logo span{color:var(--primary)}
+.sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:22px}
+.tabs{display:flex;background:#f1f5f9;padding:4px;border-radius:10px;margin-bottom:18px}
+.tabs button{flex:1;padding:10px;border-radius:8px;font-weight:700;font-size:13px;color:var(--muted);background:none}
+.tabs button.active{background:var(--primary);color:#fff}
+.lbl{display:block;font-size:13px;font-weight:600;color:#475569;margin:12px 0 6px}
+.inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;min-height:48px}
+.inp:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+.btn{width:100%;margin-top:18px;background:var(--primary);color:#fff;padding:14px;border-radius:10px;font-weight:700;min-height:52px}
+.btn:hover{background:var(--primary-hover)}
+.btn:disabled{opacity:.6}
+.msg{margin-top:12px;text-align:center;font-size:14px;font-weight:600}
+.msg.err{color:var(--danger)}.msg.ok{color:var(--primary)}
+.foot{text-align:center;margin-top:18px;font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
-
-<div class="login-card">
-  <div class="logo">Salon<span>AutoZone</span> <span class="y">&amp; AutoTrader</span></div>
-  
-  <div class="tabs">
-    <button id="tab-login" class="active" onclick="switchTab('login')" type="button">Login</button>
-    <button id="tab-register" onclick="switchTab('register')" type="button">Register</button>
-  </div>
-  
-  <h2 id="form-title">Welcome Back</h2>
-
-  <!-- LOGIN FORM -->
-  <form id="login-form" onsubmit="handleLogin(event)">
-    <label for="login-email">Email</label>
-    <input type="email" id="login-email" required autocomplete="email" placeholder="you@example.com">
-    
-    <label for="login-password">Password</label>
-    <div class="pw-wrapper">
-      <input type="password" id="login-password" required autocomplete="current-password" placeholder="Enter your password">
-      <button type="button" class="pw-toggle" onclick="togglePassword('login-password', this)" aria-label="Show password">👁️</button>
+<div class="top"><strong>Salon AutoZone</strong> · Sierra Leone</div>
+<div class="wrap">
+  <div class="card">
+    <div class="logo">Salon<span>AutoZone</span></div>
+    <p class="sub">Sign in to save listings, manage your garage, and sell.</p>
+    <div class="tabs">
+      <button type="button" class="active" data-mode="login">Sign in</button>
+      <button type="button" data-mode="register">Register</button>
     </div>
-    
-    <button type="submit" class="submit-btn">Login</button>
-    <div id="login-status" class="status"></div>
-  </form>
-
-  <!-- REGISTER FORM -->
-  <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
-    <label for="reg-fullname">Full Name</label>
-    <input type="text" id="reg-fullname" required autocomplete="name" placeholder="Alpha Conteh">
-    
-    <label for="reg-email">Email</label>
-    <input type="email" id="reg-email" required autocomplete="email" inputmode="email" autocapitalize="off" autocorrect="off" placeholder="you@example.com">
-    
-    <label for="reg-phone">Phone</label>
-    <input type="tel" id="reg-phone" required autocomplete="tel" inputmode="tel" placeholder="+232 76 123456">
-    
-    <label for="reg-password">Password</label>
-    <div class="pw-wrapper">
-      <input type="password" id="reg-password" required minlength="6" autocomplete="new-password" placeholder="At least 6 characters">
-      <button type="button" class="pw-toggle" onclick="togglePassword('reg-password', this)" aria-label="Show password">👁️</button>
-    </div>
-    
-    <label style="margin-top:20px;margin-bottom:10px;">What are you here for? (choose all that apply)</label>
-    <div class="role-grid">
-      <label class="role-opt"><input type="checkbox" class="role-check" value="buyer" checked> 🛒 Buy</label>
-      <label class="role-opt"><input type="checkbox" class="role-check" value="seller"> 🚗 Sell car</label>
-      <label class="role-opt"><input type="checkbox" class="role-check" value="vendor"> 🔧 Sell parts</label>
-      <label class="role-opt"><input type="checkbox" class="role-check" value="dealership"> 🏪 Dealership</label>
-      <label class="role-opt"><input type="checkbox" class="role-check" value="importer"> 🌍 Import</label>
-      <label class="role-opt"><input type="checkbox" class="role-check" value="mechanic"> 🛠️ Mechanic</label>
-    </div>
-    
-    <button type="submit" class="submit-btn">Create Account</button>
-    <div id="register-status" class="status"></div>
-  </form>
-
-  <div class="back-link">
-    <a href="/">← Back to Homepage</a>
+    <form id="form">
+      <div id="name-wrap" hidden>
+        <label class="lbl">Full name</label>
+        <input class="inp" name="full_name" autocomplete="name" placeholder="Your name">
+      </div>
+      <label class="lbl">Phone *</label>
+      <input class="inp" name="phone" type="tel" required autocomplete="tel" placeholder="+232 76 123456">
+      <label class="lbl">Email</label>
+      <input class="inp" name="email" type="email" autocomplete="email" placeholder="optional@email.com">
+      <label class="lbl">Password *</label>
+      <input class="inp" name="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+      <button class="btn" type="submit" id="submit">Sign in</button>
+      <div class="msg" id="msg" aria-live="polite"></div>
+    </form>
+    <p class="foot"><a href="/">← Back to marketplace</a></p>
   </div>
 </div>
-
 <script>
-function switchTab(tab) {
-    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
-    document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
-    document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
-    document.getElementById('form-title').innerText = tab === 'login' ? 'Welcome Back' : 'Create Your Account';
-}
+(function () {
+  var mode = 'login';
+  var form = document.getElementById('form');
+  var msg = document.getElementById('msg');
+  var submit = document.getElementById('submit');
+  var nameWrap = document.getElementById('name-wrap');
+  var params = new URLSearchParams(location.search);
+  var next = params.get('next') || '/my-account';
 
-function togglePassword(fieldId, btn) {
-    var field = document.getElementById(fieldId);
-    if (!field) return;
-    if (field.type === 'password') {
-        field.type = 'text';
-        btn.innerText = '🙈';
-    } else {
-        field.type = 'password';
-        btn.innerText = '👁️';
-    }
-}
+  document.querySelectorAll('.tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      mode = b.dataset.mode;
+      nameWrap.hidden = mode !== 'register';
+      submit.textContent = mode === 'login' ? 'Sign in' : 'Create account';
+      form.password.autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+      msg.textContent = '';
+    });
+  });
 
-function fetchWithTimeout(url, options, timeout) {
-    return Promise.race([
-        fetch(url, options),
-        new Promise(function(_, reject) {
-            setTimeout(function() { reject(new Error('timeout')); }, timeout);
-        })
-    ]);
-}
-
-async function handleLogin(e) {
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var s = document.getElementById('login-status');
-    var btn = e.target.querySelector('.submit-btn');
-    
-    if (btn.disabled) return;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Signing in...';
-    s.className = 'status info';
-    s.innerText = 'Connecting...';
-    
-    var payload = {
-        email: document.getElementById('login-email').value,
-        password: document.getElementById('login-password').value
+    msg.className = 'msg';
+    msg.textContent = mode === 'login' ? 'Signing in…' : 'Creating account…';
+    submit.disabled = true;
+    var body = {
+      phone: form.phone.value.trim(),
+      password: form.password.value
     };
-    
-    try {
-        var res;
-        try {
-            res = await fetchWithTimeout('/api/auth/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            }, 90000);
-        } catch (err) {
-            if (err.message === 'timeout') {
-                s.className = 'status warning';
-                s.innerText = '⏳ Server waking up... retrying...';
-                res = await fetchWithTimeout('/api/auth/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                }, 60000);
-            } else {
-                throw err;
-            }
-        }
-        
-        var data = await res.json();
-        if (!res.ok) throw new Error(data.detail || 'Login failed');
-        
-        localStorage.setItem('token', data.access_token);
-        
-        // Try to get user info
-        var isAdmin = false;
-        try {
-            var userRes = await fetchWithTimeout('/api/auth/me', {
-                headers: {'Authorization': 'Bearer ' + data.access_token}
-            }, 30000);
-            if (userRes.ok) {
-                var userData = await userRes.json();
-                localStorage.setItem('userInfo', JSON.stringify(userData));
-                isAdmin = userData.is_admin === true;
-            }
-        } catch (err) {}
-        
-        s.className = 'status success';
-        s.innerText = '✅ Logged in! Redirecting...';
-        btn.innerHTML = '✅ Success!';
-        
-        setTimeout(function() {
-            window.location.href = isAdmin ? '/admin-panel-x9k2m7' : '/dashboard';
-        }, 700);
-        
-    } catch (err) {
-        s.className = 'status error';
-        s.innerText = '❌ ' + (err.message === 'timeout' ? 'Server busy. Try again in 30 sec.' : err.message);
-        btn.disabled = false;
-        btn.innerHTML = 'Login';
-    }
-}
+    if (form.email.value.trim()) body.email = form.email.value.trim();
+    if (mode === 'register') body.full_name = form.full_name.value.trim() || body.phone;
 
-async function handleRegister(e) {
-    e.preventDefault();
-    var s = document.getElementById('register-status');
-    var btn = e.target.querySelector('.submit-btn');
-    
-    if (btn.disabled) return;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Creating account...';
-    s.className = 'status info';
-    s.innerText = 'Creating your account...';
-    
-    var rolesList = Array.from(document.querySelectorAll('.role-check:checked')).map(function(c){return c.value;});
-    if (rolesList.length === 0) rolesList = ['browser'];
-    
-    var payload = {
-        full_name: document.getElementById('reg-fullname').value,
-        email: document.getElementById('reg-email').value,
-        phone: document.getElementById('reg-phone').value,
-        password: document.getElementById('reg-password').value,
-        is_vendor: rolesList.some(function(r){return ['seller','vendor','dealership','importer'].indexOf(r) > -1;}),
-        roles: rolesList.join(',')
-    };
-    
-    try {
-        var regRes;
-        try {
-            regRes = await fetchWithTimeout('/api/auth/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            }, 90000);
-        } catch (err) {
-            if (err.message === 'timeout') {
-                s.className = 'status warning';
-                s.innerText = '⏳ Server waking up... retrying...';
-                regRes = await fetchWithTimeout('/api/auth/register', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                }, 60000);
-            } else {
-                throw err;
-            }
-        }
-        
-        var regData = await regRes.json();
-        
-        if (!regRes.ok) {
-            if (regData.detail && String(regData.detail).toLowerCase().indexOf('already') > -1) {
-                s.className = 'status warning';
-                s.innerText = '⚠️ Email registered. Logging in...';
-            } else {
-                throw new Error(regData.detail || 'Registration failed');
-            }
-        } else {
-            s.className = 'status info';
-            s.innerText = '✅ Account created! Signing in...';
-        }
-        
-        // Login
-        var loginRes = await fetchWithTimeout('/api/auth/login', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email: payload.email, password: payload.password})
-        }, 60000);
-        var loginData = await loginRes.json();
-        if (!loginRes.ok) throw new Error(loginData.detail || 'Login failed');
-        
-        localStorage.setItem('token', loginData.access_token);
-        
-        try {
-            var userRes = await fetchWithTimeout('/api/auth/me', {
-                headers: {'Authorization': 'Bearer ' + loginData.access_token}
-            }, 30000);
-            if (userRes.ok) {
-                var userData = await userRes.json();
-                localStorage.setItem('userInfo', JSON.stringify(userData));
-            }
-        } catch (err) {}
-        
-        s.className = 'status success';
-        s.innerText = '🎉 Welcome! Redirecting...';
-        btn.innerHTML = '🎉 Success!';
-        
-        setTimeout(function() { window.location.href = '/welcome'; }, 700);
-        
-    } catch (err) {
-        s.className = 'status error';
-        s.innerText = '❌ ' + (err.message === 'timeout' ? 'Server busy. Try again.' : err.message);
-        btn.disabled = false;
-        btn.innerHTML = 'Create Account';
-    }
-}
+    var url = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
+    // fallback paths some apps use
+    var alt = mode === 'login' ? '/api/auth/token' : '/api/auth/signup';
 
-// Warm up server for cold starts
-(function() { fetch('/health').catch(function(){}); })();
+    function ok(data) {
+      var token = data.access_token || data.token || data.accessToken;
+      if (token) {
+        try {
+          localStorage.setItem('token', token);
+          localStorage.setItem('access_token', token);
+          if (data.user) localStorage.setItem('userInfo', JSON.stringify(data.user));
+        } catch (err) {}
+        msg.className = 'msg ok';
+        msg.textContent = 'Success — redirecting…';
+        location.href = next;
+        return;
+      }
+      msg.className = 'msg err';
+      msg.textContent = 'Signed in but no token returned. Check auth API.';
+    }
+
+    function fail(text) {
+      msg.className = 'msg err';
+      msg.textContent = text || 'Could not sign in. Check phone and password.';
+      submit.disabled = false;
+    }
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (r.ok) { ok(d); return; }
+        // try alternate path once
+        return fetch(alt, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }).then(function (r2) {
+          return r2.json().catch(function () { return {}; }).then(function (d2) {
+            if (r2.ok) ok(d2);
+            else fail(typeof d.detail === 'string' ? d.detail : (typeof d2.detail === 'string' ? d2.detail : 'Login failed'));
+          });
+        });
+      });
+    }).catch(function () { fail('Network error'); });
+  });
+})();
 </script>
 </body>
 </html>
