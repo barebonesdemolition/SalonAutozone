@@ -3,106 +3,361 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>My Garage – SalonAutoZone</title>
+<title>My Garage – {{ app_name or 'SalonAutoZone' }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;--navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;--sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06)}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px}
-a{color:inherit;text-decoration:none}button,input{font:inherit}button{border:0;background:none;cursor:pointer}
-.top{background:var(--navy);color:#94a3b8;padding:10px 20px;font-size:12px;display:flex;justify-content:space-between}
+:root{
+  --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
+  --navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;
+  --success:#15803d;--danger:#b91c1c;
+  --sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit}
+button{border:0;background:none;cursor:pointer}
+:focus-visible{outline:3px solid var(--primary-hover);outline-offset:2px}
+.top{background:var(--navy);color:#94a3b8;padding:10px 20px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .top strong{color:#fff}
-.brand{background:#fff;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.logo{font-weight:800;font-size:18px}.logo span{color:var(--primary)}
-.wrap{max-width:800px;margin:0 auto;padding:24px 16px}
-h1{font-size:24px;font-weight:800;margin-bottom:6px}
-.sub{color:var(--muted);margin-bottom:20px}
-.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--sh);margin-bottom:16px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.brand{background:#fff;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:40;box-shadow:var(--sh)}
+.logo{font-weight:800;font-size:18px;color:var(--navy)}.logo span{color:var(--primary)}
+.nav a{font-size:14px;font-weight:600;color:#475569;margin-left:14px}
+.nav a:hover{color:var(--primary)}
+.wrap{max-width:820px;margin:0 auto;padding:24px 16px}
+.hero{margin-bottom:16px}
+.hero h1{font-size:clamp(22px,4vw,28px);font-weight:800;color:var(--navy);letter-spacing:-.02em}
+.hero p{color:var(--muted);font-size:14px;margin-top:4px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--sh);margin-bottom:16px}
+.panel h2{font-size:15px;font-weight:800;margin-bottom:14px;color:var(--navy)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:600px){.row{grid-template-columns:1fr}}
-.lbl{font-size:13px;font-weight:600;color:#475569;display:block;margin-bottom:6px}
-.inp{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;min-height:44px}
-.btn{display:inline-flex;padding:12px 18px;border-radius:8px;font-weight:700;min-height:44px}
+.lbl{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:6px}
+.inp{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;min-height:48px;background:#fff}
+.inp:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin:14px 0;color:#475569}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border-radius:8px;font-weight:700;font-size:14px;min-height:48px}
 .btn-primary{background:var(--primary);color:#fff}
-.grid{display:grid;gap:12px}
-.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--sh)}
-.card h3{font-size:16px;font-weight:700}
+.btn-primary:disabled{opacity:.6;cursor:wait}
+.btn-ghost{background:#f1f5f9;color:var(--text)}
+.btn-danger{background:#fef2f2;color:var(--danger)}
+.btn-sm{min-height:40px;padding:8px 12px;font-size:12px}
+.list{display:grid;gap:12px}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:var(--sh)}
+.card.primary{border-color:var(--primary)}
+.card h3{font-size:17px;font-weight:800;color:var(--navy)}
 .meta{font-size:13px;color:var(--muted);margin-top:4px}
-.acts{display:flex;gap:8px;margin-top:12px}
-.acts a,.acts button{flex:1;text-align:center;padding:10px;border-radius:8px;font-weight:700;font-size:13px;background:#f1f5f9;min-height:40px}
-.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;background:var(--primary-light);color:var(--primary)}
-.empty{text-align:center;padding:32px;color:var(--muted)}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px)}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:var(--primary-light);color:var(--primary)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.acts .btn{flex:1;min-width:100px}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty strong{display:block;color:var(--navy);font-size:16px;margin-bottom:6px}
+.sk{height:88px;border-radius:14px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.toast{position:fixed;bottom:90px;left:50%;transform:translate(-50%,80px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-weight:600;z-index:99;transition:transform .25s;max-width:90vw;text-align:center}
+.toast.show{transform:translate(-50%,0)}
+.toast.ok{background:var(--success)}.toast.err{background:var(--danger)}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px);z-index:50;box-shadow:0 -4px 16px rgba(15,23,42,.06)}
 .bnav nav{display:grid;grid-template-columns:repeat(4,1fr);max-width:500px;margin:0 auto}
-.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center}
-.bnav a.active{color:var(--primary);background:var(--primary-light);border-radius:10px}
+.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center;border-radius:10px}
+.bnav a.active{color:var(--primary);background:var(--primary-light)}
 .bnav svg{width:22px;height:22px}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-weight:600;transition:transform .25s;z-index:99}
-.toast.show{transform:translateX(-50%) translateY(0)}
+.tip{background:var(--primary-light);border-radius:10px;padding:12px 14px;font-size:13px;color:#0f766e;margin-bottom:16px;font-weight:500}
 </style>
 </head>
 <body>
-<div class="top"><strong>Salon AutoZone</strong><span>Freetown</span></div>
+<div class="top">
+  <strong>Salon AutoZone · Freetown</strong>
+  <span>Parts that fit your cars</span>
+</div>
 <header class="brand">
   <a class="logo" href="/">Salon<span>AutoZone</span></a>
-  <a href="/my-account" style="font-weight:600;color:#475569">Account</a>
+  <nav class="nav">
+    <a href="/">Home</a>
+    <a href="/my-account">Account</a>
+  </nav>
 </header>
+
 <main class="wrap">
-  <h1>My Garage</h1>
-  <p class="sub">Save your cars so parts search shows what fits.</p>
+  <div class="hero">
+    <h1>My Garage</h1>
+    <p>Save your vehicles so we can show parts that fit.</p>
+  </div>
+
+  <div class="tip">Tip: set one car as <strong>primary</strong> — the home page uses it for fitment.</div>
+
   <div class="panel">
-    <form id="f">
+    <h2 id="form-title">Add a vehicle</h2>
+    <form id="garage-form">
+      <input type="hidden" name="id" id="f-id" value="">
       <div class="row">
-        <div><label class="lbl">Make *</label><input class="inp" name="make" required placeholder="Toyota"></div>
-        <div><label class="lbl">Model *</label><input class="inp" name="model" required placeholder="Corolla"></div>
+        <div>
+          <label class="lbl" for="f-make">Make *</label>
+          <input class="inp" id="f-make" name="make" required placeholder="Toyota" list="makes">
+          <datalist id="makes">
+            <option>Toyota</option><option>Honda</option><option>Nissan</option>
+            <option>Hyundai</option><option>Kia</option><option>Mercedes-Benz</option>
+            <option>BMW</option><option>Ford</option><option>Volkswagen</option>
+            <option>Mazda</option><option>Mitsubishi</option><option>Suzuki</option>
+            <option>Lexus</option><option>Peugeot</option><option>Land Rover</option>
+          </datalist>
+        </div>
+        <div>
+          <label class="lbl" for="f-model">Model *</label>
+          <input class="inp" id="f-model" name="model" required placeholder="Corolla">
+        </div>
       </div>
-      <div class="row" style="margin-top:10px">
-        <div><label class="lbl">Year *</label><input class="inp" name="year" type="number" required min="1980" max="2030" placeholder="2015"></div>
-        <div><label class="lbl">Nickname</label><input class="inp" name="nickname" placeholder="My daily"></div>
+      <div class="row" style="margin-top:12px">
+        <div>
+          <label class="lbl" for="f-year">Year *</label>
+          <input class="inp" id="f-year" name="year" type="number" required min="1980" max="2030" placeholder="2015">
+        </div>
+        <div>
+          <label class="lbl" for="f-nick">Nickname</label>
+          <input class="inp" id="f-nick" name="nickname" placeholder="My daily driver">
+        </div>
       </div>
-      <label style="display:flex;gap:8px;align-items:center;margin:12px 0;font-weight:600;font-size:14px">
-        <input type="checkbox" name="is_primary"> Primary vehicle
+      <label class="check">
+        <input type="checkbox" id="f-primary" name="is_primary">
+        Set as primary vehicle
       </label>
-      <button class="btn btn-primary" type="submit">Add to garage</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button type="submit" class="btn btn-primary" id="btn-save">Add to garage</button>
+        <button type="button" class="btn btn-ghost" id="btn-cancel" hidden>Cancel edit</button>
+      </div>
     </form>
   </div>
-  <div class="grid" id="list"></div>
+
+  <div class="list" id="list">
+    <div class="sk"></div>
+    <div class="sk"></div>
+  </div>
 </main>
-<div class="bnav"><nav>
-  <a href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
-  <a href="/garage" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
-  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>Saved</a>
-  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
-</nav></div>
+
 <div class="toast" id="toast"></div>
+
+<div class="bnav" role="navigation" aria-label="Main">
+  <nav>
+    <a href="/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+      Home
+    </a>
+    <a href="/garage" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+      Garage
+    </a>
+    <a href="/my-account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>
+      Saved
+    </a>
+    <a href="/my-account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
+      Account
+    </a>
+  </nav>
+</div>
+
 <script>
-(function(){
-  function token(){try{return localStorage.getItem('token')||localStorage.getItem('access_token')||''}catch(e){return ''}}
-  function auth(){var t=token();return t?{Authorization:'Bearer '+t}:{}}
-  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
-  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
-  if(!token()){location.href='/login?next=/garage';return}
-  function load(){
-    fetch('/api/garage/',{headers:auth()}).then(function(r){if(r.status===401){location.href='/login';return[]}return r.ok?r.json():[]}).then(function(cars){
-      var el=document.getElementById('list');
-      cars=cars||[];
-      if(!cars.length){el.innerHTML='<div class="empty">No vehicles yet. Add your car above.</div>';return}
-      el.innerHTML=cars.map(function(c){
-        return '<div class="card"><h3>'+esc(c.year+' '+c.make+' '+c.model)+'</h3><div class="meta">'+esc(c.nickname||'')+(c.is_primary?' · <span class="badge">Primary</span>':'')+'</div><div class="acts"><a href="/">Find parts</a><button type="button" data-id="'+c.id+'">Remove</button></div></div>'
-      }).join('');
-      el.querySelectorAll('[data-id]').forEach(function(b){b.onclick=function(){
-        if(!confirm('Remove?'))return;
-        fetch('/api/garage/'+b.dataset.id,{method:'DELETE',headers:auth()}).then(function(r){if(r.ok){toast('Removed');load()}else toast('Failed')})
-      }})
-    })
+(function () {
+  function $(id) { return document.getElementById(id); }
+  function toast(msg, ok) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (ok ? 'ok' : 'err');
+    setTimeout(function () { t.classList.remove('show'); }, 2800);
   }
-  document.getElementById('f').onsubmit=function(e){
+  function token() {
+    try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; }
+  }
+  function auth() {
+    var t = token();
+    return t ? { Authorization: 'Bearer ' + t } : {};
+  }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function goLogin() {
+    location.href = '/login?next=' + encodeURIComponent('/garage');
+  }
+
+  if (!token()) { goLogin(); return; }
+
+  var form = $('garage-form');
+  var list = $('list');
+  var editingId = null;
+
+  function syncFitmentLocal(car) {
+    if (!car) return;
+    try {
+      localStorage.setItem('fitmentVehicle', JSON.stringify({
+        make: car.make,
+        model: car.model,
+        year: String(car.year)
+      }));
+    } catch (e) {}
+  }
+
+  function resetForm() {
+    editingId = null;
+    form.reset();
+    $('f-id').value = '';
+    $('form-title').textContent = 'Add a vehicle';
+    $('btn-save').textContent = 'Add to garage';
+    $('btn-cancel').hidden = true;
+  }
+
+  $('btn-cancel').addEventListener('click', resetForm);
+
+  function load() {
+    list.innerHTML = '<div class="sk"></div><div class="sk"></div>';
+    fetch('/api/garage/', { headers: auth() })
+      .then(function (r) {
+        if (r.status === 401) { goLogin(); throw null; }
+        return r.ok ? r.json() : [];
+      })
+      .then(function (cars) {
+        cars = Array.isArray(cars) ? cars : (cars.items || []);
+        if (!cars.length) {
+          list.innerHTML = '<div class="empty"><strong>No vehicles yet</strong>Add your car above to get better part matches.</div>';
+          return;
+        }
+        cars.sort(function (a, b) { return (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0); });
+        var primary = cars.find(function (c) { return c.is_primary; }) || cars[0];
+        if (primary) syncFitmentLocal(primary);
+
+        list.innerHTML = cars.map(function (c) {
+          return '<article class="card' + (c.is_primary ? ' primary' : '') + '" data-id="' + c.id + '">' +
+            '<h3>' + esc(c.year + ' ' + c.make + ' ' + c.model) + '</h3>' +
+            '<div class="meta">' + esc(c.nickname || 'No nickname') +
+              (c.is_primary ? ' · <span class="badge">Primary</span>' : '') +
+            '</div>' +
+            '<div class="acts">' +
+              '<a class="btn btn-primary btn-sm" href="/">Find parts</a>' +
+              (!c.is_primary ? '<button type="button" class="btn btn-ghost btn-sm" data-act="primary">Set primary</button>' : '') +
+              '<button type="button" class="btn btn-ghost btn-sm" data-act="edit">Edit</button>' +
+              '<button type="button" class="btn btn-danger btn-sm" data-act="delete">Remove</button>' +
+            '</div>' +
+          '</article>';
+        }).join('');
+
+        list.querySelectorAll('.card').forEach(function (card) {
+          var id = card.dataset.id;
+          var car = cars.find(function (x) { return String(x.id) === String(id); });
+          card.querySelectorAll('[data-act]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              var act = btn.dataset.act;
+              if (act === 'delete') removeCar(id);
+              if (act === 'edit' && car) startEdit(car);
+              if (act === 'primary' && car) setPrimary(id, car);
+            });
+          });
+        });
+      })
+      .catch(function (e) {
+        if (e !== null) list.innerHTML = '<div class="empty"><strong>Could not load garage</strong>Check your connection and try again.</div>';
+      });
+  }
+
+  function startEdit(car) {
+    editingId = car.id;
+    $('f-id').value = car.id;
+    $('f-make').value = car.make || '';
+    $('f-model').value = car.model || '';
+    $('f-year').value = car.year || '';
+    $('f-nick').value = car.nickname || '';
+    $('f-primary').checked = !!car.is_primary;
+    $('form-title').textContent = 'Edit vehicle';
+    $('btn-save').textContent = 'Save changes';
+    $('btn-cancel').hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function removeCar(id) {
+    if (!confirm('Remove this vehicle from your garage?')) return;
+    fetch('/api/garage/' + id, { method: 'DELETE', headers: auth() })
+      .then(function (r) {
+        if (r.status === 401) { goLogin(); return; }
+        if (!r.ok) throw new Error();
+        toast('Vehicle removed', true);
+        if (String(editingId) === String(id)) resetForm();
+        load();
+      })
+      .catch(function () { toast('Could not remove', false); });
+  }
+
+  function setPrimary(id, car) {
+    var body = {
+      make: car.make,
+      model: car.model,
+      year: car.year,
+      nickname: car.nickname || null,
+      is_primary: true
+    };
+    fetch('/api/garage/' + id, {
+      method: 'PUT',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      if (r.status === 401) { goLogin(); return null; }
+      if (!r.ok) {
+        return fetch('/api/garage/' + id, {
+          method: 'PATCH',
+          headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
+          body: JSON.stringify({ is_primary: true })
+        });
+      }
+      return r;
+    }).then(function (r) {
+      if (!r) return;
+      if (!r.ok) throw new Error();
+      toast('Primary vehicle updated', true);
+      syncFitmentLocal(car);
+      load();
+    }).catch(function () { toast('Could not update primary', false); });
+  }
+
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var fd=new FormData(e.target);
-    var body={make:fd.get('make'),model:fd.get('model'),year:parseInt(fd.get('year'),10),nickname:fd.get('nickname')||null,is_primary:!!fd.get('is_primary')};
-    fetch('/api/garage/',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},auth()),body:JSON.stringify(body)})
-      .then(function(r){if(!r.ok)throw 0;toast('Saved');e.target.reset();load()}).catch(function(){toast('Could not save')})
-  };
+    var btn = $('btn-save');
+    btn.disabled = true;
+    var body = {
+      make: $('f-make').value.trim(),
+      model: $('f-model').value.trim(),
+      year: parseInt($('f-year').value, 10),
+      nickname: $('f-nick').value.trim() || null,
+      is_primary: $('f-primary').checked
+    };
+    var isEdit = !!editingId;
+    var url = isEdit ? '/api/garage/' + editingId : '/api/garage/';
+    var method = isEdit ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method: method,
+      headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      if (r.status === 401) { goLogin(); return null; }
+      if (!r.ok && isEdit) {
+        return fetch('/api/garage/' + editingId, {
+          method: 'PATCH',
+          headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
+          body: JSON.stringify(body)
+        });
+      }
+      return r;
+    }).then(function (r) {
+      if (!r) return;
+      if (!r.ok) throw new Error();
+      toast(isEdit ? 'Vehicle updated' : 'Vehicle added', true);
+      if (body.is_primary) syncFitmentLocal(body);
+      resetForm();
+      load();
+    }).catch(function () {
+      toast(isEdit ? 'Could not update' : 'Could not add vehicle', false);
+    }).finally(function () { btn.disabled = false; });
+  });
+
   load();
 })();
 </script>
