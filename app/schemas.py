@@ -50,3 +50,93 @@ class VehicleResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# =====================================================================
+# Added 2026-10-01 — PartCreate / PartResponse used by parts.py
+# =====================================================================
+
+class PartCreate(BaseModel):
+    name: str
+    category: str
+    compatible_make: str | None = None
+    compatible_model: str | None = None
+    price_sll: float
+    price_usd: float | None = None
+    location: str | None = None
+    contact_phone: str | None = None
+    image_url: str | None = None
+    stock_quantity: int = 1
+    condition: str = "used"
+    description: str | None = None
+
+
+class PartResponse(BaseModel):
+    id: int
+    vendor_id: int | None = None
+    name: str
+    category: str
+    compatible_make: str | None = None
+    compatible_model: str | None = None
+    price_sll: float
+    price_usd: float | None = None
+    location: str | None = None
+    contact_phone: str | None = None
+    image_url: str | None = None
+    stock_quantity: int = 1
+    condition: str
+    description: str | None = None
+    is_featured: bool = False
+    featured_until: datetime | None = None
+    views: int = 0
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ImportRequestCreate(BaseModel):
+    customer_name: str | None = None
+    customer_phone: str | None = None
+    customer_location: str | None = None
+    part_name: str | None = None
+    car_make: str | None = None
+    car_model: str | None = None
+    car_year: int | None = None
+    quantity: int = 1
+    budget_sll: float | None = None
+    urgency: str | None = None
+    notes: str | None = None
+    status: str = "pending"
+
+
+class ImportRequestUpdate(BaseModel):
+    status: str | None = None
+    quoted_price_sll: float | None = None
+    estimated_days: int | None = None
+    supplier_country: str | None = None
+    admin_notes: str | None = None
+    notes: str | None = None
+
+
+class ImportRequestResponse(BaseModel):
+    id: int
+    user_id: int | None = None
+    customer_name: str | None = None
+    customer_phone: str | None = None
+    customer_location: str | None = None
+    part_name: str | None = None
+    car_make: str | None = None
+    car_model: str | None = None
+    car_year: int | None = None
+    quantity: int = 1
+    budget_sll: float | None = None
+    urgency: str | None = None
+    notes: str | None = None
+    status: str = "pending"
+    quoted_price_sll: float | None = None
+    estimated_days: int | None = None
+    supplier_country: str | None = None
+    admin_notes: str | None = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
