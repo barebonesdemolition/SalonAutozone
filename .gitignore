@@ -11,7 +11,6 @@ env/
 *.sqlite3
 
 # Environment
-.env
 .env.local
 
 # OS
@@ -28,3 +27,4 @@ app/static/uploads/*
 
 # Logs
 *.log
+.env

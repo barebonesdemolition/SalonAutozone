@@ -1,0 +1,123 @@
+]633;E;echo "===== A: MISSING NAMES =====";fc74c734-33fd-4780-9a24-40525117f8cc]633;C===== A: MISSING NAMES =====
+[db.py] Using database: dpg-xxxxx-a.frankfurt-postgres.render.com:5432/salon_db_jzpx
+18 distinct missing names:
+  admin.py                       models.Garage                              (1 uses)
+  admin.py                       models.ImportRequest                       (3 uses)
+  admin.py                       models.Inquiry                             (3 uses)
+  admin.py                       models.SavedListing                        (1 uses)
+  catalog.py                     models.SupplierCatalog                     (20 uses)
+  garage.py                      models.Garage                              (23 uses)
+  imports.py                     models.ImportRequest                       (18 uses)
+  imports.py                     schemas.ImportRequestCreate                 (1 uses)
+  imports.py                     schemas.ImportRequestResponse               (4 uses)
+  imports.py                     schemas.ImportRequestUpdate                 (1 uses)
+  inquiries.py                   models.Inquiry                             (23 uses)
+  my_account.py                  models.ImportRequest                       (3 uses)
+  my_account.py                  models.Inquiry                             (1 uses)
+  my_account.py                  models.SavedListing                        (7 uses)
+  parts.py                       schemas.PartCreate                          (2 uses)
+  parts.py                       schemas.PartResponse                        (4 uses)
+  unified_search.py              models.SupplierCatalog                     (9 uses)
+  unified_search.py              schemas.PartResponse                        (1 uses)
+
+===== B: MODELS COLUMNS =====
+12:class User(Base):
+15:    id = Column(Integer, primary_key=True, index=True)
+16:    full_name = Column(String, nullable=False)
+17:    email = Column(String, unique=True, index=True, nullable=False)
+18:    phone = Column(String, nullable=False, index=True)
+19:    hashed_password = Column(String, nullable=False)
+20:    is_vendor = Column(Boolean, default=False, nullable=False)
+21:    roles = Column(String, nullable=True)  # Comma-separated: e.g. "buyer,seller,vendor"
+22:    is_active = Column(Boolean, default=True, nullable=False)
+23:    is_admin = Column(Boolean, default=False, nullable=False)
+24:    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+35:class Business(Base):
+38:    id = Column(Integer, primary_key=True, index=True)
+39:    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+40:    name = Column(String, nullable=False, index=True)
+41:    slug = Column(String, unique=True, nullable=False, index=True)
+42:    business_type = Column(String, nullable=False)  # "store", "dealership", "shipper", "wholesaler"
+43:    status = Column(String, default="pending", nullable=False)  # "pending", "verified", "rejected"
+44:    city = Column(String, nullable=True)
+45:    country = Column(String, default="Sierra Leone", nullable=False)
+46:    description = Column(Text, nullable=True)
+47:    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+57:class VehicleListing(Base):
+60:    id = Column(Integer, primary_key=True, index=True)
+61:    seller_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+62:    business_id = Column(Integer, ForeignKey("businesses.id", ondelete="SET NULL"), nullable=True, index=True)
+64:    title = Column(String, nullable=False)
+65:    make = Column(String, nullable=False, index=True)
+66:    model = Column(String, nullable=False, index=True)
+67:    year = Column(Integer, nullable=False)
+68:    price_sll = Column(Float, nullable=False)
+69:    location = Column(String, nullable=True)
+70:    description = Column(Text, nullable=True)
+73:    condition = Column(String, default="used", nullable=False)        # "new", "used"
+74:    availability = Column(String, default="in_stock", nullable=False) # "in_stock", "in_transit", "on_order"
+75:    country_of_origin = Column(String, nullable=True)
+76:    vin = Column(String(17), nullable=True, index=True)
+77:    duty_paid = Column(Boolean, default=False, nullable=False)
+78:    arrival_date = Column(DateTime, nullable=True)
+79:    supplier_url = Column(String, nullable=True)
+82:    is_sold = Column(Boolean, default=False, nullable=False)
+83:    is_featured = Column(Boolean, default=False, nullable=False)
+84:    featured_until = Column(DateTime, nullable=True)
+85:    views = Column(Integer, default=0, nullable=False)
+86:    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+96:class PartListing(Base):
+99:    id = Column(Integer, primary_key=True, index=True)
+100:    seller_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+102:    name = Column(String, nullable=False, index=True)
+103:    category = Column(String, nullable=False, index=True)
+104:    compatible_make = Column(String, nullable=True, index=True)
+105:    price_sll = Column(Float, nullable=False)
+106:    location = Column(String, nullable=True)
+107:    condition = Column(String, default="used", nullable=False)
+108:    description = Column(Text, nullable=True)
+110:    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+===== C: ROUTER IMPORTS (all) =====
+app/routers/admin.py:12:from app import models
+app/routers/admin.py:13:from app.config import get_settings
+app/routers/admin.py:14:from app.db import get_db
+app/routers/ai_chat.py:11:from app.db import get_db
+app/routers/ai_chat.py:12:from app import models
+app/routers/ai_chat.py:13:from app.config import get_settings
+app/routers/auth.py:16:from app.db import get_db
+app/routers/auth.py:17:from app import models
+app/routers/catalog.py:10:from app.db import get_db
+app/routers/catalog.py:11:from app import models
+app/routers/garage.py:10:from app.db import get_db
+app/routers/garage.py:11:from app import models
+app/routers/garage.py:12:from app.config import get_settings
+app/routers/identify.py:14:from app.db import get_db
+app/routers/identify.py:15:from app import models
+app/routers/identify.py:16:from app.config import get_settings
+app/routers/imports.py:7:from app.db import get_db
+app/routers/imports.py:8:from app import models, schemas
+app/routers/inquiries.py:9:from app.db import get_db
+app/routers/inquiries.py:10:from app import models
+app/routers/listings.py:7:from app.db import get_db
+app/routers/listings.py:8:from app import models, schemas
+app/routers/my_account.py:11:from app import models
+app/routers/my_account.py:12:from app.auth import get_current_user
+app/routers/my_account.py:13:from app.db import get_db
+app/routers/parts.py:8:from app.db import get_db
+app/routers/parts.py:9:from app import models, schemas
+app/routers/parts.py:10:from app.auth import get_current_user, get_current_admin
+app/routers/search.py:9:from app import models
+app/routers/search.py:10:from app.db import get_db
+app/routers/unified_search.py:7:from app.db import get_db
+app/routers/unified_search.py:8:from app import models, schemas
+app/routers/upload.py:12:from app.db import get_db
+app/routers/upload.py:13:from app.auth import get_current_user
+app/routers/upload.py:14:from app import models
+app/routers/vehicles.py:9:from app import models, schemas
+app/routers/vehicles.py:10:from app.auth import get_current_admin, get_current_user
+app/routers/vehicles.py:11:from app.db import get_db
+
+===== D: SCHEMAS CLASSES =====
+5:class VehicleCreate(BaseModel):
+24:class VehicleResponse(BaseModel):

@@ -7,7 +7,7 @@ from app.routers import (
     vehicles,
     vehicle_listings,
     orders,
-    vin_lookup,
+    vin,
     upload,
     ai_assistant,
     search,
@@ -55,7 +55,7 @@ app.include_router(parts.router)
 app.include_router(vehicles.router)
 app.include_router(vehicle_listings.router)
 app.include_router(orders.router)
-app.include_router(vin_lookup.router)
+app.include_router(vin.router)
 app.include_router(upload.router)
 app.include_router(ai_assistant.router)
 app.include_router(search.router)
