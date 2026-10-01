@@ -1,8 +1,57 @@
+from datetime import datetime
+from typing import Optional
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from datetime import datetime
+
 from app.db import Base
 
+
+# ============================================================
+# USER MODEL
+# ============================================================
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    full_name = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    is_admin = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships
+    vehicles = relationship("VehicleListing", back_populates="seller", cascade="all, delete-orphan")
+    businesses = relationship("Business", back_populates="owner", cascade="all, delete-orphan")
+    parts = relationship("PartListing", back_populates="seller", cascade="all, delete-orphan")
+
+
+# ============================================================
+# BUSINESS / STOREFRONT MODEL
+# ============================================================
+class Business(Base):
+    __tablename__ = "businesses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    name = Column(String, nullable=False, index=True)
+    slug = Column(String, unique=True, nullable=False, index=True)
+    business_type = Column(String, nullable=False)  # "store", "dealership", "shipper", "wholesaler"
+    status = Column(String, default="pending", nullable=False)  # "pending", "verified", "rejected"
+    city = Column(String, nullable=True)
+    country = Column(String, default="Sierra Leone", nullable=False)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships
+    owner = relationship("User", back_populates="businesses")
+    vehicles = relationship("VehicleListing", back_populates="business")
+
+
+# ============================================================
+# VEHICLE LISTING MODEL
+# ============================================================
 class VehicleListing(Base):
     __tablename__ = "vehicle_listings"
 
@@ -37,3 +86,26 @@ class VehicleListing(Base):
     # Relationships
     seller = relationship("User", back_populates="vehicles")
     business = relationship("Business", back_populates="vehicles")
+
+
+# ============================================================
+# PART LISTING MODEL
+# ============================================================
+class PartListing(Base):
+    __tablename__ = "part_listings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    seller_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    
+    name = Column(String, nullable=False, index=True)
+    category = Column(String, nullable=False, index=True)
+    compatible_make = Column(String, nullable=True, index=True)
+    price_sll = Column(Float, nullable=False)
+    location = Column(String, nullable=True)
+    condition = Column(String, default="used", nullable=False)
+    description = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships
+    seller = relationship("User", back_populates="parts")
