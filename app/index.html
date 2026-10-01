@@ -694,6 +694,19 @@ a{color:inherit;text-decoration:none}
     if (token()) { var l = $('signin'); l.textContent = 'My dashboard'; l.href = '/my-account'; }
     switchMarket('parts');
     syncGarage();
+    if (requested.get('action') === 'list-car') {
+      switchMarket('vehicles');
+      openListing('vehicle');
+    }
+    var importPart = requested.get('import');
+    if (importPart) {
+      $('import-form').elements.namedItem('part_name').value = importPart;
+      var importNotes = [];
+      if (requested.get('part')) importNotes.push('Category: ' + requested.get('part'));
+      if (requested.get('vehicle')) importNotes.push('Vehicle: ' + requested.get('vehicle'));
+      $('import-form').elements.namedItem('notes').value = importNotes.join('\n');
+      openM('import-modal');
+    }
   }
   init();
 })();

@@ -167,12 +167,17 @@ async function uploadFile(){
 
   var fd = new FormData();
   fd.append('file', selectedFile);
+  var headers = {};
+  try {
+    var adminKey = sessionStorage.getItem('adminKey');
+    if (adminKey) headers['X-Admin-Key'] = adminKey;
+  } catch(e){}
 
   var replace = document.getElementById('replace').checked;
   var url = '/api/catalog/upload?replace=' + replace;
 
   try {
-    var res = await fetch(url, { method:'POST', body: fd });
+    var res = await fetch(url, { method:'POST', headers:headers, body: fd });
     var data = await res.json();
     loading.classList.remove('show');
 

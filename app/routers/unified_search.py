@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import func, or_
@@ -8,6 +8,21 @@ from app.db import get_db
 from app import models, schemas
 
 router = APIRouter(prefix="/api/unified", tags=["Unified Search"])
+
+
+@router.get("/catalog/{catalog_id}")
+async def catalog_item(catalog_id: int, db: AsyncSession = Depends(get_db)):
+    item = (await db.execute(
+        select(models.SupplierCatalog).where(models.SupplierCatalog.id == catalog_id)
+    )).scalars().first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Catalog part not found")
+    return {
+        "id": item.id,
+        "part_number": item.part_number,
+        "category": item.category,
+        "vehicle_compatibility": item.vehicle_compatibility,
+    }
 
 
 @router.get("/parts")

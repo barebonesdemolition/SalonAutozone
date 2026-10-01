@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from app.db import get_db
 from app import models
+from app.routers.admin import require_admin
 
 router = APIRouter(prefix="/api/catalog", tags=["Supplier Catalog"])
 
@@ -141,6 +142,7 @@ def parse_csv(content: str):
 async def upload_catalog(
     file: UploadFile = File(...),
     replace: bool = Query(True, description="If true, wipes existing catalog before importing"),
+    _: dict = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
     """Upload a supplier CSV file to import into the catalog."""

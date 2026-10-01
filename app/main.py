@@ -239,6 +239,11 @@ async def admin_dashboard_page():
     return FileResponse("app/templates/admin_dashboard.html")
 
 
+@app.get("/admin/catalog")
+async def admin_catalog_page():
+    return FileResponse("app/templates/admin_catalog.html")
+
+
 @app.get("/become-a-seller")
 async def become_a_seller_page():
     return FileResponse("app/templates/business.html")
@@ -247,6 +252,21 @@ async def become_a_seller_page():
 @app.get("/store/{slug}")
 async def verified_business_page(slug: str):
     return FileResponse("app/templates/business.html")
+
+
+@app.get("/part/{part_id}")
+async def part_detail_page(part_id: str):
+    return FileResponse("app/templates/part_detail.html")
+
+
+@app.get("/vehicle/{vehicle_id}")
+async def vehicle_detail_page(vehicle_id: str):
+    return FileResponse("app/templates/vehicle_detail.html")
+
+
+@app.get("/catalog/{catalog_id}")
+async def catalog_detail_page(catalog_id: str):
+    return FileResponse("app/templates/catalog_detail.html")
 
 
 @app.get("/vin-tool")
