@@ -26,12 +26,12 @@
     button.disabled = true;
     status.textContent = 'Verifying admin access…';
     try {
-      var response = await fetch('/api/admin/stats', {headers:{'X-Admin-Key':input.value}});
-      if (!response.ok) throw new Error(response.status === 403 ? 'Invalid key or admin access is not configured.' : 'Could not verify access. Try again.');
+      var response = await fetch('/api/admin/verify', {headers:{'X-Admin-Key':input.value}});
+      if (!response.ok) throw new Error(response.status === 403 ? 'Invalid key or admin access is not configured.' : 'Admin verification failed (HTTP ' + response.status + ').');
       sessionStorage.setItem('adminKey', input.value);
       location.replace('/admin/dashboard');
     } catch (error) {
-      status.textContent = error.message || 'Could not verify access.';
+      status.textContent = error instanceof TypeError ? 'Could not reach the server. Check your connection and try again.' : (error.message || 'Could not verify access.');
       button.disabled = false;
       input.focus();
     }

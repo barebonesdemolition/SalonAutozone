@@ -72,6 +72,11 @@ async def _get_listing(db: AsyncSession, listing_type: str, listing_id: int):
 # ============================================================
 # DASHBOARD STATS
 # ============================================================
+@router.get("/verify")
+async def verify_admin_access(_: dict = Depends(require_admin)):
+    return {"ok": True}
+
+
 @router.get("/stats")
 async def admin_stats(_: dict = Depends(require_admin), db: AsyncSession = Depends(get_db)):
     async def count(col):
