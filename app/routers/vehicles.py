@@ -1,18 +1,26 @@
+from datetime import datetime, timedelta
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import or_, update
-from typing import List, Optional
-from datetime import datetime, timedelta
 
-from app.db import get_db
 from app import models, schemas
-from app.auth import get_current_user, get_current_admin
+from app.auth import get_current_admin, get_current_user
+from app.db import get_db
 
 router = APIRouter(prefix="/api/vehicles", tags=["Vehicles"])
 
-# Fields a seller must never set themselves (payment/ownership/stats controlled by the server)
-PROTECTED_FIELDS = {"seller_id", "is_featured", "featured_until", "views", "is_sold"}
+# Fields a seller must never set directly via body payload
+PROTECTED_FIELDS = {
+    "seller_id",
+    "business_id",
+    "is_featured",
+    "featured_until",
+    "views",
+    "is_sold",
+}
 
 
 # ============================================================
@@ -54,6 +62,14 @@ async def _expire_featured(db: AsyncSession) -> None:
     await db.commit()
 
 
+async def _get_user_business(db: AsyncSession, user_id: int) -> Optional[models.Business]:
+    """Fetch business profile attached to user if available."""
+    result = await db.execute(
+        select(models.Business).where(models.Business.owner_id == user_id)
+    )
+    return result.scalars().first()
+
+
 # ============================================================
 # SEARCH (paginated, featured first, unsold by default)
 # ============================================================
@@ -64,6 +80,9 @@ async def search_vehicles(
     model: Optional[str] = Query(None),
     year: Optional[str] = Query(None),
     location: Optional[str] = Query(None),
+    condition: Optional[str] = Query(None, description="'new' or 'used'"),
+    availability: Optional[str] = Query(None, description="'in_stock', 'in_transit', or 'on_order'"),
+    business_id: Optional[int] = Query(None),
     q: Optional[str] = Query(None),
     sold: Optional[bool] = Query(False, description="False (default) hides sold cars; true shows only sold"),
     page: int = Query(1, ge=1),
@@ -80,6 +99,7 @@ async def search_vehicles(
                 models.VehicleListing.title.ilike(like),
                 models.VehicleListing.make.ilike(like),
                 models.VehicleListing.model.ilike(like),
+                models.VehicleListing.vin.ilike(like),
             )
         )
     if make:
@@ -93,6 +113,12 @@ async def search_vehicles(
             pass
     if location:
         query = query.where(models.VehicleListing.location.ilike(f"%{location}%"))
+    if condition:
+        query = query.where(models.VehicleListing.condition == condition.lower())
+    if availability:
+        query = query.where(models.VehicleListing.availability == availability.lower())
+    if business_id:
+        query = query.where(models.VehicleListing.business_id == business_id)
     if sold is not None:
         query = query.where(models.VehicleListing.is_sold == sold)
 
@@ -122,8 +148,20 @@ async def create_vehicle(
     current_user=Depends(get_current_user),
 ):
     data = vehicle.model_dump(exclude=PROTECTED_FIELDS, exclude_unset=True)
-    # Ownership always comes from the login token, never from the client
+    biz = await _get_user_business(db, current_user.id)
+
+    # Fraud Prevention Check: "in_transit" or "on_order" requires a verified business
+    target_availability = data.get("availability", "in_stock")
+    if target_availability in ["in_transit", "on_order"]:
+        if not biz or biz.status != "verified":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only verified business accounts can list vehicles 'In Transit' or 'On Order' to prevent scam listings.",
+            )
+
+    # Auto-assign ownership and business association
     data["seller_id"] = current_user.id
+    data["business_id"] = biz.id if biz else None
 
     new_vehicle = models.VehicleListing(**data)
     db.add(new_vehicle)
@@ -159,6 +197,17 @@ async def update_vehicle(
     _ensure_owner_or_admin(existing, current_user)
 
     update_data = vehicle.model_dump(exclude=PROTECTED_FIELDS, exclude_unset=True)
+
+    # Fraud Prevention Check if updating availability status
+    target_availability = update_data.get("availability")
+    if target_availability in ["in_transit", "on_order"]:
+        biz = await _get_user_business(db, current_user.id)
+        if not biz or biz.status != "verified":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only verified business accounts can set vehicle availability to 'In Transit' or 'On Order'.",
+            )
+
     for key, value in update_data.items():
         setattr(existing, key, value)
 
@@ -204,7 +253,7 @@ async def mark_vehicle_sold(
 
 
 # ============================================================
-# PROMOTE (ADMIN ONLY, after payment is confirmed) / UNPROMOTE
+# PROMOTE / UNPROMOTE
 # ============================================================
 
 @router.post("/{vehicle_id}/promote")
@@ -214,7 +263,7 @@ async def promote_vehicle(
     db: AsyncSession = Depends(get_db),
     admin=Depends(get_current_admin),
 ):
-    """Feature a listing. Admin only: call this once the Orange Money payment has arrived."""
+    """Feature a listing. Admin only: call this once payment is verified."""
     vehicle = await _get_vehicle_or_404(db, vehicle_id)
 
     now = datetime.utcnow()
@@ -249,7 +298,7 @@ async def unpromote_vehicle(
 
 
 # ============================================================
-# TRACK VIEW (public – no auth needed)
+# TRACK VIEW
 # ============================================================
 
 @router.post("/{vehicle_id}/view")
