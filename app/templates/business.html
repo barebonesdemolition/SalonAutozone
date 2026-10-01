@@ -31,6 +31,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--t);color:#fff;font-weight:700;padding:13px 20px;border-radius:10px;min-height:48px;border:0;cursor:pointer}
 .btn:hover{background:var(--t2)}.btn:disabled{opacity:.6;cursor:wait}.btn.full{width:100%;margin-top:20px}
 .btn.wa{background:#16a34a}
+a.btn.public-link{display:inline-flex;justify-content:center;align-items:center;border-radius:8px;font-weight:600;text-decoration:none;background-color:rgb(15,118,110);color:rgb(255,255,255)}
 .pill{display:inline-block;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700}
 .pill.ok{background:#dcfce7;color:#166534}.pill.wait{background:#fef3c7;color:var(--am)}.pill.bad{background:#fee2e2;color:var(--r)}.pill.t{background:#ccfbf1;color:var(--t2)}
 .msg{margin-top:14px;font-weight:600;text-align:center}
@@ -123,7 +124,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
   function showStatus(b) {
     root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta">' + pill(b.status) + '<span class="pill t">' + esc(b.type_label) + '</span></div></div></div>' +
       (b.status === 'pending' ? '<div class="note">We received your application. We will check your details and contact you on WhatsApp (+' + esc(b.whatsapp) + ').</div>' : '') +
-      (b.status === 'verified' ? '<a class="btn full" href="/store/' + encodeURIComponent(b.slug) + '">View your public page</a>' : '') +
+      (b.status === 'verified' ? '<a class="btn full public-link" href="/store/' + encodeURIComponent(b.slug) + '">View your public page</a>' : '') +
       ((b.status === 'rejected' || b.status === 'suspended') ? '<div class="note">Please contact us on WhatsApp to find out why and what to fix.</div>' : '');
   }
   function showForm() {
