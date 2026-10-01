@@ -231,9 +231,30 @@ body.mode-cars .safety-box{display:block}
 /* Sticky results hint */
 .results-hint{font-size:13px;color:var(--muted);margin-top:4px}
 
+
+/* Mobile bottom nav */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px);box-shadow:0 -4px 16px rgba(15,23,42,.06)}
+.bnav nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:500px;margin:0 auto}
+.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center}
+.bnav a svg{width:22px;height:22px}
+.bnav a.active,.bnav a:hover{color:var(--primary);background:var(--primary-light)}
+body.has-bnav{padding-bottom:72px}
+@media(max-width:768px){
+  .bnav{display:block}
+  body.has-bnav{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+}
+/* Tighter cards + sticky results header on mobile */
+@media(max-width:768px){
+  .rh{position:sticky;top:0;z-index:30;background:var(--bg);padding:10px 0;margin-bottom:12px;border-bottom:1px solid var(--border)}
+  .step,.step2,.cats-wrap,.sec,.idw,#sell-car-cta,.safety-box{padding-left:16px;padding-right:16px}
+  .vehicle-card,.search-card{padding:18px 14px}
+  .card .title{font-size:14px}
+  .card .price{font-size:18px}
+}
+
 </style>
 </head>
-<body>
+<body class="has-bnav">
 
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 <symbol id="i-brakes" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></symbol>
@@ -1040,6 +1061,28 @@ body.mode-cars .safety-box{display:block}
   input.addEventListener('keydown', function (e) { if (e.key === 'Enter') run(); });
 })();
 </script>
+
+
+<div class="bnav" role="navigation" aria-label="Main">
+  <nav>
+    <a href="/" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+      Home
+    </a>
+    <a href="/garage">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+      Garage
+    </a>
+    <a href="/my-account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>
+      Saved
+    </a>
+    <a href="/my-account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
+      Account
+    </a>
+  </nav>
+</div>
 
 </body>
 </html>
