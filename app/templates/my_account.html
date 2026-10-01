@@ -9,8 +9,8 @@
 <style>
 :root{
   --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
-  --navy:#0f172a;--slate:#1e293b;--text:#1e293b;--muted:#64748b;
-  --border:#e2e8f0;--bg:#f8fafc;--surface:#fff;--success:#15803d;--danger:#b91c1c;
+  --navy:#0f172a;--text:#1e293b;--muted:#64748b;
+  --border:#e2e8f0;--bg:#f8fafc;--success:#15803d;--danger:#b91c1c;
   --sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -19,6 +19,7 @@ a{color:inherit;text-decoration:none}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer;border:0;background:none}
 :focus-visible{outline:3px solid var(--primary-hover);outline-offset:2px}
+[hidden]{display:none!important}
 
 .top{background:var(--navy);color:#94a3b8;padding:10px 24px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .top strong{color:#fff}.top a{color:#99f6e4;font-weight:700}
@@ -29,12 +30,12 @@ button{cursor:pointer;border:0;background:none}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:8px;font-weight:700;font-size:14px;min-height:44px}
 .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
 .btn-ghost{background:#f1f5f9;color:var(--text)}.btn-ghost:hover{background:#e2e8f0}
-.btn-danger{background:#fef2f2;color:var(--danger)}
 
 .wrap{max-width:1100px;margin:0 auto;padding:24px 20px 64px}
 .hero{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px}
 .hero h1{font-size:26px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
 .hero p{color:var(--muted);margin-top:4px}
+.hero .ctas{display:flex;gap:8px;flex-wrap:wrap}
 
 .tabs{display:flex;gap:6px;background:#f1f5f9;padding:4px;border-radius:10px;margin-bottom:20px;flex-wrap:wrap}
 .tabs button{padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;color:var(--muted);min-height:42px}
@@ -56,12 +57,12 @@ button{cursor:pointer;border:0;background:none}
 .inp:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
 .empty{text-align:center;padding:40px 16px;color:var(--muted)}
 .empty a{color:var(--primary);font-weight:700}
-.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:var(--primary-light);color:var(--primary)}
-.badge.off{background:#f1f5f9;color:var(--muted)}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:var(--primary-light);color:var(--primary);text-transform:capitalize}
 .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;font-weight:600;z-index:99;transition:transform .25s;max-width:90vw}
 .toast.show{transform:translate(-50%,0)}.toast.ok{background:var(--success)}.toast.err{background:var(--danger)}
 .sk{height:120px;border-radius:12px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:sk 1.2s infinite}
 @keyframes sk{to{background-position:-200% 0}}
+.boot{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600;z-index:500}
 @media(max-width:700px){.row{grid-template-columns:1fr}.hero h1{font-size:22px}}
 
 .bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px);box-shadow:0 -4px 16px rgba(15,23,42,.06)}
@@ -73,10 +74,11 @@ button{cursor:pointer;border:0;background:none}
   .bnav{display:block}
   body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 }
-
 </style>
 </head>
 <body>
+<div class="boot" id="boot">Loading your account…</div>
+
 <div class="top">
   <strong>Salon AutoZone · Freetown</strong>
   <a href="tel:+23276123456">+232 76 123456</a>
@@ -88,6 +90,7 @@ button{cursor:pointer;border:0;background:none}
     <a href="/vin-tool">VIN Lookup</a>
     <a href="/garage">My Garage</a>
     <a href="/">Sell</a>
+    <a href="#" id="nav-dash" hidden>Dashboard</a>
     <button type="button" class="btn btn-ghost" id="btn-logout">Log out</button>
   </nav>
 </header>
@@ -98,7 +101,10 @@ button{cursor:pointer;border:0;background:none}
       <h1>My account</h1>
       <p id="user-line">Loading your profile…</p>
     </div>
-    <a class="btn btn-primary" href="/?action=list-car">+ List something</a>
+    <div class="ctas">
+      <a class="btn btn-ghost" id="btn-dash" href="#" hidden>Go to dashboard</a>
+      <a class="btn btn-primary" href="/?action=list-car">+ List something</a>
+    </div>
   </div>
 
   <div class="tabs" role="tablist">
@@ -144,49 +150,167 @@ button{cursor:pointer;border:0;background:none}
 
 <script>
 (function () {
+  /* ============ CONFIG: edit these to match your routes ============ */
+  var LOGIN_URL = '/login';
+  var DASHBOARDS = {
+    admin:    '/admin',
+    business: '/business/dashboard',
+    seller:   '/seller/dashboard',
+    buyer:    '/my-account'
+  };
+  // Alternate role names your backend might return -> canonical role
+  var ROLE_ALIASES = {
+    admin: 'admin', administrator: 'admin', superadmin: 'admin', super_admin: 'admin', staff: 'admin',
+    business: 'business', businesses: 'business', dealer: 'business', dealership: 'business', business_owner: 'business',
+    seller: 'seller', vendor: 'seller', merchant: 'seller',
+    buyer: 'buyer', user: 'buyer', customer: 'buyer', member: 'buyer'
+  };
+  var TOKEN_KEYS = ['token', 'access_token', 'authToken', 'jwt', 'userToken'];
+  /* ================================================================= */
+
   function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
   function toast(msg, ok) {
     var t = $('toast');
     t.textContent = msg;
     t.className = 'toast show ' + (ok ? 'ok' : 'err');
     setTimeout(function () { t.classList.remove('show'); }, 2800);
   }
+  function fmt(n) { try { return Number(n).toLocaleString(); } catch (e) { return n; } }
+
+  /* ---------- auth helpers ---------- */
   function token() {
-    try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; }
+    try {
+      for (var i = 0; i < TOKEN_KEYS.length; i++) {
+        var v = localStorage.getItem(TOKEN_KEYS[i]);
+        if (v) return v;
+      }
+    } catch (e) {}
+    return '';
+  }
+  function clearSession() {
+    try {
+      TOKEN_KEYS.concat(['userInfo']).forEach(function (k) { localStorage.removeItem(k); });
+    } catch (e) {}
   }
   function auth() {
     var t = token();
     return t ? { Authorization: 'Bearer ' + t } : {};
   }
-  function goLogin() { location.href = '/login?next=' + encodeURIComponent(location.pathname); }
+  // Clear the bad token first so login can't bounce straight back here
+  function goLogin() {
+    clearSession();
+    location.replace(LOGIN_URL + '?next=' + encodeURIComponent(location.pathname));
+  }
 
+  /* ---------- role helpers ---------- */
+  function normRole(r) {
+    if (!r) return '';
+    var k = String(r).toLowerCase().trim().replace(/[\s-]+/g, '_');
+    return ROLE_ALIASES[k] || '';
+  }
+  function jwtRole() {
+    try {
+      var p = token().split('.')[1];
+      var j = JSON.parse(atob(p.replace(/-/g, '+').replace(/_/g, '/')));
+      return normRole(j.role || (j.roles && j.roles[0]) || j.user_type || (j.is_admin ? 'admin' : ''));
+    } catch (e) { return ''; }
+  }
+  function cachedUser() {
+    try { return JSON.parse(localStorage.getItem('userInfo') || 'null') || {}; } catch (e) { return {}; }
+  }
+  function roleOf(u) {
+    u = u || {};
+    if (u.is_admin || u.is_superuser) return 'admin';
+    return normRole(u.role || u.user_type || u.account_type);
+  }
+  function dashFor(role) { return DASHBOARDS[role] || DASHBOARDS.buyer; }
+
+  /* Redirect to the role dashboard unless this page IS that dashboard
+     or the user explicitly came here with ?stay=1 (e.g. from the Dashboard
+     link's "My account" counterpart). */
+  function routeByRole(role) {
+    var target = dashFor(role);
+    var here = location.pathname.replace(/\/+$/, '') || '/';
+    var stay = /[?&]stay=1\b/.test(location.search);
+    var isHere = target.replace(/\/+$/, '') === here;
+    if (role && role !== 'buyer' && !isHere && !stay) {
+      location.replace(target);
+      return true;
+    }
+    return false;
+  }
+
+  /* ---------- boot ---------- */
   if (!token()) { goLogin(); return; }
 
-  // Tabs
-  document.querySelectorAll('.tabs button').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
-      b.classList.add('active');
-      ['saved', 'garage', 'profile'].forEach(function (name) {
-        var el = $('tab-' + name);
-        if (el) el.hidden = name !== b.dataset.tab;
-      });
-      if (b.dataset.tab === 'garage') loadGarage();
-      if (b.dataset.tab === 'profile') loadProfile();
+  // 1) Instant guess from cache / JWT so non-buyers don't flash the buyer page
+  var user = cachedUser();
+  var role = roleOf(user) || jwtRole();
+  if (routeByRole(role)) return;
+
+  // 2) Confirm with the server
+  fetch('/api/my-account/me', { headers: auth() })
+    .then(function (r) {
+      if (r.status === 401 || r.status === 403) { goLogin(); throw null; }
+      // 404 / 5xx: do NOT log out, keep going with cached data
+      return r.ok ? r.json() : null;
+    })
+    .then(function (d) {
+      if (d) {
+        user = d;
+        try { localStorage.setItem('userInfo', JSON.stringify(d)); } catch (e) {}
+      }
+      var serverRole = roleOf(user) || role || 'buyer';
+      if (routeByRole(serverRole)) return;
+      role = serverRole;
+      init();
+    })
+    .catch(function (e) {
+      if (e === null) return;          // goLogin already fired
+      role = role || 'buyer';          // network error: stay, use cache
+      init();
     });
-  });
 
-  $('btn-logout').addEventListener('click', function () {
-    try {
-      localStorage.removeItem('token');
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('userInfo');
-    } catch (e) {}
-    location.href = '/';
-  });
+  /* ---------- page ---------- */
+  function init() {
+    $('boot').hidden = true;
 
-  function fmt(n) {
-    try { return Number(n).toLocaleString(); } catch (e) { return n; }
+    if (role !== 'buyer') {
+      var d = dashFor(role);
+      ['nav-dash', 'btn-dash'].forEach(function (id) { $(id).href = d; $(id).hidden = false; });
+    }
+    renderUserLine();
+
+    document.querySelectorAll('.tabs button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        ['saved', 'garage', 'profile'].forEach(function (name) { $('tab-' + name).hidden = name !== b.dataset.tab; });
+        if (b.dataset.tab === 'garage') loadGarage();
+        if (b.dataset.tab === 'profile') renderProfile();
+      });
+    });
+
+    $('btn-logout').addEventListener('click', function () { clearSession(); location.href = '/'; });
+    $('garage-form').addEventListener('submit', saveVehicle);
+
+    loadSaved();
+    renderProfile();
+  }
+
+  function renderUserLine() {
+    $('user-line').textContent = (user.full_name || user.name || user.phone || 'Member') + (user.email ? ' · ' + user.email : '');
+  }
+
+  function renderProfile() {
+    $('profile-body').innerHTML =
+      '<p><strong>Name</strong><br>' + esc(user.full_name || user.name || '—') + '</p>' +
+      '<p style="margin-top:12px"><strong>Phone</strong><br>' + esc(user.phone || '—') + '</p>' +
+      '<p style="margin-top:12px"><strong>Email</strong><br>' + esc(user.email || '—') + '</p>' +
+      '<p style="margin-top:12px"><strong>Role</strong><br><span class="badge">' + esc(role) + '</span></p>';
   }
 
   function loadSaved() {
@@ -197,7 +321,7 @@ button{cursor:pointer;border:0;background:none}
         return r.ok ? r.json() : { items: [] };
       })
       .then(function (d) {
-        var items = d.items || d || [];
+        var items = Array.isArray(d) ? d : (d.items || []);
         if (!items.length) {
           grid.innerHTML = '<div class="empty">No saved listings yet.<br><a href="/">Browse cars &amp; parts</a></div>';
           return;
@@ -205,8 +329,7 @@ button{cursor:pointer;border:0;background:none}
         grid.innerHTML = items.map(function (i) {
           var href = (i.listing_type === 'vehicle' ? '/vehicle/' : '/part/') + i.listing_id;
           var price = i.listing_price_sll ? 'SLL ' + fmt(i.listing_price_sll) : '';
-          return '<div class="card">' +
-            '<h3>' + esc(i.listing_title || (i.listing_type + ' #' + i.listing_id)) + '</h3>' +
+          return '<div class="card"><h3>' + esc(i.listing_title || (i.listing_type + ' #' + i.listing_id)) + '</h3>' +
             '<div class="meta">' + esc(i.listing_type || '') + '</div>' +
             (price ? '<div class="price">' + price + '</div>' : '') +
             '<div class="acts"><a href="' + href + '">View</a>' +
@@ -215,10 +338,7 @@ button{cursor:pointer;border:0;background:none}
         grid.querySelectorAll('[data-unsave]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             fetch('/api/my-account/saved/' + btn.dataset.unsave, { method: 'DELETE', headers: auth() })
-              .then(function (r) {
-                if (r.ok) { toast('Removed', true); loadSaved(); }
-                else toast('Could not remove', false);
-              });
+              .then(function (r) { if (r.ok) { toast('Removed', true); loadSaved(); } else toast('Could not remove', false); });
           });
         });
       })
@@ -234,40 +354,30 @@ button{cursor:pointer;border:0;background:none}
         return r.ok ? r.json() : [];
       })
       .then(function (cars) {
-        cars = cars || [];
-        if (!cars.length) {
-          grid.innerHTML = '<div class="empty">No vehicles in your garage yet. Add one above.</div>';
-          return;
-        }
+        cars = Array.isArray(cars) ? cars : (cars && cars.items) || [];
+        if (!cars.length) { grid.innerHTML = '<div class="empty">No vehicles in your garage yet. Add one above.</div>'; return; }
         grid.innerHTML = cars.map(function (c) {
-          return '<div class="card">' +
-            '<h3>' + esc(c.year + ' ' + c.make + ' ' + c.model) + '</h3>' +
-            '<div class="meta">' + esc(c.nickname || 'No nickname') +
-            (c.is_primary ? ' · <span class="badge">Primary</span>' : '') + '</div>' +
-            '<div class="acts">' +
-            '<a href="/?make=' + encodeURIComponent(c.make) + '&model=' + encodeURIComponent(c.model) + '&year=' + c.year + '">Find parts</a>' +
+          return '<div class="card"><h3>' + esc(c.year + ' ' + c.make + ' ' + c.model) + '</h3>' +
+            '<div class="meta">' + esc(c.nickname || 'No nickname') + (c.is_primary ? ' · <span class="badge">Primary</span>' : '') + '</div>' +
+            '<div class="acts"><a href="/?make=' + encodeURIComponent(c.make) + '&model=' + encodeURIComponent(c.model) + '&year=' + c.year + '">Find parts</a>' +
             '<button type="button" data-del-garage="' + c.id + '">Remove</button></div></div>';
         }).join('');
         grid.querySelectorAll('[data-del-garage]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             if (!confirm('Remove this vehicle from your garage?')) return;
             fetch('/api/garage/' + btn.dataset.delGarage, { method: 'DELETE', headers: auth() })
-              .then(function (r) {
-                if (r.ok) { toast('Removed', true); loadGarage(); }
-                else toast('Could not remove', false);
-              });
+              .then(function (r) { if (r.ok) { toast('Removed', true); loadGarage(); } else toast('Could not remove', false); });
           });
         });
       })
       .catch(function (e) { if (e !== null) grid.innerHTML = '<div class="empty">Could not load garage.</div>'; });
   }
 
-  $('garage-form').addEventListener('submit', function (e) {
+  function saveVehicle(e) {
     e.preventDefault();
     var fd = new FormData(e.target);
     var body = {
-      make: fd.get('make'),
-      model: fd.get('model'),
+      make: fd.get('make'), model: fd.get('model'),
       year: parseInt(fd.get('year'), 10),
       nickname: fd.get('nickname') || null,
       is_primary: !!fd.get('is_primary')
@@ -283,38 +393,7 @@ button{cursor:pointer;border:0;background:none}
       e.target.reset();
       loadGarage();
     }).catch(function () { toast('Could not save vehicle', false); });
-  });
-
-  function loadProfile() {
-    var box = $('profile-body');
-    var u = null;
-    try { u = JSON.parse(localStorage.getItem('userInfo') || 'null'); } catch (e) {}
-    fetch('/api/my-account/me', { headers: auth() })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) {
-        u = d || u || {};
-        $('user-line').textContent = (u.full_name || u.name || u.phone || 'Member') + (u.email ? ' · ' + u.email : '');
-        box.innerHTML =
-          '<p><strong>Name</strong><br>' + esc(u.full_name || u.name || '—') + '</p>' +
-          '<p style="margin-top:12px"><strong>Phone</strong><br>' + esc(u.phone || '—') + '</p>' +
-          '<p style="margin-top:12px"><strong>Email</strong><br>' + esc(u.email || '—') + '</p>' +
-          '<p style="margin-top:12px"><strong>Role</strong><br><span class="badge">' + esc(u.role || 'buyer') + '</span></p>';
-      })
-      .catch(function () {
-        if (u) {
-          $('user-line').textContent = u.full_name || u.phone || 'Member';
-          box.innerHTML = '<p>Signed in. Profile details unavailable offline.</p>';
-        } else box.innerHTML = '<p class="empty">Could not load profile.</p>';
-      });
   }
-
-  function esc(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-
-  loadSaved();
-  loadProfile();
 })();
 </script>
 
@@ -328,11 +407,11 @@ button{cursor:pointer;border:0;background:none}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
       Garage
     </a>
-    <a href="/my-account" class="active">
+    <a href="/my-account?stay=1" class="active">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>
       Saved
     </a>
-    <a href="/my-account" class="active">
+    <a href="/my-account" id="bnav-account">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
       Account
     </a>
