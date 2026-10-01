@@ -206,6 +206,31 @@ body.mode-cars #sell-car-cta{display:block}
 body.mode-cars .step2-title-parts{display:none}
 body.mode-cars .step2-title-cars{display:inline}
 
+
+/* Trust strip */
+.trust{background:#f0fdfa;border-bottom:1px solid #99f6e4;padding:10px 24px;display:flex;flex-wrap:wrap;gap:14px 24px;justify-content:center;font-size:13px;font-weight:600;color:#0f766e}
+.trust span{display:inline-flex;align-items:center;gap:6px}
+/* VIN safety box (cars mode) */
+.safety-box{display:none;max-width:1100px;margin:16px auto 0;padding:0 20px}
+body.mode-cars .safety-box{display:block}
+.safety-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--sh)}
+.safety-card h3{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.safety-card p{font-size:13px;color:var(--muted);margin-bottom:12px}
+.safety-row{display:flex;gap:10px;flex-wrap:wrap}
+.safety-row input{flex:1;min-width:200px;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;min-height:48px}
+.safety-row button{background:var(--primary);color:#fff;padding:12px 20px;border-radius:8px;font-weight:700;min-height:48px}
+.safety-out{margin-top:12px;font-size:14px;display:none}
+.safety-out.show{display:block}
+.safety-out .ok{color:var(--success);font-weight:700}
+.safety-out .warn{color:#b45309;font-weight:700}
+.safety-out ul{margin:8px 0 0 18px;color:var(--muted);font-size:13px}
+/* Standout result badges */
+.tag.fit{background:#ccfbf1;color:#0f766e}
+.tag.safe{background:#dcfce7;color:#166534}
+.tag.recall{background:#fef3c7;color:#92400e}
+/* Sticky results hint */
+.results-hint{font-size:13px;color:var(--muted);margin-top:4px}
+
 </style>
 </head>
 <body>
@@ -225,6 +250,13 @@ body.mode-cars .step2-title-cars{display:inline}
 <div class="top">
   <strong>Salon AutoZone HQ, Freetown, Sierra Leone</strong>
   <div><a href="tel:+23276123456" class="ph">+232 76 123456</a><a href="/login" id="signin">Sign in / Register</a></div>
+</div>
+
+<div class="trust">
+  <span>✓ Free VIN safety check</span>
+  <span>✓ Parts that fit your car</span>
+  <span>✓ Buy &amp; sell across Sierra Leone</span>
+  <span>✓ WhatsApp the seller directly</span>
 </div>
 
 <header class="brand">
@@ -305,6 +337,19 @@ body.mode-cars .step2-title-cars{display:inline}
   <button type="button" class="abroad" data-act="open" data-v="import-modal">Can't find it locally? Request it from abroad</button>
 </section>
 
+
+
+<div class="safety-box" id="safety-box">
+  <div class="safety-card">
+    <h3>Free VIN safety check</h3>
+    <p>US safety database — shows vehicle identity and open recalls. Best for US-spec imports.</p>
+    <div class="safety-row">
+      <input type="text" id="safety-vin" maxlength="17" placeholder="Enter 17-character VIN" autocomplete="off" spellcheck="false">
+      <button type="button" id="safety-btn">Check free</button>
+    </div>
+    <div class="safety-out" id="safety-out" aria-live="polite"></div>
+  </div>
+</div>
 
 <div id="sell-car-cta">
   <button type="button" class="btn" data-act="list" data-v="vehicle">Sell your car</button>
@@ -564,7 +609,7 @@ body.mode-cars .step2-title-cars{display:inline}
     if (cat.length) h += '<h3 class="grp" style="margin-top:20px">Import from abroad (7-14 days)</h3>' + cat.map(catalogCard).join('');
     if (!h && !feat.length) {
       h = only ? '<div class="empty">No parts here fit your car.<br><button type="button" data-act="showall">Show all parts</button></div>'
-               : '<div class="empty">No parts found. Try a different search, or<br><button type="button" data-act="open" data-v="import-modal">request it from abroad</button></div>';
+               : '<div class="empty">No parts found for this search. Try another category or clear filters.. Try a different search, or<br><button type="button" data-act="open" data-v="import-modal">request it from abroad</button></div>';
     }
     $('results').innerHTML = h;
     markSaved();
@@ -940,6 +985,59 @@ body.mode-cars .step2-title-cars{display:inline}
     });
     ro.observe(results, { childList: true, subtree: true });
   }
+})();
+</script>
+
+
+<script>
+/* Free NHTSA safety check on home (cars mode) */
+(function () {
+  var btn = document.getElementById('safety-btn');
+  var input = document.getElementById('safety-vin');
+  var out = document.getElementById('safety-out');
+  if (!btn || !input || !out) return;
+
+  function run() {
+    var vin = (input.value || '').replace(/\s+/g, '').toUpperCase();
+    if (vin.length !== 17) {
+      out.className = 'safety-out show';
+      out.innerHTML = '<span class="warn">Enter a full 17-character VIN.</span>';
+      return;
+    }
+    out.className = 'safety-out show';
+    out.innerHTML = 'Checking…';
+    btn.disabled = true;
+    fetch('/api/nhtsa/check/' + encodeURIComponent(vin))
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (x) {
+        if (!x.ok) {
+          out.innerHTML = '<span class="warn">' + (x.d.detail || x.d.error || 'Could not check this VIN') + '</span>';
+          return;
+        }
+        var s = (x.d.decode && x.d.decode.summary) || {};
+        var rec = x.d.recalls || {};
+        var name = [s.year, s.make, s.model].filter(Boolean).join(' ') || 'Vehicle';
+        var n = rec.count || 0;
+        var html = '<div><strong>' + name + '</strong></div>';
+        if (n === 0) {
+          html += '<div class="ok">No open recalls found in the US safety database.</div>';
+        } else {
+          html += '<div class="warn">' + n + ' open recall' + (n > 1 ? 's' : '') + '</div><ul>';
+          (rec.recalls || []).slice(0, 5).forEach(function (r) {
+            html += '<li><strong>' + (r.component || 'Recall') + '</strong>: ' + (r.summary || '').slice(0, 160) + '</li>';
+          });
+          html += '</ul>';
+        }
+        html += '<div style="margin-top:8px;font-size:12px;color:#64748b">Free check via NHTSA. Not a full accident/title history.</div>';
+        out.innerHTML = html;
+      })
+      .catch(function () {
+        out.innerHTML = '<span class="warn">Network error. Try again.</span>';
+      })
+      .finally(function () { btn.disabled = false; });
+  }
+  btn.addEventListener('click', run);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') run(); });
 })();
 </script>
 
