@@ -1,190 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ app_name }} - Part Details</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; color: #1a1a1a; }
-        .navbar { background: #0b1e3a; color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 22px; font-weight: bold; color: #00a8e8; text-decoration: none; }
-        .logo span { color: #ffb800; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 25px; font-size: 14px; }
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-        .back-link { color: #00a8e8; text-decoration: none; font-weight: bold; margin-bottom: 20px; display: inline-block; }
-        .detail-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
-        .hero-img { width: 100%; height: 350px; background: linear-gradient(135deg, #0b1e3a, #1a3a6b); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 100px; margin-bottom: 20px; }
-        .main-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-        .part-title { font-size: 26px; color: #0b1e3a; margin-bottom: 10px; }
-        .part-price { font-size: 32px; color: #00a8e8; font-weight: bold; margin-bottom: 20px; }
-        .specs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .spec { background: #f4f6f8; padding: 12px; border-radius: 8px; }
-        .spec-label { font-size: 12px; color: #888; text-transform: uppercase; }
-        .spec-value { font-size: 16px; font-weight: bold; color: #0b1e3a; margin-top: 4px; }
-        .description { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; line-height: 1.6; color: #555; }
-        .sidebar { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); height: fit-content; }
-        .vendor-name { font-size: 18px; font-weight: bold; color: #0b1e3a; margin-bottom: 5px; }
-        .vendor-info { color: #666; font-size: 14px; margin-bottom: 20px; }
-        .contact-btn { background: #00a8e8; color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 10px; }
-        .whatsapp-btn { background: #25D366; }
-        .stock-badge { background: #22c55e; color: white; padding: 6px 14px; border-radius: 6px; font-weight: bold; display: inline-block; margin-bottom: 15px; font-size: 13px; }
-        .stock-badge.low { background: #f59e0b; }
-        .stock-badge.out { background: #dc2626; }
-    
-/* ========== MOBILE PART DETAIL ========== */
-@media (max-width: 768px) {
-    .navbar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
-    .logo { font-size: 15px; }
-    .nav-links a { font-size: 12px; margin-left: 12px; }
-    
-    .container { padding: 0 12px; margin-top: 16px; }
-    .back-link { font-size: 14px; margin-bottom: 14px; }
-    
-    .detail-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
-    .hero-img { height: 200px; font-size: 60px; margin-bottom: 14px; border-radius: 12px; }
-    .main-card { padding: 16px; border-radius: 12px; }
-    .part-title { font-size: 20px; line-height: 1.3; }
-    .part-price { font-size: 26px; letter-spacing: -0.5px; }
-    
-    .stock-badge { padding: 5px 12px; font-size: 12px; margin-bottom: 12px; }
-    
-    .specs-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .spec { padding: 10px; }
-    .spec-label { font-size: 10px; }
-    .spec-value { font-size: 14px; }
-    
-    .description { margin-top: 16px; padding-top: 16px; font-size: 14px; line-height: 1.6; }
-    
-    .sidebar { padding: 16px; }
-    .vendor-name { font-size: 16px; }
-    .vendor-info { font-size: 13px; margin-bottom: 16px; }
-    .contact-btn { padding: 14px; min-height: 48px; font-size: 15px; border-radius: 10px; margin-bottom: 10px; }
-}
-
-@media (max-width: 400px) {
-    .specs-grid { grid-template-columns: 1fr; }
-}
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Part – {{ app_name or 'SalonAutoZone' }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;--navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;--success:#15803d;--sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding-bottom:80px}
+a{color:inherit;text-decoration:none}button{border:0;background:none;cursor:pointer;font:inherit}
+.top{background:var(--navy);color:#94a3b8;padding:10px 20px;font-size:12px;display:flex;justify-content:space-between}
+.top strong{color:#fff}
+.brand{background:#fff;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:40}
+.logo{font-weight:800;font-size:18px}.logo span{color:var(--primary)}
+.wrap{max-width:900px;margin:0 auto;padding:20px 16px}
+.hero-img{height:200px;background:linear-gradient(135deg,#e2e8f0,#f1f5f9);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--muted);margin-bottom:16px;background-size:cover;background-position:center}
+h1{font-size:clamp(20px,4vw,26px);font-weight:800;color:var(--navy)}
+.price{font-size:22px;font-weight:800;color:var(--primary);margin:8px 0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.tag{background:#f1f5f9;color:#475569;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600}
+.tag.fit{background:var(--primary-light);color:var(--primary)}
+.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--sh);margin:16px 0}
+.panel h2{font-size:15px;font-weight:800;margin-bottom:10px}
+.fit-list{list-style:none}.fit-list li{padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.fit-list li:last-child{border-bottom:0}
+.ok{color:var(--success);font-weight:700}
+.muted{color:var(--muted);font-size:13px}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:8px;font-weight:700;min-height:48px;flex:1}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-wa{background:#25d366;color:#fff}
+.btn-ghost{background:#f1f5f9}
+.sk{height:160px;border-radius:12px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:s 1.2s infinite}
+@keyframes s{to{background-position:-200% 0}}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px);z-index:50}
+.bnav nav{display:grid;grid-template-columns:repeat(4,1fr);max-width:500px;margin:0 auto}
+.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center}
+.bnav a.active{color:var(--primary);background:var(--primary-light);border-radius:10px}
+.bnav svg{width:22px;height:22px}
 </style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="/" class="logo">Salon<span>AutoZone</span> & <span>AutoTrader</span></a>
-        <div class="nav-links"><a href="/">← Back to Home</a></div>
-    </div>
-    <div class="container">
-        <a href="/" class="back-link">← Back to Search</a>
-        <div id="detail-content">Loading...</div>
-    </div>
-
-<div id="inquiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;padding:20px;">
-<div style="background:white;border-radius:16px;max-width:460px;width:100%;padding:28px;position:relative;">
-<span onclick="closeInquiryModal()" style="position:absolute;top:14px;right:18px;font-size:26px;cursor:pointer;color:#888;">&times;</span>
-<h2 style="color:#0b1e3a;margin-bottom:6px;font-size:20px;">✉️ Send Inquiry</h2>
-<p style="color:#64748b;font-size:13px;margin-bottom:18px;">The vendor will contact you on WhatsApp.</p>
-<form id="inquiry-form" onsubmit="submitInquiry(event)">
-  <label style="display:block;font-size:13px;color:#475569;font-weight:600;margin-bottom:6px;">Your Name *</label>
-  <input name="buyer_name" required placeholder="e.g. Kadi Sesay" style="width:100%;padding:11px;border:1px solid #e0e6ed;border-radius:8px;margin-bottom:12px;font-size:14px;font-family:inherit;">
-  <label style="display:block;font-size:13px;color:#475569;font-weight:600;margin-bottom:6px;">Your WhatsApp Number *</label>
-  <input name="buyer_phone" required placeholder="+232 76 123 456" style="width:100%;padding:11px;border:1px solid #e0e6ed;border-radius:8px;margin-bottom:12px;font-size:14px;font-family:inherit;">
-  <label style="display:block;font-size:13px;color:#475569;font-weight:600;margin-bottom:6px;">Message</label>
-  <textarea name="buyer_message" rows="3" placeholder="Hi, I want this part. Is it in stock?" style="width:100%;padding:11px;border:1px solid #e0e6ed;border-radius:8px;margin-bottom:16px;font-size:14px;font-family:inherit;"></textarea>
-  <button type="submit" style="background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;border:none;padding:14px;border-radius:10px;width:100%;font-weight:bold;font-size:15px;cursor:pointer;font-family:inherit;">Send Inquiry</button>
-  <div id="inquiry-status" style="margin-top:14px;text-align:center;font-weight:600;font-size:14px;"></div>
-</form>
-</div>
-</div>
-
+<div class="top"><strong>Salon AutoZone · Freetown</strong><a href="/" style="color:#99f6e4;font-weight:700">Home</a></div>
+<header class="brand">
+  <a class="logo" href="/">Salon<span>AutoZone</span></a>
+  <a href="/garage" style="font-weight:600;color:#475569;font-size:14px">My Garage</a>
+</header>
+<main class="wrap" id="app"><div class="sk"></div></main>
+<div class="bnav"><nav>
+  <a href="/" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
+  <a href="/garage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
+  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>Saved</a>
+  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
+</nav></div>
 <script>
-    const partId = window.location.pathname.split('/').pop();
-    async function loadPart() {
-        try {
-            const res = await fetch('/api/parts/' + partId);
-            if (!res.ok) throw new Error('Not found');
-            const p = await res.json();
-            renderPart(p);
-        } catch (err) {
-            document.getElementById('detail-content').innerHTML = '<div style="text-align:center;padding:60px;color:#888;">Part not found.</div>';
-        }
-    }
-    function renderPart(p) {
-        let stockClass = 'stock-badge';
-        let stockText = 'In Stock (' + p.stock_quantity + ')';
-        if (p.stock_quantity === 0) { stockClass += ' out'; stockText = 'Out of Stock'; }
-        else if (p.stock_quantity < 5) { stockClass += ' low'; stockText = 'Low Stock (' + p.stock_quantity + ' left)'; }
-        document.getElementById('detail-content').innerHTML = `
-            <div class="detail-grid">
-                <div>
-                    <div class="hero-img">🔧</div>
-                    <div class="main-card">
-                        <div class="${stockClass}">${stockText}</div>
-                        <div class="part-title">${p.name}</div>
-                        <div class="part-price">SLL ${p.price_sll.toLocaleString()}</div>
-                        <div class="specs-grid">
-                            <div class="spec"><div class="spec-label">Category</div><div class="spec-value">${p.category}</div></div>
-                            <div class="spec"><div class="spec-label">Condition</div><div class="spec-value">${p.condition}</div></div>
-                            <div class="spec"><div class="spec-label">Compatible Make</div><div class="spec-value">${p.compatible_make || 'Universal'}</div></div>
-                            <div class="spec"><div class="spec-label">Compatible Model</div><div class="spec-value">${p.compatible_model || 'Any'}</div></div>
-                            <div class="spec"><div class="spec-label">Location</div><div class="spec-value">📍 ${p.location}</div></div>
-                            <div class="spec"><div class="spec-label">Stock</div><div class="spec-value">${p.stock_quantity} units</div></div>
-                        </div>
-                        ${p.description ? `<div class="description"><strong>Description</strong><br>${p.description}</div>` : ''}
-                    </div>
-                </div>
-                <div>
-                    <div class="sidebar">
-                        <div class="vendor-name">Vendor Information</div>
-                        <div class="vendor-info">Vendor ID: #${p.vendor_id}</div>
-                        <button class="contact-btn" onclick="alert('+232 XX XXX XXX (Demo)')">📞 Call Vendor</button>
-                        <button class="contact-btn whatsapp-btn" onclick="alert('WhatsApp: +232 XX XXX XXX (Demo)')">💬 WhatsApp</button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-function openInquiryModal() {
-  document.getElementById('inquiry-modal').style.display = 'flex';
-}
-function closeInquiryModal() {
-  document.getElementById('inquiry-modal').style.display = 'none';
-  document.getElementById('inquiry-form').reset();
-  document.getElementById('inquiry-status').innerHTML = '';
-}
-async function submitInquiry(e) {
-  e.preventDefault();
-  var statusEl = document.getElementById('inquiry-status');
-  statusEl.style.color = '#00a8e8';
-  statusEl.innerText = 'Sending...';
-  var form = e.target;
-  var data = new FormData(form);
-  var payload = {
-    listing_type: 'part',
-    listing_id: parseInt(partId),
-    buyer_name: data.get('buyer_name'),
-    buyer_phone: data.get('buyer_phone'),
-    buyer_message: data.get('buyer_message') || ''
-  };
-  try {
-    var res = await fetch('/api/inquiries/', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-      var err = await res.json();
-      throw new Error(err.detail || 'Failed to send');
-    }
-    statusEl.style.color = '#22c55e';
-    statusEl.innerHTML = '✅ Inquiry sent!<br>Vendor will contact you soon.';
-    setTimeout(function() { closeInquiryModal(); }, 2500);
-  } catch (err) {
-    statusEl.style.color = '#dc2626';
-    statusEl.innerText = '❌ ' + err.message;
-  }
-}
+(function () {
+  var id = location.pathname.split('/').pop();
+  var app = document.getElementById('app');
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+  function fmt(n){try{return Number(n).toLocaleString()}catch(e){return n}}
+  function token(){try{return localStorage.getItem('token')||localStorage.getItem('access_token')||''}catch(e){return ''}}
+  function auth(){var t=token();return t?{Authorization:'Bearer '+t}:{}}
 
-loadPart();
+  fetch('/api/parts/' + id).then(function(r){return r.ok?r.json():null}).then(function(p){
+    if(!p){app.innerHTML='<p class="muted">Part not found.</p>';return}
+    var title = p.name || p.title || 'Part';
+    var img = p.image_url || p.photo_url || '';
+    var phone = (p.contact_phone||'').replace(/\s+/g,'');
+    var wa = phone ? 'https://wa.me/' + phone.replace(/^\+/,'') + '?text=' + encodeURIComponent('Hi, I am interested in: ' + title + ' on SalonAutoZone') : null;
+    var compat = [p.compatible_make, p.compatible_model].filter(Boolean).join(' ');
+
+    app.innerHTML =
+      '<div class="hero-img"' + (img?' style="background-image:url(\''+esc(img)+'\')"':'') + '>' + (img?'':'No photo') + '</div>' +
+      '<h1>' + esc(title) + '</h1>' +
+      '<div class="price">' + (p.price_sll!=null?'SLL '+fmt(p.price_sll):'Price on request') + '</div>' +
+      '<div class="meta">' +
+        (p.category?'<span class="tag">'+esc(p.category)+'</span>':'') +
+        (p.condition?'<span class="tag">'+esc(p.condition)+'</span>':'') +
+        (p.location?'<span class="tag">'+esc(p.location)+'</span>':'') +
+        (compat?'<span class="tag fit">Fits: '+esc(compat)+'</span>':'') +
+      '</div>' +
+      (p.description?'<div class="panel"><h2>Description</h2><p>'+esc(p.description)+'</p></div>':'') +
+      '<div class="panel" id="fit-panel"><h2>Fits your garage?</h2><p class="muted" id="fit-body">Checking your garage…</p></div>' +
+      '<div class="acts">' +
+        (wa?'<a class="btn btn-wa" href="'+wa+'" target="_blank" rel="noopener">WhatsApp seller</a>':'') +
+        '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
+        '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
+      '</div>';
+
+    // Garage fit check
+    var fitBody = document.getElementById('fit-body');
+    function norm(s){return String(s||'').trim().toLowerCase()}
+    function checkGarage(cars) {
+      if (!cars || !cars.length) {
+        fitBody.innerHTML = 'No cars in your garage. <a href="/garage" style="color:var(--primary);font-weight:700">Add a vehicle</a> to see if this part fits.';
+        return;
+      }
+      var make = norm(p.compatible_make);
+      var model = norm(p.compatible_model);
+      var hits = [];
+      cars.forEach(function(c){
+        var cm = norm(c.make), cmo = norm(c.model);
+        var ok = true;
+        if (make && make !== 'any' && cm && cm.indexOf(make) < 0 && make.indexOf(cm) < 0) ok = false;
+        if (model && cmo && cmo.indexOf(model) < 0 && model.indexOf(cmo) < 0) ok = false;
+        if (!make && !model) ok = false;
+        if (ok) hits.push(c);
+      });
+      if (!make && !model) {
+        fitBody.innerHTML = '<span class="muted">This listing has no fitment info. Confirm with the seller.</span>';
+        return;
+      }
+      if (hits.length) {
+        fitBody.innerHTML = '<div class="ok">Likely fits ' + hits.length + ' of your vehicle' + (hits.length>1?'s':'') + '</div><ul class="fit-list">' +
+          hits.map(function(c){ return '<li>'+esc(c.year+' '+c.make+' '+c.model)+(c.is_primary?' · primary':'')+'</li>'; }).join('') +
+          '</ul><p class="muted">Always confirm with the seller before buying.</p>';
+      } else {
+        fitBody.innerHTML = '<span class="muted">Does not match your garage vehicles' +
+          (compat ? ' (listed for '+esc(compat)+')' : '') +
+          '. <a href="/garage" style="color:var(--primary);font-weight:700">Manage garage</a></span>';
+      }
+    }
+
+    if (token()) {
+      fetch('/api/garage/', { headers: auth() }).then(function(r){ return r.ok ? r.json() : []; }).then(checkGarage).catch(function(){
+        fitBody.innerHTML = '<span class="muted">Could not load garage.</span>';
+      });
+    } else {
+      // localStorage fitment from home page
+      var local = null;
+      try { local = JSON.parse(localStorage.getItem('fitmentVehicle') || 'null'); } catch(e) {}
+      if (local && local.make) checkGarage([local]);
+      else fitBody.innerHTML = '<a href="/login" style="color:var(--primary);font-weight:700">Sign in</a> or set your car on the home page to check fit.';
+    }
+
+    document.getElementById('btn-share').onclick = function(){
+      var msg = '*' + title + '*\n' + (p.price_sll?'SLL '+fmt(p.price_sll)+'\n':'') + '\n' + location.href;
+      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+    };
+    document.getElementById('btn-save').onclick = function(){
+      if (!token()) { location.href='/login?next='+encodeURIComponent(location.pathname); return; }
+      fetch('/api/my-account/saved', {
+        method:'POST',
+        headers: Object.assign({'Content-Type':'application/json'}, auth()),
+        body: JSON.stringify({listing_type:'part', listing_id: Number(id)})
+      }).then(function(r){
+        if (r.status===401) location.href='/login';
+        else if (r.ok) document.getElementById('btn-save').textContent='Saved';
+      });
+    };
+  }).catch(function(){ app.innerHTML='<p class="muted">Could not load part.</p>'; });
+})();
 </script>
 </body>
 </html>
