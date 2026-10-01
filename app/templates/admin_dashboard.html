@@ -2,408 +2,323 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard · SalonAutoZone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%23ffb800' font-family='Arial'>A</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin – {{ app_name or 'SalonAutoZone' }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --navy-900:#0a1729;--navy-800:#0b1e3a;--navy-600:#1a3a6b;
-  --blue-400:#00a8e8;--blue-500:#0091d5;
-  --amber-500:#ffb800;--orange-500:#ff6b00;
-  --green-500:#16a34a;--green-400:#22c55e;
-  --red-500:#dc2626;--red-400:#ef4444;
-  --slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;
-  --slate-400:#94a3b8;--slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;
-  --slate-800:#1e293b;
-  --shadow-sm:0 1px 2px rgba(15,23,42,0.04),0 1px 3px rgba(15,23,42,0.06);
-  --shadow-md:0 2px 4px rgba(15,23,42,0.04),0 4px 12px rgba(15,23,42,0.06);
-  --shadow-lg:0 4px 8px rgba(15,23,42,0.06),0 12px 28px rgba(15,23,42,0.10);
+  --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
+  --navy:#0f172a;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f1f5f9;--surface:#fff;
+  --success:#15803d;--danger:#b91c1c;--warn:#b45309;
+  --sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--slate-800);background:var(--slate-50);-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+body{font-family:Inter,-apple-system,sans-serif;font-size:14px;color:var(--text);background:var(--bg);line-height:1.5}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--primary-hover);outline-offset:2px}
 
-.navbar{background:var(--navy-800);color:white;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.logo{font-size:18px;font-weight:800;color:var(--amber-500);text-decoration:none;letter-spacing:-0.03em}
-.logo span{color:var(--blue-400)}
-.navbar a{color:white;text-decoration:none;font-size:13px;font-weight:600;padding:9px 14px;border-radius:8px;background:rgba(255,255,255,0.08);transition:background 0.15s}
-.navbar a:hover{background:rgba(255,255,255,0.18)}
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.side{position:sticky;top:0;z-index:40}}
 
-.container{max-width:1300px;margin:24px auto;padding:0 20px}
-.page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-600) 100%);color:white;padding:36px 32px;border-radius:16px;margin-bottom:24px;position:relative;overflow:hidden}
-.page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(255,184,0,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(0,168,232,0.12) 0%,transparent 50%);pointer-events:none}
-.page-header > *{position:relative;z-index:1}
-.page-header h1{font-size:28px;font-weight:800;margin-bottom:6px;letter-spacing:-0.03em}
-.page-header p{font-size:14px;opacity:0.85}
-.page-header .admin-key-form{display:flex;gap:8px;margin-top:16px;max-width:420px}
-.page-header .admin-key-form input{flex:1;padding:12px 14px;border:none;border-radius:8px;font-size:14px;font-family:inherit}
-.page-header .admin-key-form button{background:var(--amber-500);color:var(--navy-900);border:none;padding:12px 22px;border-radius:8px;font-weight:800;cursor:pointer;font-size:14px;font-family:inherit}
-.page-header .admin-key-form button:hover{opacity:0.9}
+.side{background:var(--navy);color:#94a3b8;padding:20px 14px;display:flex;flex-direction:column;gap:6px}
+.side .logo{color:#fff;font-weight:800;font-size:16px;padding:8px 10px 18px}.side .logo span{color:#5eead4}
+.side button,.side a{text-align:left;padding:11px 12px;border-radius:8px;font-weight:600;color:#cbd5e1;width:100%}
+.side button:hover,.side a:hover,.side button.active{background:rgba(255,255,255,.08);color:#fff}
+.side button.active{background:var(--primary);color:#fff}
+.side .foot{margin-top:auto;padding:12px 10px;font-size:12px;color:#64748b}
 
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{background:white;border-radius:14px;padding:18px 20px;box-shadow:var(--shadow-sm);border-left:4px solid var(--blue-400);transition:transform 0.15s,box-shadow 0.15s}
-.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.stat-label{font-size:10px;color:var(--slate-400);text-transform:uppercase;font-weight:700;letter-spacing:0.08em}
-.stat-value{font-size:28px;color:var(--navy-800);font-weight:800;margin-top:6px;letter-spacing:-0.03em}
-.stat-value.revenue{color:var(--green-500)}
+.main{padding:24px 20px 48px;max-width:1200px}
+.hdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.hdr h1{font-size:22px;font-weight:800;color:var(--navy)}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--sh)}
+.stat .k{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.stat .v{font-size:26px;font-weight:800;color:var(--navy);margin-top:4px}
 
-.tabs{display:flex;gap:6px;margin-bottom:18px;background:white;padding:6px;border-radius:12px;box-shadow:var(--shadow-sm);overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{padding:12px 18px;background:transparent;border:none;border-radius:8px;font-weight:700;cursor:pointer;color:var(--slate-500);font-size:13px;white-space:nowrap;flex-shrink:0;font-family:inherit;transition:all 0.15s}
-.tab:hover{color:var(--navy-800)}
-.tab.active{background:var(--navy-800);color:white}
-
-.section{background:white;border-radius:16px;padding:24px;box-shadow:var(--shadow-sm);display:none;border:1px solid var(--slate-200)}
-.section.active{display:block;animation:fadeInUp 0.3s ease-out}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.section h2{color:var(--navy-800);font-size:20px;font-weight:800;margin-bottom:18px;letter-spacing:-0.02em}
-
-.data-row{display:flex;gap:14px;padding:14px 16px;border-bottom:1px solid var(--slate-100);align-items:center;flex-wrap:wrap;transition:background 0.15s;border-radius:10px}
-.data-row:hover{background:var(--slate-50)}
-.data-row:last-child{border-bottom:none}
-.data-icon{width:44px;height:44px;border-radius:12px;background:var(--slate-100);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.data-icon.featured{background:linear-gradient(135deg,var(--amber-500),#e5a700);color:white}
-.data-main{flex:1;min-width:0}
-.data-title{font-weight:700;color:var(--navy-800);font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.data-meta{font-size:12px;color:var(--slate-500);display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:4px}
-.data-meta strong{color:var(--slate-700)}
-
-.badge{padding:4px 10px;border-radius:9999px;font-size:11px;font-weight:700;background:var(--slate-100);color:var(--slate-600)}
-.badge-featured{background:var(--amber-500);color:var(--navy-900)}
-.badge-green{background:var(--green-500);color:white}
-.badge-red{background:var(--red-500);color:white}
-.badge-blue{background:var(--blue-400);color:white}
-
-.action-btn{padding:8px 14px;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px;font-family:inherit;min-height:36px;transition:opacity 0.15s}
-.action-btn:hover{opacity:0.85}
-.btn-unfeature{background:#fef3c7;color:#92400e}
-.btn-contact{background:var(--blue-400);color:white}
-
-.loading{text-align:center;padding:40px;color:var(--blue-400);font-weight:600}
-.empty{text-align:center;padding:60px 20px;color:var(--slate-400);font-size:14px}
-.empty-icon{font-size:48px;margin-bottom:12px;opacity:0.4}
-.error-box{background:#fef2f2;border-radius:12px;padding:16px 20px;border-left:4px solid var(--red-500);color:#991b1b;font-weight:600;font-size:14px;margin-bottom:16px}
-
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--navy-800);color:white;padding:14px 24px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:var(--shadow-lg);transition:transform 0.3s,opacity 0.3s;opacity:0;z-index:9999;pointer-events:none;max-width:90vw;text-align:center}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.success{background:var(--green-500)}
-.toast.error{background:var(--red-500)}
-
-@media (max-width:768px){
-  .navbar{padding:12px 16px;flex-direction:column}
-  .page-header{padding:24px 20px}
-  .page-header h1{font-size:22px}
-  .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .stat-value{font-size:22px}
-  .data-row{padding:12px}
-  .action-btn{width:100%;margin-top:6px}
-}
+.panel{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh);overflow:hidden}
+.panel .bar{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.panel h2{font-size:15px;font-weight:800}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;background:#f8fafc}
+td{font-size:13px}
+.badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.badge.ok{background:#dcfce7;color:#166534}
+.badge.warn{background:#fef3c7;color:#92400e}
+.badge.off{background:#f1f5f9;color:#64748b}
+.badge.bad{background:#fef2f2;color:#b91c1c}
+.btn{display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px;font-weight:700;font-size:12px;min-height:36px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-ghost{background:#f1f5f9}
+.btn-danger{background:#fef2f2;color:var(--danger)}
+.inp{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;min-height:40px}
+.empty{padding:36px;text-align:center;color:var(--muted)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--navy);color:#fff;padding:12px 16px;border-radius:10px;font-weight:600;transform:translateY(120px);transition:transform .25s;z-index:99}
+.toast.show{transform:translateY(0)}.toast.ok{background:var(--success)}.toast.err{background:var(--danger)}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
+<div class="shell">
+  <aside class="side">
+    <div class="logo">Salon<span>Admin</span></div>
+    <button type="button" class="active" data-view="overview">Overview</button>
+    <button type="button" data-view="vehicles">Vehicle listings</button>
+    <button type="button" data-view="parts">Part listings</button>
+    <button type="button" data-view="imports">Import requests</button>
+    <button type="button" data-view="inquiries">Inquiries</button>
+    <a href="/admin/catalog">Supplier catalog</a>
+    <a href="/">← Back to site</a>
+    <div class="foot">Admin panel · protect this URL</div>
+  </aside>
 
-<div class="navbar">
-  <a href="/" class="logo">Salon<span>AutoZone</span> · Admin</a>
-  <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <a href="/">🏠 Back to Site</a>
-    <a href="/my-account">👤 My Account</a>
+  <div class="main">
+    <div class="hdr">
+      <h1 id="page-title">Overview</h1>
+      <button type="button" class="btn btn-ghost" id="btn-refresh">Refresh</button>
+    </div>
+
+    <div id="view-overview">
+      <div class="stats" id="stats">
+        <div class="stat"><div class="k">Vehicles</div><div class="v" id="s-vehicles">—</div></div>
+        <div class="stat"><div class="k">Parts</div><div class="v" id="s-parts">—</div></div>
+        <div class="stat"><div class="k">Import req.</div><div class="v" id="s-imports">—</div></div>
+        <div class="stat"><div class="k">Inquiries</div><div class="v" id="s-inquiries">—</div></div>
+      </div>
+      <div class="panel">
+        <div class="bar"><h2>Quick actions</h2></div>
+        <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn btn-primary" href="/admin/catalog">Manage catalog</a>
+          <a class="btn btn-ghost" href="/admin/run-migration-xyz" target="_blank">Run migrations</a>
+          <a class="btn btn-ghost" href="/health" target="_blank">Health check</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-vehicles" class="hidden">
+      <div class="panel">
+        <div class="bar">
+          <h2>Vehicle listings</h2>
+          <input class="inp" id="q-vehicles" placeholder="Filter title/make…">
+        </div>
+        <div class="table-wrap"><table><thead><tr>
+          <th>ID</th><th>Title</th><th>Price</th><th>Location</th><th>Status</th><th></th>
+        </tr></thead><tbody id="tb-vehicles"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <div id="view-parts" class="hidden">
+      <div class="panel">
+        <div class="bar">
+          <h2>Part listings</h2>
+          <input class="inp" id="q-parts" placeholder="Filter name/category…">
+        </div>
+        <div class="table-wrap"><table><thead><tr>
+          <th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th></th>
+        </tr></thead><tbody id="tb-parts"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <div id="view-imports" class="hidden">
+      <div class="panel">
+        <div class="bar"><h2>Import requests</h2></div>
+        <div class="table-wrap"><table><thead><tr>
+          <th>ID</th><th>Customer</th><th>Item</th><th>Status</th><th>Created</th>
+        </tr></thead><tbody id="tb-imports"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <div id="view-inquiries" class="hidden">
+      <div class="panel">
+        <div class="bar"><h2>Inquiries</h2></div>
+        <div class="table-wrap"><table><thead><tr>
+          <th>ID</th><th>Type</th><th>Listing</th><th>Status</th><th>Created</th>
+        </tr></thead><tbody id="tb-inquiries"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+      </div>
+    </div>
   </div>
 </div>
-
-<div class="container">
-  <div class="page-header">
-    <h1>🛡️ Admin Dashboard</h1>
-    <p>Manage featured listings, users, imports, and inquiries</p>
-    <div class="admin-key-form" id="admin-key-wrap">
-      <input type="password" id="admin-key-input" placeholder="Enter admin key" autocomplete="current-password">
-      <button onclick="saveAdminKey()">Unlock</button>
-    </div>
-  </div>
-
-  <div id="error-box" class="error-box" style="display:none;"></div>
-
-  <div id="dashboard-content" style="display:none;">
-    <div class="stats-grid" id="stats-grid">
-      <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">—</div></div>
-      <div class="stat-card" style="border-left-color:var(--amber-500)"><div class="stat-label">Featured Listings</div><div class="stat-value" id="stat-featured">—</div></div>
-      <div class="stat-card" style="border-left-color:var(--green-500)"><div class="stat-label">Featured Revenue (SLL)</div><div class="stat-value revenue" id="stat-revenue">—</div></div>
-      <div class="stat-card" style="border-left-color:#a855f7"><div class="stat-label">Total Vehicles</div><div class="stat-value" id="stat-vehicles">—</div></div>
-      <div class="stat-card" style="border-left-color:#ff6b00"><div class="stat-label">Total Parts</div><div class="stat-value" id="stat-parts">—</div></div>
-      <div class="stat-card" style="border-left-color:var(--blue-400)"><div class="stat-label">Total Inquiries</div><div class="stat-value" id="stat-inquiries">—</div></div>
-      <div class="stat-card" style="border-left-color:var(--red-500)"><div class="stat-label">Import Requests</div><div class="stat-value" id="stat-imports">—</div></div>
-      <div class="stat-card" style="border-left-color:var(--slate-400)"><div class="stat-label">Saved Items</div><div class="stat-value" id="stat-saved">—</div></div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="featured">⭐ Featured (Revenue)</button>
-      <button class="tab" data-tab="users">👥 Users</button>
-      <button class="tab" data-tab="imports">🌍 Imports</button>
-      <button class="tab" data-tab="inquiries">💬 Inquiries</button>
-    </div>
-
-    <div id="section-featured" class="section active">
-      <h2>⭐ Featured Listings — Payment Tracker</h2>
-      <div id="featured-list"><div class="loading">Loading…</div></div>
-    </div>
-
-    <div id="section-users" class="section">
-      <h2>👥 Users</h2>
-      <div id="users-list"><div class="loading">Loading…</div></div>
-    </div>
-
-    <div id="section-imports" class="section">
-      <h2>🌍 Import Requests</h2>
-      <div id="imports-list"><div class="loading">Loading…</div></div>
-    </div>
-
-    <div id="section-inquiries" class="section">
-      <h2>💬 Recent Inquiries</h2>
-      <div id="inquiries-list"><div class="loading">Loading…</div></div>
-    </div>
-  </div>
-</div>
-
-<div id="toast" class="toast"></div>
+<div class="toast" id="toast"></div>
 
 <script>
 (function () {
-  'use strict';
-
-  var ADMIN_KEY_STORAGE = 'admin_key';
-  var adminKey = '';
-  try { adminKey = localStorage.getItem(ADMIN_KEY_STORAGE) || ''; } catch (e) {}
-
-  function showToast(msg, type) {
-    var t = document.getElementById('toast');
-    t.innerText = msg;
-    t.className = 'toast show ' + (type || '');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(function () { t.className = 'toast'; }, 3000);
+  function $(id) { return document.getElementById(id); }
+  function toast(msg, ok) {
+    var t = $('toast'); t.textContent = msg;
+    t.className = 'toast show ' + (ok ? 'ok' : 'err');
+    setTimeout(function () { t.classList.remove('show'); }, 2500);
   }
-
-  function showError(msg) {
-    var e = document.getElementById('error-box');
-    e.innerHTML = '⚠️ ' + msg;
-    e.style.display = 'block';
+  function token() {
+    try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; }
   }
-
-  function hideError() {
-    document.getElementById('error-box').style.display = 'none';
+  function auth() {
+    var t = token();
+    return t ? { Authorization: 'Bearer ' + t } : {};
   }
-
-  async function adminFetch(url, options) {
-    var opts = options || {};
-    opts.headers = Object.assign({}, opts.headers || {}, {
-      'X-Admin-Key': adminKey,
-    });
-    var res = await fetch(url, opts);
-    if (res.status === 403) {
-      throw new Error('Invalid admin key. Please check and try again.');
-    }
-    if (!res.ok) {
-      var err = await res.json().catch(function() { return {}; });
-      throw new Error(err.detail || 'Request failed: ' + res.status);
-    }
-    return res.json();
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
+  function fmt(n) { try { return Number(n).toLocaleString(); } catch (e) { return n; } }
 
-  window.saveAdminKey = function () {
-    var input = document.getElementById('admin-key-input');
-    var key = (input.value || '').trim();
-    if (!key) { showToast('Please enter the admin key', 'error'); return; }
-    adminKey = key;
-    try { localStorage.setItem(ADMIN_KEY_STORAGE, key); } catch (e) {}
-    input.value = '';
-    initDashboard();
+  var titles = {
+    overview: 'Overview',
+    vehicles: 'Vehicle listings',
+    parts: 'Part listings',
+    imports: 'Import requests',
+    inquiries: 'Inquiries'
   };
 
-  async function loadStats() {
-    try {
-      var d = await adminFetch('/api/admin/stats');
-      document.getElementById('stat-users').textContent = d.total_users ?? 0;
-      document.getElementById('stat-featured').textContent = (d.featured_parts ?? 0) + (d.featured_vehicles ?? 0);
-      document.getElementById('stat-revenue').textContent = 'SLL ' + Number(d.featured_revenue_sll || 0).toLocaleString();
-      document.getElementById('stat-vehicles').textContent = d.total_vehicles ?? 0;
-      document.getElementById('stat-parts').textContent = d.total_parts ?? 0;
-      document.getElementById('stat-inquiries').textContent = d.total_inquiries ?? 0;
-      document.getElementById('stat-imports').textContent = d.total_imports ?? 0;
-      document.getElementById('stat-saved').textContent = d.total_saved ?? 0;
-    } catch (err) {
-      showError(err.message);
-    }
-  }
-
-  async function loadFeatured() {
-    var el = document.getElementById('featured-list');
-    el.innerHTML = '<div class="loading">Loading…</div>';
-    try {
-      var d = await adminFetch('/api/admin/featured');
-      if (!d.count || d.count === 0) {
-        el.innerHTML = '<div class="empty"><div class="empty-icon">⭐</div>No featured listings right now.</div>';
-        return;
-      }
-      el.innerHTML = '<div style="background:#fef3c7;padding:12px 16px;border-radius:10px;margin-bottom:14px;font-weight:700;color:#92400e;">💰 Total featured revenue this cycle: SLL ' + Number(d.revenue_sll).toLocaleString() + '</div>' +
-        d.items.map(function (item) {
-          var owner = item.owner || {};
-          return '<div class="data-row">' +
-            '<div class="data-icon featured">⭐</div>' +
-            '<div class="data-main">' +
-              '<div class="data-title">' + item.title + ' <span class="badge badge-featured">' + item.type.toUpperCase() + '</span></div>' +
-              '<div class="data-meta">' +
-                '<span>SLL ' + Number(item.price_sll || 0).toLocaleString() + '</span>' +
-                '<span>📍 ' + item.location + '</span>' +
-                '<span>Featured until: ' + (item.featured_until ? new Date(item.featured_until).toLocaleDateString() : '—') + '</span>' +
-              '</div>' +
-              (owner.name ? '<div class="data-meta" style="margin-top:6px"><span>👤 <strong>' + owner.name + '</strong></span><span>📞 ' + (owner.phone || '—') + '</span><span>✉️ ' + (owner.email || '—') + '</span></div>' : '') +
-            '</div>' +
-            '<button class="action-btn btn-unfeature" onclick="unfeature(\'' + item.type + '\',' + item.id + ')">Unfeature</button>' +
-            (owner.phone ? '<a href="https://wa.me/' + (owner.phone || '').replace(/[^0-9]/g, '') + '" target="_blank" rel="noopener" class="action-btn btn-contact" style="text-decoration:none;display:inline-flex;align-items:center;">💬 WhatsApp</a>' : '') +
-          '</div>';
-        }).join('');
-    } catch (err) {
-      el.innerHTML = '<div class="error-box">' + err.message + '</div>';
-    }
-  }
-
-  window.unfeature = async function (type, id) {
-    if (!confirm('Remove featured status?')) return;
-    try {
-      await adminFetch('/api/admin/unfeature/' + type + '/' + id, { method: 'POST' });
-      showToast('Unfeatured', 'success');
-      loadFeatured();
-      loadStats();
-    } catch (err) {
-      showToast('❌ ' + err.message, 'error');
-    }
-  };
-
-  async function loadUsers() {
-    var el = document.getElementById('users-list');
-    el.innerHTML = '<div class="loading">Loading…</div>';
-    try {
-      var d = await adminFetch('/api/admin/users');
-      if (!d.count) { el.innerHTML = '<div class="empty">No users yet.</div>'; return; }
-      el.innerHTML = d.users.map(function (u) {
-        return '<div class="data-row">' +
-          '<div class="data-icon">👤</div>' +
-          '<div class="data-main">' +
-            '<div class="data-title">' + u.full_name + (u.is_admin ? ' <span class="badge badge-red">ADMIN</span>' : '') + (u.is_vendor ? ' <span class="badge badge-blue">VENDOR</span>' : '') + '</div>' +
-            '<div class="data-meta">' +
-              '<span>✉️ ' + u.email + '</span>' +
-              '<span>📞 ' + u.phone + '</span>' +
-              '<span>Joined: ' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '—') + '</span>' +
-            '</div>' +
-          '</div>' +
-          '<a href="https://wa.me/' + (u.phone || '').replace(/[^0-9]/g, '') + '" target="_blank" rel="noopener" class="action-btn btn-contact" style="text-decoration:none;display:inline-flex;align-items:center;">💬 WhatsApp</a>' +
-        '</div>';
-      }).join('');
-    } catch (err) {
-      el.innerHTML = '<div class="error-box">' + err.message + '</div>';
-    }
-  }
-
-  async function loadImports() {
-    var el = document.getElementById('imports-list');
-    el.innerHTML = '<div class="loading">Loading…</div>';
-    try {
-      var d = await adminFetch('/api/admin/imports');
-      if (!d.count) { el.innerHTML = '<div class="empty">No import requests.</div>'; return; }
-      el.innerHTML = d.imports.map(function (r) {
-        return '<div class="data-row">' +
-          '<div class="data-icon">🌍</div>' +
-          '<div class="data-main">' +
-            '<div class="data-title">' + r.part_name + ' <span class="badge">' + r.status + '</span></div>' +
-            '<div class="data-meta">' +
-              '<span>🚗 ' + r.car_make + ' ' + r.car_model + ' ' + r.car_year + '</span>' +
-              '<span>👤 ' + r.customer_name + '</span>' +
-              '<span>📞 ' + r.customer_phone + '</span>' +
-              (r.budget_sll ? '<span>💰 SLL ' + Number(r.budget_sll).toLocaleString() + '</span>' : '') +
-              '<span>⏱️ ' + (r.created_at ? new Date(r.created_at).toLocaleDateString() : '—') + '</span>' +
-            '</div>' +
-          '</div>' +
-          '<a href="https://wa.me/' + (r.customer_phone || '').replace(/[^0-9]/g, '') + '" target="_blank" rel="noopener" class="action-btn btn-contact" style="text-decoration:none;display:inline-flex;align-items:center;">💬 WhatsApp</a>' +
-        '</div>';
-      }).join('');
-    } catch (err) {
-      el.innerHTML = '<div class="error-box">' + err.message + '</div>';
-    }
-  }
-
-  async function loadInquiries() {
-    var el = document.getElementById('inquiries-list');
-    el.innerHTML = '<div class="loading">Loading…</div>';
-    try {
-      var d = await adminFetch('/api/admin/inquiries');
-      if (!d.count) { el.innerHTML = '<div class="empty">No inquiries yet.</div>'; return; }
-      el.innerHTML = d.inquiries.map(function (i) {
-        var msg = i.buyer_message ? '<div style="font-size:13px;color:var(--slate-600);margin-top:4px;font-style:italic;">"' + i.buyer_message + '"</div>' : '';
-        return '<div class="data-row">' +
-          '<div class="data-icon">' + (i.listing_type === 'vehicle' ? '🚗' : '🔧') + '</div>' +
-          '<div class="data-main">' +
-            '<div class="data-title">' + (i.listing_title || '(listing #' + i.listing_id + ')') + ' <span class="badge">' + i.status + '</span></div>' +
-            '<div class="data-meta">' +
-              '<span>👤 ' + i.buyer_name + '</span>' +
-              '<span>📞 ' + i.buyer_phone + '</span>' +
-              '<span>' + (i.created_at ? new Date(i.created_at).toLocaleDateString() : '—') + '</span>' +
-            '</div>' +
-            msg +
-          '</div>' +
-          '<a href="https://wa.me/' + (i.buyer_phone || '').replace(/[^0-9]/g, '') + '" target="_blank" rel="noopener" class="action-btn btn-contact" style="text-decoration:none;display:inline-flex;align-items:center;">💬 WhatsApp</a>' +
-        '</div>';
-      }).join('');
-    } catch (err) {
-      el.innerHTML = '<div class="error-box">' + err.message + '</div>';
-    }
-  }
-
-  var tabs = document.querySelectorAll('.tab');
-  var sections = {
-    featured: document.getElementById('section-featured'),
-    users: document.getElementById('section-users'),
-    imports: document.getElementById('section-imports'),
-    inquiries: document.getElementById('section-inquiries')
-  };
-
-  function switchTab(name) {
-    tabs.forEach(function (t) { t.classList.toggle('active', t.dataset.tab === name); });
-    Object.keys(sections).forEach(function (k) { sections[k].classList.toggle('active', k === name); });
-    if (name === 'featured') loadFeatured();
-    else if (name === 'users') loadUsers();
-    else if (name === 'imports') loadImports();
-    else if (name === 'inquiries') loadInquiries();
-  }
-
-   tabs.forEach(function (t) {
-    t.addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      var name = t.getAttribute('data-tab');
-      console.log('Tab clicked:', name);
-      switchTab(name);
+  document.querySelectorAll('.side [data-view]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.side [data-view]').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      var v = btn.dataset.view;
+      $('page-title').textContent = titles[v] || v;
+      ['overview','vehicles','parts','imports','inquiries'].forEach(function (name) {
+        var el = $('view-' + name);
+        if (el) el.classList.toggle('hidden', name !== v);
+      });
+      loadView(v);
     });
   });
-  async function initDashboard() {
-    hideError();
-    if (!adminKey) {
-      document.getElementById('admin-key-wrap').style.display = 'flex';
-      document.getElementById('dashboard-content').style.display = 'none';
-      return;
-    }
-    try {
-      await loadStats();
-      document.getElementById('admin-key-wrap').style.display = 'none';
-      document.getElementById('dashboard-content').style.display = 'block';
-      loadFeatured();
-    } catch (err) {
-      document.getElementById('admin-key-wrap').style.display = 'flex';
-      document.getElementById('dashboard-content').style.display = 'none';
-      showError(err.message);
-    }
+
+  $('btn-refresh').addEventListener('click', function () {
+    var active = document.querySelector('.side button.active');
+    loadView(active ? active.dataset.view : 'overview');
+  });
+
+  function loadView(v) {
+    if (v === 'overview') loadOverview();
+    if (v === 'vehicles') loadVehicles();
+    if (v === 'parts') loadParts();
+    if (v === 'imports') loadImports();
+    if (v === 'inquiries') loadInquiries();
   }
 
-  initDashboard();
+  function loadOverview() {
+    // Best-effort counts from list endpoints
+    Promise.all([
+      fetch('/api/vehicles/?limit=1', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      fetch('/api/parts/?limit=1', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      fetch('/api/import-requests/', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      fetch('/api/inquiries/', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+    ]).then(function (arr) {
+      function count(d) {
+        if (!d) return '—';
+        if (typeof d.total === 'number') return d.total;
+        if (Array.isArray(d)) return d.length;
+        if (Array.isArray(d.items)) return d.items.length;
+        return '—';
+      }
+      $('s-vehicles').textContent = count(arr[0]);
+      $('s-parts').textContent = count(arr[1]);
+      $('s-imports').textContent = count(arr[2]);
+      $('s-inquiries').textContent = count(arr[3]);
+    });
+  }
+
+  function rowsOrEmpty(tbody, items, render) {
+    if (!items || !items.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty">No records found (or API not available).</td></tr>';
+      return;
+    }
+    tbody.innerHTML = items.map(render).join('');
+  }
+
+  function loadVehicles() {
+    var tb = $('tb-vehicles');
+    fetch('/api/vehicles/?limit=50', { headers: auth() })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (d) {
+        var items = d.items || d.results || d || [];
+        if (!Array.isArray(items)) items = [];
+        window.__vehicles = items;
+        filterVehicles();
+      })
+      .catch(function () { tb.innerHTML = '<tr><td colspan="6" class="empty">Could not load vehicles.</td></tr>'; });
+  }
+  function filterVehicles() {
+    var q = ($('q-vehicles').value || '').toLowerCase();
+    var items = (window.__vehicles || []).filter(function (v) {
+      var t = ((v.title || '') + ' ' + (v.make || '') + ' ' + (v.model || '')).toLowerCase();
+      return !q || t.indexOf(q) >= 0;
+    });
+    rowsOrEmpty($('tb-vehicles'), items, function (v) {
+      var sold = v.is_sold ? '<span class="badge bad">Sold</span>' : '<span class="badge ok">Active</span>';
+      return '<tr><td>' + v.id + '</td><td>' + esc(v.title || (v.year + ' ' + v.make + ' ' + v.model)) +
+        '</td><td>' + (v.price_sll != null ? 'SLL ' + fmt(v.price_sll) : '—') +
+        '</td><td>' + esc(v.location || '—') + '</td><td>' + sold +
+        '</td><td><a class="btn btn-ghost" href="/vehicle/' + v.id + '" target="_blank">Open</a></td></tr>';
+    });
+  }
+  $('q-vehicles').addEventListener('input', filterVehicles);
+
+  function loadParts() {
+    var tb = $('tb-parts');
+    fetch('/api/parts/?limit=50', { headers: auth() })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (d) {
+        var items = d.items || d.results || d || [];
+        if (!Array.isArray(items)) items = [];
+        window.__parts = items;
+        filterParts();
+      })
+      .catch(function () { tb.innerHTML = '<tr><td colspan="6" class="empty">Could not load parts.</td></tr>'; });
+  }
+  function filterParts() {
+    var q = ($('q-parts').value || '').toLowerCase();
+    var items = (window.__parts || []).filter(function (p) {
+      var t = ((p.name || p.title || '') + ' ' + (p.category || '')).toLowerCase();
+      return !q || t.indexOf(q) >= 0;
+    });
+    rowsOrEmpty($('tb-parts'), items, function (p) {
+      return '<tr><td>' + p.id + '</td><td>' + esc(p.name || p.title || '—') +
+        '</td><td>' + esc(p.category || '—') +
+        '</td><td>' + (p.price_sll != null ? 'SLL ' + fmt(p.price_sll) : '—') +
+        '</td><td><span class="badge off">' + esc(p.condition || '—') + '</span></td>' +
+        '<td><a class="btn btn-ghost" href="/part/' + p.id + '" target="_blank">Open</a></td></tr>';
+    });
+  }
+  $('q-parts').addEventListener('input', filterParts);
+
+  function loadImports() {
+    var tb = $('tb-imports');
+    fetch('/api/import-requests/', { headers: auth() })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (d) {
+        var items = d.items || d || [];
+        if (!Array.isArray(items)) items = [];
+        rowsOrEmpty(tb, items, function (i) {
+          return '<tr><td>' + (i.id || '—') + '</td><td>' + esc(i.customer_phone || i.phone || '—') +
+            '</td><td>' + esc(i.part_name || i.item || i.description || '—') +
+            '</td><td><span class="badge warn">' + esc(i.status || 'pending') + '</span></td>' +
+            '<td>' + esc((i.created_at || '').toString().slice(0, 10)) + '</td></tr>';
+        });
+      })
+      .catch(function () { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load import requests.</td></tr>'; });
+  }
+
+  function loadInquiries() {
+    var tb = $('tb-inquiries');
+    fetch('/api/inquiries/', { headers: auth() })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (d) {
+        var items = d.items || d || [];
+        if (!Array.isArray(items)) items = [];
+        rowsOrEmpty(tb, items, function (i) {
+          return '<tr><td>' + (i.id || '—') + '</td><td>' + esc(i.inquiry_type || i.type || '—') +
+            '</td><td>' + esc((i.listing_type || '') + ' #' + (i.listing_id || '')) +
+            '</td><td><span class="badge off">' + esc(i.status || '—') + '</span></td>' +
+            '<td>' + esc((i.created_at || '').toString().slice(0, 10)) + '</td></tr>';
+        });
+      })
+      .catch(function () { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load inquiries.</td></tr>'; });
+  }
+
+  loadOverview();
 })();
 </script>
 </body>
