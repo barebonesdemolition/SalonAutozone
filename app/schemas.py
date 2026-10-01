@@ -1,112 +1,52 @@
-from pydantic import BaseModel, field_validator
-from datetime import datetime
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
+from datetime import datetime
 
-
-# --- Vehicle Schemas ---
-
-class VehicleBase(BaseModel):
+class VehicleCreate(BaseModel):
     title: str
     make: str
     model: str
     year: int
     price_sll: float
-    price_usd: Optional[float] = None
-    mileage_km: int
-    fuel_type: str
-    transmission: str
-    location: str
+    location: Optional[str] = None
     description: Optional[str] = None
-    image_url: Optional[str] = None
-    contact_phone: Optional[str] = None
+    
+    # Dealership / Import Fields
+    condition: Optional[str] = "used"          # "new" or "used"
+    availability: Optional[str] = "in_stock"    # "in_stock", "in_transit", or "on_order"
+    country_of_origin: Optional[str] = None     # e.g., "USA", "Japan", "Germany"
+    vin: Optional[str] = None                  # 17-character VIN
+    duty_paid: Optional[bool] = False
+    arrival_date: Optional[datetime] = None
+    supplier_url: Optional[str] = None          # Staff/Internal supplier reference
 
 
-class VehicleCreate(VehicleBase):
-    # seller_id is set by the backend from the logged-in user — do not require it
-    seller_id: Optional[int] = None
-
-
-class VehicleResponse(VehicleBase):
+class VehicleResponse(BaseModel):
     id: int
-    is_sold: bool = False
-    is_featured: bool = False
-    featured_until: Optional[datetime] = None
-    views: int = 0
-    seller_id: Optional[int] = None
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-# --- Part Schemas ---
-
-class PartBase(BaseModel):
-    name: str
-    category: str
-    compatible_make: Optional[str] = None
-    compatible_model: Optional[str] = None
+    seller_id: int
+    business_id: Optional[int] = None
+    title: str
+    make: str
+    model: str
+    year: int
     price_sll: float
-    stock_quantity: int = 1
-    condition: str
-    location: str
+    location: Optional[str] = None
     description: Optional[str] = None
-    image_url: Optional[str] = None
-    contact_phone: Optional[str] = None
-
-
-class PartCreate(PartBase):
-    # vendor_id is set by the backend from the logged-in user
-    vendor_id: Optional[int] = None
-
-
-class PartResponse(PartBase):
-    id: int
-    is_featured: bool = False
+    
+    # Dealership / Import Fields
+    condition: str
+    availability: str
+    country_of_origin: Optional[str] = None
+    vin: Optional[str] = None
+    duty_paid: bool
+    arrival_date: Optional[datetime] = None
+    supplier_url: Optional[str] = None
+    
+    # Listing Meta
+    is_sold: bool
+    is_featured: bool
     featured_until: Optional[datetime] = None
-    views: int = 0
-    vendor_id: Optional[int] = None
+    views: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
-
-# --- Import Request Schemas ---
-
-class ImportRequestCreate(BaseModel):
-    customer_name: str
-    customer_phone: str
-    customer_email: Optional[str] = None
-    customer_location: str
-    part_name: str
-    car_make: str
-    car_model: str
-    car_year: str
-    part_number: Optional[str] = None
-    quantity: int = 1
-    budget_sll: Optional[float] = None
-    urgency: str = "Normal"
-    notes: Optional[str] = None
-
-
-class ImportRequestResponse(ImportRequestCreate):
-    id: int
-    status: str
-    quoted_price_sll: Optional[float] = None
-    supplier_country: Optional[str] = None
-    estimated_days: Optional[int] = None
-    admin_notes: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class ImportRequestUpdate(BaseModel):
-    status: Optional[str] = None
-    quoted_price_sll: Optional[float] = None
-    supplier_country: Optional[str] = None
-    estimated_days: Optional[int] = None
-    admin_notes: Optional[str] = None
+    model_config = ConfigDict(from_attributes=True)
