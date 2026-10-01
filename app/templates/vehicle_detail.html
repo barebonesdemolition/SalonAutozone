@@ -1,207 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ app_name }} - Vehicle Details</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; color: #1a1a1a; }
-        .navbar { background: #0b1e3a; color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 22px; font-weight: bold; color: #00a8e8; text-decoration: none; }
-        .logo span { color: #ffb800; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 25px; font-size: 14px; }
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-        .back-link { color: #00a8e8; text-decoration: none; font-weight: bold; margin-bottom: 20px; display: inline-block; }
-        .detail-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
-        .hero-img { width: 100%; height: 400px; background: linear-gradient(135deg, #0b1e3a, #1a3a6b); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 100px; margin-bottom: 20px; }
-        .main-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-        .car-title { font-size: 26px; color: #0b1e3a; margin-bottom: 10px; }
-        .car-price { font-size: 32px; color: #00a8e8; font-weight: bold; margin-bottom: 5px; }
-        .car-price-usd { font-size: 16px; color: #888; margin-bottom: 20px; }
-        .specs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
-        .spec { background: #f4f6f8; padding: 12px; border-radius: 8px; }
-        .spec-label { font-size: 12px; color: #888; text-transform: uppercase; }
-        .spec-value { font-size: 16px; font-weight: bold; color: #0b1e3a; margin-top: 4px; }
-        .description { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; line-height: 1.6; color: #555; }
-        .sidebar { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); height: fit-content; }
-        .seller-name { font-size: 18px; font-weight: bold; color: #0b1e3a; margin-bottom: 5px; }
-        .seller-info { color: #666; font-size: 14px; margin-bottom: 20px; }
-        .contact-btn { background: #00a8e8; color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 10px; }
-        .whatsapp-btn { background: #25D366; }
-        .sold-badge { background: #ff4444; color: white; padding: 8px 20px; border-radius: 6px; font-weight: bold; display: inline-block; margin-bottom: 15px; }
-    
-/* ========== MOBILE VEHICLE DETAIL ========== */
-@media (max-width: 768px) {
-    .navbar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
-    .logo { font-size: 15px; }
-    .nav-links a { font-size: 12px; margin-left: 12px; }
-    
-    .container { padding: 0 12px; margin-top: 16px; }
-    .back-link { font-size: 14px; margin-bottom: 14px; }
-    
-    .detail-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
-    .hero-img { height: 220px; font-size: 60px; margin-bottom: 14px; border-radius: 12px; }
-    .main-card { padding: 16px; border-radius: 12px; }
-    .car-title { font-size: 20px; line-height: 1.3; }
-    .car-price { font-size: 26px; letter-spacing: -0.5px; }
-    .car-price-usd { font-size: 14px; }
-    
-    .specs-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
-    .spec { padding: 10px; }
-    .spec-label { font-size: 10px; }
-    .spec-value { font-size: 14px; }
-    
-    .description { margin-top: 16px; padding-top: 16px; font-size: 14px; line-height: 1.6; }
-    
-    .sidebar { padding: 16px; }
-    .seller-name { font-size: 16px; }
-    .seller-info { font-size: 13px; margin-bottom: 16px; }
-    .contact-btn { padding: 14px; min-height: 48px; font-size: 15px; border-radius: 10px; margin-bottom: 10px; }
-    .sold-badge { padding: 6px 14px; font-size: 13px; }
-}
-
-@media (max-width: 400px) {
-    .specs-grid { grid-template-columns: 1fr; }
-}
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vehicle – {{ app_name or 'SalonAutoZone' }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;--navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;--success:#15803d;--warn:#b45309;--sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding-bottom:80px}
+a{color:inherit;text-decoration:none}button,input{font:inherit}button{border:0;background:none;cursor:pointer}
+.top{background:var(--navy);color:#94a3b8;padding:10px 20px;font-size:12px;display:flex;justify-content:space-between}
+.top strong{color:#fff}
+.brand{background:#fff;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:40}
+.logo{font-weight:800;font-size:18px}.logo span{color:var(--primary)}
+.wrap{max-width:900px;margin:0 auto;padding:20px 16px}
+.hero-img{height:220px;background:linear-gradient(135deg,#e2e8f0,#f1f5f9);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--muted);margin-bottom:16px;background-size:cover;background-position:center}
+h1{font-size:clamp(22px,4vw,28px);font-weight:800;color:var(--navy);letter-spacing:-.02em}
+.price{font-size:24px;font-weight:800;color:var(--primary);margin:8px 0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.tag{background:#f1f5f9;color:#475569;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600}
+.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--sh);margin:16px 0}
+.panel h2{font-size:15px;font-weight:800;margin-bottom:10px}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:8px;font-weight:700;min-height:48px;flex:1}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-wa{background:#25d366;color:#fff}
+.btn-ghost{background:#f1f5f9}
+.safety .ok{color:var(--success);font-weight:700}
+.safety .warn{color:var(--warn);font-weight:700}
+.safety ul{margin:8px 0 0 18px;font-size:13px;color:var(--muted)}
+.muted{color:var(--muted);font-size:13px}
+.sk{height:160px;border-radius:12px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:s 1.2s infinite}
+@keyframes s{to{background-position:-200% 0}}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px);z-index:50}
+.bnav nav{display:grid;grid-template-columns:repeat(4,1fr);max-width:500px;margin:0 auto}
+.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center}
+.bnav a.active{color:var(--primary);background:var(--primary-light);border-radius:10px}
+.bnav svg{width:22px;height:22px}
 </style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="/" class="logo">Salon<span>AutoZone</span> & <span>AutoTrader</span></a>
-        <div class="nav-links"><a href="/">← Back to Home</a></div>
-    </div>
-    <div class="container">
-        <a href="/" class="back-link">← Back to Search</a>
-        <div id="detail-content">Loading...</div>
-    </div>
-
-<!-- ============ INQUIRY MODAL ============ -->
-<div id="inquiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;padding:20px;">
-<div style="background:white;border-radius:16px;max-width:460px;width:100%;padding:28px;position:relative;">
-<span onclick="closeInquiryModal()" style="position:absolute;top:14px;right:18px;font-size:26px;cursor:pointer;color:#888;">&times;</span>
-<h2 style="color:#0b1e3a;margin-bottom:6px;font-size:20px;">✉️ Send Inquiry</h2>
-<p style="color:#64748b;font-size:13px;margin-bottom:18px;">The seller will contact you on WhatsApp at the number you provide.</p>
-<form id="inquiry-form" onsubmit="submitInquiry(event)">
-  <label style="display:block;font-size:13px;color:#475569;font-weight:600;margin-bottom:6px;">Your Name *</label>
-  <input name="buyer_name" required placeholder="e.g. Kadi Sesay" style="width:100%;padding:11px;border:1px solid #e0e6ed;border-radius:8px;margin-bottom:12px;font-size:14px;font-family:inherit;">
-  <label style="display:block;font-size:13px;color:#475569;font-weight:600;margin-bottom:6px;">Your WhatsApp Number *</label>
-  <input name="buyer_phone" required placeholder="+232 76 123 456" style="width:100%;padding:11px;border:1px solid #e0e6ed;border-radius:8px;margin-bottom:12px;font-size:14px;font-family:inherit;">
-  <label style="display:block;font-size:13px;color:#475569;font-weight:600;margin-bottom:6px;">Message (optional)</label>
-  <textarea name="buyer_message" rows="3" placeholder="Hi, I'm interested in this car. Is it still available?" style="width:100%;padding:11px;border:1px solid #e0e6ed;border-radius:8px;margin-bottom:16px;font-size:14px;font-family:inherit;"></textarea>
-  <button type="submit" style="background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;border:none;padding:14px;border-radius:10px;width:100%;font-weight:bold;font-size:15px;cursor:pointer;font-family:inherit;">Send Inquiry</button>
-  <div id="inquiry-status" style="margin-top:14px;text-align:center;font-weight:600;font-size:14px;"></div>
-  <div style="text-align:center;margin-top:10px;font-size:12px;color:#94a3b8;">✓ No account needed &nbsp;•&nbsp; ✓ Seller contacts you directly</div>
-</form>
-</div>
-</div>
-
+<div class="top"><strong>Salon AutoZone · Freetown</strong><a href="/" style="color:#99f6e4;font-weight:700">Home</a></div>
+<header class="brand">
+  <a class="logo" href="/">Salon<span>AutoZone</span></a>
+  <a href="/my-account" style="font-weight:600;color:#475569;font-size:14px">Account</a>
+</header>
+<main class="wrap" id="app"><div class="sk"></div></main>
+<div class="bnav"><nav>
+  <a href="/" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
+  <a href="/garage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
+  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>Saved</a>
+  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
+</nav></div>
 <script>
-    const vehicleId = window.location.pathname.split('/').pop();
-    async function loadVehicle() {
-        try {
-            const res = await fetch('/api/vehicles/' + vehicleId);
-            if (!res.ok) throw new Error('Not found');
-            const v = await res.json();
-            renderVehicle(v);
-        } catch (err) {
-            document.getElementById('detail-content').innerHTML = '<div style="text-align:center;padding:60px;color:#888;">Vehicle not found.</div>';
-        }
-    }
-    function renderVehicle(v) {
-        const soldBadge = v.is_sold ? '<div class="sold-badge">SOLD</div>' : '';
-        document.getElementById('detail-content').innerHTML = `
-            <div class="detail-grid">
-                <div>
-                    <div class="hero-img">🚗</div>
-                    <div class="main-card">
-                        ${soldBadge}
-                        <div class="car-title">${v.title}</div>
-                        <div class="car-price">SLL ${v.price_sll.toLocaleString()}</div>
-                        ${v.price_usd ? `<div class="car-price-usd">Approx. $${v.price_usd.toLocaleString()} USD</div>` : ''}
-                        <div class="specs-grid">
-                            <div class="spec"><div class="spec-label">Make</div><div class="spec-value">${v.make}</div></div>
-                            <div class="spec"><div class="spec-label">Model</div><div class="spec-value">${v.model}</div></div>
-                            <div class="spec"><div class="spec-label">Year</div><div class="spec-value">${v.year}</div></div>
-                            <div class="spec"><div class="spec-label">Mileage</div><div class="spec-value">${v.mileage_km.toLocaleString()} km</div></div>
-                            <div class="spec"><div class="spec-label">Fuel</div><div class="spec-value">${v.fuel_type}</div></div>
-                            <div class="spec"><div class="spec-label">Transmission</div><div class="spec-value">${v.transmission}</div></div>
-                            <div class="spec"><div class="spec-label">Location</div><div class="spec-value">📍 ${v.location}</div></div>
-                            <div class="spec"><div class="spec-label">Status</div><div class="spec-value">${v.is_sold ? 'Sold' : 'Available'}</div></div>
-                        </div>
-                        ${v.description ? `<div class="description"><strong>Description</strong><br>${v.description}</div>` : ''}
-                    </div>
-                </div>
-                <div>
-                    <div class="sidebar">
-                        <div class="seller-name">Seller Information</div>
-                        <div class="seller-info">🇸🇱 Verified Sierra Leone Seller</div>
-                        <button class="contact-btn" onclick="alert('+232 XX XXX XXX (Demo)')">📞 Call Seller</button>
-                        <button class="contact-btn whatsapp-btn" onclick="alert('WhatsApp: +232 XX XXX XXX (Demo)')">💬 WhatsApp</button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-function openInquiryModal() {
-  if (!currentVehicle) return;
-  document.getElementById('inquiry-modal').style.display = 'flex';
-}
-function closeInquiryModal() {
-  document.getElementById('inquiry-modal').style.display = 'none';
-  document.getElementById('inquiry-form').reset();
-  document.getElementById('inquiry-status').innerHTML = '';
-}
-async function submitInquiry(e) {
-  e.preventDefault();
-  var statusEl = document.getElementById('inquiry-status');
-  statusEl.style.color = '#00a8e8';
-  statusEl.innerText = 'Sending...';
-  var form = e.target;
-  var data = new FormData(form);
-  var payload = {
-    listing_type: 'vehicle',
-    listing_id: parseInt(vehicleId),
-    buyer_name: data.get('buyer_name'),
-    buyer_phone: data.get('buyer_phone'),
-    buyer_message: data.get('buyer_message') || ''
-  };
-  try {
-    var res = await fetch('/api/inquiries/', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-      var err = await res.json();
-      throw new Error(err.detail || 'Failed to send');
-    }
-    statusEl.style.color = '#22c55e';
-    statusEl.innerHTML = '✅ Your inquiry has been sent!<br>Seller will contact you shortly.';
-    
-    // Notify admin via WhatsApp
-    var msg = 'Hello Salon AutoZone!\n\n'
-            + '✅ NEW INQUIRY\n\n'
-            + '👤 Buyer: ' + data.get('buyer_name') + '\n'
-            + '📱 Phone: ' + data.get('buyer_phone') + '\n'
-            + '💬 Message: ' + (data.get('buyer_message') || 'No message') + '\n\n'
-            + 'Listing: ' + (currentVehicle ? currentVehicle.title : 'Part listing');
-    
-    var waUrl = 'https://wa.me/23276570104?text=' + encodeURIComponent(msg);
-    
-    setTimeout(function() {
-      closeInquiryModal();
-      // Open WhatsApp notification
-      window.open(waUrl, '_blank');
-    }, 2000);
-  } catch (err) {
-    statusEl.style.color = '#dc2626';
-    statusEl.innerText = '❌ ' + err.message;
-  }
-}
+(function () {
+  var id = location.pathname.split('/').pop();
+  var app = document.getElementById('app');
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+  function fmt(n){try{return Number(n).toLocaleString()}catch(e){return n}}
+  function token(){try{return localStorage.getItem('token')||localStorage.getItem('access_token')||''}catch(e){return ''}}
+  function auth(){var t=token();return t?{Authorization:'Bearer '+t}:{}}
 
-loadVehicle();
+  fetch('/api/vehicles/' + id).then(function(r){return r.ok?r.json():null}).then(function(v){
+    if(!v){app.innerHTML='<p class="muted">Vehicle not found.</p>';return}
+    var title = v.title || [v.year,v.make,v.model].filter(Boolean).join(' ');
+    var img = v.image_url || v.photo_url || '';
+    var phone = (v.contact_phone||'').replace(/\s+/g,'');
+    var wa = phone ? 'https://wa.me/' + phone.replace(/^\+/,'') + '?text=' + encodeURIComponent('Hi, I saw your ' + title + ' on SalonAutoZone') : null;
+    app.innerHTML =
+      '<div class="hero-img"' + (img?' style="background-image:url(\''+esc(img)+'\')"':'') + '>' + (img?'':'No photo') + '</div>' +
+      '<h1>' + esc(title) + '</h1>' +
+      '<div class="price">' + (v.price_sll!=null?'SLL '+fmt(v.price_sll):'Price on request') + '</div>' +
+      (v.price_usd?'<div class="muted">≈ USD '+fmt(v.price_usd)+'</div>':'') +
+      '<div class="meta">' +
+        (v.year?'<span class="tag">'+esc(v.year)+'</span>':'') +
+        (v.mileage_km!=null?'<span class="tag">'+fmt(v.mileage_km)+' km</span>':'') +
+        (v.fuel_type?'<span class="tag">'+esc(v.fuel_type)+'</span>':'') +
+        (v.transmission?'<span class="tag">'+esc(v.transmission)+'</span>':'') +
+        (v.location?'<span class="tag">'+esc(v.location)+'</span>':'') +
+      '</div>' +
+      (v.description?'<div class="panel"><h2>Description</h2><p>'+esc(v.description)+'</p></div>':'') +
+      '<div class="panel safety" id="safety"><h2>Free safety check</h2><p class="muted" id="safety-body">Enter or load VIN to check open recalls (US database).</p></div>' +
+      '<div class="acts">' +
+        (wa?'<a class="btn btn-wa" href="'+wa+'" target="_blank" rel="noopener">WhatsApp seller</a>':'') +
+        '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
+        '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
+      '</div>';
+
+    // Safety check
+    var vin = v.vin || v.chassis_number || '';
+    var safetyBody = document.getElementById('safety-body');
+    function runCheck(vinCode) {
+      if (!vinCode || vinCode.length < 11) {
+        safetyBody.innerHTML = '<span class="muted">No VIN on this listing. Ask the seller for the chassis number.</span>';
+        return;
+      }
+      safetyBody.textContent = 'Checking…';
+      fetch('/api/nhtsa/check/' + encodeURIComponent(vinCode)).then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d}})}).then(function(x){
+        if (!x.ok) { safetyBody.innerHTML = '<span class="warn">' + esc(x.d.detail||x.d.error||'Check failed') + '</span>'; return; }
+        var s = (x.d.decode&&x.d.decode.summary)||{};
+        var rec = x.d.recalls||{};
+        var name = [s.year,s.make,s.model].filter(Boolean).join(' ');
+        var n = rec.count||0;
+        var h = name ? '<div><strong>'+esc(name)+'</strong></div>' : '';
+        if (n===0) h += '<div class="ok">No open recalls found.</div>';
+        else {
+          h += '<div class="warn">'+n+' open recall'+(n>1?'s':'')+'</div><ul>';
+          (rec.recalls||[]).slice(0,5).forEach(function(r){ h += '<li><strong>'+esc(r.component||'Recall')+'</strong>: '+esc((r.summary||'').slice(0,140))+'</li>'; });
+          h += '</ul>';
+        }
+        h += '<p class="muted" style="margin-top:8px">Free NHTSA check — not full accident history. VIN: '+esc(vinCode)+'</p>';
+        safetyBody.innerHTML = h;
+      }).catch(function(){ safetyBody.innerHTML = '<span class="warn">Network error</span>'; });
+    }
+    if (vin) runCheck(vin);
+    else {
+      safetyBody.innerHTML = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+        '<input id="vin-in" maxlength="17" placeholder="17-character VIN" style="flex:1;min-width:180px;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;text-transform:uppercase">' +
+        '<button type="button" class="btn btn-primary" id="vin-go" style="flex:0">Check free</button></div>';
+      document.getElementById('vin-go').onclick = function(){ runCheck((document.getElementById('vin-in').value||'').replace(/\s+/g,'').toUpperCase()); };
+    }
+
+    document.getElementById('btn-share').onclick = function(){
+      var url = location.href;
+      var msg = '*' + title + '*\n' + (v.price_sll?'SLL '+fmt(v.price_sll)+'\n':'') + '\n' + url;
+      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+    };
+    document.getElementById('btn-save').onclick = function(){
+      if (!token()) { location.href='/login?next='+encodeURIComponent(location.pathname); return; }
+      fetch('/api/my-account/saved', {
+        method:'POST',
+        headers: Object.assign({'Content-Type':'application/json'}, auth()),
+        body: JSON.stringify({listing_type:'vehicle', listing_id: Number(id)})
+      }).then(function(r){
+        if (r.status===401) location.href='/login';
+        else if (r.ok) { document.getElementById('btn-save').textContent='Saved'; }
+      });
+    };
+  }).catch(function(){ app.innerHTML='<p class="muted">Could not load vehicle.</p>'; });
+})();
 </script>
 </body>
 </html>
