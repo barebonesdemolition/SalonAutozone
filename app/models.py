@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
@@ -7,7 +6,7 @@ from app.db import Base
 
 
 # ============================================================
-# USER MODEL
+# USER MODEL (Fixes the missing attribute error)
 # ============================================================
 class User(Base):
     __tablename__ = "users"
@@ -28,7 +27,7 @@ class User(Base):
 
 
 # ============================================================
-# BUSINESS / STOREFRONT MODEL
+# BUSINESS MODEL
 # ============================================================
 class Business(Base):
     __tablename__ = "businesses"
