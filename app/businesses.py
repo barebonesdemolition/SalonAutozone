@@ -1,6 +1,5 @@
-"""Business accounts: local parts stores, car dealerships, shippers/importers and wholesalers abroad.
-
-Step 1: apply, public storefront profile, admin verification. Listings get linked to a business in step 2.
+"""
+Business accounts: local parts stores, car dealerships, shippers/importers and wholesalers abroad.
 """
 import re
 from datetime import datetime
@@ -9,6 +8,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, field_validator
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, desc, or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -68,10 +68,16 @@ async def _unique_slug(db: AsyncSession, name: str) -> str:
 
 def _public(b: Business) -> dict:
     return {
-        "id": b.id, "slug": b.slug, "business_type": b.business_type,
+        "id": b.id,
+        "slug": b.slug,
+        "business_type": b.business_type,
         "type_label": BUSINESS_TYPES.get(b.business_type, b.business_type),
-        "name": b.name, "country": b.country, "city": b.city, "whatsapp": b.whatsapp,
-        "description": b.description, "logo_url": b.logo_url,
+        "name": b.name,
+        "country": b.country,
+        "city": b.city,
+        "whatsapp": b.whatsapp,
+        "description": b.description,
+        "logo_url": b.logo_url,
         "created_at": b.created_at.isoformat() if b.created_at else None,
     }
 
@@ -98,7 +104,7 @@ class BusinessApply(BaseModel):
     @field_validator("name", "city", "country")
     @classmethod
     def _text(cls, v):
-        v = v.strip()
+        v = (v or "").strip()
         if not 2 <= len(v) <= 80:
             raise ValueError("Must be 2 to 80 characters")
         return v
@@ -123,25 +129,48 @@ class BusinessApply(BaseModel):
         if not v:
             return None
         if not (v.startswith("https://") or (v.startswith("/") and not v.startswith("//"))):
-            raise ValueError("Logo must be an https link")
+            raise ValueError("Logo must be an https link or relative path")
         return v
 
 
 # ---------- owner routes ----------
 
 @router.post("/apply", status_code=status.HTTP_201_CREATED)
-async def apply(data: BusinessApply, user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    if (await db.execute(select(Business.id).where(Business.owner_id == user.id))).first():
+async def apply(
+    data: BusinessApply,
+    user: models.User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    existing = await db.execute(select(Business.id).where(Business.owner_id == user.id))
+    if existing.first():
         raise HTTPException(status_code=400, detail="You already have a business application")
+
+    slug = await _unique_slug(db, data.name)
     biz = Business(
-        owner_id=user.id, business_type=data.business_type, name=data.name,
-        slug=await _unique_slug(db, data.name), country=data.country, city=data.city,
-        whatsapp=data.whatsapp, email=(data.email or "").strip() or None,
-        description=data.description, logo_url=data.logo_url, status="pending",
+        owner_id=user.id,
+        business_type=data.business_type,
+        name=data.name,
+        slug=slug,
+        country=data.country,
+        city=data.city,
+        whatsapp=data.whatsapp,
+        email=(data.email or "").strip() or None,
+        description=data.description,
+        logo_url=data.logo_url,
+        status="pending",
     )
     db.add(biz)
-    await db.commit()
-    await db.refresh(biz)
+    
+    try:
+        await db.commit()
+        await db.refresh(biz)
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A business with this name or user account already exists. Please try again."
+        )
+
     return {"success": True, "status": biz.status, "slug": biz.slug}
 
 
@@ -154,18 +183,37 @@ async def mine(user: models.User = Depends(get_current_user), db: AsyncSession =
 
 
 @router.put("/mine")
-async def update_mine(data: BusinessApply, user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def update_mine(
+    data: BusinessApply,
+    user: models.User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     biz = (await db.execute(select(Business).where(Business.owner_id == user.id))).scalars().first()
     if not biz:
         raise HTTPException(status_code=404, detail="No business found")
-    # type and slug cannot be changed by the owner; status is controlled by admins
-    biz.name, biz.country, biz.city, biz.whatsapp = data.name, data.country, data.city, data.whatsapp
-    biz.email, biz.description, biz.logo_url = (data.email or "").strip() or None, data.description, data.logo_url
-    await db.commit()
-    return {"success": True}
+
+    # Re-trigger pending status if core identifying info is changed
+    if biz.name != data.name or biz.whatsapp != data.whatsapp:
+        biz.status = "pending"
+
+    biz.name = data.name
+    biz.country = data.country
+    biz.city = data.city
+    biz.whatsapp = data.whatsapp
+    biz.email = (data.email or "").strip() or None
+    biz.description = data.description
+    biz.logo_url = data.logo_url
+
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(status_code=400, detail="Could not update business details")
+
+    return {"success": True, "status": biz.status}
 
 
-# ---------- admin routes (declared before /{slug}) ----------
+# ---------- admin routes ----------
 
 @router.get("/admin/list")
 async def admin_list(
@@ -173,15 +221,18 @@ async def admin_list(
     _: dict = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
+    if status_filter != "all" and status_filter not in STATUSES:
+        raise HTTPException(status_code=400, detail=f"Invalid status filter. Must be 'all' or one of {list(STATUSES)}")
+
     q = select(Business, models.User).join(models.User, models.User.id == Business.owner_id).order_by(desc(Business.created_at))
     if status_filter != "all":
         q = q.where(Business.status == status_filter)
+
     rows = (await db.execute(q)).all()
     return {
         "count": len(rows),
         "businesses": [
-            {**_public(b), "status": b.status, "email": b.email,
-             "owner": {"name": u.full_name, "email": u.email, "phone": u.phone}}
+            {**_public(b), "status": b.status, "email": b.email, "owner": {"name": u.full_name, "email": u.email, "phone": u.phone}}
             for b, u in rows
         ],
     }
@@ -215,11 +266,14 @@ async def list_businesses(
 ):
     query = select(Business).where(Business.status == "verified")
     if business_type:
+        if business_type not in BUSINESS_TYPES:
+            raise HTTPException(status_code=400, detail="Invalid business type filter")
         query = query.where(Business.business_type == business_type)
     if country:
         query = query.where(Business.country.ilike(country))
     if q:
         query = query.where(or_(Business.name.ilike(f"%{q}%"), Business.city.ilike(f"%{q}%")))
+
     rows = (await db.execute(query.order_by(Business.name).limit(200))).scalars().all()
     return {"count": len(rows), "businesses": [_public(b) for b in rows]}
 
