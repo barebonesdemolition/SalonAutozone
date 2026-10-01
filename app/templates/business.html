@@ -57,7 +57,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
     ['wholesaler', 'Wholesaler (abroad)', 'You supply parts from outside Sierra Leone']
   ];
   var token = '';
-  try { token = localStorage.getItem('token') || ''; } catch (e) {}
+  try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
 
   function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function safeUrl(u) { u = String(u || '').trim(); return (u.indexOf('https://') === 0 || (u.charAt(0) === '/' && u.charAt(1) !== '/')) ? u : ''; }
@@ -69,11 +69,20 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
         if (!r.ok) {
           var detail = d.detail;
           if (Array.isArray(detail)) detail = detail.map(function (x) { return x.msg; }).join('. ');
-          throw new Error(typeof detail === 'string' ? detail : 'Something went wrong');
+          var error = new Error(typeof detail === 'string' ? detail : 'Something went wrong');
+          error.status = r.status;
+          throw error;
         }
         return d;
       });
     });
+  }
+  function returnToLogin() {
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+    } catch (e) {}
+    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
   }
   function pill(st) {
     var map = { verified: ['ok', 'Verified'], pending: ['wait', 'Waiting for approval'], rejected: ['bad', 'Not approved'], suspended: ['bad', 'Suspended'] };
@@ -106,7 +115,10 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
     if (!token) { window.location.href = '/login?next=/become-a-seller'; return; }
     api('/api/businesses/mine').then(function (d) {
       if (d.business) { showStatus(d.business); } else { showForm(); }
-    }).catch(function (e) { root.innerHTML = '<p class="msg" style="color:var(--r)">' + esc(e.message) + '</p>'; });
+    }).catch(function (e) {
+      if (e.status === 401) { returnToLogin(); return; }
+      root.innerHTML = '<p class="msg" style="color:var(--r)">' + esc(e.message) + '</p>';
+    });
   }
   function showStatus(b) {
     root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta">' + pill(b.status) + '<span class="pill t">' + esc(b.type_label) + '</span></div></div></div>' +
@@ -139,7 +151,10 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shad
       btn.disabled = true; msg.style.color = 'var(--t)'; msg.textContent = 'Sending...';
       api('/api/businesses/apply', { method: 'POST', body: JSON.stringify(p) })
         .then(function () { showApply(); })
-        .catch(function (err) { msg.style.color = 'var(--r)'; msg.textContent = err.message; btn.disabled = false; });
+        .catch(function (err) {
+          if (err.status === 401) { returnToLogin(); return; }
+          msg.style.color = 'var(--r)'; msg.textContent = err.message; btn.disabled = false;
+        });
     });
   }
 

@@ -241,12 +241,12 @@ async def admin_dashboard_page():
 
 @app.get("/become-a-seller")
 async def become_a_seller_page():
-    return FileResponse("templates/index.html")
+    return FileResponse("app/templates/business.html")
 
 
 @app.get("/store/{slug}")
 async def verified_business_page(slug: str):
-    return FileResponse("templates/index.html")
+    return FileResponse("app/templates/business.html")
 
 
 @app.get("/vin-tool")
