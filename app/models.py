@@ -43,7 +43,7 @@ class User(Base):
 class UserCar(Base):
     __tablename__ = "user_cars"
 
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(Integer, primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     vehicle_id = Column(String, ForeignKey("vehicles.id", ondelete="CASCADE"), nullable=True)
     make = Column(String, nullable=False)
@@ -360,7 +360,7 @@ class ListingPhoto(Base):
     __tablename__ = "listing_photos"
 
     id = Column(String, primary_key=True)
-    listing_id = Column(String, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
+    listing_id = Column(Integer, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
     url = Column(String, nullable=False)
     position = Column(Integer, default=0, nullable=False)
     is_hero = Column(Boolean, default=False, nullable=False)
@@ -384,12 +384,12 @@ class OrderItem(Base):
     __tablename__ = "order_items"
 
     id = Column(String, primary_key=True)
-    order_id = Column(String, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
+    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
     item_type = Column(String, nullable=False)
-    supplier_part_id = Column(String, ForeignKey("supplier_parts.id", ondelete="RESTRICT"), nullable=True)
-    listing_id = Column(String, ForeignKey("listings.id", ondelete="RESTRICT"), nullable=True)
+    supplier_part_id = Column(Integer, ForeignKey("supplier_parts.id", ondelete="RESTRICT"), nullable=True)
+    listing_id = Column(Integer, ForeignKey("listings.id", ondelete="RESTRICT"), nullable=True)
     fulfillment_type = Column(String, default="ship_to_address", nullable=False)
-    pickup_supplier_id = Column(String, ForeignKey("suppliers.id", ondelete="RESTRICT"), nullable=True)
+    pickup_supplier_id = Column(Integer, ForeignKey("suppliers.id", ondelete="RESTRICT"), nullable=True)
     quantity = Column(Integer, default=1, nullable=False)
     unit_price = Column(Float, nullable=False)
     currency_code = Column(String, default="CAD", nullable=False)
