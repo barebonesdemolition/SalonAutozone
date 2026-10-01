@@ -190,6 +190,22 @@ a{color:inherit;text-decoration:none}
 }
 @media (max-width:400px){.cats{grid-template-columns:repeat(2,1fr)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Market mode: cars hides vehicle step */
+body.mode-cars #step-vehicle{display:none}
+body.mode-cars #cats{display:none}
+body.mode-cars .abroad{display:none}
+body.mode-cars .idw{display:none}
+body.mode-parts #sell-car-cta{display:none}
+#sell-car-cta{display:none;max-width:1100px;margin:12px auto 0;padding:0 20px}
+body.mode-cars #sell-car-cta{display:block}
+#sell-car-cta .btn{width:100%;background:var(--slate);color:#fff;padding:14px;border-radius:10px;font-weight:700;min-height:52px}
+#sell-car-cta .btn:hover{background:var(--navy)}
+.step2-title-parts{display:inline}
+.step2-title-cars{display:none}
+body.mode-cars .step2-title-parts{display:none}
+body.mode-cars .step2-title-cars{display:inline}
+
 </style>
 </head>
 <body>
@@ -263,7 +279,10 @@ a{color:inherit;text-decoration:none}
 
 <!-- STEP 2: Search -->
 <section class="step2" id="step-search">
-  <div class="step-label"><span class="num">2</span> Find parts or cars</div>
+  <div class="step-label"><span class="num">2</span>
+    <span class="step2-title-parts">Find parts</span>
+    <span class="step2-title-cars">Browse cars</span>
+  </div>
   <div class="search-card">
     <div class="srow">
       <select id="s-cat" aria-label="Category">
@@ -285,6 +304,11 @@ a{color:inherit;text-decoration:none}
   </div>
   <button type="button" class="abroad" data-act="open" data-v="import-modal">Can't find it locally? Request it from abroad</button>
 </section>
+
+
+<div id="sell-car-cta">
+  <button type="button" class="btn" data-act="list" data-v="vehicle">Sell your car</button>
+</div>
 
 <div class="idw"><button type="button" class="id" data-act="open" data-v="id-modal">Identify a car from a photo</button></div>
 
@@ -789,8 +813,27 @@ a{color:inherit;text-decoration:none}
 {% endraw %}
 
 <script>
-/* UI enhancements: stepped vehicle card + scroll to results */
+/* UI enhancements: stepped vehicle card + dual market modes + scroll to results */
 (function () {
+  function setMode(mode) {
+    document.body.classList.remove('mode-parts', 'mode-cars');
+    document.body.classList.add(mode === 'vehicles' || mode === 'cars' ? 'mode-cars' : 'mode-parts');
+    var title = document.getElementById('results-title');
+    var count = document.getElementById('results-count');
+    if (title) {
+      if (mode === 'vehicles' || mode === 'cars') title.textContent = 'Cars & trucks';
+      else {
+        var fit = document.getElementById('fit-label');
+        var fitTxt = fit ? fit.textContent : '';
+        if (fitTxt && fitTxt.indexOf('Not set') === -1 && fitTxt !== '—') {
+          title.textContent = 'Parts for ' + fitTxt;
+        } else {
+          title.textContent = 'Parts';
+        }
+      }
+    }
+  }
+
   function showVehicleSet(v) {
     var unset = document.getElementById('vehicle-unset');
     var set = document.getElementById('vehicle-set');
@@ -807,7 +850,35 @@ a{color:inherit;text-decoration:none}
       if (only) only.classList.remove('show');
     }
   }
-  // Hook after init: observe fit-label text
+
+  // Default mode
+  setMode('parts');
+
+  // Observe tab changes
+  var tParts = document.getElementById('t-parts');
+  var tCars = document.getElementById('t-vehicles');
+  function syncModeFromTabs() {
+    if (tCars && tCars.getAttribute('aria-selected') === 'true') setMode('cars');
+    else setMode('parts');
+  }
+  if (tParts) {
+    new MutationObserver(syncModeFromTabs).observe(tParts, { attributes: true, attributeFilter: ['aria-selected'] });
+  }
+  if (tCars) {
+    new MutationObserver(syncModeFromTabs).observe(tCars, { attributes: true, attributeFilter: ['aria-selected'] });
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-act=market]');
+    if (t) {
+      setTimeout(function () {
+        setMode(t.dataset.v === 'vehicles' ? 'cars' : 'parts');
+        var sec = document.getElementById('results-sec');
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    }
+  });
+
+  // Vehicle label observer
   var label = document.getElementById('fit-label');
   if (label) {
     var obs = new MutationObserver(function () {
@@ -817,13 +888,21 @@ a{color:inherit;text-decoration:none}
       } else {
         showVehicleSet(null);
       }
+      // Refresh parts title if in parts mode
+      if (!document.body.classList.contains('mode-cars')) {
+        var title = document.getElementById('results-title');
+        if (title) {
+          if (t && t.indexOf('Not set') === -1 && t !== '—') title.textContent = 'Parts for ' + t;
+          else title.textContent = 'Parts';
+        }
+      }
     });
     obs.observe(label, { childList: true, characterData: true, subtree: true });
-    // initial
-    var t = label.textContent || '';
-    if (t && t.indexOf('Not set') === -1 && t.length > 2 && t !== '—') showVehicleSet({ make: true });
+    var t0 = label.textContent || '';
+    if (t0 && t0.indexOf('Not set') === -1 && t0.length > 2 && t0 !== '—') showVehicleSet({ make: true });
   }
-  // Scroll to results when Search is clicked
+
+  // Scroll to results on search / category
   document.addEventListener('click', function (e) {
     var t = e.target.closest('[data-act=search], [data-act=cat]');
     if (t) {
@@ -833,24 +912,30 @@ a{color:inherit;text-decoration:none}
       }, 300);
     }
   });
-  // Update results title/count when grid changes
+
+  // Results count observer
   var results = document.getElementById('results');
   var title = document.getElementById('results-title');
   var count = document.getElementById('results-count');
-  if (results && title) {
+  if (results) {
     var ro = new MutationObserver(function () {
       var cards = results.querySelectorAll('.card');
       var empty = results.querySelector('.empty');
       var n = cards.length;
       if (count) count.textContent = empty ? '0 found' : (n + ' found');
-      var tabParts = document.getElementById('t-parts');
-      var isParts = tabParts && tabParts.getAttribute('aria-selected') === 'true';
-      var fit = document.getElementById('fit-label');
-      var fitTxt = fit ? fit.textContent : '';
-      if (fitTxt && fitTxt.indexOf('Not set') === -1 && fitTxt !== '—' && isParts) {
-        title.textContent = 'Parts for ' + fitTxt;
-      } else {
-        title.textContent = isParts ? 'Parts' : 'Cars & trucks';
+      var isCars = document.body.classList.contains('mode-cars');
+      if (title) {
+        if (isCars) {
+          title.textContent = 'Cars & trucks';
+        } else {
+          var fit = document.getElementById('fit-label');
+          var fitTxt = fit ? fit.textContent : '';
+          if (fitTxt && fitTxt.indexOf('Not set') === -1 && fitTxt !== '—') {
+            title.textContent = 'Parts for ' + fitTxt;
+          } else {
+            title.textContent = 'Parts';
+          }
+        }
       }
     });
     ro.observe(results, { childList: true, subtree: true });
