@@ -139,7 +139,7 @@ async def decode_vin(payload: VinRequest):
     parts = common_parts.get(manufacturer_info["make"], ["Brake Pads", "Oil Filter", "Air Filter"])
 
     return {
-        "placeholder": placeholder_for(make),
+        "placeholder": placeholder_for(manufacturer_info.get("make")),
         "vin": vin,
         "valid": True,
         "manufacturer": manufacturer_info["make"],
