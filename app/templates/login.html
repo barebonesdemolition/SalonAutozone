@@ -127,12 +127,26 @@ button{border:0;cursor:pointer}
         } catch (err) {}
         msg.className = 'msg ok';
         msg.textContent = 'Success — redirecting…';
-        var user = data.user || {};
-        var accountRole = mode === 'register' ? accountType.value : (user.account_type || user.roles || (user.is_vendor ? 'seller' : 'buyer'));
-        var roles = String(accountRole).toLowerCase().split(',').map(function (role) { return role.trim(); });
-        var dashboard = roles.indexOf('business') !== -1 ? '/become-a-seller' :
-          (roles.indexOf('seller') !== -1 || user.is_vendor ? '/dashboard' : '/my-account');
-        location.href = mode === 'login' && next ? next : dashboard;
+        var HOME = { admin: '/admin/dashboard', business: '/become-a-seller', seller: '/dashboard', buyer: '/my-account' };
+        var GENERIC = ['/my-account', '/dashboard', '/admin', '/admin/dashboard', '/become-a-seller'];
+        var go = function (user) {
+          var l = String(user.account_type || user.role || user.roles || '').toLowerCase().split(',').map(function (x) { return x.trim(); });
+          var role = 'buyer';
+          if (user.is_admin || l.indexOf('admin') > -1 || l.indexOf('superadmin') > -1) role = 'admin';
+          else if (l.indexOf('business') > -1) role = 'business';
+          else if (l.indexOf('seller') > -1 || user.is_vendor) role = 'seller';
+          if (mode === 'register') role = accountType.value;
+          console.warn('LOGIN ROLE:', role, user);
+          var useNext = mode === 'login' && next && GENERIC.indexOf(next) === -1;
+          location.href = useNext ? next : (HOME[role] || '/my-account');
+        };
+        fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } })
+          .then(function (r) { return r.ok ? r.json() : (data.user || {}); })
+          .catch(function () { return data.user || {}; })
+          .then(function (u) {
+            try { localStorage.setItem('userInfo', JSON.stringify(u)); } catch (e) {}
+            go(u);
+          });
         return;
       }
       msg.className = 'msg err';
