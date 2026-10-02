@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Auth Diagnostic</title>
+<style>body{font-family:monospace;padding:20px;background:#111;color:#eee;font-size:15px;line-height:1.7}
+pre{background:#222;padding:14px;border-radius:6px;white-space:pre-wrap;word-break:break-all;font-size:14px}
+.ok{color:#4ade80}.bad{color:#f87171}.head{color:#fbbf24;font-weight:bold}</style>
+</head><body>
+<h2>Auth Diagnostic — paste everything below</h2>
+<pre id="out">running…</pre>
+<script>
+(async function(){
+  var out=document.getElementById('out'),lines=[];
+  function log(t){lines.push(t);out.innerHTML=lines.join('\n');}
+  function row(l,v,ok){var c=ok===true?'ok':(ok===false?'bad':'');log('<span class="'+c+'">'+l+': '+v+'</span>');}
+  row('URL',location.href);
+  log('<span class="head">---- localStorage ----</span>');
+  row('token',localStorage.getItem('token')||'(none)',!!localStorage.getItem('token'));
+  row('access_token',localStorage.getItem('access_token')||'(none)',!!localStorage.getItem('access_token'));
+  row('userInfo',localStorage.getItem('userInfo')||'(none)',!!localStorage.getItem('userInfo'));
+  row('all keys','['+Object.keys(localStorage).join(', ')+']');
+  log('<span class="head">---- sessionStorage ----</span>');
+  row('adminKey',sessionStorage.getItem('adminKey')?'(present)':'(none)',!!sessionStorage.getItem('adminKey'));
+  row('all keys','['+Object.keys(sessionStorage).join(', ')+']');
+  log('<span class="head">---- cookies ----</span>');
+  row('document.cookie',document.cookie||'(empty)');
+  log('<span class="head">---- backend checks ----</span>');
+  try{var r=await fetch('/health');row('/health',r.status,r.ok);}catch(e){row('/health','ERR: '+e.message,false);}
+  try{
+    var t=localStorage.getItem('token')||localStorage.getItem('access_token');
+    var h=t?{'Authorization':'Bearer '+t}:{};
+    row('sending Authorization header',t?'YES ('+t.substring(0,20)+'...)':'NO',!!t);
+    var r2=await fetch('/api/auth/me',{headers:h});
+    var b2=await r2.text();
+    row('/api/auth/me',r2.status,r2.ok);
+    row('  body',b2.substring(0,400));
+  }catch(e){row('/api/auth/me','ERR: '+e.message,false);}
+  try{
+    var r3=await fetch('/api/admin/verify',{headers:{'X-Admin-Key':sessionStorage.getItem('adminKey')||''}});
+    row('/api/admin/verify',r3.status,r3.ok);
+  }catch(e){row('/api/admin/verify','ERR: '+e.message,false);}
+  log('<span class="head">---- DONE — copy everything above ----</span>');
+})();
+</script>
+</body></html>

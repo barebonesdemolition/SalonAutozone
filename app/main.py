@@ -204,6 +204,11 @@ async def health_check():
     return {"status": "ok"}
 
 
+@app.get("/_diag")
+async def _diag():
+    return FileResponse("app/templates/_diag.html")
+
+
 @app.get("/login")
 async def login_page():
     return FileResponse("app/templates/login.html")
