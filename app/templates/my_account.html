@@ -418,9 +418,6 @@ button{cursor:pointer;border:0;background:none}
   </nav>
 </div>
 
-<div id="__dbg" style="position:fixed;top:0;left:0;right:0;background:#900;color:#fff;padding:8px;font:12px monospace;z-index:99999;">DBG: loading...</div>
-<script>
-setTimeout(function(){var t=localStorage.getItem("token")||localStorage.getItem("access_token")||"NONE";var k=Object.keys(localStorage).join(",");document.getElementById("__dbg").textContent="TOKEN: "+(t?t.substring(0,25)+"...":"NONE")+" | KEYS: ["+k+"] | URL: "+location.pathname;},200);
-</script>
+
 </body>
 </html>
