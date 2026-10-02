@@ -38,7 +38,6 @@ async def lifespan(_: FastAPI):
 
 
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app = FastAPI(
     title="Salon Car Parts API",
@@ -46,6 +45,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app.include_router(businesses.router)
 
