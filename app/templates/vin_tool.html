@@ -98,6 +98,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
   .specs-grid{grid-template-columns:1fr}
   .hero h1{font-size:22px}
 }
+
+    .vin-silhouette { width: 100%; max-width: 260px; margin: 0 auto 16px; display: block; }
 </style>
 </head>
 <body>
@@ -280,7 +282,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
 
     resultEl.innerHTML =
       '<div class="result-header">' +
-        '<div class="result-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-car"/></svg></div>' +
+        '<img class="vin-silhouette" src="' + (row.placeholder || '/static/silhouettes/generic.svg') + '" alt="Vehicle silhouette">' +
         '<div>' +
           '<div class="result-title">' + esc(title) + '</div>' +
           '<div class="result-subtitle">' + esc(vin) + '</div>' +
