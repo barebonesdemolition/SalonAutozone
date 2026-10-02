@@ -13,6 +13,35 @@ from functools import lru_cache
 
 from app.config import get_settings
 
+
+BODY_CLASS_TO_SVG = {
+    "sedan": "sedan.svg",
+    "saloon": "sedan.svg",
+    "suv": "suv.svg",
+    "sport utility": "suv.svg",
+    "mpv": "minivan.svg",
+    "multipurpose": "minivan.svg",
+    "pickup": "pickup.svg",
+    "truck": "pickup.svg",
+    "hatchback": "hatchback.svg",
+    "liftback": "hatchback.svg",
+    "notchback": "hatchback.svg",
+    "coupe": "coupe.svg",
+    "convertible": "coupe.svg",
+    "minivan": "minivan.svg",
+    "van": "van.svg",
+    "cargo van": "van.svg",
+}
+
+def placeholder_for_body(body_class):
+    if not body_class:
+        return '/static/silhouettes/generic.svg'
+    bc = body_class.lower()
+    for key, svg in BODY_CLASS_TO_SVG.items():
+        if key in bc:
+            return f'/static/silhouettes/{svg}'
+    return '/static/silhouettes/generic.svg'
+
 router = APIRouter(prefix="/api/nhtsa", tags=["NHTSA Vehicle Data"])
 
 BASE_URL = "https://vpic.nhtsa.dot.gov/api/vehicles"
@@ -187,6 +216,7 @@ async def decode_vin_official(vin: str):
                 "model": clean(r.get("Model")),
                 "year": clean(r.get("ModelYear")),
                 "body_class": clean(r.get("BodyClass")),
+        "placeholder": placeholder_for_body(clean(r.get("BodyClass"))),
                 "vehicle_type": clean(r.get("VehicleType")),
                 "doors": clean(r.get("Doors")),
                 "fuel_type": clean(r.get("FuelTypePrimary")),
