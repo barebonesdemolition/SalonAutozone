@@ -1,5 +1,6 @@
 import re
 
+from app.auth import get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -56,26 +57,7 @@ class GarageCarResponse(BaseModel):
 # ============================================================
 # AUTH HELPER
 # ============================================================
-async def get_current_user(
-    authorization: Optional[str] = Header(None),
-    db: AsyncSession = Depends(get_db),
-):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
-    token = authorization.replace("Bearer ", "")
-    try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
-        user_id = int(payload.get("sub"))
-    except (JWTError, TypeError, ValueError):
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-    result = await db.execute(select(models.User).where(models.User.id == user_id))
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=401, detail="User not found")
-    return user
-
+# get_current_user is imported from app.auth above
 
 # ============================================================
 # LIST MY CARS
