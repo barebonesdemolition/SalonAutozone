@@ -37,6 +37,7 @@ pre{background:#222;padding:14px;border-radius:6px;white-space:pre-wrap;word-bre
     var r3=await fetch('/api/admin/verify',{headers:{'X-Admin-Key':sessionStorage.getItem('adminKey')||''}});
     row('/api/admin/verify',r3.status,r3.ok);
   }catch(e){row('/api/admin/verify','ERR: '+e.message,false);}
+  try{var r4=await fetch('/api/garage/',{headers:t?{'Authorization':'Bearer '+t}:{}});var b4=await r4.text();row('/api/garage/',r4.status,r4.ok);row('  body',b4.substring(0,400));}catch(e){row('/api/garage/','ERR: '+e.message,false);}
   log('<span class="head">---- DONE — copy everything above ----</span>');
 })();
 </script>
