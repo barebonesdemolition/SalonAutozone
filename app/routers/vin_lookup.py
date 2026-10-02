@@ -59,6 +59,22 @@ YEAR_CODES = {
     "S2": 2025,
 }
 
+
+MAKE_TO_SVG = {
+    "Toyota": "sedan.svg", "Honda": "sedan.svg", "Nissan": "sedan.svg",
+    "Mazda": "sedan.svg", "Hyundai": "sedan.svg", "Kia": "sedan.svg",
+    "Mitsubishi": "sedan.svg", "Subaru": "sedan.svg",
+    "Ford": "pickup.svg", "Chevrolet": "pickup.svg", "Dodge": "pickup.svg",
+    "Ram": "pickup.svg", "Jeep": "suv.svg", "Land Rover": "suv.svg",
+    "Mercedes-Benz": "sedan.svg", "BMW": "sedan.svg", "Audi": "sedan.svg",
+    "Volkswagen": "sedan.svg", "Volvo": "suv.svg", "Lexus": "sedan.svg",
+}
+DEFAULT_SVG = "generic.svg"
+
+def placeholder_for(make):
+    svg = MAKE_TO_SVG.get(make or "", DEFAULT_SVG)
+    return f"/static/silhouettes/{svg}"
+
 @router.post("/decode")
 async def decode_vin(payload: VinRequest):
     vin = payload.vin.strip().upper()
@@ -123,6 +139,7 @@ async def decode_vin(payload: VinRequest):
     parts = common_parts.get(manufacturer_info["make"], ["Brake Pads", "Oil Filter", "Air Filter"])
 
     return {
+        "placeholder": placeholder_for(make),
         "vin": vin,
         "valid": True,
         "manufacturer": manufacturer_info["make"],
