@@ -434,3 +434,23 @@ from app.routers import authme
 
 
 app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
+
+@app.get("/_migrate_vehicles")
+async def _migrate_vehicles():
+    from sqlalchemy import text
+    from app.db import engine
+    statements = [
+        "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS business_id INTEGER",
+        "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS price_usd FLOAT",
+        "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS country_of_origin VARCHAR",
+        "ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS supplier_url VARCHAR",
+    ]
+    results = []
+    async with engine.begin() as conn:
+        for stmt in statements:
+            try:
+                await conn.execute(text(stmt))
+                results.append({"sql": stmt, "ok": True})
+            except Exception as e:
+                results.append({"sql": stmt, "ok": False, "error": str(e)[:200]})
+    return {"results": results}
