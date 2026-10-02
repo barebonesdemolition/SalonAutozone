@@ -12,6 +12,7 @@ from sqlalchemy.future import select
 from app.db import get_db
 from app.auth import get_current_user
 from app import models
+from app.r2_storage import save_to_r2, R2_CONFIGURED
 
 router = APIRouter(prefix="/api/upload", tags=["Upload"])
 
@@ -36,29 +37,39 @@ def _save_and_resize(file: UploadFile) -> str:
     # Generate unique filename
     ext = file.filename.split(".")[-1].lower() if file.filename else "jpg"
     if ext not in ("jpg", "jpeg", "png", "webp"):
-        ext = "jpg"
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    filepath = UPLOAD_DIR / filename
+        from io import BytesIO
+
+    ext = "jpg"
 
     # Read and check size
     content = file.file.read()
     if len(content) > MAX_SIZE_BYTES:
         raise HTTPException(status_code=400, detail="Image larger than 5 MB")
 
-    # Save temporarily then resize
-    with open(filepath, "wb") as f:
-        f.write(content)
-
+    # Resize in memory (no temp file needed)
     try:
-        with Image.open(filepath) as img:
-            img = img.convert("RGB")  # handles PNG with alpha
+        with Image.open(BytesIO(content)) as img:
+            img = img.convert("RGB")
             img.thumbnail((MAX_DIMENSION, MAX_DIMENSION), Image.Resampling.LANCZOS)
-            img.save(filepath, format="JPEG", quality=82, optimize=True)
+            buf = BytesIO()
+            img.save(buf, format="JPEG", quality=82, optimize=True)
+            resized_bytes = buf.getvalue()
     except Exception:
-        filepath.unlink(missing_ok=True)
         raise HTTPException(status_code=400, detail="Invalid image file")
 
-    # Public URL path (adjust if you serve static files differently)
+    # Try R2 first, fall back to local disk
+    if R2_CONFIGURED:
+        try:
+            return save_to_r2(resized_bytes, ext, "image/jpeg")
+        except Exception as e:
+            print(f"R2 upload failed, falling back to disk: {e}")
+
+    # Local disk fallback
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    filepath = UPLOAD_DIR / filename
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    with open(filepath, "wb") as f:
+        f.write(resized_bytes)
     return f"/uploads/{filename}"
 
 
