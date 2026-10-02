@@ -173,7 +173,7 @@ td{font-size:13px}
     setTimeout(function () { t.classList.remove('show'); }, 2500);
   }
   function token() {
-    try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; }
+    try { return localStorage.getItem('token') || localStorage.getItem('access_token') || sessionStorage.getItem('adminKey') || ''; } catch (e) { return ''; }
   }
   function auth() {
     var t = token();
