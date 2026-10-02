@@ -201,7 +201,7 @@ button{cursor:pointer;border:0;background:none}
   }
   // Clear the bad token first so login can't bounce straight back here
   function goLogin() {
-    clearSession();
+// FIX:     clearSession();
     location.replace(LOGIN_URL + '?next=' + encodeURIComponent(location.pathname));
   }
 
