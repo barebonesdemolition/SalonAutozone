@@ -166,6 +166,7 @@ async function init() {
   if (!getToken()) { goLogin('no token'); return; }
   try { await loadUser(); await loadMyCars(); } catch (e) { if (e !== null) console.error(e); }
 }
+console.log("[DASH] TOKEN_KEYS", TOKEN_KEYS, "token=", localStorage.getItem("token"), "access=", localStorage.getItem("access_token"), "getToken()=", getToken());
 init();
 </script>
 </body>
