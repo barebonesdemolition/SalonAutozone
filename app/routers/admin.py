@@ -40,11 +40,12 @@ async def require_admin(
     if authorization and authorization.startswith("Bearer "):
         token = authorization[len("Bearer "):]
         try:
-            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
+            from app.routers.auth import decode_access_token
+            payload = decode_access_token(token)
             user_id = int(payload.get("sub"))
             result = await db.execute(select(models.User).where(models.User.id == user_id))
             user = result.scalars().first()
-            if user and user.is_admin and user.is_active is not False:
+            if user and (user.is_admin or ({r.strip().lower() for r in (getattr(user, "roles", "") or "").split(",")} & {"admin", "superadmin"})) and user.is_active is not False:
                 return {"via": "user", "user": user}
         except (JWTError, TypeError, ValueError):
             pass

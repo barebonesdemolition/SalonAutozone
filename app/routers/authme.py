@@ -7,7 +7,7 @@ router = APIRouter()
 
 def compute_role(user) -> str:
     roles = {r.strip().lower() for r in (getattr(user, "roles", "") or "").split(",") if r.strip()}
-    if roles & {"admin", "superadmin"}:
+    if getattr(user, "is_admin", False) or roles & {"admin", "superadmin"}:
         return "admin"
     if "business" in roles:
         return "business"
