@@ -62,7 +62,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; }
 </div>
 <script>
 var TOKEN_KEYS = ['token', 'access_token', 'authToken', 'jwt', 'userToken'];
-var HOME = { admin: '/admin', business: '/become-a-seller', seller: '/dashboard', buyer: '/my-account' };
+var HOME = { admin: '/admin/dashboard', business: '/become-a-seller', seller: '/dashboard', buyer: '/my-account' };
 
 function getToken() {
   try { for (var i = 0; i < TOKEN_KEYS.length; i++) { var v = localStorage.getItem(TOKEN_KEYS[i]); if (v) return v; } } catch (e) {}
