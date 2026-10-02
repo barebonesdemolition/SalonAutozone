@@ -138,7 +138,7 @@ button{border:0;cursor:pointer}
           if (mode === 'register') role = accountType.value;
           console.warn('LOGIN ROLE:', role, user);
           var useNext = mode === 'login' && next && GENERIC.indexOf(next) === -1;
-          location.href = useNext ? next : (HOME[role] || '/my-account');
+          location.href = useNext ? next : "/my-account";
         };
         fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } })
           .then(function (r) { return r.ok ? r.json() : (data.user || {}); })
