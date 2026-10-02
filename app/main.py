@@ -433,14 +433,4 @@ app.include_router(unified_search.router)
 from app.routers import authme
 
 
-@app.get("/_files")
-async def _files():
-    import os
-    base = os.path.abspath("app/static")
-    result = {"cwd": os.getcwd(), "base": base, "exists": os.path.isdir(base), "entries": []}
-    if os.path.isdir(base):
-        for root, dirs, files in os.walk(base):
-            for f in files:
-                result["entries"].append(os.path.relpath(os.path.join(root, f), base))
-    return result
 app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
