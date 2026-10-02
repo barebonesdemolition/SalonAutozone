@@ -3,6 +3,7 @@ import inspect
 import re
 from typing import Optional
 
+from fastapi.staticfiles import StaticFiles
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
@@ -35,6 +36,9 @@ async def lifespan(_: FastAPI):
     await ensure_business_contact_columns()
     yield
 
+
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app = FastAPI(
     title="Salon Car Parts API",
@@ -426,4 +430,16 @@ app.include_router(inquiries.router)
 app.include_router(catalog.router)
 app.include_router(unified_search.router)
 from app.routers import authme
+
+
+@app.get("/_files")
+async def _files():
+    import os
+    base = os.path.abspath("app/static")
+    result = {"cwd": os.getcwd(), "base": base, "exists": os.path.isdir(base), "entries": []}
+    if os.path.isdir(base):
+        for root, dirs, files in os.walk(base):
+            for f in files:
+                result["entries"].append(os.path.relpath(os.path.join(root, f), base))
+    return result
 app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
