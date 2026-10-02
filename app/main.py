@@ -219,6 +219,10 @@ async def login_page():
     return FileResponse("app/templates/login.html")
 
 
+@app.get("/sell")
+async def sell_page():
+    return FileResponse("app/templates/sell.html")
+
 @app.get("/my-account")
 async def my_account_page():
     return FileResponse("app/templates/my_account.html")
