@@ -16,6 +16,7 @@ from app import models
 from app.config import get_settings
 import json
 import re
+from app.auth import decode_access_token
 
 router = APIRouter(prefix="/api/identify", tags=["AI Identification"])
 settings = get_settings()
@@ -46,7 +47,7 @@ async def get_optional_user(
         return None
     token = authorization.replace("Bearer ", "")
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
+        payload = decode_access_token(token)
         user_id = int(payload.get("sub"))
         result = await db.execute(select(models.User).where(models.User.id == user_id))
         return result.scalars().first()
