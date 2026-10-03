@@ -38,8 +38,7 @@ def _save_and_resize(file: UploadFile) -> str:
     # Generate unique filename
     ext = file.filename.split(".")[-1].lower() if file.filename else "jpg"
     if ext not in ("jpg", "jpeg", "png", "webp"):
-        from io import BytesIO
-
+        pass  # BytesIO imported at module level
     ext = "jpg"
 
     # Read and check size
