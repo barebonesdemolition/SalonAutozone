@@ -43,10 +43,10 @@ class VehicleResponse(BaseModel):
     supplier_url: Optional[str] = None
     
     # Listing Meta
-    is_sold: bool
-    is_featured: bool
+    is_sold: Optional[bool] = False
+    is_featured: Optional[bool] = False
     featured_until: Optional[datetime] = None
-    views: int
+    views: Optional[int] = 0
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -86,9 +86,9 @@ class PartResponse(BaseModel):
     stock_quantity: int = 1
     condition: str
     description: str | None = None
-    is_featured: bool = False
+    is_featured: Optional[bool] = False
     featured_until: datetime | None = None
-    views: int = 0
+    views: Optional[int] = 0
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
