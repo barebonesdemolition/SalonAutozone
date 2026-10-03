@@ -276,21 +276,34 @@ textarea { resize: vertical; min-height: 80px; }
  if (!r.ok) throw new Error(d.detail || ('Create failed (' + r.status + ')'));
  var vehicleId = d.id;
 
- if (selectedFiles.length > 0) {
- setStatus('Uploading photos...');
- for (var i = 0; i < selectedFiles.length; i++) {
- var f = selectedFiles[i];
- var upFd = new FormData();
- upFd.append('file', f);
- try {
- await fetch('/api/upload/vehicle/' + vehicleId, {
- method: 'POST',
- headers: authHeaders(),
- body: upFd
- });
- } catch (e) {
- console.warn('Photo upload failed', e);
- }
+      if (selectedFiles.length > 0) {
+        setStatus('Uploading ' + selectedFiles.length + ' photo(s)...');
+        var uploadErrors = [];
+        for (var i = 0; i < selectedFiles.length; i++) {
+          var f = selectedFiles[i];
+          var upFd = new FormData();
+          upFd.append('file', f);
+          try {
+            var upRes = await fetch('/api/upload/vehicle/' + vehicleId, {
+              method: 'POST',
+              headers: authHeaders(),
+              body: upFd
+            });
+            var upBody = await upRes.text();
+            if (!upRes.ok) {
+              uploadErrors.push('Photo ' + (i+1) + ' (' + upRes.status + '): ' + upBody.substring(0, 150));
+            }
+          } catch (e) {
+            uploadErrors.push('Photo ' + (i+1) + ' network error: ' + e.message);
+          }
+        }
+        if (uploadErrors.length > 0) {
+          console.error('Upload failures:', uploadErrors);
+          setStatus('Listing created, but photo upload failed: ' + uploadErrors.join(' | '), 'err');
+          submit.disabled = false;
+          return;
+        }
+      }
  }
  }
 
