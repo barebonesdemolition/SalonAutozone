@@ -8,7 +8,7 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "Salon AutoZone & AutoTrader"
+    APP_NAME: str = "SalonAutoZone"
     APP_VERSION: str = "1.0.0"
     DEFAULT_CURRENCY: str = "SLL"
 
