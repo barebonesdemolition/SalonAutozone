@@ -503,3 +503,13 @@ async def _list_vehicles():
             if row.get("created_at"):
                 row["created_at"] = str(row["created_at"])
     return {"count": len(rows), "vehicles": rows}
+
+@app.get("/_debug_uploads")
+async def _debug_uploads():
+    import os
+    base = os.path.abspath("uploads")
+    result = {"cwd": os.getcwd(), "uploads_abspath": base, "exists": os.path.isdir(base), "files": []}
+    if os.path.isdir(base):
+        for f in os.listdir(base):
+            result["files"].append(f)
+    return result
