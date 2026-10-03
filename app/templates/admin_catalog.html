@@ -52,7 +52,7 @@ h1{color:#0b1e3a;margin-bottom:8px}
 </head>
 <body>
 <div class="navbar">
-<a href="/" class="logo">Salon<span>AutoZone</span> &amp; AutoTrader</a>
+<a href="/" class="logo">Salon<span>AutoZone</span></a>
 <div>
 <a href="/">Home</a>
 <a href="/vin-tool">VIN Lookup</a>
@@ -116,127 +116,127 @@ var dropZone = document.getElementById('drop-zone');
 var fileInput = document.getElementById('file-input');
 
 ['dragenter','dragover'].forEach(function(evt){
-  dropZone.addEventListener(evt,function(e){
-    e.preventDefault();
-    dropZone.classList.add('dragover');
-  });
+ dropZone.addEventListener(evt,function(e){
+ e.preventDefault();
+ dropZone.classList.add('dragover');
+ });
 });
 
 ['dragleave','drop'].forEach(function(evt){
-  dropZone.addEventListener(evt,function(e){
-    e.preventDefault();
-    dropZone.classList.remove('dragover');
-  });
+ dropZone.addEventListener(evt,function(e){
+ e.preventDefault();
+ dropZone.classList.remove('dragover');
+ });
 });
 
 dropZone.addEventListener('drop',function(e){
-  var files = e.dataTransfer.files;
-  if(files.length > 0) handleFile(files[0]);
+ var files = e.dataTransfer.files;
+ if(files.length > 0) handleFile(files[0]);
 });
 
 fileInput.addEventListener('change',function(e){
-  if(e.target.files.length > 0) handleFile(e.target.files[0]);
+ if(e.target.files.length > 0) handleFile(e.target.files[0]);
 });
 
 function handleFile(file){
-  if(!file.name.toLowerCase().endsWith('.csv')){
-    showResult('error','Please upload a .csv file, not a '+file.name.split('.').pop());
-    return;
-  }
-  selectedFile = file;
-  var nameEl = document.getElementById('file-name');
-  nameEl.innerText = '📄 ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
-  nameEl.classList.add('show');
-  document.getElementById('upload-btn').disabled = false;
-  document.getElementById('result').innerHTML = '';
+ if(!file.name.toLowerCase().endsWith('.csv')){
+ showResult('error','Please upload a .csv file, not a '+file.name.split('.').pop());
+ return;
+ }
+ selectedFile = file;
+ var nameEl = document.getElementById('file-name');
+ nameEl.innerText = '📄 ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
+ nameEl.classList.add('show');
+ document.getElementById('upload-btn').disabled = false;
+ document.getElementById('result').innerHTML = '';
 }
 
 function showResult(type, message, details){
-  var el = document.getElementById('result');
-  el.innerHTML = '<div class="result '+type+'"><h3>'+(type==='success'?'✅ ':'❌ ')+message+'</h3>'+(details||'')+'</div>';
+ var el = document.getElementById('result');
+ el.innerHTML = '<div class="result '+type+'"><h3>'+(type==='success'?'✅ ':'❌ ')+message+'</h3>'+(details||'')+'</div>';
 }
 
 async function uploadFile(){
-  if(!selectedFile) return;
+ if(!selectedFile) return;
 
-  var btn = document.getElementById('upload-btn');
-  var loading = document.getElementById('loading');
-  btn.disabled = true;
-  loading.classList.add('show');
-  document.getElementById('result').innerHTML = '';
+ var btn = document.getElementById('upload-btn');
+ var loading = document.getElementById('loading');
+ btn.disabled = true;
+ loading.classList.add('show');
+ document.getElementById('result').innerHTML = '';
 
-  var fd = new FormData();
-  fd.append('file', selectedFile);
-  var headers = {};
-  try {
-    var adminKey = sessionStorage.getItem('adminKey');
-    if (adminKey) headers['X-Admin-Key'] = adminKey;
-  } catch(e){}
+ var fd = new FormData();
+ fd.append('file', selectedFile);
+ var headers = {};
+ try {
+ var adminKey = sessionStorage.getItem('adminKey');
+ if (adminKey) headers['X-Admin-Key'] = adminKey;
+ } catch(e){}
 
-  var replace = document.getElementById('replace').checked;
-  var url = '/api/catalog/upload?replace=' + replace;
+ var replace = document.getElementById('replace').checked;
+ var url = '/api/catalog/upload?replace=' + replace;
 
-  try {
-    var res = await fetch(url, { method:'POST', headers:headers, body: fd });
-    var data = await res.json();
-    loading.classList.remove('show');
+ try {
+ var res = await fetch(url, { method:'POST', headers:headers, body: fd });
+ var data = await res.json();
+ loading.classList.remove('show');
 
-    if(!res.ok){
-      showResult('error', data.detail || 'Upload failed');
-      btn.disabled = false;
-      return;
-    }
+ if(!res.ok){
+ showResult('error', data.detail || 'Upload failed');
+ btn.disabled = false;
+ return;
+ }
 
-    showResult('success',
-      'Catalog imported!',
-      '<ul>' +
-      '<li><strong>' + data.imported + '</strong> parts imported</li>' +
-      '<li><strong>' + data.skipped + '</strong> skipped (duplicates)</li>' +
-      '<li><strong>' + data.total_parts + '</strong> total parts in file</li>' +
-      '</ul>'
-    );
+ showResult('success',
+ 'Catalog imported!',
+ '<ul>' +
+ '<li><strong>' + data.imported + '</strong> parts imported</li>' +
+ '<li><strong>' + data.skipped + '</strong> skipped (duplicates)</li>' +
+ '<li><strong>' + data.total_parts + '</strong> total parts in file</li>' +
+ '</ul>'
+ );
 
-    // Refresh stats and categories
-    loadStats();
-    loadCategories();
+ // Refresh stats and categories
+ loadStats();
+ loadCategories();
 
-    // Reset
-    selectedFile = null;
-    fileInput.value = '';
-    document.getElementById('file-name').classList.remove('show');
+ // Reset
+ selectedFile = null;
+ fileInput.value = '';
+ document.getElementById('file-name').classList.remove('show');
 
-  } catch(err){
-    loading.classList.remove('show');
-    showResult('error', 'Network error: ' + err.message);
-  }
-  btn.disabled = false;
+ } catch(err){
+ loading.classList.remove('show');
+ showResult('error', 'Network error: ' + err.message);
+ }
+ btn.disabled = false;
 }
 
 async function loadStats(){
-  try {
-    var res = await fetch('/api/catalog/stats');
-    var data = await res.json();
-    document.getElementById('stat-total').innerText = data.total_parts;
-    document.getElementById('stat-categories').innerText = data.categories;
-    document.getElementById('stat-vehicles').innerText = data.vehicles;
-  } catch(e){}
+ try {
+ var res = await fetch('/api/catalog/stats');
+ var data = await res.json();
+ document.getElementById('stat-total').innerText = data.total_parts;
+ document.getElementById('stat-categories').innerText = data.categories;
+ document.getElementById('stat-vehicles').innerText = data.vehicles;
+ } catch(e){}
 }
 
 async function loadCategories(){
-  try {
-    var res = await fetch('/api/catalog/categories');
-    var data = await res.json();
-    if(!data.categories || data.categories.length === 0){
-      document.getElementById('category-list').style.display = 'none';
-      return;
-    }
-    document.getElementById('category-list').style.display = 'block';
-    var html = '';
-    data.categories.forEach(function(c){
-      html += '<div class="category-row"><div class="category-name">'+c.name+'</div><div class="category-count">'+c.count+' parts</div></div>';
-    });
-    document.getElementById('categories-content').innerHTML = html;
-  } catch(e){}
+ try {
+ var res = await fetch('/api/catalog/categories');
+ var data = await res.json();
+ if(!data.categories || data.categories.length === 0){
+ document.getElementById('category-list').style.display = 'none';
+ return;
+ }
+ document.getElementById('category-list').style.display = 'block';
+ var html = '';
+ data.categories.forEach(function(c){
+ html += '<div class="category-row"><div class="category-name">'+c.name+'</div><div class="category-count">'+c.count+' parts</div></div>';
+ });
+ document.getElementById('categories-content').innerHTML = html;
+ } catch(e){}
 }
 
 // Load on startup

@@ -41,247 +41,247 @@ textarea { resize: vertical; min-height: 80px; }
 </head>
 <body>
 <header class="top">
-  <a class="brand" href="/">Salon<span>AutoZone</span></a>
-  <a href="/" style="font-size:13px;color:#64748b;font-weight:700;text-decoration:none;">Back to marketplace</a>
+ <a class="brand" href="/">Salon<span>AutoZone</span></a>
+ <a href="/" style="font-size:13px;color:#64748b;font-weight:700;text-decoration:none;">Back to marketplace</a>
 </header>
 <div class="wrap">
-  <h1>Sell your car</h1>
-  <p class="sub">Fill in the details and add photos. Takes about 2 minutes.</p>
-  <div class="card">
-    <form id="sell-form">
-      <div class="row full">
-        <div>
-          <label for="vin">VIN (optional — autofills make/model/year)</label>
-          <div class="vin-row">
-            <input id="vin" name="vin" maxlength="17" placeholder="17-character VIN" autocomplete="off">
-            <button type="button" class="btn ghost" id="decode-btn">Decode</button>
-          </div>
-        </div>
-      </div>
+ <h1>Sell your car</h1>
+ <p class="sub">Fill in the details and add photos. Takes about 2 minutes.</p>
+ <div class="card">
+ <form id="sell-form">
+ <div class="row full">
+ <div>
+ <label for="vin">VIN (optional — autofills make/model/year)</label>
+ <div class="vin-row">
+ <input id="vin" name="vin" maxlength="17" placeholder="17-character VIN" autocomplete="off">
+ <button type="button" class="btn ghost" id="decode-btn">Decode</button>
+ </div>
+ </div>
+ </div>
 
-      <div class="row">
-        <div>
-          <label for="title">Listing title *</label>
-          <input id="title" name="title" required placeholder="e.g. 2015 Toyota Camry SE">
-        </div>
-        <div>
-          <label for="price_sll">Price (SLL) *</label>
-          <input id="price_sll" name="price_sll" type="number" min="0" step="1000" required placeholder="150000">
-        </div>
-      </div>
+ <div class="row">
+ <div>
+ <label for="title">Listing title *</label>
+ <input id="title" name="title" required placeholder="e.g. 2015 Toyota Camry SE">
+ </div>
+ <div>
+ <label for="price_sll">Price (SLL) *</label>
+ <input id="price_sll" name="price_sll" type="number" min="0" step="1000" required placeholder="150000">
+ </div>
+ </div>
 
-      <div class="row">
-        <div>
-          <label for="make">Make *</label>
-          <input id="make" name="make" required placeholder="Toyota">
-        </div>
-        <div>
-          <label for="model">Model *</label>
-          <input id="model" name="model" required placeholder="Camry">
-        </div>
-      </div>
+ <div class="row">
+ <div>
+ <label for="make">Make *</label>
+ <input id="make" name="make" required placeholder="Toyota">
+ </div>
+ <div>
+ <label for="model">Model *</label>
+ <input id="model" name="model" required placeholder="Camry">
+ </div>
+ </div>
 
-      <div class="row">
-        <div>
-          <label for="year">Year *</label>
-          <input id="year" name="year" type="number" min="1900" max="2100" required placeholder="2015">
-        </div>
-        <div>
-          <label for="condition">Condition</label>
-          <select id="condition" name="condition">
-            <option value="used">Used</option>
-            <option value="new">New</option>
-          </select>
-        </div>
-      </div>
+ <div class="row">
+ <div>
+ <label for="year">Year *</label>
+ <input id="year" name="year" type="number" min="1900" max="2100" required placeholder="2015">
+ </div>
+ <div>
+ <label for="condition">Condition</label>
+ <select id="condition" name="condition">
+ <option value="used">Used</option>
+ <option value="new">New</option>
+ </select>
+ </div>
+ </div>
 
-      <div class="row">
-        <div>
-          <label for="location">Location</label>
-          <input id="location" name="location" placeholder="Freetown">
-        </div>
-        <div>
-          <label for="country_of_origin">Country of origin</label>
-          <input id="country_of_origin" name="country_of_origin" placeholder="Japan">
-        </div>
-      </div>
+ <div class="row">
+ <div>
+ <label for="location">Location</label>
+ <input id="location" name="location" placeholder="Freetown">
+ </div>
+ <div>
+ <label for="country_of_origin">Country of origin</label>
+ <input id="country_of_origin" name="country_of_origin" placeholder="Japan">
+ </div>
+ </div>
 
-      <div class="row">
-        <div>
-          <label for="availability">Availability</label>
-          <select id="availability" name="availability">
-            <option value="in_stock">In stock</option>
-            <option value="on_order">On order</option>
-            <option value="in_transit">In transit</option>
-          </select>
-        </div>
-        <div>
-          <label for="duty_paid">Duty paid</label>
-          <select id="duty_paid" name="duty_paid">
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-          </select>
-        </div>
-      </div>
+ <div class="row">
+ <div>
+ <label for="availability">Availability</label>
+ <select id="availability" name="availability">
+ <option value="in_stock">In stock</option>
+ <option value="on_order">On order</option>
+ <option value="in_transit">In transit</option>
+ </select>
+ </div>
+ <div>
+ <label for="duty_paid">Duty paid</label>
+ <select id="duty_paid" name="duty_paid">
+ <option value="false">No</option>
+ <option value="true">Yes</option>
+ </select>
+ </div>
+ </div>
 
-      <div class="row full">
-        <div>
-          <label for="description">Description</label>
-          <textarea id="description" name="description" placeholder="Condition details, extras, service history..."></textarea>
-        </div>
-      </div>
+ <div class="row full">
+ <div>
+ <label for="description">Description</label>
+ <textarea id="description" name="description" placeholder="Condition details, extras, service history..."></textarea>
+ </div>
+ </div>
 
-      <div class="row full">
-        <div>
-          <label for="photos">Photos (up to 6, max 5 MB each)</label>
-          <input id="photos" type="file" accept="image/*" multiple>
-          <div class="photos" id="previews"></div>
-        </div>
-      </div>
+ <div class="row full">
+ <div>
+ <label for="photos">Photos (up to 6, max 5 MB each)</label>
+ <input id="photos" type="file" accept="image/*" multiple>
+ <div class="photos" id="previews"></div>
+ </div>
+ </div>
 
-      <div class="btn-row">
-        <button type="submit" class="btn" id="submit">Post listing</button>
-        <a href="/" class="btn ghost">Cancel</a>
-      </div>
-      <p class="status" id="status"></p>
-    </form>
-  </div>
+ <div class="btn-row">
+ <button type="submit" class="btn" id="submit">Post listing</button>
+ <a href="/" class="btn ghost">Cancel</a>
+ </div>
+ <p class="status" id="status"></p>
+ </form>
+ </div>
 </div>
 
 <script>
 (function() {
-  var token = null;
-  try { token = localStorage.getItem('token') || localStorage.getItem('access_token'); } catch(e) {}
-  if (!token) {
-    location.replace('/login?next=' + encodeURIComponent('/sell'));
-    return;
-  }
+ var token = null;
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token'); } catch(e) {}
+ if (!token) {
+ location.replace('/login?next=' + encodeURIComponent('/sell'));
+ return;
+ }
 
-  var form = document.getElementById('sell-form');
-  var status = document.getElementById('status');
-  var submit = document.getElementById('submit');
-  var photosInput = document.getElementById('photos');
-  var previews = document.getElementById('previews');
-  var decodeBtn = document.getElementById('decode-btn');
-  var selectedFiles = [];
+ var form = document.getElementById('sell-form');
+ var status = document.getElementById('status');
+ var submit = document.getElementById('submit');
+ var photosInput = document.getElementById('photos');
+ var previews = document.getElementById('previews');
+ var decodeBtn = document.getElementById('decode-btn');
+ var selectedFiles = [];
 
-  function setStatus(msg, kind) {
-    status.textContent = msg;
-    status.className = 'status' + (kind ? ' ' + kind : '');
-  }
+ function setStatus(msg, kind) {
+ status.textContent = msg;
+ status.className = 'status' + (kind ? ' ' + kind : '');
+ }
 
-  function authHeaders() {
-    return token ? { 'Authorization': 'Bearer ' + token } : {};
-  }
+ function authHeaders() {
+ return token ? { 'Authorization': 'Bearer ' + token } : {};
+ }
 
-  decodeBtn.addEventListener('click', async function() {
-    var vin = document.getElementById('vin').value.trim().toUpperCase();
-    if (vin.length !== 17) { setStatus('VIN must be 17 characters', 'err'); return; }
-    setStatus('Decoding VIN...');
-    try {
-      var r = await fetch('/api/nhtsa/decode-vin/' + encodeURIComponent(vin));
-      var d = await r.json();
-      if (!r.ok) throw new Error(d.detail || 'Decode failed');
-      if (d.make) document.getElementById('make').value = d.make;
-      if (d.model) document.getElementById('model').value = d.model;
-      if (d.year) document.getElementById('year').value = d.year;
-      if (d.plant_country) document.getElementById('country_of_origin').value = d.plant_country;
-      if (!document.getElementById('title').value && d.year && d.make && d.model) {
-        document.getElementById('title').value = d.year + ' ' + d.make + ' ' + d.model;
-      }
-      setStatus('VIN decoded — check the fields above', 'ok');
-    } catch (e) {
-      setStatus('Could not decode: ' + e.message, 'err');
-    }
-  });
+ decodeBtn.addEventListener('click', async function() {
+ var vin = document.getElementById('vin').value.trim().toUpperCase();
+ if (vin.length !== 17) { setStatus('VIN must be 17 characters', 'err'); return; }
+ setStatus('Decoding VIN...');
+ try {
+ var r = await fetch('/api/nhtsa/decode-vin/' + encodeURIComponent(vin));
+ var d = await r.json();
+ if (!r.ok) throw new Error(d.detail || 'Decode failed');
+ if (d.make) document.getElementById('make').value = d.make;
+ if (d.model) document.getElementById('model').value = d.model;
+ if (d.year) document.getElementById('year').value = d.year;
+ if (d.plant_country) document.getElementById('country_of_origin').value = d.plant_country;
+ if (!document.getElementById('title').value && d.year && d.make && d.model) {
+ document.getElementById('title').value = d.year + ' ' + d.make + ' ' + d.model;
+ }
+ setStatus('VIN decoded — check the fields above', 'ok');
+ } catch (e) {
+ setStatus('Could not decode: ' + e.message, 'err');
+ }
+ });
 
-  photosInput.addEventListener('change', function() {
-    var files = Array.from(photosInput.files || []).slice(0, 6);
-    selectedFiles = files;
-    previews.innerHTML = '';
-    files.forEach(function(f, i) {
-      var url = URL.createObjectURL(f);
-      var div = document.createElement('div');
-      div.className = 'photo';
-      div.innerHTML = '<img src="' + url + '"><button type="button" class="rm" data-i="' + i + '">×</button>';
-      previews.appendChild(div);
-    });
-    previews.querySelectorAll('.rm').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var i = parseInt(btn.dataset.i, 10);
-        selectedFiles.splice(i, 1);
-        photosInput.value = '';
-        previews.innerHTML = '';
-        selectedFiles.forEach(function(f, j) {
-          var url = URL.createObjectURL(f);
-          var div = document.createElement('div');
-          div.className = 'photo';
-          div.innerHTML = '<img src="' + url + '"><button type="button" class="rm" data-i="' + j + '">×</button>';
-          previews.appendChild(div);
-        });
-        Array.from(previews.querySelectorAll('.rm')).forEach(function(b2, k) {
-          b2.addEventListener('click', function(){ selectedFiles.splice(k,1); b2.parentElement.remove(); });
-        });
-      });
-    });
-  });
+ photosInput.addEventListener('change', function() {
+ var files = Array.from(photosInput.files || []).slice(0, 6);
+ selectedFiles = files;
+ previews.innerHTML = '';
+ files.forEach(function(f, i) {
+ var url = URL.createObjectURL(f);
+ var div = document.createElement('div');
+ div.className = 'photo';
+ div.innerHTML = '<img src="' + url + '"><button type="button" class="rm" data-i="' + i + '">×</button>';
+ previews.appendChild(div);
+ });
+ previews.querySelectorAll('.rm').forEach(function(btn) {
+ btn.addEventListener('click', function() {
+ var i = parseInt(btn.dataset.i, 10);
+ selectedFiles.splice(i, 1);
+ photosInput.value = '';
+ previews.innerHTML = '';
+ selectedFiles.forEach(function(f, j) {
+ var url = URL.createObjectURL(f);
+ var div = document.createElement('div');
+ div.className = 'photo';
+ div.innerHTML = '<img src="' + url + '"><button type="button" class="rm" data-i="' + j + '">×</button>';
+ previews.appendChild(div);
+ });
+ Array.from(previews.querySelectorAll('.rm')).forEach(function(b2, k) {
+ b2.addEventListener('click', function(){ selectedFiles.splice(k,1); b2.parentElement.remove(); });
+ });
+ });
+ });
+ });
 
-  form.addEventListener('submit', async function(ev) {
-    ev.preventDefault();
-    submit.disabled = true;
-    setStatus('Creating listing...');
+ form.addEventListener('submit', async function(ev) {
+ ev.preventDefault();
+ submit.disabled = true;
+ setStatus('Creating listing...');
 
-    var fd = new FormData(form);
-    var body = {
-      title: fd.get('title'),
-      make: fd.get('make'),
-      model: fd.get('model'),
-      year: parseInt(fd.get('year'), 10),
-      price_sll: parseFloat(fd.get('price_sll')),
-      location: fd.get('location') || null,
-      description: fd.get('description') || null,
-      condition: fd.get('condition') || 'used',
-      availability: fd.get('availability') || 'in_stock',
-      country_of_origin: fd.get('country_of_origin') || null,
-      vin: fd.get('vin') || null,
-      duty_paid: fd.get('duty_paid') === 'true'
-    };
+ var fd = new FormData(form);
+ var body = {
+ title: fd.get('title'),
+ make: fd.get('make'),
+ model: fd.get('model'),
+ year: parseInt(fd.get('year'), 10),
+ price_sll: parseFloat(fd.get('price_sll')),
+ location: fd.get('location') || null,
+ description: fd.get('description') || null,
+ condition: fd.get('condition') || 'used',
+ availability: fd.get('availability') || 'in_stock',
+ country_of_origin: fd.get('country_of_origin') || null,
+ vin: fd.get('vin') || null,
+ duty_paid: fd.get('duty_paid') === 'true'
+ };
 
-    try {
-      var r = await fetch('/api/vehicles/', {
-        method: 'POST',
-        headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
-        body: JSON.stringify(body)
-      });
-      var d = await r.json();
-      if (!r.ok) throw new Error(d.detail || ('Create failed (' + r.status + ')'));
-      var vehicleId = d.id;
+ try {
+ var r = await fetch('/api/vehicles/', {
+ method: 'POST',
+ headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+ body: JSON.stringify(body)
+ });
+ var d = await r.json();
+ if (!r.ok) throw new Error(d.detail || ('Create failed (' + r.status + ')'));
+ var vehicleId = d.id;
 
-      if (selectedFiles.length > 0) {
-        setStatus('Uploading photos...');
-        for (var i = 0; i < selectedFiles.length; i++) {
-          var f = selectedFiles[i];
-          var upFd = new FormData();
-          upFd.append('file', f);
-          try {
-            await fetch('/api/upload/vehicle/' + vehicleId, {
-              method: 'POST',
-              headers: authHeaders(),
-              body: upFd
-            });
-          } catch (e) {
-            console.warn('Photo upload failed', e);
-          }
-        }
-      }
+ if (selectedFiles.length > 0) {
+ setStatus('Uploading photos...');
+ for (var i = 0; i < selectedFiles.length; i++) {
+ var f = selectedFiles[i];
+ var upFd = new FormData();
+ upFd.append('file', f);
+ try {
+ await fetch('/api/upload/vehicle/' + vehicleId, {
+ method: 'POST',
+ headers: authHeaders(),
+ body: upFd
+ });
+ } catch (e) {
+ console.warn('Photo upload failed', e);
+ }
+ }
+ }
 
-      setStatus('Listing created! Redirecting...', 'ok');
-      setTimeout(function() { location.href = '/vehicle/' + vehicleId; }, 800);
-    } catch (e) {
-      setStatus(e.message, 'err');
-      submit.disabled = false;
-    }
-  });
+ setStatus('Listing created! Redirecting...', 'ok');
+ setTimeout(function() { location.href = '/vehicle/' + vehicleId; }, 800);
+ } catch (e) {
+ setStatus(e.message, 'err');
+ submit.disabled = false;
+ }
+ });
 })();
 </script>
 </body>

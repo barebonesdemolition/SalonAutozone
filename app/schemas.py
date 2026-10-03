@@ -140,3 +140,16 @@ class ImportRequestResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class GarageCarResponse(BaseModel):
+    id: int
+    make: str | None = None
+    model: str | None = None
+    year: int | None = None
+    vin: str | None = None
+    nickname: str | None = None
+    is_primary: bool = False
+
+    class Config:
+        from_attributes = True

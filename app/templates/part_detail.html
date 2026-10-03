@@ -44,114 +44,114 @@ h1{font-size:clamp(20px,4vw,26px);font-weight:800;color:var(--navy)}
 <body>
 <div class="top"><strong>Salon AutoZone · Freetown</strong><a href="/" style="color:#99f6e4;font-weight:700">Home</a></div>
 <header class="brand">
-  <a class="logo" href="/">Salon<span>AutoZone</span></a>
-  <a href="/vin-tool" style="font-weight:600;color:#475569;font-size:14px">VIN Lookup</a>
-  <a href="/garage" style="font-weight:600;color:#475569;font-size:14px">My Garage</a>
+ <a class="logo" href="/">Salon<span>AutoZone</span></a>
+ <a href="/vin-tool" style="font-weight:600;color:#475569;font-size:14px">VIN Lookup</a>
+ <a href="/garage" style="font-weight:600;color:#475569;font-size:14px">My Garage</a>
 </header>
 <main class="wrap" id="app"><div class="sk"></div></main>
 <div class="bnav"><nav>
-  <a href="/" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
-  <a href="/garage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
-  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>Saved</a>
-  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
+ <a href="/" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
+ <a href="/garage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
+ <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>Saved</a>
+ <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
 </nav></div>
 <script>
 (function () {
-  var id = location.pathname.split('/').pop();
-  var app = document.getElementById('app');
-  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
-  function fmt(n){try{return Number(n).toLocaleString()}catch(e){return n}}
-  function token(){try{return localStorage.getItem('token')||localStorage.getItem('access_token')||''}catch(e){return ''}}
-  function auth(){var t=token();return t?{Authorization:'Bearer '+t}:{}}
+ var id = location.pathname.split('/').pop();
+ var app = document.getElementById('app');
+ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+ function fmt(n){try{return Number(n).toLocaleString()}catch(e){return n}}
+ function token(){try{return localStorage.getItem('token')||localStorage.getItem('access_token')||''}catch(e){return ''}}
+ function auth(){var t=token();return t?{Authorization:'Bearer '+t}:{}}
 
-  fetch('/api/parts/' + id).then(function(r){return r.ok?r.json():null}).then(function(p){
-    if(!p){app.innerHTML='<p class="muted">Part not found.</p>';return}
-    var title = p.name || p.title || 'Part';
-    var img = p.image_url || p.photo_url || '';
-    var phone = (p.contact_phone||'').replace(/\s+/g,'');
-    var wa = phone ? 'https://wa.me/' + phone.replace(/^\+/,'') + '?text=' + encodeURIComponent('Hi, I am interested in: ' + title + ' on SalonAutoZone') : null;
-    var compat = [p.compatible_make, p.compatible_model].filter(Boolean).join(' ');
+ fetch('/api/parts/' + id).then(function(r){return r.ok?r.json():null}).then(function(p){
+ if(!p){app.innerHTML='<p class="muted">Part not found.</p>';return}
+ var title = p.name || p.title || 'Part';
+ var img = p.image_url || p.photo_url || '';
+ var phone = (p.contact_phone||'').replace(/\s+/g,'');
+ var wa = phone ? 'https://wa.me/' + phone.replace(/^\+/,'') + '?text=' + encodeURIComponent('Hi, I am interested in: ' + title + ' on SalonAutoZone') : null;
+ var compat = [p.compatible_make, p.compatible_model].filter(Boolean).join(' ');
 
-    app.innerHTML =
-      '<div class="hero-img"' + (img?' style="background-image:url(\''+esc(img)+'\')"':'') + '>' + (img?'':'No photo') + '</div>' +
-      '<h1>' + esc(title) + '</h1>' +
-      '<div class="price">' + (p.price_sll!=null?'SLL '+fmt(p.price_sll):'Price on request') + '</div>' +
-      '<div class="meta">' +
-        (p.category?'<span class="tag">'+esc(p.category)+'</span>':'') +
-        (p.condition?'<span class="tag">'+esc(p.condition)+'</span>':'') +
-        (p.location?'<span class="tag">'+esc(p.location)+'</span>':'') +
-        (compat?'<span class="tag fit">Fits: '+esc(compat)+'</span>':'') +
-      '</div>' +
-      (p.description?'<div class="panel"><h2>Description</h2><p>'+esc(p.description)+'</p></div>':'') +
-      '<div class="panel" id="fit-panel"><h2>Fits your garage?</h2><p class="muted" id="fit-body">Checking your garage…</p></div>' +
-      '<div class="acts">' +
-        (wa?'<a class="btn btn-wa" href="'+wa+'" target="_blank" rel="noopener">WhatsApp seller</a>':'') +
-        '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
-        '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
-      '</div>';
+ app.innerHTML =
+ '<div class="hero-img"' + (img?' style="background-image:url(\''+esc(img)+'\')"':'') + '>' + (img?'':'No photo') + '</div>' +
+ '<h1>' + esc(title) + '</h1>' +
+ '<div class="price">' + (p.price_sll!=null?'SLL '+fmt(p.price_sll):'Price on request') + '</div>' +
+ '<div class="meta">' +
+ (p.category?'<span class="tag">'+esc(p.category)+'</span>':'') +
+ (p.condition?'<span class="tag">'+esc(p.condition)+'</span>':'') +
+ (p.location?'<span class="tag">'+esc(p.location)+'</span>':'') +
+ (compat?'<span class="tag fit">Fits: '+esc(compat)+'</span>':'') +
+ '</div>' +
+ (p.description?'<div class="panel"><h2>Description</h2><p>'+esc(p.description)+'</p></div>':'') +
+ '<div class="panel" id="fit-panel"><h2>Fits your garage?</h2><p class="muted" id="fit-body">Checking your garage…</p></div>' +
+ '<div class="acts">' +
+ (wa?'<a class="btn btn-wa" href="'+wa+'" target="_blank" rel="noopener">WhatsApp seller</a>':'') +
+ '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
+ '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
+ '</div>';
 
-    // Garage fit check
-    var fitBody = document.getElementById('fit-body');
-    function norm(s){return String(s||'').trim().toLowerCase()}
-    function checkGarage(cars) {
-      if (!cars || !cars.length) {
-        fitBody.innerHTML = 'No cars in your garage. <a href="/garage" style="color:var(--primary);font-weight:700">Add a vehicle</a> to see if this part fits.';
-        return;
-      }
-      var make = norm(p.compatible_make);
-      var model = norm(p.compatible_model);
-      var hits = [];
-      cars.forEach(function(c){
-        var cm = norm(c.make), cmo = norm(c.model);
-        var ok = true;
-        if (make && make !== 'any' && cm && cm.indexOf(make) < 0 && make.indexOf(cm) < 0) ok = false;
-        if (model && cmo && cmo.indexOf(model) < 0 && model.indexOf(cmo) < 0) ok = false;
-        if (!make && !model) ok = false;
-        if (ok) hits.push(c);
-      });
-      if (!make && !model) {
-        fitBody.innerHTML = '<span class="muted">This listing has no fitment info. Confirm with the seller.</span>';
-        return;
-      }
-      if (hits.length) {
-        fitBody.innerHTML = '<div class="ok">Likely fits ' + hits.length + ' of your vehicle' + (hits.length>1?'s':'') + '</div><ul class="fit-list">' +
-          hits.map(function(c){ return '<li>'+esc(c.year+' '+c.make+' '+c.model)+(c.is_primary?' · primary':'')+'</li>'; }).join('') +
-          '</ul><p class="muted">Always confirm with the seller before buying.</p>';
-      } else {
-        fitBody.innerHTML = '<span class="muted">Does not match your garage vehicles' +
-          (compat ? ' (listed for '+esc(compat)+')' : '') +
-          '. <a href="/garage" style="color:var(--primary);font-weight:700">Manage garage</a></span>';
-      }
-    }
+ // Garage fit check
+ var fitBody = document.getElementById('fit-body');
+ function norm(s){return String(s||'').trim().toLowerCase()}
+ function checkGarage(cars) {
+ if (!cars || !cars.length) {
+ fitBody.innerHTML = 'No cars in your garage. <a href="/garage" style="color:var(--primary);font-weight:700">Add a vehicle</a> to see if this part fits.';
+ return;
+ }
+ var make = norm(p.compatible_make);
+ var model = norm(p.compatible_model);
+ var hits = [];
+ cars.forEach(function(c){
+ var cm = norm(c.make), cmo = norm(c.model);
+ var ok = true;
+ if (make && make !== 'any' && cm && cm.indexOf(make) < 0 && make.indexOf(cm) < 0) ok = false;
+ if (model && cmo && cmo.indexOf(model) < 0 && model.indexOf(cmo) < 0) ok = false;
+ if (!make && !model) ok = false;
+ if (ok) hits.push(c);
+ });
+ if (!make && !model) {
+ fitBody.innerHTML = '<span class="muted">This listing has no fitment info. Confirm with the seller.</span>';
+ return;
+ }
+ if (hits.length) {
+ fitBody.innerHTML = '<div class="ok">Likely fits ' + hits.length + ' of your vehicle' + (hits.length>1?'s':'') + '</div><ul class="fit-list">' +
+ hits.map(function(c){ return '<li>'+esc(c.year+' '+c.make+' '+c.model)+(c.is_primary?' · primary':'')+'</li>'; }).join('') +
+ '</ul><p class="muted">Always confirm with the seller before buying.</p>';
+ } else {
+ fitBody.innerHTML = '<span class="muted">Does not match your garage vehicles' +
+ (compat ? ' (listed for '+esc(compat)+')' : '') +
+ '. <a href="/garage" style="color:var(--primary);font-weight:700">Manage garage</a></span>';
+ }
+ }
 
-    if (token()) {
-      fetch('/api/garage/', { headers: auth() }).then(function(r){ return r.ok ? r.json() : []; }).then(checkGarage).catch(function(){
-        fitBody.innerHTML = '<span class="muted">Could not load garage.</span>';
-      });
-    } else {
-      // localStorage fitment from home page
-      var local = null;
-      try { local = JSON.parse(localStorage.getItem('fitmentVehicle') || 'null'); } catch(e) {}
-      if (local && local.make) checkGarage([local]);
-      else fitBody.innerHTML = '<a href="/login" style="color:var(--primary);font-weight:700">Sign in</a> or set your car on the home page to check fit.';
-    }
+ if (token()) {
+ fetch('/api/garage/', { headers: auth() }).then(function(r){ return r.ok ? r.json() : []; }).then(checkGarage).catch(function(){
+ fitBody.innerHTML = '<span class="muted">Could not load garage.</span>';
+ });
+ } else {
+ // localStorage fitment from home page
+ var local = null;
+ try { local = JSON.parse(localStorage.getItem('fitmentVehicle') || 'null'); } catch(e) {}
+ if (local && local.make) checkGarage([local]);
+ else fitBody.innerHTML = '<a href="/login" style="color:var(--primary);font-weight:700">Sign in</a> or set your car on the home page to check fit.';
+ }
 
-    document.getElementById('btn-share').onclick = function(){
-      var msg = '*' + title + '*\n' + (p.price_sll?'SLL '+fmt(p.price_sll)+'\n':'') + '\n' + location.href;
-      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-    };
-    document.getElementById('btn-save').onclick = function(){
-      if (!token()) { location.href='/login?next='+encodeURIComponent(location.pathname); return; }
-      fetch('/api/my-account/saved', {
-        method:'POST',
-        headers: Object.assign({'Content-Type':'application/json'}, auth()),
-        body: JSON.stringify({listing_type:'part', listing_id: Number(id)})
-      }).then(function(r){
-        if (r.status===401) location.href='/login';
-        else if (r.ok) document.getElementById('btn-save').textContent='Saved';
-      });
-    };
-  }).catch(function(){ app.innerHTML='<p class="muted">Could not load part.</p>'; });
+ document.getElementById('btn-share').onclick = function(){
+ var msg = '*' + title + '*\n' + (p.price_sll?'SLL '+fmt(p.price_sll)+'\n':'') + '\n' + location.href;
+ window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+ };
+ document.getElementById('btn-save').onclick = function(){
+ if (!token()) { location.href='/login?next='+encodeURIComponent(location.pathname); return; }
+ fetch('/api/my-account/saved', {
+ method:'POST',
+ headers: Object.assign({'Content-Type':'application/json'}, auth()),
+ body: JSON.stringify({listing_type:'part', listing_id: Number(id)})
+ }).then(function(r){
+ if (r.status===401) location.href='/login';
+ else if (r.ok) document.getElementById('btn-save').textContent='Saved';
+ });
+ };
+ }).catch(function(){ app.innerHTML='<p class="muted">Could not load part.</p>'; });
 })();
 </script>
 </body>

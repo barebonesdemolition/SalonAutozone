@@ -43,103 +43,103 @@ h1{font-size:clamp(22px,4vw,28px);font-weight:800;color:var(--navy);letter-spaci
 <body>
 <div class="top"><strong>Salon AutoZone · Freetown</strong><a href="/" style="color:#99f6e4;font-weight:700">Home</a></div>
 <header class="brand">
-  <a class="logo" href="/">Salon<span>AutoZone</span></a>
-  <a href="/vin-tool" style="font-weight:600;color:#475569;font-size:14px">VIN Lookup</a>
-  <a href="/my-account" style="font-weight:600;color:#475569;font-size:14px">Account</a>
+ <a class="logo" href="/">Salon<span>AutoZone</span></a>
+ <a href="/vin-tool" style="font-weight:600;color:#475569;font-size:14px">VIN Lookup</a>
+ <a href="/my-account" style="font-weight:600;color:#475569;font-size:14px">Account</a>
 </header>
 <main class="wrap" id="app"><div class="sk"></div></main>
 <div class="bnav"><nav>
-  <a href="/" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
-  <a href="/garage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
-  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>Saved</a>
-  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
+ <a href="/" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
+ <a href="/garage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
+ <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>Saved</a>
+ <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
 </nav></div>
 <script>
 (function () {
-  var id = location.pathname.split('/').pop();
-  var app = document.getElementById('app');
-  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
-  function fmt(n){try{return Number(n).toLocaleString()}catch(e){return n}}
-  function token(){try{return localStorage.getItem('token')||localStorage.getItem('access_token')||''}catch(e){return ''}}
-  function auth(){var t=token();return t?{Authorization:'Bearer '+t}:{}}
+ var id = location.pathname.split('/').pop();
+ var app = document.getElementById('app');
+ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+ function fmt(n){try{return Number(n).toLocaleString()}catch(e){return n}}
+ function token(){try{return localStorage.getItem('token')||localStorage.getItem('access_token')||''}catch(e){return ''}}
+ function auth(){var t=token();return t?{Authorization:'Bearer '+t}:{}}
 
-  fetch('/api/vehicles/' + id).then(function(r){return r.ok?r.json():null}).then(function(v){
-    if(!v){app.innerHTML='<p class="muted">Vehicle not found.</p>';return}
-    var title = v.title || [v.year,v.make,v.model].filter(Boolean).join(' ');
-    var img = v.image_url || v.photo_url || '';
-    var phone = (v.contact_phone||'').replace(/\s+/g,'');
-    var wa = phone ? 'https://wa.me/' + phone.replace(/^\+/,'') + '?text=' + encodeURIComponent('Hi, I saw your ' + title + ' on SalonAutoZone') : null;
-    app.innerHTML =
-      '<div class="hero-img"' + (img?' style="background-image:url(\''+esc(img)+'\')"':'') + '>' + (img?'':'No photo') + '</div>' +
-      '<h1>' + esc(title) + '</h1>' +
-      '<div class="price">' + (v.price_sll!=null?'SLL '+fmt(v.price_sll):'Price on request') + '</div>' +
-      (v.price_usd?'<div class="muted">≈ USD '+fmt(v.price_usd)+'</div>':'') +
-      '<div class="meta">' +
-        (v.year?'<span class="tag">'+esc(v.year)+'</span>':'') +
-        (v.mileage_km!=null?'<span class="tag">'+fmt(v.mileage_km)+' km</span>':'') +
-        (v.fuel_type?'<span class="tag">'+esc(v.fuel_type)+'</span>':'') +
-        (v.transmission?'<span class="tag">'+esc(v.transmission)+'</span>':'') +
-        (v.location?'<span class="tag">'+esc(v.location)+'</span>':'') +
-      '</div>' +
-      (v.description?'<div class="panel"><h2>Description</h2><p>'+esc(v.description)+'</p></div>':'') +
-      '<div class="panel safety" id="safety"><h2>Free safety check</h2><p class="muted" id="safety-body">Enter or load VIN to check open recalls (US database).</p></div>' +
-      '<div class="acts">' +
-        (wa?'<a class="btn btn-wa" href="'+wa+'" target="_blank" rel="noopener">WhatsApp seller</a>':'') +
-        '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
-        '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
-      '</div>';
+ fetch('/api/vehicles/' + id).then(function(r){return r.ok?r.json():null}).then(function(v){
+ if(!v){app.innerHTML='<p class="muted">Vehicle not found.</p>';return}
+ var title = v.title || [v.year,v.make,v.model].filter(Boolean).join(' ');
+ var img = v.image_url || v.photo_url || '';
+ var phone = (v.contact_phone||'').replace(/\s+/g,'');
+ var wa = phone ? 'https://wa.me/' + phone.replace(/^\+/,'') + '?text=' + encodeURIComponent('Hi, I saw your ' + title + ' on SalonAutoZone') : null;
+ app.innerHTML =
+ '<div class="hero-img"' + (img?' style="background-image:url(\''+esc(img)+'\')"':'') + '>' + (img?'':'No photo') + '</div>' +
+ '<h1>' + esc(title) + '</h1>' +
+ '<div class="price">' + (v.price_sll!=null?'SLL '+fmt(v.price_sll):'Price on request') + '</div>' +
+ (v.price_usd?'<div class="muted">≈ USD '+fmt(v.price_usd)+'</div>':'') +
+ '<div class="meta">' +
+ (v.year?'<span class="tag">'+esc(v.year)+'</span>':'') +
+ (v.mileage_km!=null?'<span class="tag">'+fmt(v.mileage_km)+' km</span>':'') +
+ (v.fuel_type?'<span class="tag">'+esc(v.fuel_type)+'</span>':'') +
+ (v.transmission?'<span class="tag">'+esc(v.transmission)+'</span>':'') +
+ (v.location?'<span class="tag">'+esc(v.location)+'</span>':'') +
+ '</div>' +
+ (v.description?'<div class="panel"><h2>Description</h2><p>'+esc(v.description)+'</p></div>':'') +
+ '<div class="panel safety" id="safety"><h2>Free safety check</h2><p class="muted" id="safety-body">Enter or load VIN to check open recalls (US database).</p></div>' +
+ '<div class="acts">' +
+ (wa?'<a class="btn btn-wa" href="'+wa+'" target="_blank" rel="noopener">WhatsApp seller</a>':'') +
+ '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
+ '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
+ '</div>';
 
-    // Safety check
-    var vin = v.vin || v.chassis_number || '';
-    var safetyBody = document.getElementById('safety-body');
-    function runCheck(vinCode) {
-      if (!vinCode || vinCode.length < 11) {
-        safetyBody.innerHTML = '<span class="muted">No VIN on this listing. Ask the seller for the chassis number.</span>';
-        return;
-      }
-      safetyBody.textContent = 'Checking…';
-      fetch('/api/nhtsa/check/' + encodeURIComponent(vinCode)).then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d}})}).then(function(x){
-        if (!x.ok) { safetyBody.innerHTML = '<span class="warn">' + esc(x.d.detail||x.d.error||'Check failed') + '</span>'; return; }
-        var s = (x.d.decode&&x.d.decode.summary)||{};
-        var rec = x.d.recalls||{};
-        var name = [s.year,s.make,s.model].filter(Boolean).join(' ');
-        var n = rec.count||0;
-        var h = name ? '<div><strong>'+esc(name)+'</strong></div>' : '';
-        if (n===0) h += '<div class="ok">No open recalls found.</div>';
-        else {
-          h += '<div class="warn">'+n+' open recall'+(n>1?'s':'')+'</div><ul>';
-          (rec.recalls||[]).slice(0,5).forEach(function(r){ h += '<li><strong>'+esc(r.component||'Recall')+'</strong>: '+esc((r.summary||'').slice(0,140))+'</li>'; });
-          h += '</ul>';
-        }
-        h += '<p class="muted" style="margin-top:8px">Free NHTSA check — not full accident history. VIN: '+esc(vinCode)+'</p>';
-        safetyBody.innerHTML = h;
-      }).catch(function(){ safetyBody.innerHTML = '<span class="warn">Network error</span>'; });
-    }
-    if (vin) runCheck(vin);
-    else {
-      safetyBody.innerHTML = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
-        '<input id="vin-in" maxlength="17" placeholder="17-character VIN" style="flex:1;min-width:180px;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;text-transform:uppercase">' +
-        '<button type="button" class="btn btn-primary" id="vin-go" style="flex:0">Check free</button></div>';
-      document.getElementById('vin-go').onclick = function(){ runCheck((document.getElementById('vin-in').value||'').replace(/\s+/g,'').toUpperCase()); };
-    }
+ // Safety check
+ var vin = v.vin || v.chassis_number || '';
+ var safetyBody = document.getElementById('safety-body');
+ function runCheck(vinCode) {
+ if (!vinCode || vinCode.length < 11) {
+ safetyBody.innerHTML = '<span class="muted">No VIN on this listing. Ask the seller for the chassis number.</span>';
+ return;
+ }
+ safetyBody.textContent = 'Checking…';
+ fetch('/api/nhtsa/check/' + encodeURIComponent(vinCode)).then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d}})}).then(function(x){
+ if (!x.ok) { safetyBody.innerHTML = '<span class="warn">' + esc(x.d.detail||x.d.error||'Check failed') + '</span>'; return; }
+ var s = (x.d.decode&&x.d.decode.summary)||{};
+ var rec = x.d.recalls||{};
+ var name = [s.year,s.make,s.model].filter(Boolean).join(' ');
+ var n = rec.count||0;
+ var h = name ? '<div><strong>'+esc(name)+'</strong></div>' : '';
+ if (n===0) h += '<div class="ok">No open recalls found.</div>';
+ else {
+ h += '<div class="warn">'+n+' open recall'+(n>1?'s':'')+'</div><ul>';
+ (rec.recalls||[]).slice(0,5).forEach(function(r){ h += '<li><strong>'+esc(r.component||'Recall')+'</strong>: '+esc((r.summary||'').slice(0,140))+'</li>'; });
+ h += '</ul>';
+ }
+ h += '<p class="muted" style="margin-top:8px">Free NHTSA check — not full accident history. VIN: '+esc(vinCode)+'</p>';
+ safetyBody.innerHTML = h;
+ }).catch(function(){ safetyBody.innerHTML = '<span class="warn">Network error</span>'; });
+ }
+ if (vin) runCheck(vin);
+ else {
+ safetyBody.innerHTML = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+ '<input id="vin-in" maxlength="17" placeholder="17-character VIN" style="flex:1;min-width:180px;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;text-transform:uppercase">' +
+ '<button type="button" class="btn btn-primary" id="vin-go" style="flex:0">Check free</button></div>';
+ document.getElementById('vin-go').onclick = function(){ runCheck((document.getElementById('vin-in').value||'').replace(/\s+/g,'').toUpperCase()); };
+ }
 
-    document.getElementById('btn-share').onclick = function(){
-      var url = location.href;
-      var msg = '*' + title + '*\n' + (v.price_sll?'SLL '+fmt(v.price_sll)+'\n':'') + '\n' + url;
-      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-    };
-    document.getElementById('btn-save').onclick = function(){
-      if (!token()) { location.href='/login?next='+encodeURIComponent(location.pathname); return; }
-      fetch('/api/my-account/saved', {
-        method:'POST',
-        headers: Object.assign({'Content-Type':'application/json'}, auth()),
-        body: JSON.stringify({listing_type:'vehicle', listing_id: Number(id)})
-      }).then(function(r){
-        if (r.status===401) location.href='/login';
-        else if (r.ok) { document.getElementById('btn-save').textContent='Saved'; }
-      });
-    };
-  }).catch(function(){ app.innerHTML='<p class="muted">Could not load vehicle.</p>'; });
+ document.getElementById('btn-share').onclick = function(){
+ var url = location.href;
+ var msg = '*' + title + '*\n' + (v.price_sll?'SLL '+fmt(v.price_sll)+'\n':'') + '\n' + url;
+ window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+ };
+ document.getElementById('btn-save').onclick = function(){
+ if (!token()) { location.href='/login?next='+encodeURIComponent(location.pathname); return; }
+ fetch('/api/my-account/saved', {
+ method:'POST',
+ headers: Object.assign({'Content-Type':'application/json'}, auth()),
+ body: JSON.stringify({listing_type:'vehicle', listing_id: Number(id)})
+ }).then(function(r){
+ if (r.status===401) location.href='/login';
+ else if (r.ok) { document.getElementById('btn-save').textContent='Saved'; }
+ });
+ };
+ }).catch(function(){ app.innerHTML='<p class="muted">Could not load vehicle.</p>'; });
 })();
 </script>
 </body>

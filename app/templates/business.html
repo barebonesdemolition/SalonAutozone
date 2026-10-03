@@ -49,119 +49,119 @@ a.btn.public-link{display:inline-flex;justify-content:center;align-items:center;
 
 <script>
 (function () {
-  'use strict';
-  var root = document.getElementById('root');
-  var TYPES = [
-    ['store', 'Local parts store', 'You stock parts in Sierra Leone'],
-    ['dealership', 'Car dealership', 'You sell new or used cars'],
-    ['shipper', 'Shipper / importer', 'You bring cars in from abroad'],
-    ['wholesaler', 'Wholesaler (abroad)', 'You supply parts from outside Sierra Leone']
-  ];
-  var token = '';
-  try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
+ 'use strict';
+ var root = document.getElementById('root');
+ var TYPES = [
+ ['store', 'Local parts store', 'You stock parts in Sierra Leone'],
+ ['dealership', 'Car dealership', 'You sell new or used cars'],
+ ['shipper', 'Shipper / importer', 'You bring cars in from abroad'],
+ ['wholesaler', 'Wholesaler (abroad)', 'You supply parts from outside Sierra Leone']
+ ];
+ var token = '';
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
 
-  function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function safeUrl(u) { u = String(u || '').trim(); return (u.indexOf('https://') === 0 || (u.charAt(0) === '/' && u.charAt(1) !== '/')) ? u : ''; }
-  function api(url, opts) {
-    opts = opts || {};
-    opts.headers = Object.assign({ 'Content-Type': 'application/json' }, token ? { 'Authorization': 'Bearer ' + token } : {}, opts.headers || {});
-    return fetch(url, opts).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (d) {
-        if (!r.ok) {
-          var detail = d.detail;
-          if (Array.isArray(detail)) detail = detail.map(function (x) { return x.msg; }).join('. ');
-          var error = new Error(typeof detail === 'string' ? detail : 'Something went wrong');
-          error.status = r.status;
-          throw error;
-        }
-        return d;
-      });
-    });
-  }
-  function returnToLogin() {
-    try {
-      localStorage.removeItem('token');
-      localStorage.removeItem('access_token');
-    } catch (e) {}
-    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
-  }
-  function pill(st) {
-    var map = { verified: ['ok', 'Verified'], pending: ['wait', 'Waiting for approval'], rejected: ['bad', 'Not approved'], suspended: ['bad', 'Suspended'] };
-    var p = map[st] || ['wait', st];
-    return '<span class="pill ' + p[0] + '">' + p[1] + '</span>';
-  }
-  function logoBox(b) {
-    var u = safeUrl(b.logo_url);
-    return '<div class="logo-box">' + (u ? '<img src="' + esc(u) + '" alt="">' : esc((b.name || '?').charAt(0).toUpperCase())) + '</div>';
-  }
+ function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function safeUrl(u) { u = String(u || '').trim(); return (u.indexOf('https://') === 0 || (u.charAt(0) === '/' && u.charAt(1) !== '/')) ? u : ''; }
+ function api(url, opts) {
+ opts = opts || {};
+ opts.headers = Object.assign({ 'Content-Type': 'application/json' }, token ? { 'Authorization': 'Bearer ' + token } : {}, opts.headers || {});
+ return fetch(url, opts).then(function (r) {
+ return r.json().catch(function () { return {}; }).then(function (d) {
+ if (!r.ok) {
+ var detail = d.detail;
+ if (Array.isArray(detail)) detail = detail.map(function (x) { return x.msg; }).join('. ');
+ var error = new Error(typeof detail === 'string' ? detail : 'Something went wrong');
+ error.status = r.status;
+ throw error;
+ }
+ return d;
+ });
+ });
+ }
+ function returnToLogin() {
+ try {
+ localStorage.removeItem('token');
+ localStorage.removeItem('access_token');
+ } catch (e) {}
+ window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+ }
+ function pill(st) {
+ var map = { verified: ['ok', 'Verified'], pending: ['wait', 'Waiting for approval'], rejected: ['bad', 'Not approved'], suspended: ['bad', 'Suspended'] };
+ var p = map[st] || ['wait', st];
+ return '<span class="pill ' + p[0] + '">' + p[1] + '</span>';
+ }
+ function logoBox(b) {
+ var u = safeUrl(b.logo_url);
+ return '<div class="logo-box">' + (u ? '<img src="' + esc(u) + '" alt="">' : esc((b.name || '?').charAt(0).toUpperCase())) + '</div>';
+ }
 
-  // ---------- storefront ----------
-  function showStore(slug) {
-    api('/api/businesses/' + encodeURIComponent(slug)).then(function (b) {
-      document.title = b.name + ' · SalonAutoZone';
-      var contact = b.whatsapp
-        ? '<a class="btn wa full" href="https://wa.me/' + encodeURIComponent(b.whatsapp) + '?text=' + encodeURIComponent('Hello ' + b.name + ', I found you on SalonAutoZone.') + '" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>'
-        : '<div class="note">This business has not added a WhatsApp contact yet.</div>';
-      root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta"><span class="pill ok">Verified</span><span class="pill t">' + esc(b.type_label) + '</span><span class="pill t">' + esc(b.city) + ', ' + esc(b.country) + '</span></div></div></div>' +
-        (b.description ? '<p>' + esc(b.description) + '</p>' : '') +
-        contact +
-        '<div class="note">Listings from this business will appear here soon. Never pay a deposit before you have checked the seller and seen the item.</div>';
-    }).catch(function () {
-      root.innerHTML = '<h1>Business not found</h1><p class="sub">This page does not exist or has not been approved yet.</p><a class="btn" href="/">Back to marketplace</a>';
-    });
-  }
+ // ---------- storefront ----------
+ function showStore(slug) {
+ api('/api/businesses/' + encodeURIComponent(slug)).then(function (b) {
+ document.title = b.name + ' · SalonAutoZone';
+ var contact = b.whatsapp
+ ? '<a class="btn wa full" href="https://wa.me/' + encodeURIComponent(b.whatsapp) + '?text=' + encodeURIComponent('Hello ' + b.name + ', I found you on SalonAutoZone.') + '" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>'
+ : '<div class="note">This business has not added a WhatsApp contact yet.</div>';
+ root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta"><span class="pill ok">Verified</span><span class="pill t">' + esc(b.type_label) + '</span><span class="pill t">' + esc(b.city) + ', ' + esc(b.country) + '</span></div></div></div>' +
+ (b.description ? '<p>' + esc(b.description) + '</p>' : '') +
+ contact +
+ '<div class="note">Listings from this business will appear here soon. Never pay a deposit before you have checked the seller and seen the item.</div>';
+ }).catch(function () {
+ root.innerHTML = '<h1>Business not found</h1><p class="sub">This page does not exist or has not been approved yet.</p><a class="btn" href="/">Back to marketplace</a>';
+ });
+ }
 
-  // ---------- apply ----------
-  function showApply() {
-    if (!token) { window.location.href = '/login?next=/become-a-seller'; return; }
-    api('/api/businesses/mine').then(function (d) {
-      if (d.business) { showStatus(d.business); } else { showForm(); }
-    }).catch(function (e) {
-      if (e.status === 401) { returnToLogin(); return; }
-      root.innerHTML = '<p class="msg" style="color:var(--r)">' + esc(e.message) + '</p>';
-    });
-  }
-  function showStatus(b) {
-    root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta">' + pill(b.status) + '<span class="pill t">' + esc(b.type_label) + '</span></div></div></div>' +
-      (b.status === 'pending' ? '<div class="note">We received your application. We will check your details and contact you on WhatsApp (+' + esc(b.whatsapp) + ').</div>' : '') +
-      (b.status === 'verified' ? '<a class="btn full public-link" href="/store/' + encodeURIComponent(b.slug) + '">View your public page</a>' : '') +
-      ((b.status === 'rejected' || b.status === 'suspended') ? '<div class="note">Please contact us on WhatsApp to find out why and what to fix.</div>' : '');
-  }
-  function showForm() {
-    var chosen = '';
-    root.innerHTML = '<h1>Sell on SalonAutoZone as a business</h1><p class="sub">Stores, dealerships, shippers and wholesalers get a public page with a Verified badge once we have checked the details.</p>' +
-      '<form id="f"><label>What kind of business are you?</label><div class="types" id="types">' +
-      TYPES.map(function (t) { return '<button type="button" class="type" data-t="' + t[0] + '" aria-pressed="false"><b>' + t[1] + '</b><small>' + t[2] + '</small></button>'; }).join('') + '</div>' +
-      '<label>Business name<input name="name" required minlength="2" maxlength="80" placeholder="e.g. Freetown Auto Parts"></label>' +
-      '<div class="row"><label>Country<input name="country" required value="Sierra Leone"></label><label>City<input name="city" required placeholder="Freetown"></label></div>' +
-      '<label>WhatsApp number<input name="whatsapp" type="tel" required placeholder="+232 76 123456"></label>' +
-      '<label>Email (optional)<input name="email" type="email"></label>' +
-      '<label>About your business<textarea name="description" rows="4" maxlength="1000" placeholder="What you sell, how long you have traded, where to find you"></textarea></label>' +
-      '<button class="btn full" type="submit">Send application</button><div class="msg" id="msg" aria-live="polite"></div></form>';
-    document.getElementById('types').addEventListener('click', function (e) {
-      var b = e.target.closest('.type'); if (!b) return;
-      chosen = b.dataset.t;
-      document.querySelectorAll('.type').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
-    });
-    document.getElementById('f').addEventListener('submit', function (e) {
-      e.preventDefault();
-      var msg = document.getElementById('msg'), btn = e.target.querySelector('.btn');
-      if (!chosen) { msg.style.color = 'var(--r)'; msg.textContent = 'Choose what kind of business you are.'; return; }
-      var p = { business_type: chosen };
-      new FormData(e.target).forEach(function (v, k) { if (v !== '') p[k] = v; });
-      btn.disabled = true; msg.style.color = 'var(--t)'; msg.textContent = 'Sending...';
-      api('/api/businesses/apply', { method: 'POST', body: JSON.stringify(p) })
-        .then(function () { showApply(); })
-        .catch(function (err) {
-          if (err.status === 401) { returnToLogin(); return; }
-          msg.style.color = 'var(--r)'; msg.textContent = err.message; btn.disabled = false;
-        });
-    });
-  }
+ // ---------- apply ----------
+ function showApply() {
+ if (!token) { window.location.href = '/login?next=/become-a-seller'; return; }
+ api('/api/businesses/mine').then(function (d) {
+ if (d.business) { showStatus(d.business); } else { showForm(); }
+ }).catch(function (e) {
+ if (e.status === 401) { returnToLogin(); return; }
+ root.innerHTML = '<p class="msg" style="color:var(--r)">' + esc(e.message) + '</p>';
+ });
+ }
+ function showStatus(b) {
+ root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta">' + pill(b.status) + '<span class="pill t">' + esc(b.type_label) + '</span></div></div></div>' +
+ (b.status === 'pending' ? '<div class="note">We received your application. We will check your details and contact you on WhatsApp (+' + esc(b.whatsapp) + ').</div>' : '') +
+ (b.status === 'verified' ? '<a class="btn full public-link" href="/store/' + encodeURIComponent(b.slug) + '">View your public page</a>' : '') +
+ ((b.status === 'rejected' || b.status === 'suspended') ? '<div class="note">Please contact us on WhatsApp to find out why and what to fix.</div>' : '');
+ }
+ function showForm() {
+ var chosen = '';
+ root.innerHTML = '<h1>Sell on SalonAutoZone as a business</h1><p class="sub">Stores, dealerships, shippers and wholesalers get a public page with a Verified badge once we have checked the details.</p>' +
+ '<form id="f"><label>What kind of business are you?</label><div class="types" id="types">' +
+ TYPES.map(function (t) { return '<button type="button" class="type" data-t="' + t[0] + '" aria-pressed="false"><b>' + t[1] + '</b><small>' + t[2] + '</small></button>'; }).join('') + '</div>' +
+ '<label>Business name<input name="name" required minlength="2" maxlength="80" placeholder="e.g. Freetown Auto Parts"></label>' +
+ '<div class="row"><label>Country<input name="country" required value="Sierra Leone"></label><label>City<input name="city" required placeholder="Freetown"></label></div>' +
+ '<label>WhatsApp number<input name="whatsapp" type="tel" required placeholder="+232 76 123456"></label>' +
+ '<label>Email (optional)<input name="email" type="email"></label>' +
+ '<label>About your business<textarea name="description" rows="4" maxlength="1000" placeholder="What you sell, how long you have traded, where to find you"></textarea></label>' +
+ '<button class="btn full" type="submit">Send application</button><div class="msg" id="msg" aria-live="polite"></div></form>';
+ document.getElementById('types').addEventListener('click', function (e) {
+ var b = e.target.closest('.type'); if (!b) return;
+ chosen = b.dataset.t;
+ document.querySelectorAll('.type').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+ });
+ document.getElementById('f').addEventListener('submit', function (e) {
+ e.preventDefault();
+ var msg = document.getElementById('msg'), btn = e.target.querySelector('.btn');
+ if (!chosen) { msg.style.color = 'var(--r)'; msg.textContent = 'Choose what kind of business you are.'; return; }
+ var p = { business_type: chosen };
+ new FormData(e.target).forEach(function (v, k) { if (v !== '') p[k] = v; });
+ btn.disabled = true; msg.style.color = 'var(--t)'; msg.textContent = 'Sending...';
+ api('/api/businesses/apply', { method: 'POST', body: JSON.stringify(p) })
+ .then(function () { showApply(); })
+ .catch(function (err) {
+ if (err.status === 401) { returnToLogin(); return; }
+ msg.style.color = 'var(--r)'; msg.textContent = err.message; btn.disabled = false;
+ });
+ });
+ }
 
-  var path = window.location.pathname;
-  if (path.indexOf('/store/') === 0) showStore(decodeURIComponent(path.slice('/store/'.length)));
-  else showApply();
+ var path = window.location.pathname;
+ if (path.indexOf('/store/') === 0) showStore(decodeURIComponent(path.slice('/store/'.length)));
+ else showApply();
 })();
 </script>
 </body>

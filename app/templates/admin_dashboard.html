@@ -7,10 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
-  --navy:#0f172a;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f1f5f9;--surface:#fff;
-  --success:#15803d;--danger:#b91c1c;--warn:#b45309;
-  --sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06);
+ --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
+ --navy:#0f172a;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f1f5f9;--surface:#fff;
+ --success:#15803d;--danger:#b91c1c;--warn:#b45309;
+ --sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,-apple-system,sans-serif;font-size:14px;color:var(--text);background:var(--bg);line-height:1.5}
@@ -63,337 +63,337 @@ td{font-size:13px}
 </head>
 <body>
 <div class="shell">
-  <aside class="side">
-    <div class="logo">Salon<span>Admin</span></div>
-    <button type="button" class="active" data-view="overview">Overview</button>
-    <button type="button" data-view="vehicles">Vehicle listings</button>
-    <button type="button" data-view="parts">Part listings</button>
-    <button type="button" data-view="imports">Import requests</button>
-    <button type="button" data-view="inquiries">Inquiries</button>
-    <button type="button" data-view="businesses">Business applications</button>
-    <a href="/admin/catalog">Supplier catalog</a>
-    <a href="/vin-tool">VIN lookup</a>
-    <a href="/">← Back to site</a>
-    <button type="button" id="btn-admin-logout">Sign out</button>
-    <div class="foot">Admin panel · protect this URL</div>
-  </aside>
+ <aside class="side">
+ <div class="logo">Salon<span>Admin</span></div>
+ <button type="button" class="active" data-view="overview">Overview</button>
+ <button type="button" data-view="vehicles">Vehicle listings</button>
+ <button type="button" data-view="parts">Part listings</button>
+ <button type="button" data-view="imports">Import requests</button>
+ <button type="button" data-view="inquiries">Inquiries</button>
+ <button type="button" data-view="businesses">Business applications</button>
+ <a href="/admin/catalog">Supplier catalog</a>
+ <a href="/vin-tool">VIN lookup</a>
+ <a href="/">← Back to site</a>
+ <button type="button" id="btn-admin-logout">Sign out</button>
+ <div class="foot">Admin panel · protect this URL</div>
+ </aside>
 
-  <div class="main">
-    <div class="hdr">
-      <h1 id="page-title">Overview</h1>
-      <button type="button" class="btn btn-ghost" id="btn-refresh">Refresh</button>
-    </div>
+ <div class="main">
+ <div class="hdr">
+ <h1 id="page-title">Overview</h1>
+ <button type="button" class="btn btn-ghost" id="btn-refresh">Refresh</button>
+ </div>
 
-    <div id="view-overview">
-      <div class="stats" id="stats">
-        <div class="stat"><div class="k">Vehicles</div><div class="v" id="s-vehicles">—</div></div>
-        <div class="stat"><div class="k">Parts</div><div class="v" id="s-parts">—</div></div>
-        <div class="stat"><div class="k">Import req.</div><div class="v" id="s-imports">—</div></div>
-        <div class="stat"><div class="k">Inquiries</div><div class="v" id="s-inquiries">—</div></div>
-      </div>
-      <div class="panel">
-        <div class="bar"><h2>Quick actions</h2></div>
-        <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn btn-primary" href="/admin/catalog">Manage catalog</a>
-          <button class="btn btn-ghost" type="button" data-view-link="businesses">Review business applications</button>
-          <a class="btn btn-ghost" href="/docs">API docs</a>
-          <a class="btn btn-ghost" href="/health" target="_blank">Health check</a>
-        </div>
-      </div>
-    </div>
+ <div id="view-overview">
+ <div class="stats" id="stats">
+ <div class="stat"><div class="k">Vehicles</div><div class="v" id="s-vehicles">—</div></div>
+ <div class="stat"><div class="k">Parts</div><div class="v" id="s-parts">—</div></div>
+ <div class="stat"><div class="k">Import req.</div><div class="v" id="s-imports">—</div></div>
+ <div class="stat"><div class="k">Inquiries</div><div class="v" id="s-inquiries">—</div></div>
+ </div>
+ <div class="panel">
+ <div class="bar"><h2>Quick actions</h2></div>
+ <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap">
+ <a class="btn btn-primary" href="/admin/catalog">Manage catalog</a>
+ <button class="btn btn-ghost" type="button" data-view-link="businesses">Review business applications</button>
+ <a class="btn btn-ghost" href="/docs">API docs</a>
+ <a class="btn btn-ghost" href="/health" target="_blank">Health check</a>
+ </div>
+ </div>
+ </div>
 
-    <div id="view-vehicles" class="hidden">
-      <div class="panel">
-        <div class="bar">
-          <h2>Vehicle listings</h2>
-          <input class="inp" id="q-vehicles" placeholder="Filter title/make…">
-        </div>
-        <div class="table-wrap"><table><thead><tr>
-          <th>ID</th><th>Title</th><th>Price</th><th>Location</th><th>Status</th><th></th>
-        </tr></thead><tbody id="tb-vehicles"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
-      </div>
-    </div>
+ <div id="view-vehicles" class="hidden">
+ <div class="panel">
+ <div class="bar">
+ <h2>Vehicle listings</h2>
+ <input class="inp" id="q-vehicles" placeholder="Filter title/make…">
+ </div>
+ <div class="table-wrap"><table><thead><tr>
+ <th>ID</th><th>Title</th><th>Price</th><th>Location</th><th>Status</th><th></th>
+ </tr></thead><tbody id="tb-vehicles"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
 
-    <div id="view-parts" class="hidden">
-      <div class="panel">
-        <div class="bar">
-          <h2>Part listings</h2>
-          <input class="inp" id="q-parts" placeholder="Filter name/category…">
-        </div>
-        <div class="table-wrap"><table><thead><tr>
-          <th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th></th>
-        </tr></thead><tbody id="tb-parts"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
-      </div>
-    </div>
+ <div id="view-parts" class="hidden">
+ <div class="panel">
+ <div class="bar">
+ <h2>Part listings</h2>
+ <input class="inp" id="q-parts" placeholder="Filter name/category…">
+ </div>
+ <div class="table-wrap"><table><thead><tr>
+ <th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th></th>
+ </tr></thead><tbody id="tb-parts"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
 
-    <div id="view-imports" class="hidden">
-      <div class="panel">
-        <div class="bar"><h2>Import requests</h2></div>
-        <div class="table-wrap"><table><thead><tr>
-          <th>ID</th><th>Customer</th><th>Item</th><th>Status</th><th>Created</th>
-        </tr></thead><tbody id="tb-imports"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
-      </div>
-    </div>
+ <div id="view-imports" class="hidden">
+ <div class="panel">
+ <div class="bar"><h2>Import requests</h2></div>
+ <div class="table-wrap"><table><thead><tr>
+ <th>ID</th><th>Customer</th><th>Item</th><th>Status</th><th>Created</th>
+ </tr></thead><tbody id="tb-imports"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
 
-    <div id="view-inquiries" class="hidden">
-      <div class="panel">
-        <div class="bar"><h2>Inquiries</h2></div>
-        <div class="table-wrap"><table><thead><tr>
-          <th>ID</th><th>Type</th><th>Listing</th><th>Status</th><th>Created</th>
-        </tr></thead><tbody id="tb-inquiries"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
-      </div>
-    </div>
+ <div id="view-inquiries" class="hidden">
+ <div class="panel">
+ <div class="bar"><h2>Inquiries</h2></div>
+ <div class="table-wrap"><table><thead><tr>
+ <th>ID</th><th>Type</th><th>Listing</th><th>Status</th><th>Created</th>
+ </tr></thead><tbody id="tb-inquiries"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
 
-    <div id="view-businesses" class="hidden">
-      <div class="panel">
-        <div class="bar">
-          <h2>Business applications</h2>
-          <select class="inp" id="q-businesses" aria-label="Application status">
-            <option value="pending">Pending review</option>
-            <option value="verified">Verified</option>
-            <option value="rejected">Rejected</option>
-            <option value="all">All applications</option>
-          </select>
-        </div>
-        <div class="table-wrap"><table><thead><tr>
-          <th>Business</th><th>Type</th><th>Owner</th><th>Contact</th><th>Status</th><th>Storefront</th><th>Review</th>
-        </tr></thead><tbody id="tb-businesses"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
-      </div>
-    </div>
-  </div>
+ <div id="view-businesses" class="hidden">
+ <div class="panel">
+ <div class="bar">
+ <h2>Business applications</h2>
+ <select class="inp" id="q-businesses" aria-label="Application status">
+ <option value="pending">Pending review</option>
+ <option value="verified">Verified</option>
+ <option value="rejected">Rejected</option>
+ <option value="all">All applications</option>
+ </select>
+ </div>
+ <div class="table-wrap"><table><thead><tr>
+ <th>Business</th><th>Type</th><th>Owner</th><th>Contact</th><th>Status</th><th>Storefront</th><th>Review</th>
+ </tr></thead><tbody id="tb-businesses"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
+ </div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
 (function () {
-  function $(id) { return document.getElementById(id); }
-  function toast(msg, ok) {
-    var t = $('toast'); t.textContent = msg;
-    t.className = 'toast show ' + (ok ? 'ok' : 'err');
-    setTimeout(function () { t.classList.remove('show'); }, 2500);
-  }
-  function token() {
-    try { return localStorage.getItem('token') || localStorage.getItem('access_token') || sessionStorage.getItem('adminKey') || ''; } catch (e) { return ''; }
-  }
-  function auth() {
-    var t = token();
-    var headers = t ? { Authorization: 'Bearer ' + t } : {};
-    try { var key = sessionStorage.getItem('adminKey'); if (key) headers['X-Admin-Key'] = key; } catch (e) {}
-    return headers;
-  }
-  function esc(s) {
-    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-  function fmt(n) { try { return Number(n).toLocaleString(); } catch (e) { return n; } }
+ function $(id) { return document.getElementById(id); }
+ function toast(msg, ok) {
+ var t = $('toast'); t.textContent = msg;
+ t.className = 'toast show ' + (ok ? 'ok' : 'err');
+ setTimeout(function () { t.classList.remove('show'); }, 2500);
+ }
+ function token() {
+ try { return localStorage.getItem('token') || localStorage.getItem('access_token') || sessionStorage.getItem('adminKey') || ''; } catch (e) { return ''; }
+ }
+ function auth() {
+ var t = token();
+ var headers = t ? { Authorization: 'Bearer ' + t } : {};
+ try { var key = sessionStorage.getItem('adminKey'); if (key) headers['X-Admin-Key'] = key; } catch (e) {}
+ return headers;
+ }
+ function esc(s) {
+ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ }
+ function fmt(n) { try { return Number(n).toLocaleString(); } catch (e) { return n; } }
 
-  var titles = {
-    overview: 'Overview',
-    vehicles: 'Vehicle listings',
-    parts: 'Part listings',
-    imports: 'Import requests',
-    inquiries: 'Inquiries',
-    businesses: 'Business applications'
-  };
+ var titles = {
+ overview: 'Overview',
+ vehicles: 'Vehicle listings',
+ parts: 'Part listings',
+ imports: 'Import requests',
+ inquiries: 'Inquiries',
+ businesses: 'Business applications'
+ };
 
-  document.querySelectorAll('.side [data-view]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('.side [data-view]').forEach(function (b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      var v = btn.dataset.view;
-      $('page-title').textContent = titles[v] || v;
-      ['overview','vehicles','parts','imports','inquiries','businesses'].forEach(function (name) {
-        var el = $('view-' + name);
-        if (el) el.classList.toggle('hidden', name !== v);
-      });
-      loadView(v);
-    });
-  });
+ document.querySelectorAll('.side [data-view]').forEach(function (btn) {
+ btn.addEventListener('click', function () {
+ document.querySelectorAll('.side [data-view]').forEach(function (b) { b.classList.remove('active'); });
+ btn.classList.add('active');
+ var v = btn.dataset.view;
+ $('page-title').textContent = titles[v] || v;
+ ['overview','vehicles','parts','imports','inquiries','businesses'].forEach(function (name) {
+ var el = $('view-' + name);
+ if (el) el.classList.toggle('hidden', name !== v);
+ });
+ loadView(v);
+ });
+ });
 
-  $('btn-refresh').addEventListener('click', function () {
-    var active = document.querySelector('.side button.active');
-    loadView(active ? active.dataset.view : 'overview');
-  });
+ $('btn-refresh').addEventListener('click', function () {
+ var active = document.querySelector('.side button.active');
+ loadView(active ? active.dataset.view : 'overview');
+ });
 
-  function loadView(v) {
-    if (v === 'overview') loadOverview();
-    if (v === 'vehicles') loadVehicles();
-    if (v === 'parts') loadParts();
-    if (v === 'imports') loadImports();
-    if (v === 'inquiries') loadInquiries();
-    if (v === 'businesses') loadBusinesses();
-  }
+ function loadView(v) {
+ if (v === 'overview') loadOverview();
+ if (v === 'vehicles') loadVehicles();
+ if (v === 'parts') loadParts();
+ if (v === 'imports') loadImports();
+ if (v === 'inquiries') loadInquiries();
+ if (v === 'businesses') loadBusinesses();
+ }
 
-  document.querySelectorAll('[data-view-link]').forEach(function (button) {
-    button.addEventListener('click', function () {
-      var target = document.querySelector('.side [data-view="' + button.dataset.viewLink + '"]');
-      if (target) target.click();
-    });
-  });
+ document.querySelectorAll('[data-view-link]').forEach(function (button) {
+ button.addEventListener('click', function () {
+ var target = document.querySelector('.side [data-view="' + button.dataset.viewLink + '"]');
+ if (target) target.click();
+ });
+ });
 
-  function loadOverview() {
-    fetch('/api/admin/stats', { headers: auth() })
-      .then(function (r) { if (r.status === 403) throw new Error('Admin session expired'); return r.json(); })
-      .then(function (data) {
-        $('s-vehicles').textContent = fmt(data.total_vehicles);
-        $('s-parts').textContent = fmt(data.total_parts);
-        $('s-imports').textContent = fmt(data.total_imports);
-        $('s-inquiries').textContent = fmt(data.total_inquiries);
-      })
-      .catch(function () { requireAdmin(); });
-  }
+ function loadOverview() {
+ fetch('/api/admin/stats', { headers: auth() })
+ .then(function (r) { if (r.status === 403) throw new Error('Admin session expired'); return r.json(); })
+ .then(function (data) {
+ $('s-vehicles').textContent = fmt(data.total_vehicles);
+ $('s-parts').textContent = fmt(data.total_parts);
+ $('s-imports').textContent = fmt(data.total_imports);
+ $('s-inquiries').textContent = fmt(data.total_inquiries);
+ })
+ .catch(function () { requireAdmin(); });
+ }
 
-  function rowsOrEmpty(tbody, items, render) {
-    if (!items || !items.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="empty">No records found (or API not available).</td></tr>';
-      return;
-    }
-    tbody.innerHTML = items.map(render).join('');
-  }
+ function rowsOrEmpty(tbody, items, render) {
+ if (!items || !items.length) {
+ tbody.innerHTML = '<tr><td colspan="8" class="empty">No records found (or API not available).</td></tr>';
+ return;
+ }
+ tbody.innerHTML = items.map(render).join('');
+ }
 
-  function loadVehicles() {
-    var tb = $('tb-vehicles');
-    fetch('/api/vehicles/?limit=50', { headers: auth() })
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (d) {
-        var items = d.items || d.results || d || [];
-        if (!Array.isArray(items)) items = [];
-        window.__vehicles = items;
-        filterVehicles();
-      })
-      .catch(function () { tb.innerHTML = '<tr><td colspan="6" class="empty">Could not load vehicles.</td></tr>'; });
-  }
-  function filterVehicles() {
-    var q = ($('q-vehicles').value || '').toLowerCase();
-    var items = (window.__vehicles || []).filter(function (v) {
-      var t = ((v.title || '') + ' ' + (v.make || '') + ' ' + (v.model || '')).toLowerCase();
-      return !q || t.indexOf(q) >= 0;
-    });
-    rowsOrEmpty($('tb-vehicles'), items, function (v) {
-      var sold = v.is_sold ? '<span class="badge bad">Sold</span>' : '<span class="badge ok">Active</span>';
-      return '<tr><td>' + v.id + '</td><td>' + esc(v.title || (v.year + ' ' + v.make + ' ' + v.model)) +
-        '</td><td>' + (v.price_sll != null ? 'SLL ' + fmt(v.price_sll) : '—') +
-        '</td><td>' + esc(v.location || '—') + '</td><td>' + sold +
-        '</td><td><a class="btn btn-ghost" href="/vehicle/' + v.id + '" target="_blank">Open</a></td></tr>';
-    });
-  }
-  $('q-vehicles').addEventListener('input', filterVehicles);
+ function loadVehicles() {
+ var tb = $('tb-vehicles');
+ fetch('/api/vehicles/?limit=50', { headers: auth() })
+ .then(function (r) { return r.ok ? r.json() : []; })
+ .then(function (d) {
+ var items = d.items || d.results || d || [];
+ if (!Array.isArray(items)) items = [];
+ window.__vehicles = items;
+ filterVehicles();
+ })
+ .catch(function () { tb.innerHTML = '<tr><td colspan="6" class="empty">Could not load vehicles.</td></tr>'; });
+ }
+ function filterVehicles() {
+ var q = ($('q-vehicles').value || '').toLowerCase();
+ var items = (window.__vehicles || []).filter(function (v) {
+ var t = ((v.title || '') + ' ' + (v.make || '') + ' ' + (v.model || '')).toLowerCase();
+ return !q || t.indexOf(q) >= 0;
+ });
+ rowsOrEmpty($('tb-vehicles'), items, function (v) {
+ var sold = v.is_sold ? '<span class="badge bad">Sold</span>' : '<span class="badge ok">Active</span>';
+ return '<tr><td>' + v.id + '</td><td>' + esc(v.title || (v.year + ' ' + v.make + ' ' + v.model)) +
+ '</td><td>' + (v.price_sll != null ? 'SLL ' + fmt(v.price_sll) : '—') +
+ '</td><td>' + esc(v.location || '—') + '</td><td>' + sold +
+ '</td><td><a class="btn btn-ghost" href="/vehicle/' + v.id + '" target="_blank">Open</a></td></tr>';
+ });
+ }
+ $('q-vehicles').addEventListener('input', filterVehicles);
 
-  function loadParts() {
-    var tb = $('tb-parts');
-    fetch('/api/parts/?limit=50', { headers: auth() })
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (d) {
-        var items = d.items || d.results || d || [];
-        if (!Array.isArray(items)) items = [];
-        window.__parts = items;
-        filterParts();
-      })
-      .catch(function () { tb.innerHTML = '<tr><td colspan="6" class="empty">Could not load parts.</td></tr>'; });
-  }
-  function filterParts() {
-    var q = ($('q-parts').value || '').toLowerCase();
-    var items = (window.__parts || []).filter(function (p) {
-      var t = ((p.name || p.title || '') + ' ' + (p.category || '')).toLowerCase();
-      return !q || t.indexOf(q) >= 0;
-    });
-    rowsOrEmpty($('tb-parts'), items, function (p) {
-      return '<tr><td>' + p.id + '</td><td>' + esc(p.name || p.title || '—') +
-        '</td><td>' + esc(p.category || '—') +
-        '</td><td>' + (p.price_sll != null ? 'SLL ' + fmt(p.price_sll) : '—') +
-        '</td><td><span class="badge off">' + esc(p.condition || '—') + '</span></td>' +
-        '<td><a class="btn btn-ghost" href="/part/' + p.id + '" target="_blank">Open</a></td></tr>';
-    });
-  }
-  $('q-parts').addEventListener('input', filterParts);
+ function loadParts() {
+ var tb = $('tb-parts');
+ fetch('/api/parts/?limit=50', { headers: auth() })
+ .then(function (r) { return r.ok ? r.json() : []; })
+ .then(function (d) {
+ var items = d.items || d.results || d || [];
+ if (!Array.isArray(items)) items = [];
+ window.__parts = items;
+ filterParts();
+ })
+ .catch(function () { tb.innerHTML = '<tr><td colspan="6" class="empty">Could not load parts.</td></tr>'; });
+ }
+ function filterParts() {
+ var q = ($('q-parts').value || '').toLowerCase();
+ var items = (window.__parts || []).filter(function (p) {
+ var t = ((p.name || p.title || '') + ' ' + (p.category || '')).toLowerCase();
+ return !q || t.indexOf(q) >= 0;
+ });
+ rowsOrEmpty($('tb-parts'), items, function (p) {
+ return '<tr><td>' + p.id + '</td><td>' + esc(p.name || p.title || '—') +
+ '</td><td>' + esc(p.category || '—') +
+ '</td><td>' + (p.price_sll != null ? 'SLL ' + fmt(p.price_sll) : '—') +
+ '</td><td><span class="badge off">' + esc(p.condition || '—') + '</span></td>' +
+ '<td><a class="btn btn-ghost" href="/part/' + p.id + '" target="_blank">Open</a></td></tr>';
+ });
+ }
+ $('q-parts').addEventListener('input', filterParts);
 
-  function loadImports() {
-    var tb = $('tb-imports');
-    fetch('/api/admin/imports', { headers: auth() })
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (d) {
-        var items = d.imports || [];
-        if (!Array.isArray(items)) items = [];
-        rowsOrEmpty(tb, items, function (i) {
-          return '<tr><td>' + (i.id || '—') + '</td><td>' + esc(i.customer_phone || i.phone || '—') +
-            '</td><td>' + esc(i.part_name || i.item || i.description || '—') +
-            '</td><td><span class="badge warn">' + esc(i.status || 'pending') + '</span></td>' +
-            '<td>' + esc((i.created_at || '').toString().slice(0, 10)) + '</td></tr>';
-        });
-      })
-      .catch(function () { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load import requests.</td></tr>'; });
-  }
+ function loadImports() {
+ var tb = $('tb-imports');
+ fetch('/api/admin/imports', { headers: auth() })
+ .then(function (r) { return r.ok ? r.json() : []; })
+ .then(function (d) {
+ var items = d.imports || [];
+ if (!Array.isArray(items)) items = [];
+ rowsOrEmpty(tb, items, function (i) {
+ return '<tr><td>' + (i.id || '—') + '</td><td>' + esc(i.customer_phone || i.phone || '—') +
+ '</td><td>' + esc(i.part_name || i.item || i.description || '—') +
+ '</td><td><span class="badge warn">' + esc(i.status || 'pending') + '</span></td>' +
+ '<td>' + esc((i.created_at || '').toString().slice(0, 10)) + '</td></tr>';
+ });
+ })
+ .catch(function () { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load import requests.</td></tr>'; });
+ }
 
-  function loadInquiries() {
-    var tb = $('tb-inquiries');
-    fetch('/api/admin/inquiries', { headers: auth() })
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (d) {
-        var items = d.inquiries || [];
-        if (!Array.isArray(items)) items = [];
-        rowsOrEmpty(tb, items, function (i) {
-          return '<tr><td>' + (i.id || '—') + '</td><td>' + esc(i.inquiry_type || i.type || '—') +
-            '</td><td>' + esc((i.listing_type || '') + ' #' + (i.listing_id || '')) +
-            '</td><td><span class="badge off">' + esc(i.status || '—') + '</span></td>' +
-            '<td>' + esc((i.created_at || '').toString().slice(0, 10)) + '</td></tr>';
-        });
-      })
-      .catch(function () { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load inquiries.</td></tr>'; });
-  }
+ function loadInquiries() {
+ var tb = $('tb-inquiries');
+ fetch('/api/admin/inquiries', { headers: auth() })
+ .then(function (r) { return r.ok ? r.json() : []; })
+ .then(function (d) {
+ var items = d.inquiries || [];
+ if (!Array.isArray(items)) items = [];
+ rowsOrEmpty(tb, items, function (i) {
+ return '<tr><td>' + (i.id || '—') + '</td><td>' + esc(i.inquiry_type || i.type || '—') +
+ '</td><td>' + esc((i.listing_type || '') + ' #' + (i.listing_id || '')) +
+ '</td><td><span class="badge off">' + esc(i.status || '—') + '</span></td>' +
+ '<td>' + esc((i.created_at || '').toString().slice(0, 10)) + '</td></tr>';
+ });
+ })
+ .catch(function () { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load inquiries.</td></tr>'; });
+ }
 
-  function loadBusinesses() {
-    var tb = $('tb-businesses');
-    var filter = $('q-businesses').value;
-    tb.innerHTML = '<tr><td colspan="7" class="empty">Loading applications…</td></tr>';
-    fetch('/api/businesses/admin/list?status=' + encodeURIComponent(filter), { headers: auth() })
-      .then(function (response) { if (!response.ok) throw new Error('Could not load applications'); return response.json(); })
-      .then(function (data) {
-        var items = data.businesses || [];
-        if (!items.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">No business applications in this view.</td></tr>'; return; }
-        tb.innerHTML = items.map(function (business) {
-          var owner = business.owner || {};
-          var actions = business.status === 'pending'
-            ? '<button class="btn btn-primary" data-business-status="verified" data-business-id="' + business.id + '">Approve</button> <button class="btn btn-danger" data-business-status="rejected" data-business-id="' + business.id + '">Reject</button>'
-            : '<span class="badge off">Reviewed</span>';
-          var store = business.status === 'verified'
-            ? '<a class="btn btn-ghost" href="/store/' + encodeURIComponent(business.slug) + '" target="_blank" rel="noopener">Open page</a>'
-            : '<span class="badge warn">Not public</span>';
-          return '<tr><td><strong>' + esc(business.name) + '</strong><br><small>' + esc(business.city || '') + ', ' + esc(business.country || '') + '</small></td>' +
-            '<td>' + esc(business.type_label || business.business_type || '') + '</td>' +
-            '<td>' + esc(owner.name || '—') + '<br><small>' + esc(owner.email || '') + '</small></td>' +
-            '<td>' + esc(business.whatsapp || owner.phone || '—') + '</td>' +
-            '<td><span class="badge ' + (business.status === 'verified' ? 'ok' : business.status === 'rejected' ? 'bad' : 'warn') + '">' + esc(business.status) + '</span></td>' +
-            '<td>' + store + '</td><td>' + actions + '</td></tr>';
-        }).join('');
-      })
-      .catch(function (error) { tb.innerHTML = '<tr><td colspan="7" class="empty">' + esc(error.message) + '.</td></tr>'; });
-  }
+ function loadBusinesses() {
+ var tb = $('tb-businesses');
+ var filter = $('q-businesses').value;
+ tb.innerHTML = '<tr><td colspan="7" class="empty">Loading applications…</td></tr>';
+ fetch('/api/businesses/admin/list?status=' + encodeURIComponent(filter), { headers: auth() })
+ .then(function (response) { if (!response.ok) throw new Error('Could not load applications'); return response.json(); })
+ .then(function (data) {
+ var items = data.businesses || [];
+ if (!items.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">No business applications in this view.</td></tr>'; return; }
+ tb.innerHTML = items.map(function (business) {
+ var owner = business.owner || {};
+ var actions = business.status === 'pending'
+ ? '<button class="btn btn-primary" data-business-status="verified" data-business-id="' + business.id + '">Approve</button> <button class="btn btn-danger" data-business-status="rejected" data-business-id="' + business.id + '">Reject</button>'
+ : '<span class="badge off">Reviewed</span>';
+ var store = business.status === 'verified'
+ ? '<a class="btn btn-ghost" href="/store/' + encodeURIComponent(business.slug) + '" target="_blank" rel="noopener">Open page</a>'
+ : '<span class="badge warn">Not public</span>';
+ return '<tr><td><strong>' + esc(business.name) + '</strong><br><small>' + esc(business.city || '') + ', ' + esc(business.country || '') + '</small></td>' +
+ '<td>' + esc(business.type_label || business.business_type || '') + '</td>' +
+ '<td>' + esc(owner.name || '—') + '<br><small>' + esc(owner.email || '') + '</small></td>' +
+ '<td>' + esc(business.whatsapp || owner.phone || '—') + '</td>' +
+ '<td><span class="badge ' + (business.status === 'verified' ? 'ok' : business.status === 'rejected' ? 'bad' : 'warn') + '">' + esc(business.status) + '</span></td>' +
+ '<td>' + store + '</td><td>' + actions + '</td></tr>';
+ }).join('');
+ })
+ .catch(function (error) { tb.innerHTML = '<tr><td colspan="7" class="empty">' + esc(error.message) + '.</td></tr>'; });
+ }
 
-  $('q-businesses').addEventListener('change', loadBusinesses);
-  $('tb-businesses').addEventListener('click', function (event) {
-    var button = event.target.closest('[data-business-status]');
-    if (!button) return;
-    button.disabled = true;
-    fetch('/api/businesses/admin/' + encodeURIComponent(button.dataset.businessId) + '/status?status=' + encodeURIComponent(button.dataset.businessStatus), {
-      method: 'POST', headers: auth()
-    }).then(function (response) { if (!response.ok) throw new Error('Could not update business status'); return response.json(); })
-      .then(function () { loadBusinesses(); toast('Business status updated', true); })
-      .catch(function (error) { button.disabled = false; toast(error.message, false); });
-  });
+ $('q-businesses').addEventListener('change', loadBusinesses);
+ $('tb-businesses').addEventListener('click', function (event) {
+ var button = event.target.closest('[data-business-status]');
+ if (!button) return;
+ button.disabled = true;
+ fetch('/api/businesses/admin/' + encodeURIComponent(button.dataset.businessId) + '/status?status=' + encodeURIComponent(button.dataset.businessStatus), {
+ method: 'POST', headers: auth()
+ }).then(function (response) { if (!response.ok) throw new Error('Could not update business status'); return response.json(); })
+ .then(function () { loadBusinesses(); toast('Business status updated', true); })
+ .catch(function (error) { button.disabled = false; toast(error.message, false); });
+ });
 
-  function requireAdmin() {
-    fetch('/api/admin/stats', { headers: auth() }).then(function (response) {
-      if (!response.ok) throw new Error('Admin access required');
-      loadOverview();
-    }).catch(function () {
-      try { sessionStorage.removeItem('adminKey'); } catch (e) {}
-      location.replace('/admin/login');
-    });
-  }
-  $('btn-admin-logout').addEventListener('click', function () {
-    try { sessionStorage.removeItem('adminKey'); } catch (e) {}
-    location.replace('/admin/login');
-  });
-  requireAdmin();
+ function requireAdmin() {
+ fetch('/api/admin/stats', { headers: auth() }).then(function (response) {
+ if (!response.ok) throw new Error('Admin access required');
+ loadOverview();
+ }).catch(function () {
+ try { sessionStorage.removeItem('adminKey'); } catch (e) {}
+ location.replace('/admin/login');
+ });
+ }
+ $('btn-admin-logout').addEventListener('click', function () {
+ try { sessionStorage.removeItem('adminKey'); } catch (e) {}
+ location.replace('/admin/login');
+ });
+ requireAdmin();
 })();
 </script>
 </body>

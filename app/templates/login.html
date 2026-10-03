@@ -36,150 +36,150 @@ button{border:0;cursor:pointer}
 <body>
 <div class="top"><strong>Salon AutoZone</strong> · Sierra Leone <a href="/vin-tool" style="float:right">VIN Lookup</a></div>
 <div class="wrap">
-  <div class="card">
-    <div class="logo">Salon<span>AutoZone</span></div>
-    <p class="sub">Sign in to save listings, manage your garage, and sell.</p>
-    <div class="tabs">
-      <button type="button" class="active" data-mode="login">Sign in</button>
-      <button type="button" data-mode="register">Register</button>
-    </div>
-    <form id="form">
-      <div id="name-wrap" hidden>
-        <label class="lbl">Full name</label>
-        <input class="inp" name="full_name" autocomplete="name" placeholder="Your name">
-      </div>
-      <div id="account-type-wrap" hidden>
-        <label class="lbl" for="account-type">Account type</label>
-        <select class="inp" id="account-type" name="account_type">
-          <option value="buyer">Buyer</option>
-          <option value="seller">Seller</option>
-          <option value="business">Business</option>
-        </select>
-      </div>
-      <label class="lbl">Phone *</label>
-      <input class="inp" name="phone" type="tel" required autocomplete="tel" placeholder="+232 76 123456">
-      <label class="lbl">Email</label>
-      <input class="inp" name="email" type="email" autocomplete="email" placeholder="Email for registration">
-      <label class="lbl">Password *</label>
-      <input class="inp" name="password" type="password" required autocomplete="current-password" placeholder="••••••••">
-      <button class="btn" type="submit" id="submit">Sign in</button>
-      <div class="msg" id="msg" aria-live="polite"></div>
-    </form>
-    <p class="foot"><a href="/">Back to marketplace</a></p>
-  </div>
+ <div class="card">
+ <div class="logo">Salon<span>AutoZone</span></div>
+ <p class="sub">Sign in to save listings, manage your garage, and sell.</p>
+ <div class="tabs">
+ <button type="button" class="active" data-mode="login">Sign in</button>
+ <button type="button" data-mode="register">Register</button>
+ </div>
+ <form id="form">
+ <div id="name-wrap" hidden>
+ <label class="lbl">Full name</label>
+ <input class="inp" name="full_name" autocomplete="name" placeholder="Your name">
+ </div>
+ <div id="account-type-wrap" hidden>
+ <label class="lbl" for="account-type">Account type</label>
+ <select class="inp" id="account-type" name="account_type">
+ <option value="buyer">Buyer</option>
+ <option value="seller">Seller</option>
+ <option value="business">Business</option>
+ </select>
+ </div>
+ <label class="lbl">Phone *</label>
+ <input class="inp" name="phone" type="tel" required autocomplete="tel" placeholder="+232 76 123456">
+ <label class="lbl">Email</label>
+ <input class="inp" name="email" type="email" autocomplete="email" placeholder="Email for registration">
+ <label class="lbl">Password *</label>
+ <input class="inp" name="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+ <button class="btn" type="submit" id="submit">Sign in</button>
+ <div class="msg" id="msg" aria-live="polite"></div>
+ </form>
+ <p class="foot"><a href="/">Back to marketplace</a></p>
+ </div>
 </div>
 <script>
 (function () {
-  var mode = 'login';
-  var form = document.getElementById('form');
-  var msg = document.getElementById('msg');
-  var submit = document.getElementById('submit');
-  var nameWrap = document.getElementById('name-wrap');
-  var accountTypeWrap = document.getElementById('account-type-wrap');
-  var accountType = form.elements.namedItem('account_type');
-  var params = new URLSearchParams(location.search);
-  var requestedNext = params.get('next') || '';
-  var next = requestedNext.charAt(0) === '/' && requestedNext.charAt(1) !== '/' ? requestedNext : '';
-  var emailInput = form.elements.namedItem('email');
-  var nameInput = form.elements.namedItem('full_name');
-  emailInput.required = false;
-  nameInput.required = false;
+ var mode = 'login';
+ var form = document.getElementById('form');
+ var msg = document.getElementById('msg');
+ var submit = document.getElementById('submit');
+ var nameWrap = document.getElementById('name-wrap');
+ var accountTypeWrap = document.getElementById('account-type-wrap');
+ var accountType = form.elements.namedItem('account_type');
+ var params = new URLSearchParams(location.search);
+ var requestedNext = params.get('next') || '';
+ var next = requestedNext.charAt(0) === '/' && requestedNext.charAt(1) !== '/' ? requestedNext : '';
+ var emailInput = form.elements.namedItem('email');
+ var nameInput = form.elements.namedItem('full_name');
+ emailInput.required = false;
+ nameInput.required = false;
 
-  document.querySelectorAll('.tabs button').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
-      b.classList.add('active');
-      mode = b.dataset.mode;
-      nameWrap.hidden = mode !== 'register';
-      accountTypeWrap.hidden = mode !== 'register';
-      nameInput.required = mode === 'register';
-      emailInput.required = mode === 'register';
-      accountType.required = mode === 'register';
-      submit.textContent = mode === 'login' ? 'Sign in' : 'Create account';
-      form.password.autocomplete = mode === 'login' ? 'current-password' : 'new-password';
-      msg.textContent = '';
-    });
-  });
+ document.querySelectorAll('.tabs button').forEach(function (b) {
+ b.addEventListener('click', function () {
+ document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
+ b.classList.add('active');
+ mode = b.dataset.mode;
+ nameWrap.hidden = mode !== 'register';
+ accountTypeWrap.hidden = mode !== 'register';
+ nameInput.required = mode === 'register';
+ emailInput.required = mode === 'register';
+ accountType.required = mode === 'register';
+ submit.textContent = mode === 'login' ? 'Sign in' : 'Create account';
+ form.password.autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+ msg.textContent = '';
+ });
+ });
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    msg.className = 'msg';
-    msg.textContent = mode === 'login' ? 'Signing in…' : 'Creating account…';
-    submit.disabled = true;
-    var body = {
-      phone: form.phone.value.trim(),
-      password: form.password.value
-    };
-    if (form.email.value.trim()) body.email = form.email.value.trim();
-    if (mode === 'register') body.full_name = form.full_name.value.trim() || body.phone;
+ form.addEventListener('submit', function (e) {
+ e.preventDefault();
+ msg.className = 'msg';
+ msg.textContent = mode === 'login' ? 'Signing in…' : 'Creating account…';
+ submit.disabled = true;
+ var body = {
+ phone: form.phone.value.trim(),
+ password: form.password.value
+ };
+ if (form.email.value.trim()) body.email = form.email.value.trim();
+ if (mode === 'register') body.full_name = form.full_name.value.trim() || body.phone;
 
-    var url = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
-    // fallback paths some apps use
-    var alt = mode === 'login' ? '/api/auth/token' : '/api/auth/signup';
+ var url = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
+ // fallback paths some apps use
+ var alt = mode === 'login' ? '/api/auth/token' : '/api/auth/signup';
 
-    function ok(data) {
-      var token = data.access_token || data.token || data.accessToken;
-      if (token) {
-        try {
-          localStorage.setItem('token', token);
-          localStorage.setItem('access_token', token);
-          if (data.user) localStorage.setItem('userInfo', JSON.stringify(data.user));
-        } catch (err) {}
-        msg.className = 'msg ok';
-        msg.textContent = 'Success — redirecting…';
-        var HOME = { admin: '/admin/dashboard', business: '/become-a-seller', seller: '/dashboard', buyer: '/my-account' };
-        var GENERIC = ['/my-account', '/dashboard', '/admin', '/admin/dashboard', '/become-a-seller'];
-        var go = function (user) {
-          var l = String(user.account_type || user.role || user.roles || '').toLowerCase().split(',').map(function (x) { return x.trim(); });
-          var role = 'buyer';
-          if (user.is_admin || l.indexOf('admin') > -1 || l.indexOf('superadmin') > -1) role = 'admin';
-          else if (l.indexOf('business') > -1) role = 'business';
-          else if (l.indexOf('seller') > -1 || user.is_vendor) role = 'seller';
-          if (mode === 'register') role = accountType.value;
-          console.warn('LOGIN ROLE:', role, user);
-          var useNext = mode === 'login' && next && GENERIC.indexOf(next) === -1;
-          location.href = useNext ? next : "/my-account";
-        };
-        fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } })
-          .then(function (r) { return r.ok ? r.json() : (data.user || {}); })
-          .catch(function () { return data.user || {}; })
-          .then(function (u) {
-            try { localStorage.setItem('userInfo', JSON.stringify(u)); } catch (e) {}
-            go(u);
-          });
-        return;
-      }
-      msg.className = 'msg err';
-      msg.textContent = 'Signed in but no token returned. Check auth API.';
-    }
+ function ok(data) {
+ var token = data.access_token || data.token || data.accessToken;
+ if (token) {
+ try {
+ localStorage.setItem('token', token);
+ localStorage.setItem('access_token', token);
+ if (data.user) localStorage.setItem('userInfo', JSON.stringify(data.user));
+ } catch (err) {}
+ msg.className = 'msg ok';
+ msg.textContent = 'Success — redirecting…';
+ var HOME = { admin: '/admin/dashboard', business: '/become-a-seller', seller: '/dashboard', buyer: '/my-account' };
+ var GENERIC = ['/my-account', '/dashboard', '/admin', '/admin/dashboard', '/become-a-seller'];
+ var go = function (user) {
+ var l = String(user.account_type || user.role || user.roles || '').toLowerCase().split(',').map(function (x) { return x.trim(); });
+ var role = 'buyer';
+ if (user.is_admin || l.indexOf('admin') > -1 || l.indexOf('superadmin') > -1) role = 'admin';
+ else if (l.indexOf('business') > -1) role = 'business';
+ else if (l.indexOf('seller') > -1 || user.is_vendor) role = 'seller';
+ if (mode === 'register') role = accountType.value;
+ console.warn('LOGIN ROLE:', role, user);
+ var useNext = mode === 'login' && next && GENERIC.indexOf(next) === -1;
+ location.href = useNext ? next : "/my-account";
+ };
+ fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } })
+ .then(function (r) { return r.ok ? r.json() : (data.user || {}); })
+ .catch(function () { return data.user || {}; })
+ .then(function (u) {
+ try { localStorage.setItem('userInfo', JSON.stringify(u)); } catch (e) {}
+ go(u);
+ });
+ return;
+ }
+ msg.className = 'msg err';
+ msg.textContent = 'Signed in but no token returned. Check auth API.';
+ }
 
-    function fail(text) {
-      msg.className = 'msg err';
-      msg.textContent = text || 'Could not sign in. Check phone and password.';
-      submit.disabled = false;
-    }
+ function fail(text) {
+ msg.className = 'msg err';
+ msg.textContent = text || 'Could not sign in. Check phone and password.';
+ submit.disabled = false;
+ }
 
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    }).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (d) {
-        if (r.ok) { ok(d); return; }
-        // try alternate path once
-        return fetch(alt, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        }).then(function (r2) {
-          return r2.json().catch(function () { return {}; }).then(function (d2) {
-            if (r2.ok) ok(d2);
-            else fail(typeof d.detail === 'string' ? d.detail : (typeof d2.detail === 'string' ? d2.detail : 'Login failed'));
-          });
-        });
-      });
-    }).catch(function () { fail('Network error'); });
-  });
+ fetch(url, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify(body)
+ }).then(function (r) {
+ return r.json().catch(function () { return {}; }).then(function (d) {
+ if (r.ok) { ok(d); return; }
+ // try alternate path once
+ return fetch(alt, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify(body)
+ }).then(function (r2) {
+ return r2.json().catch(function () { return {}; }).then(function (d2) {
+ if (r2.ok) ok(d2);
+ else fail(typeof d.detail === 'string' ? d.detail : (typeof d2.detail === 'string' ? d2.detail : 'Login failed'));
+ });
+ });
+ });
+ }).catch(function () { fail('Network error'); });
+ });
 })();
 </script>
 </body>

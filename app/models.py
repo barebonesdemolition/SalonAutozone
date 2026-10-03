@@ -544,3 +544,16 @@ for table_name in list(User.metadata.tables):
         User.metadata.remove(User.metadata.tables[table_name])
 
 seed_legacy_data()
+
+
+class Garage(Base):
+    __tablename__ = "garage"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    make = Column(String, nullable=True)
+    model = Column(String, nullable=True)
+    year = Column(Integer, nullable=True)
+    vin = Column(String(17), nullable=True)
+    nickname = Column(String, nullable=True)
+    is_primary = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

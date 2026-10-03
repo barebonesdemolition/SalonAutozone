@@ -40,7 +40,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(
-    title="Salon Car Parts API",
+    title="SalonAutoZone",
     description="Backend API for Salon Car Parts marketplace",
     version="1.0.0",
     lifespan=lifespan,
@@ -202,7 +202,7 @@ async def root():
 async def api_status():
     return {
         "status": "online",
-        "service": "Salon Car Parts API",
+        "service": "SalonAutoZone",
         "marketplace": "/marketplace",
         "interactive_docs": "/docs",
         "redoc_docs": "/redoc",

@@ -64,110 +64,104 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; }
 var TOKEN_KEYS = ['token', 'access_token', 'authToken', 'jwt', 'userToken'];
 var HOME = { admin: '/admin/dashboard', business: '/become-a-seller', seller: '/dashboard', buyer: '/my-account' };
 
-function getToken() {
-  try { for (var i = 0; i < TOKEN_KEYS.length; i++) { var v = localStorage.getItem(TOKEN_KEYS[i]); if (v) return v; } } catch (e) {}
-  return '';
 }
 function clearSession() {
-  try { TOKEN_KEYS.concat(['userInfo']).forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+ try { TOKEN_KEYS.concat(['userInfo']).forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
 }
-function goLogin(reason) {
-  console.warn('AUTH REDIRECT:', reason);
-  clearSession();
-  location.replace('/login?next=' + encodeURIComponent(location.pathname));
-}
+
 function getRole(u) {
-  u = u || {};
-  if (u.is_admin || u.is_superuser) return 'admin';
-  var list = String(u.account_type || u.role || u.roles || '').toLowerCase().split(',').map(function (s) { return s.trim(); });
-  if (list.indexOf('admin') > -1) return 'admin';
-  if (list.indexOf('business') > -1) return 'business';
-  if (list.indexOf('seller') > -1 || u.is_vendor) return 'seller';
-  return 'buyer';
+ u = u || {};
+ if (u.is_admin || u.is_superuser) return 'admin';
+ var list = String(u.account_type || u.role || u.roles || '').toLowerCase().split(',').map(function (s) { return s.trim(); });
+ if (list.indexOf('admin') > -1) return 'admin';
+ if (list.indexOf('business') > -1) return 'business';
+ if (list.indexOf('seller') > -1 || u.is_vendor) return 'seller';
+ return 'buyer';
 }
 function esc(s) {
-  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+ return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 // Only a real 401 logs the user out. 404/500/network errors do not.
 function authFetch(url, opts) {
-  opts = opts || {};
-  opts.headers = Object.assign({ Authorization: 'Bearer ' + getToken() }, opts.headers || {});
-  return fetch(url, opts).then(function (r) {
-    if (r.status === 401) { goLogin('401 from ' + url); throw null; }
-    return r;
-  });
+ opts = opts || {};
+ opts.headers = Object.assign({ Authorization: 'Bearer ' + Auth.getToken() }, opts.headers || {});
+ return fetch(url, opts).then(function (r) {
+ if (r.status === 401) { Auth.goLogin('401 from ' + url); throw null; }
+ return r;
+ });
 }
 
 var currentUser = null;
 
 async function loadUser() {
-  var cached = {};
-  try { cached = JSON.parse(localStorage.getItem('userInfo') || 'null') || {}; } catch (e) {}
-  var user = cached;
-  try {
-    var res = await authFetch('/api/auth/me');
-    if (res.ok) {
-      user = await res.json();
-      try { localStorage.setItem('userInfo', JSON.stringify(user)); } catch (e) {}
-    } else {
-      console.warn('/api/auth/me returned', res.status, '- using cached profile');
-    }
-  } catch (err) {
-    if (err === null) throw err;           // redirect already started
-    console.warn('/api/auth/me failed', err);
-  }
-  currentUser = user;
+ var cached = {};
+ try { cached = JSON.parse(localStorage.getItem('userInfo') || 'null') || {}; } catch (e) {}
+ var user = cached;
+ try {
+ var res = await authFetch('/api/auth/me');
+ if (res.ok) {
+ user = await res.json();
+ try { localStorage.setItem('userInfo', JSON.stringify(user)); } catch (e) {}
+ } else {
+ console.warn('/api/auth/me returned', res.status, '- using cached profile');
+ }
+ } catch (err) {
+ if (err === null) throw err; // redirect already started
+ console.warn('/api/auth/me failed', err);
+ }
+ currentUser = user;
 
-  // Send people to the dashboard that matches their role
-  var role = getRole(user);
-  if (role === 'admin' || role === 'buyer') { location.replace(HOME[role]); throw null; }
+ // Send people to the dashboard that matches their role
+ var role = getRole(user);
+ if (role === 'admin' || role === 'buyer') { location.replace(HOME[role]); throw null; }
 
-  document.getElementById('greeting').innerText = 'Welcome back, ' + (user.full_name || user.name || 'Member') + '!';
-  document.getElementById('user-email').innerText = [user.email, user.phone].filter(Boolean).join(' • ');
-  document.getElementById('stat-type').innerText = role === 'business' ? 'Business' : 'Seller';
-  document.getElementById('boot').hidden = true;
+ document.getElementById('greeting').innerText = 'Welcome back, ' + (user.full_name || user.name || 'Member') + '!';
+ document.getElementById('user-email').innerText = [user.email, user.phone].filter(Boolean).join(' • ');
+ document.getElementById('stat-type').innerText = role === 'business' ? 'Business' : 'Seller';
+ document.getElementById('boot').hidden = true;
 }
 
 async function loadMyCars() {
-  var el = document.getElementById('cars-list');
-  try {
-    var res = await authFetch('/api/vehicles/?is_sold=false');
-    var cars = res.ok ? await res.json() : [];
-    if (!Array.isArray(cars)) cars = cars.items || [];
-    var myCars = currentUser && currentUser.id != null ? cars.filter(function (c) { return c.seller_id === currentUser.id; }) : [];
-    document.getElementById('stat-cars').innerText = myCars.length;
-    if (!myCars.length) {
-      el.innerHTML = '<div class="empty">You haven\'t listed any cars yet.<br><br><a href="/?action=list-car" style="color:#00a8e8;font-weight:bold;">+ List Your First Car</a></div>';
-      return;
-    }
-    el.innerHTML = myCars.map(function (c) {
-      return '<div class="listing-row"><div><div class="listing-title">' + esc(c.title) + '</div>' +
-        '<div class="listing-meta">' + esc(c.year) + ' • ' + esc(c.transmission) + ' • 📍 ' + esc(c.location) + '</div>' +
-        '<div class="listing-price">SLL ' + Number(c.price_sll || 0).toLocaleString() + '</div></div>' +
-        '<div><button class="action-btn delete-btn" onclick="deleteCar(' + Number(c.id) + ')">Delete</button></div></div>';
-    }).join('');
-  } catch (err) {
-    if (err !== null) el.innerHTML = '<div class="empty">Error loading cars.</div>';
-  }
+ var el = document.getElementById('cars-list');
+ try {
+ var res = await authFetch('/api/vehicles/?is_sold=false');
+ var cars = res.ok ? await res.json() : [];
+ if (!Array.isArray(cars)) cars = cars.items || [];
+ var myCars = currentUser && currentUser.id != null ? cars.filter(function (c) { return c.seller_id === currentUser.id; }) : [];
+ document.getElementById('stat-cars').innerText = myCars.length;
+ if (!myCars.length) {
+ el.innerHTML = '<div class="empty">You haven\'t listed any cars yet.<br><br><a href="/?action=list-car" style="color:#00a8e8;font-weight:bold;">+ List Your First Car</a></div>';
+ return;
+ }
+ el.innerHTML = myCars.map(function (c) {
+ return '<div class="listing-row"><div><div class="listing-title">' + esc(c.title) + '</div>' +
+ '<div class="listing-meta">' + esc(c.year) + ' • ' + esc(c.transmission) + ' • 📍 ' + esc(c.location) + '</div>' +
+ '<div class="listing-price">SLL ' + Number(c.price_sll || 0).toLocaleString() + '</div></div>' +
+ '<div><button class="action-btn delete-btn" onclick="deleteCar(' + Number(c.id) + ')">Delete</button></div></div>';
+ }).join('');
+ } catch (err) {
+ if (err !== null) el.innerHTML = '<div class="empty">Error loading cars.</div>';
+ }
 }
 
 async function deleteCar(id) {
-  if (!confirm('Delete this listing?')) return;
-  try {
-    var r = await authFetch('/api/vehicles/' + id, { method: 'DELETE' });
-    if (!r.ok) alert('Could not delete this listing.');
-  } catch (e) {}
-  loadMyCars();
+ if (!confirm('Delete this listing?')) return;
+ try {
+ var r = await authFetch('/api/vehicles/' + id, { method: 'DELETE' });
+ if (!r.ok) alert('Could not delete this listing.');
+ } catch (e) {}
+ loadMyCars();
 }
 
-function logout() { clearSession(); location.href = '/'; }
+function logout() { Auth.clearSession(); location.href = '/'; }
 
 async function init() {
-  if (!getToken()) { goLogin('no token'); return; }
-  try { await loadUser(); await loadMyCars(); } catch (e) { if (e !== null) console.error(e); }
+ if (!Auth.getToken()) { Auth.goLogin('no token'); return; }
+ try { await loadUser(); await loadMyCars(); } catch (e) { if (e !== null) console.error(e); }
 }
-console.log("[DASH] TOKEN_KEYS", TOKEN_KEYS, "token=", localStorage.getItem("token"), "access=", localStorage.getItem("access_token"), "getToken()=", getToken());
+console.log("[DASH] TOKEN_KEYS", TOKEN_KEYS, "token=", localStorage.getItem("token"), "access=", localStorage.getItem("access_token"), "Auth.getToken()=", Auth.getToken());
 init();
 </script>
+<script src="/static/auth.js"></script>
 </body>
 </html>

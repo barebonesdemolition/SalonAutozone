@@ -140,500 +140,501 @@ body.mode-cars .t-cars{display:inline}body.mode-cars .t-parts{display:none}
 <div class="trust"><span>✓ Free VIN safety check</span><span>✓ Parts that fit your car</span><span>✓ Buy &amp; sell across Sierra Leone</span><span>✓ WhatsApp the seller directly</span></div>
 
 <header class="brand">
-  <div class="logo">Salon<span>AutoZone</span> <em>&amp; AutoTrader</em></div>
-  <div class="tabs" role="tablist">
-    <button role="tab" id="t-parts" aria-selected="true" data-act="market" data-v="parts">Parts</button>
-    <button role="tab" id="t-vehicles" aria-selected="false" data-act="market" data-v="vehicles">Cars &amp; Trucks</button>
-  </div>
-  <nav class="nav">
-    <a href="/vin-tool">VIN Lookup</a><a href="/garage">My Garage</a>
-    <a href="/become-a-seller">Sell as a business</a>
-    <a href="#" data-act="list" data-v="vehicle">Sell a car</a>
-    <a href="#" data-act="list" data-v="parts" class="cta">+ List a part</a>
-  </nav>
+ <div class="logo">Salon<span>AutoZone</span> </div>
+ <div class="tabs" role="tablist">
+ <button role="tab" id="t-parts" aria-selected="true" data-act="market" data-v="parts">Parts</button>
+ <button role="tab" id="t-vehicles" aria-selected="false" data-act="market" data-v="vehicles">Cars &amp; Trucks</button>
+ </div>
+ <nav class="nav">
+ <a href="/vin-tool">VIN Lookup</a><a href="/garage">My Garage</a>
+ <a href="/become-a-seller">Sell as a business</a>
+ <a href="#" data-act="list" data-v="vehicle">Sell a car</a>
+ <a href="#" data-act="list" data-v="parts" class="cta">+ List a part</a>
+ </nav>
 </header>
 <div class="biz"><span>Own a store, dealership or shipping business?</span><a href="/become-a-seller">Get a verified page</a></div>
 
 <section class="step parts-only" id="step-vehicle">
-  <div class="step-label"><span class="num">1</span> Your vehicle</div>
-  <div class="vcard">
-    <div class="vunset" id="vunset">
-      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
-      <h2>Select your vehicle</h2><p>Choose make, model and year so we only show parts that fit.</p>
-      <div class="ctl">
-        <select id="f-make" aria-label="Your car make"></select><select id="f-model" aria-label="Your car model"></select><select id="f-year" aria-label="Your car year"></select>
-        <button type="button" class="btn teal" data-act="saveFit">Save car</button>
-      </div>
-    </div>
-    <div class="vset" id="vset">
-      <div class="row"><div><small>Shopping for</small><b id="fit-label">-</b></div><button type="button" class="btn ghost" data-act="clearFit">Change</button></div>
-      <label class="only" id="f-only"><input type="checkbox" id="f-filter"> Only show parts that fit this car</label>
-    </div>
-  </div>
+ <div class="step-label"><span class="num">1</span> Your vehicle</div>
+ <div class="vcard">
+ <div class="vunset" id="vunset">
+ <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+ <h2>Select your vehicle</h2><p>Choose make, model and year so we only show parts that fit.</p>
+ <div class="ctl">
+ <select id="f-make" aria-label="Your car make"></select><select id="f-model" aria-label="Your car model"></select><select id="f-year" aria-label="Your car year"></select>
+ <button type="button" class="btn teal" data-act="saveFit">Save car</button>
+ </div>
+ </div>
+ <div class="vset" id="vset">
+ <div class="row"><div><small>Shopping for</small><b id="fit-label">-</b></div><button type="button" class="btn ghost" data-act="clearFit">Change</button></div>
+ <label class="only" id="f-only"><input type="checkbox" id="f-filter"> Only show parts that fit this car</label>
+ </div>
+ </div>
 </section>
 
 <section class="step2" id="step-search">
-  <div class="step-label"><span class="num">2</span><span class="parts-only">Find parts</span><span class="cars-only t-cars">Browse cars</span></div>
-  <div class="scard">
-    <div class="srow">
-      <select id="s-cat" class="parts-sel" aria-label="Category">
-        <option value="">All categories</option>
-        <optgroup label="Fluids &amp; oils"><option value="Fluids">All fluids &amp; oils</option><option>Engine Oil</option><option>Transmission Fluid</option><option>Power Steering Fluid</option><option>Brake Fluid</option><option value="Coolant / Antifreeze">Coolant / Antifreeze</option><option>Differential Oil</option><option value="Windshield Washer">Windshield washer fluid</option><option>Grease</option></optgroup>
-        <optgroup label="Parts"><option>Filters</option><option>Batteries</option><option>Brakes</option><option>Engine</option><option>Suspension</option><option>Electrical</option><option value="Tires &amp; Wheels">Tires &amp; Wheels</option><option>Transmission</option><option>Body</option><option>Interior</option><option>Exhaust</option><option>Lighting</option><option>Audio</option><option>Accessories</option></optgroup>
-      </select>
-      <select id="s-make" aria-label="Make"></select><select id="s-model" aria-label="Model"></select><select id="s-year" aria-label="Year"></select>
-      <select id="s-loc" aria-label="Location"></select>
-      <button type="button" class="btn teal go" data-act="search">Search</button>
-    </div>
-    <div class="trow"><label class="sr" for="s-q">Search by part or car name</label>
-      <input type="search" id="s-q" placeholder="Or type a part or car name..." autocomplete="off"><div class="sug" id="sug"></div></div>
-  </div>
-  <button type="button" class="abroad parts-only" data-act="open" data-v="import-modal">Can't find it locally? Request it from abroad</button>
+ <div class="step-label"><span class="num">2</span><span class="parts-only">Find parts</span><span class="cars-only t-cars">Browse cars</span></div>
+ <div class="scard">
+ <div class="srow">
+ <select id="s-cat" class="parts-sel" aria-label="Category">
+ <option value="">All categories</option>
+ <optgroup label="Fluids &amp; oils"><option value="Fluids">All fluids &amp; oils</option><option>Engine Oil</option><option>Transmission Fluid</option><option>Power Steering Fluid</option><option>Brake Fluid</option><option value="Coolant / Antifreeze">Coolant / Antifreeze</option><option>Differential Oil</option><option value="Windshield Washer">Windshield washer fluid</option><option>Grease</option></optgroup>
+ <optgroup label="Parts"><option>Filters</option><option>Batteries</option><option>Brakes</option><option>Engine</option><option>Suspension</option><option>Electrical</option><option value="Tires &amp; Wheels">Tires &amp; Wheels</option><option>Transmission</option><option>Body</option><option>Interior</option><option>Exhaust</option><option>Lighting</option><option>Audio</option><option>Accessories</option></optgroup>
+ </select>
+ <select id="s-make" aria-label="Make"></select><select id="s-model" aria-label="Model"></select><select id="s-year" aria-label="Year"></select>
+ <select id="s-loc" aria-label="Location"></select>
+ <button type="button" class="btn teal go" data-act="search">Search</button>
+ </div>
+ <div class="trow"><label class="sr" for="s-q">Search by part or car name</label>
+ <input type="search" id="s-q" placeholder="Or type a part or car name..." autocomplete="off"><div class="sug" id="sug"></div></div>
+ </div>
+ <button type="button" class="abroad parts-only" data-act="open" data-v="import-modal">Can't find it locally? Request it from abroad</button>
 </section>
 
 <div class="band cars-only"><div class="safety">
-  <h3>Free VIN safety check</h3><p>US safety database: shows vehicle identity and open recalls. Best for US-spec imports.</p>
-  <div class="srow2"><input type="text" id="safety-vin" maxlength="17" placeholder="Enter 17-character VIN" autocomplete="off" spellcheck="false" aria-label="VIN"><button type="button" class="btn teal" id="safety-btn">Check free</button></div>
-  <div class="sout" id="safety-out" aria-live="polite"></div>
+ <h3>Free VIN safety check</h3><p>US safety database: shows vehicle identity and open recalls. Best for US-spec imports.</p>
+ <div class="srow2"><input type="text" id="safety-vin" maxlength="17" placeholder="Enter 17-character VIN" autocomplete="off" spellcheck="false" aria-label="VIN"><button type="button" class="btn teal" id="safety-btn">Check free</button></div>
+ <div class="sout" id="safety-out" aria-live="polite"></div>
 </div></div>
 <div class="band cars-only"><button type="button" class="btn" data-act="list" data-v="vehicle">Sell your car</button></div>
 <div class="band parts-only"><button type="button" class="btn" data-act="open" data-v="id-modal">Identify a car from a photo</button></div>
 
 <div class="cats-wrap parts-only" id="cats"><h3>Top categories</h3><div class="cats">
-  <button type="button" class="cat" data-act="cat" data-v="Brakes"><svg><use href="#i-brakes"/></svg>Brakes</button>
-  <button type="button" class="cat" data-act="cat" data-v="Engine"><svg><use href="#i-engine"/></svg>Engine</button>
-  <button type="button" class="cat" data-act="cat" data-v="Suspension"><svg><use href="#i-susp"/></svg>Suspension</button>
-  <button type="button" class="cat" data-act="cat" data-v="Electrical"><svg><use href="#i-elec"/></svg>Electrical</button>
-  <button type="button" class="cat" data-act="cat" data-v="Tires &amp; Wheels"><svg><use href="#i-tire"/></svg>Tires</button>
-  <button type="button" class="cat" data-act="cat" data-v="Accessories"><svg><use href="#i-acc"/></svg>Accessories</button>
+ <button type="button" class="cat" data-act="cat" data-v="Brakes"><svg><use href="#i-brakes"/></svg>Brakes</button>
+ <button type="button" class="cat" data-act="cat" data-v="Engine"><svg><use href="#i-engine"/></svg>Engine</button>
+ <button type="button" class="cat" data-act="cat" data-v="Suspension"><svg><use href="#i-susp"/></svg>Suspension</button>
+ <button type="button" class="cat" data-act="cat" data-v="Electrical"><svg><use href="#i-elec"/></svg>Electrical</button>
+ <button type="button" class="cat" data-act="cat" data-v="Tires &amp; Wheels"><svg><use href="#i-tire"/></svg>Tires</button>
+ <button type="button" class="cat" data-act="cat" data-v="Accessories"><svg><use href="#i-acc"/></svg>Accessories</button>
 </div></div>
 
 <section class="sec" id="feat-sec" style="display:none;margin-bottom:0"><div class="rh"><h2 id="feat-title">Featured</h2></div><div class="feat" id="feat"></div></section>
 
 <main class="sec" id="results-sec">
-  <div class="rh"><h2 id="results-title">Parts</h2>
-    <div class="r"><span class="cnt" id="cnt" aria-live="polite">-</span>
-      <select id="sort" aria-label="Sort"><option value="">Newest</option><option value="asc">Price: low to high</option><option value="desc">Price: high to low</option></select></div></div>
-  <div class="grid" id="results"></div>
+ <div class="rh"><h2 id="results-title">Parts</h2>
+ <div class="r"><span class="cnt" id="cnt" aria-live="polite">-</span>
+ <select id="sort" aria-label="Sort"><option value="">Newest</option><option value="asc">Price: low to high</option><option value="desc">Price: high to low</option></select></div></div>
+ <div class="grid" id="results"></div>
 </main>
 
 <div class="overlay" id="list-modal" role="dialog" aria-modal="true" aria-labelledby="list-title"><div class="modal"><button class="x" data-act="close" aria-label="Close">&times;</button>
-  <h2 id="list-title">List an item</h2><form id="list-form"><div id="list-fields"></div><button type="submit" class="submit">Publish listing</button><div class="stat" id="list-stat" aria-live="polite"></div></form></div></div>
+ <h2 id="list-title">List an item</h2><form id="list-form"><div id="list-fields"></div><button type="submit" class="submit">Publish listing</button><div class="stat" id="list-stat" aria-live="polite"></div></form></div></div>
 
 <div class="overlay" id="import-modal" role="dialog" aria-modal="true" aria-labelledby="imp-title"><div class="modal"><button class="x" data-act="close" aria-label="Close">&times;</button>
-  <h2 id="imp-title">Request a part from abroad</h2><p style="color:var(--muted);font-size:14px">We source from Dubai, China, the UK and the USA, and deliver to you in Sierra Leone.</p>
-  <form id="import-form">
-    <div class="row2"><label class="lbl">Your name *<input class="inp" name="customer_name" required placeholder="Aminata Kamara"></label>
-      <label class="lbl">WhatsApp number *<input class="inp" name="customer_phone" type="tel" required placeholder="+232 76 123456"></label>
-      <label class="lbl">Your city *<select class="inp" name="customer_location" id="imp-city" required></select></label>
-      <label class="lbl">Email (optional)<input class="inp" name="customer_email" type="email"></label></div>
-    <label class="lbl">Part name *<input class="inp" name="part_name" required placeholder="e.g. Front bumper, alternator, turbo"></label>
-    <div class="row2" style="grid-template-columns:1fr 1fr 1fr"><label class="lbl">Make *<input class="inp" name="car_make" required placeholder="Toyota"></label>
-      <label class="lbl">Model *<input class="inp" name="car_model" required placeholder="Corolla"></label>
-      <label class="lbl">Year *<input class="inp" name="car_year" required inputmode="numeric" placeholder="2018"></label></div>
-    <div class="row2"><label class="lbl">Quantity<input class="inp" name="quantity" type="number" value="1" min="1"></label>
-      <label class="lbl">Budget in SLL (optional)<input class="inp" name="budget_sll" type="number" min="0"></label></div>
-    <label class="lbl">Urgency<select class="inp" name="urgency"><option>Normal</option><option>Urgent (need within 1 week)</option><option>Flexible (can wait 1+ month)</option></select></label>
-    <label class="lbl">Notes<textarea class="inp" name="notes" rows="3" placeholder="e.g. OEM preferred, any colour is fine"></textarea></label>
-    <button type="submit" class="submit">Send request</button><div class="stat" id="import-stat" aria-live="polite"></div>
-  </form></div></div>
+ <h2 id="imp-title">Request a part from abroad</h2><p style="color:var(--muted);font-size:14px">We source from Dubai, China, the UK and the USA, and deliver to you in Sierra Leone.</p>
+ <form id="import-form">
+ <div class="row2"><label class="lbl">Your name *<input class="inp" name="customer_name" required placeholder="Aminata Kamara"></label>
+ <label class="lbl">WhatsApp number *<input class="inp" name="customer_phone" type="tel" required placeholder="+232 76 123456"></label>
+ <label class="lbl">Your city *<select class="inp" name="customer_location" id="imp-city" required></select></label>
+ <label class="lbl">Email (optional)<input class="inp" name="customer_email" type="email"></label></div>
+ <label class="lbl">Part name *<input class="inp" name="part_name" required placeholder="e.g. Front bumper, alternator, turbo"></label>
+ <div class="row2" style="grid-template-columns:1fr 1fr 1fr"><label class="lbl">Make *<input class="inp" name="car_make" required placeholder="Toyota"></label>
+ <label class="lbl">Model *<input class="inp" name="car_model" required placeholder="Corolla"></label>
+ <label class="lbl">Year *<input class="inp" name="car_year" required inputmode="numeric" placeholder="2018"></label></div>
+ <div class="row2"><label class="lbl">Quantity<input class="inp" name="quantity" type="number" value="1" min="1"></label>
+ <label class="lbl">Budget in SLL (optional)<input class="inp" name="budget_sll" type="number" min="0"></label></div>
+ <label class="lbl">Urgency<select class="inp" name="urgency"><option>Normal</option><option>Urgent (need within 1 week)</option><option>Flexible (can wait 1+ month)</option></select></label>
+ <label class="lbl">Notes<textarea class="inp" name="notes" rows="3" placeholder="e.g. OEM preferred, any colour is fine"></textarea></label>
+ <button type="submit" class="submit">Send request</button><div class="stat" id="import-stat" aria-live="polite"></div>
+ </form></div></div>
 
 <div class="overlay" id="id-modal" role="dialog" aria-modal="true" aria-labelledby="id-title"><div class="modal" style="max-width:520px"><button class="x" data-act="close" aria-label="Close">&times;</button>
-  <div id="id-up"><h2 id="id-title">Identify your car</h2><p style="color:var(--muted);font-size:14px;margin-bottom:16px">Take a clear photo of the front or side of the car. You'll get the make, model and an estimated price in Leones.</p>
-    <label class="drop" for="id-file"><input type="file" id="id-file" accept="image/*" class="sr"><b>Tap to take a photo or upload</b><small style="color:var(--muted);font-weight:400">JPG, PNG or WEBP, up to 8 MB</small></label>
-    <div class="stat" id="id-stat" aria-live="polite"></div></div>
-  <div id="id-res" style="display:none"></div></div></div>
+ <div id="id-up"><h2 id="id-title">Identify your car</h2><p style="color:var(--muted);font-size:14px;margin-bottom:16px">Take a clear photo of the front or side of the car. You'll get the make, model and an estimated price in Leones.</p>
+ <label class="drop" for="id-file"><input type="file" id="id-file" accept="image/*" class="sr"><b>Tap to take a photo or upload</b><small style="color:var(--muted);font-weight:400">JPG, PNG or WEBP, up to 8 MB</small></label>
+ <div class="stat" id="id-stat" aria-live="polite"></div></div>
+ <div id="id-res" style="display:none"></div></div></div>
 
 <div class="bnav" role="navigation" aria-label="Main"><nav>
-  <a href="/" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
-  <a href="/garage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
-  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Saved</a>
-  <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
+ <a href="/" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
+ <a href="/garage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
+ <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Saved</a>
+ <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
 </nav></div>
 
 <script>
 (function () {
-  'use strict';
-  var $ = function (id) { return document.getElementById(id); };
-  var CITIES = ['Freetown','Bo','Kenema','Makeni','Koidu','Lunsar','Port Loko','Kabala','Waterloo'];
-  var CATS = ['Fluids','Filters','Batteries','Brakes','Engine','Suspension','Electrical','Tires & Wheels','Transmission','Body','Interior','Exhaust','Lighting','Audio','Accessories'];
-  var RAW = 'Toyota:Corolla,Camry,Hilux,RAV4,Land Cruiser,Prado,Vitz,Yaris,Avensis,Prius,Highlander,Hiace;Nissan:X-Trail,Altima,Sunny,Patrol,Navara,Qashqai,Juke,Note,Murano;Honda:Civic,Accord,CR-V,Fit,Jazz,Pilot;Mitsubishi:Pajero,Lancer,Outlander,L200;Mazda:CX-5,Mazda3,Mazda6,BT-50;Suzuki:Swift,Vitara,Jimny,Alto;Subaru:Forester,Outback,Impreza;Isuzu:D-Max,MU-X,Trooper;Lexus:RX,NX,ES,GX,LX;Hyundai:Tucson,Santa Fe,Elantra,Sonata,i10,Accent,Creta;Kia:Sportage,Sorento,Rio,Cerato,Picanto;Mercedes-Benz:C-Class,E-Class,S-Class,GLC,GLE,ML,G-Class,Sprinter;BMW:3 Series,5 Series,X3,X5,X6;Volkswagen:Golf,Passat,Tiguan,Polo,Jetta;Audi:A3,A4,A6,Q5,Q7;Ford:Focus,Fiesta,Ranger,Explorer,Escape;Chevrolet:Cruze,Malibu,Equinox,Tahoe;Jeep:Wrangler,Grand Cherokee;Peugeot:208,308,3008,Partner;Renault:Clio,Duster,Logan;Land Rover:Defender,Discovery,Range Rover,Evoque;Volvo:XC60,XC90;Chery:Tiggo 4,Tiggo 7;Geely:Coolray,Emgrand;BYD:Atto 3,Han,Seal;Other:Other';
-  var MAKES = [], MODELS = {};
-  RAW.split(';').forEach(function (p) { var a = p.split(':'); MAKES.push(a[0]); MODELS[a[0]] = a[1].split(','); });
-  var YEARS = []; for (var y = new Date().getFullYear() + 1; y >= 1980; y--) YEARS.push(y);
-  var tab = 'parts', seq = 0, sugTimer = null, lastVehicles = [], lastParts = null;
+ 'use strict';
+ var $ = function (id) { return document.getElementById(id); };
+ var CITIES = ['Freetown','Bo','Kenema','Makeni','Koidu','Lunsar','Port Loko','Kabala','Waterloo'];
+ var CATS = ['Fluids','Filters','Batteries','Brakes','Engine','Suspension','Electrical','Tires & Wheels','Transmission','Body','Interior','Exhaust','Lighting','Audio','Accessories'];
+ var RAW = 'Toyota:Corolla,Camry,Hilux,RAV4,Land Cruiser,Prado,Vitz,Yaris,Avensis,Prius,Highlander,Hiace;Nissan:X-Trail,Altima,Sunny,Patrol,Navara,Qashqai,Juke,Note,Murano;Honda:Civic,Accord,CR-V,Fit,Jazz,Pilot;Mitsubishi:Pajero,Lancer,Outlander,L200;Mazda:CX-5,Mazda3,Mazda6,BT-50;Suzuki:Swift,Vitara,Jimny,Alto;Subaru:Forester,Outback,Impreza;Isuzu:D-Max,MU-X,Trooper;Lexus:RX,NX,ES,GX,LX;Hyundai:Tucson,Santa Fe,Elantra,Sonata,i10,Accent,Creta;Kia:Sportage,Sorento,Rio,Cerato,Picanto;Mercedes-Benz:C-Class,E-Class,S-Class,GLC,GLE,ML,G-Class,Sprinter;BMW:3 Series,5 Series,X3,X5,X6;Volkswagen:Golf,Passat,Tiguan,Polo,Jetta;Audi:A3,A4,A6,Q5,Q7;Ford:Focus,Fiesta,Ranger,Explorer,Escape;Chevrolet:Cruze,Malibu,Equinox,Tahoe;Jeep:Wrangler,Grand Cherokee;Peugeot:208,308,3008,Partner;Renault:Clio,Duster,Logan;Land Rover:Defender,Discovery,Range Rover,Evoque;Volvo:XC60,XC90;Chery:Tiggo 4,Tiggo 7;Geely:Coolray,Emgrand;BYD:Atto 3,Han,Seal;Other:Other';
+ var MAKES = [], MODELS = {};
+ RAW.split(';').forEach(function (p) { var a = p.split(':'); MAKES.push(a[0]); MODELS[a[0]] = a[1].split(','); });
+ var YEARS = []; for (var y = new Date().getFullYear() + 1; y >= 1980; y--) YEARS.push(y);
+ var tab = 'parts', seq = 0, sugTimer = null, lastVehicles = [], lastParts = null;
 
-  function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function safeUrl(u) { u = String(u || '').trim(); var l = u.toLowerCase(); return (l.indexOf('http://') === 0 || l.indexOf('https://') === 0 || l.indexOf('data:image/') === 0 || (u.charAt(0) === '/' && u.charAt(1) !== '/')) ? u : ''; }
-  function cssUrl(u) { return u.split(String.fromCharCode(92)).join('%5C').split("'").join('%27').split('"').join('%22').split('(').join('%28').split(')').join('%29').split(' ').join('%20'); }
-  function fmt(n) { return Number(n || 0).toLocaleString(); }
-  var ls = {
-    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
-    del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
-  };
-  function token() { return ls.get('token') || ''; }
-  function json(k) { try { return JSON.parse(ls.get(k) || 'null'); } catch (e) { return null; } }
-  function opts(list, first) { return '<option value="">' + esc(first) + '</option>' + list.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + '</option>'; }).join(''); }
-  function timed(url, ms, o) { var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms); o = o || {}; o.signal = c.signal; return fetch(url, o).finally(function () { clearTimeout(t); }); }
-  function auth() { return { 'Authorization': 'Bearer ' + token() }; }
-  function toast(msg, type) {
-    var t = $('toast');
-    if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
-    t.className = 'toast ' + (type || ''); t.textContent = msg; void t.offsetWidth; t.classList.add('show');
-    clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('show'); }, 2800);
-  }
-  function goLogin() { location.href = '/login?next=' + encodeURIComponent(location.pathname); }
-  function toResults() { setTimeout(function () { $('results-sec').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250); }
+ function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function safeUrl(u) { u = String(u || '').trim(); var l = u.toLowerCase(); return (l.indexOf('http://') === 0 || l.indexOf('https://') === 0 || l.indexOf('data:image/') === 0 || (u.charAt(0) === '/' && u.charAt(1) !== '/')) ? u : ''; }
+ function cssUrl(u) { return u.split(String.fromCharCode(92)).join('%5C').split("'").join('%27').split('"').join('%22').split('(').join('%28').split(')').join('%29').split(' ').join('%20'); }
+ function fmt(n) { return Number(n || 0).toLocaleString(); }
+ var ls = {
+ get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+ set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+ del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+ };
+ function Auth.getToken() { return ls.get('token') || ''; }
+ function json(k) { try { return JSON.parse(ls.get(k) || 'null'); } catch (e) { return null; } }
+ function opts(list, first) { return '<option value="">' + esc(first) + '</option>' + list.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + '</option>'; }).join(''); }
+ function timed(url, ms, o) { var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms); o = o || {}; o.signal = c.signal; return fetch(url, o).finally(function () { clearTimeout(t); }); }
+ function auth() { return { 'Authorization': 'Bearer ' + Auth.getToken() }; }
+ function toast(msg, type) {
+ var t = $('toast');
+ if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+ t.className = 'toast ' + (type || ''); t.textContent = msg; void t.offsetWidth; t.classList.add('show');
+ clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('show'); }, 2800);
+ }
+ 
+ function toResults() { setTimeout(function () { $('results-sec').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250); }
 
-  var lastFocus = null;
-  function openM(id) { lastFocus = document.activeElement; $(id).classList.add('open'); var f = $(id).querySelector('input:not(.sr),select,button.x'); if (f) f.focus(); }
-  function closeM(id) { $(id).classList.remove('open'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { document.querySelectorAll('.overlay.open').forEach(function (m) { closeM(m.id); }); hideSug(); }
-    if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('card')) location.href = e.target.dataset.href;
-  });
+ var lastFocus = null;
+ function openM(id) { lastFocus = document.activeElement; $(id).classList.add('open'); var f = $(id).querySelector('input:not(.sr),select,button.x'); if (f) f.focus(); }
+ function closeM(id) { $(id).classList.remove('open'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+ document.addEventListener('keydown', function (e) {
+ if (e.key === 'Escape') { document.querySelectorAll('.overlay.open').forEach(function (m) { closeM(m.id); }); hideSug(); }
+ if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('card')) location.href = e.target.dataset.href;
+ });
 
-  function updateTitle() {
-    var t = 'Cars & trucks';
-    if (tab === 'parts') { var f = json('fitmentVehicle'); t = (f && f.make) ? 'Parts for ' + f.year + ' ' + f.make + ' ' + f.model : 'Parts'; }
-    $('results-title').textContent = t;
-  }
-  function switchMarket(m) {
-    tab = m;
-    $('t-parts').setAttribute('aria-selected', m === 'parts');
-    $('t-vehicles').setAttribute('aria-selected', m === 'vehicles');
-    document.body.className = m === 'vehicles' ? 'mode-cars' : 'mode-parts';
-    $('s-cat').style.display = m === 'parts' ? '' : 'none';
-    $('feat-sec').style.display = 'none';
-    updateTitle();
-    doSearch();
-  }
+ function updateTitle() {
+ var t = 'Cars & trucks';
+ if (tab === 'parts') { var f = json('fitmentVehicle'); t = (f && f.make) ? 'Parts for ' + f.year + ' ' + f.make + ' ' + f.model : 'Parts'; }
+ $('results-title').textContent = t;
+ }
+ function switchMarket(m) {
+ tab = m;
+ $('t-parts').setAttribute('aria-selected', m === 'parts');
+ $('t-vehicles').setAttribute('aria-selected', m === 'vehicles');
+ document.body.className = m === 'vehicles' ? 'mode-cars' : 'mode-parts';
+ $('s-cat').style.display = m === 'parts' ? '' : 'none';
+ $('feat-sec').style.display = 'none';
+ updateTitle();
+ doSearch();
+ }
 
-  function media(url, icon) {
-    var u = safeUrl(url);
-    if (u) return '<div class="card-img" style="background-image:url(&quot;' + esc(cssUrl(u)) + '&quot;)" role="img" aria-label="Listing photo"></div>';
-    return '<div class="card-img"><svg aria-hidden="true"><use href="#' + icon + '"/></svg></div>';
-  }
-  function card(o) {
-    var h = '<article class="card" tabindex="0" role="link" data-href="' + esc(o.href) + '">' + o.img + '<div class="badges">' + (o.badges || '') + '</div><div class="body"><h3 class="title">' + esc(o.title) + '</h3>' + o.body;
-    if (o.type) {
-      var d = ' data-type="' + o.type + '" data-id="' + esc(o.id) + '" data-title="' + esc(o.title) + '" data-price="' + esc(o.price || 0) + '"';
-      h += '<div class="acts"><button type="button" class="share" data-act="share"' + d + '>Share</button><button type="button" data-act="save"' + d + '>Save</button></div>';
-    }
-    return h + '</div></article>';
-  }
-  function partCard(p, featured, fits) {
-    var badges = featured ? '<span class="bd f">Featured</span>' : '<span class="bd">' + esc(p.condition || 'New') + '</span>';
-    if (fits) badges += '<span class="bd g">Fits your car</span>';
-    return card({ href: '/part/' + encodeURIComponent(p.id), id: p.id, type: 'part', title: p.name, price: p.price_sll, badges: badges, img: media(p.image_url, 'i-part'),
-      body: '<div class="price">SLL ' + fmt(p.price_sll) + '</div><div class="meta"><span class="tag">' + esc(p.category) + '</span><span class="tag">Stock: ' + (p.stock_quantity || 0) + '</span><span class="tag">' + esc(p.location) + '</span></div>' });
-  }
-  function vehicleCard(v) {
-    return card({ href: '/vehicle/' + encodeURIComponent(v.id), id: v.id, type: 'vehicle', title: v.title, price: v.price_sll,
-      badges: (v.is_featured ? '<span class="bd f">Featured</span>' : '') + '<span class="bd g">Verified</span>', img: media(v.image_url, 'i-car'),
-      body: '<div class="price">SLL ' + fmt(v.price_sll) + '</div>' + (v.price_usd ? '<div class="usd">About $' + fmt(v.price_usd) + ' USD</div>' : '') +
-        '<div class="meta"><span class="tag">' + esc(v.year) + '</span><span class="tag">' + esc(v.transmission) + '</span><span class="tag">' + esc(v.location) + '</span></div>' });
-  }
-  function catalogCard(c) {
-    return card({ href: '/catalog/' + encodeURIComponent(c.id), title: c.category || 'Part', badges: '<span class="bd">Import available</span>',
-      img: '<div class="card-img"><svg aria-hidden="true"><use href="#i-globe"/></svg></div>',
-      body: '<div style="font-family:monospace;font-size:12px;color:var(--muted)">' + esc(c.part_number) + '</div><div style="font-size:13px;color:var(--muted)">Fits: ' + esc(c.vehicle_compatibility || 'Universal') + '</div><div style="color:var(--primary);font-weight:700;font-size:13px;margin-top:6px">Request a quote</div>' });
-  }
-  function sortBy(list) {
-    var s = $('sort').value; if (!s) return list;
-    return list.slice().sort(function (a, b) { return s === 'asc' ? (a.price_sll || 0) - (b.price_sll || 0) : (b.price_sll || 0) - (a.price_sll || 0); });
-  }
+ function media(url, icon) {
+ var u = safeUrl(url);
+ if (u) return '<div class="card-img" style="background-image:url(&quot;' + esc(cssUrl(u)) + '&quot;)" role="img" aria-label="Listing photo"></div>';
+ return '<div class="card-img"><svg aria-hidden="true"><use href="#' + icon + '"/></svg></div>';
+ }
+ function card(o) {
+ var h = '<article class="card" tabindex="0" role="link" data-href="' + esc(o.href) + '">' + o.img + '<div class="badges">' + (o.badges || '') + '</div><div class="body"><h3 class="title">' + esc(o.title) + '</h3>' + o.body;
+ if (o.type) {
+ var d = ' data-type="' + o.type + '" data-id="' + esc(o.id) + '" data-title="' + esc(o.title) + '" data-price="' + esc(o.price || 0) + '"';
+ h += '<div class="acts"><button type="button" class="share" data-act="share"' + d + '>Share</button><button type="button" data-act="save"' + d + '>Save</button></div>';
+ }
+ return h + '</div></article>';
+ }
+ function partCard(p, featured, fits) {
+ var badges = featured ? '<span class="bd f">Featured</span>' : '<span class="bd">' + esc(p.condition || 'New') + '</span>';
+ if (fits) badges += '<span class="bd g">Fits your car</span>';
+ return card({ href: '/part/' + encodeURIComponent(p.id), id: p.id, type: 'part', title: p.name, price: p.price_sll, badges: badges, img: media(p.image_url, 'i-part'),
+ body: '<div class="price">SLL ' + fmt(p.price_sll) + '</div><div class="meta"><span class="tag">' + esc(p.category) + '</span><span class="tag">Stock: ' + (p.stock_quantity || 0) + '</span><span class="tag">' + esc(p.location) + '</span></div>' });
+ }
+ function vehicleCard(v) {
+ return card({ href: '/vehicle/' + encodeURIComponent(v.id), id: v.id, type: 'vehicle', title: v.title, price: v.price_sll,
+ badges: (v.is_featured ? '<span class="bd f">Featured</span>' : '') + '<span class="bd g">Verified</span>', img: media(v.image_url, 'i-car'),
+ body: '<div class="price">SLL ' + fmt(v.price_sll) + '</div>' + (v.price_usd ? '<div class="usd">About $' + fmt(v.price_usd) + ' USD</div>' : '') +
+ '<div class="meta"><span class="tag">' + esc(v.year) + '</span><span class="tag">' + esc(v.transmission) + '</span><span class="tag">' + esc(v.location) + '</span></div>' });
+ }
+ function catalogCard(c) {
+ return card({ href: '/catalog/' + encodeURIComponent(c.id), title: c.category || 'Part', badges: '<span class="bd">Import available</span>',
+ img: '<div class="card-img"><svg aria-hidden="true"><use href="#i-globe"/></svg></div>',
+ body: '<div style="font-family:monospace;font-size:12px;color:var(--muted)">' + esc(c.part_number) + '</div><div style="font-size:13px;color:var(--muted)">Fits: ' + esc(c.vehicle_compatibility || 'Universal') + '</div><div style="color:var(--primary);font-weight:700;font-size:13px;margin-top:6px">Request a quote</div>' });
+ }
+ function sortBy(list) {
+ var s = $('sort').value; if (!s) return list;
+ return list.slice().sort(function (a, b) { return s === 'asc' ? (a.price_sll || 0) - (b.price_sll || 0) : (b.price_sll || 0) - (a.price_sll || 0); });
+ }
 
-  function doSearch() {
-    var my = ++seq, res = $('results'), cnt = $('cnt');
-    cnt.textContent = 'Loading...';
-    var sk = ''; for (var i = 0; i < 6; i++) sk += '<div class="card sk"></div>';
-    res.innerHTML = sk; updateTitle();
-    var p = new URLSearchParams(), q = $('s-q').value.trim(), vehicles = tab === 'vehicles';
-    if ($('s-loc').value) p.append('location', $('s-loc').value);
-    if ($('s-make').value) p.append('make', $('s-make').value);
-    if ($('s-model').value) p.append('model', $('s-model').value);
-    if ($('s-year').value) p.append('year', $('s-year').value);
-    if (q) p.append('q', q);
-    if (!vehicles && $('s-cat').value) p.append('category', $('s-cat').value);
-    timed((vehicles ? '/api/vehicles/?' : '/api/unified/parts?') + p.toString(), 10000)
-      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function (data) {
-        if (my !== seq) return;
-        if (vehicles) { lastVehicles = Array.isArray(data) ? data : (data.items || []); renderVehicles(); }
-        else { lastParts = data; renderParts(); }
-      })
-      .catch(function (err) {
-        if (my !== seq) return;
-        console.error('[search]', err); cnt.textContent = 'Error';
-        res.innerHTML = '<div class="empty">Could not load ' + (vehicles ? 'cars' : 'parts') + '. Check your connection and try again.<br><button type="button" data-act="search">Try again</button></div>';
-      });
-  }
-  function renderVehicles() {
-    var items = lastVehicles;
-    $('cnt').textContent = items.length + (items.length === 1 ? ' car' : ' cars') + ' found';
-    var feat = sortBy(items.filter(function (v) { return v.is_featured; })), reg = sortBy(items.filter(function (v) { return !v.is_featured; }));
-    $('feat-sec').style.display = feat.length ? 'block' : 'none'; $('feat-title').textContent = 'Featured cars';
-    $('feat').innerHTML = feat.map(vehicleCard).join('');
-    $('results').innerHTML = reg.length ? reg.map(vehicleCard).join('') : (feat.length ? '' : '<div class="empty">No cars found. Try a different search.</div>');
-    markSaved();
-  }
-  function renderParts() {
-    var data = lastParts || {}, local = data.local_parts || [], cat = data.catalog_parts || [];
-    $('cnt').textContent = (data.total || 0) + ' results (' + (data.local_count || 0) + ' local, ' + (data.catalog_count || 0) + ' importable)';
-    var fit = json('fitmentVehicle'), only = ls.get('fitmentFilterOn') === '1' && fit && fit.make;
-    function fits(p) {
-      if (!fit || !fit.make || !p.compatible_make) return false;
-      var mk = String(p.compatible_make).toLowerCase() === fit.make.toLowerCase();
-      var md = !p.compatible_model || !fit.model || String(p.compatible_model).toLowerCase().indexOf(fit.model.toLowerCase()) !== -1;
-      return mk && md;
-    }
-    var feat = sortBy(local.filter(function (p) { return p.is_featured; })), reg = sortBy(local.filter(function (p) { return !p.is_featured; }));
-    $('feat-sec').style.display = feat.length ? 'block' : 'none'; $('feat-title').textContent = 'Featured listings';
-    $('feat').innerHTML = feat.map(function (p) { return partCard(p, true, fits(p)); }).join('');
-    if (only) reg = reg.filter(fits);
-    var h = '';
-    if (reg.length) h += '<h3 class="grp">Available in Sierra Leone</h3>' + reg.map(function (p) { return partCard(p, false, fits(p)); }).join('');
-    if (cat.length) h += '<h3 class="grp" style="margin-top:20px">Import from abroad (7-14 days)</h3>' + cat.map(catalogCard).join('');
-    if (!h && !feat.length) {
-      h = only ? '<div class="empty">No parts here fit your car.<br><button type="button" data-act="showall">Show all parts</button></div>'
-               : '<div class="empty">No parts found for this search. Try another category, or<br><button type="button" data-act="open" data-v="import-modal">request it from abroad</button></div>';
-    }
-    $('results').innerHTML = h; markSaved();
-  }
+ function doSearch() {
+ var my = ++seq, res = $('results'), cnt = $('cnt');
+ cnt.textContent = 'Loading...';
+ var sk = ''; for (var i = 0; i < 6; i++) sk += '<div class="card sk"></div>';
+ res.innerHTML = sk; updateTitle();
+ var p = new URLSearchParams(), q = $('s-q').value.trim(), vehicles = tab === 'vehicles';
+ if ($('s-loc').value) p.append('location', $('s-loc').value);
+ if ($('s-make').value) p.append('make', $('s-make').value);
+ if ($('s-model').value) p.append('model', $('s-model').value);
+ if ($('s-year').value) p.append('year', $('s-year').value);
+ if (q) p.append('q', q);
+ if (!vehicles && $('s-cat').value) p.append('category', $('s-cat').value);
+ timed((vehicles ? '/api/vehicles/?' : '/api/unified/parts?') + p.toString(), 10000)
+ .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+ .then(function (data) {
+ if (my !== seq) return;
+ if (vehicles) { lastVehicles = Array.isArray(data) ? data : (data.items || []); renderVehicles(); }
+ else { lastParts = data; renderParts(); }
+ })
+ .catch(function (err) {
+ if (my !== seq) return;
+ console.error('[search]', err); cnt.textContent = 'Error';
+ res.innerHTML = '<div class="empty">Could not load ' + (vehicles ? 'cars' : 'parts') + '. Check your connection and try again.<br><button type="button" data-act="search">Try again</button></div>';
+ });
+ }
+ function renderVehicles() {
+ var items = lastVehicles;
+ $('cnt').textContent = items.length + (items.length === 1 ? ' car' : ' cars') + ' found';
+ var feat = sortBy(items.filter(function (v) { return v.is_featured; })), reg = sortBy(items.filter(function (v) { return !v.is_featured; }));
+ $('feat-sec').style.display = feat.length ? 'block' : 'none'; $('feat-title').textContent = 'Featured cars';
+ $('feat').innerHTML = feat.map(vehicleCard).join('');
+ $('results').innerHTML = reg.length ? reg.map(vehicleCard).join('') : (feat.length ? '' : '<div class="empty">No cars found. Try a different search.</div>');
+ markSaved();
+ }
+ function renderParts() {
+ var data = lastParts || {}, local = data.local_parts || [], cat = data.catalog_parts || [];
+ $('cnt').textContent = (data.total || 0) + ' results (' + (data.local_count || 0) + ' local, ' + (data.catalog_count || 0) + ' importable)';
+ var fit = json('fitmentVehicle'), only = ls.get('fitmentFilterOn') === '1' && fit && fit.make;
+ function fits(p) {
+ if (!fit || !fit.make || !p.compatible_make) return false;
+ var mk = String(p.compatible_make).toLowerCase() === fit.make.toLowerCase();
+ var md = !p.compatible_model || !fit.model || String(p.compatible_model).toLowerCase().indexOf(fit.model.toLowerCase()) !== -1;
+ return mk && md;
+ }
+ var feat = sortBy(local.filter(function (p) { return p.is_featured; })), reg = sortBy(local.filter(function (p) { return !p.is_featured; }));
+ $('feat-sec').style.display = feat.length ? 'block' : 'none'; $('feat-title').textContent = 'Featured listings';
+ $('feat').innerHTML = feat.map(function (p) { return partCard(p, true, fits(p)); }).join('');
+ if (only) reg = reg.filter(fits);
+ var h = '';
+ if (reg.length) h += '<h3 class="grp">Available in Sierra Leone</h3>' + reg.map(function (p) { return partCard(p, false, fits(p)); }).join('');
+ if (cat.length) h += '<h3 class="grp" style="margin-top:20px">Import from abroad (7-14 days)</h3>' + cat.map(catalogCard).join('');
+ if (!h && !feat.length) {
+ h = only ? '<div class="empty">No parts here fit your car.<br><button type="button" data-act="showall">Show all parts</button></div>'
+ : '<div class="empty">No parts found for this search. Try another category, or<br><button type="button" data-act="open" data-v="import-modal">request it from abroad</button></div>';
+ }
+ $('results').innerHTML = h; markSaved();
+ }
 
-  function share(t) {
-    var d = t.dataset, url = location.origin + (d.type === 'vehicle' ? '/vehicle/' : '/part/') + d.id, NL = String.fromCharCode(10);
-    var msg = '*' + d.title + '*' + NL + (Number(d.price) ? 'SLL ' + fmt(d.price) + NL : '') + NL + 'View on SalonAutoZone:' + NL + url;
-    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener,noreferrer');
-  }
-  function save(btn) {
-    if (!token()) { toast('Log in to save items', 'error'); setTimeout(goLogin, 1000); return; }
-    btn.disabled = true; btn.textContent = 'Saving...';
-    fetch('/api/my-account/saved', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ listing_type: btn.dataset.type, listing_id: Number(btn.dataset.id) }) })
-      .then(function (r) {
-        if (r.status === 401) { toast('Session expired. Log in again.', 'error'); setTimeout(goLogin, 1000); throw null; }
-        if (!r.ok) throw new Error('Could not save. Try again.');
-        return r.json();
-      })
-      .then(function (d) { btn.textContent = 'Saved'; btn.classList.add('saved'); toast(d.already_saved ? 'Already in your saved items' : 'Saved to your account', 'success'); })
-      .catch(function (e) { if (e) toast(e.message, 'error'); btn.textContent = 'Save'; })
-      .finally(function () { btn.disabled = false; });
-  }
-  function markSaved() {
-    if (!token()) return;
-    fetch('/api/my-account/saved', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-      if (!d) return;
-      var s = {}; (d.items || []).forEach(function (i) { s[i.listing_type + '-' + i.listing_id] = 1; });
-      document.querySelectorAll('[data-act=save]').forEach(function (b) { if (s[b.dataset.type + '-' + b.dataset.id]) { b.textContent = 'Saved'; b.classList.add('saved'); } });
-    }).catch(function () {});
-  }
+ function share(t) {
+ var d = t.dataset, url = location.origin + (d.type === 'vehicle' ? '/vehicle/' : '/part/') + d.id, NL = String.fromCharCode(10);
+ var msg = '*' + d.title + '*' + NL + (Number(d.price) ? 'SLL ' + fmt(d.price) + NL : '') + NL + 'View on SalonAutoZone:' + NL + url;
+ window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener,noreferrer');
+ }
+ function save(btn) {
+ if (!Auth.getToken()) { toast('Log in to save items', 'error'); setTimeout(goLogin, 1000); return; }
+ btn.disabled = true; btn.textContent = 'Saving...';
+ fetch('/api/my-account/saved', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ listing_type: btn.dataset.type, listing_id: Number(btn.dataset.id) }) })
+ .then(function (r) {
+ if (r.status === 401) { toast('Session expired. Log in again.', 'error'); setTimeout(goLogin, 1000); throw null; }
+ if (!r.ok) throw new Error('Could not save. Try again.');
+ return r.json();
+ })
+ .then(function (d) { btn.textContent = 'Saved'; btn.classList.add('saved'); toast(d.already_saved ? 'Already in your saved items' : 'Saved to your account', 'success'); })
+ .catch(function (e) { if (e) toast(e.message, 'error'); btn.textContent = 'Save'; })
+ .finally(function () { btn.disabled = false; });
+ }
+ function markSaved() {
+ if (!Auth.getToken()) return;
+ fetch('/api/my-account/saved', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+ if (!d) return;
+ var s = {}; (d.items || []).forEach(function (i) { s[i.listing_type + '-' + i.listing_id] = 1; });
+ document.querySelectorAll('[data-act=save]').forEach(function (b) { if (s[b.dataset.type + '-' + b.dataset.id]) { b.textContent = 'Saved'; b.classList.add('saved'); } });
+ }).catch(function () {});
+ }
 
-  function fillModels(sel, make, first) { sel.innerHTML = opts(make ? (MODELS[make] || ['Other']) : [], first); }
-  function showVehicle(v) {
-    var on = !!(v && v.make);
-    $('vset').classList.toggle('on', on); $('vunset').classList.toggle('off', on); $('f-only').classList.toggle('on', on);
-    if (on) $('fit-label').textContent = v.year + ' ' + v.make + ' ' + v.model;
-    updateTitle();
-  }
-  function setFitSelects(v) { $('f-make').value = v.make || ''; fillModels($('f-model'), v.make, 'Model'); $('f-model').value = v.model || ''; $('f-year').value = v.year || ''; }
-  function saveFit() {
-    var v = { make: $('f-make').value, model: $('f-model').value, year: $('f-year').value };
-    if (!v.make || !v.model || !v.year) { toast('Choose make, model and year first', 'error'); return; }
-    ls.set('fitmentVehicle', JSON.stringify(v)); showVehicle(v);
-    if (tab === 'parts') doSearch();
-  }
-  function clearFit() {
-    ls.del('fitmentVehicle'); ls.del('fitmentFilterOn'); setFitSelects({}); $('f-filter').checked = false; showVehicle(null);
-    if (tab === 'parts') doSearch();
-  }
-  function syncGarage() {
-    if (!token()) return;
-    fetch('/api/garage/', { headers: auth() }).then(function (r) { return r.ok ? r.json() : []; }).then(function (cars) {
-      var c = (cars || []).find(function (x) { return x.is_primary; }) || (cars || [])[0];
-      if (!c) return;
-      var v = { make: c.make, model: c.model, year: String(c.year) }, old = json('fitmentVehicle');
-      ls.set('fitmentVehicle', JSON.stringify(v)); setFitSelects(v); showVehicle(v);
-      if (!old || old.make !== v.make || old.model !== v.model || old.year !== v.year) { if (tab === 'parts') doSearch(); }
-    }).catch(function () {});
-  }
+ function fillModels(sel, make, first) { sel.innerHTML = opts(make ? (MODELS[make] || ['Other']) : [], first); }
+ function showVehicle(v) {
+ var on = !!(v && v.make);
+ $('vset').classList.toggle('on', on); $('vunset').classList.toggle('off', on); $('f-only').classList.toggle('on', on);
+ if (on) $('fit-label').textContent = v.year + ' ' + v.make + ' ' + v.model;
+ updateTitle();
+ }
+ function setFitSelects(v) { $('f-make').value = v.make || ''; fillModels($('f-model'), v.make, 'Model'); $('f-model').value = v.model || ''; $('f-year').value = v.year || ''; }
+ function saveFit() {
+ var v = { make: $('f-make').value, model: $('f-model').value, year: $('f-year').value };
+ if (!v.make || !v.model || !v.year) { toast('Choose make, model and year first', 'error'); return; }
+ ls.set('fitmentVehicle', JSON.stringify(v)); showVehicle(v);
+ if (tab === 'parts') doSearch();
+ }
+ function clearFit() {
+ ls.del('fitmentVehicle'); ls.del('fitmentFilterOn'); setFitSelects({}); $('f-filter').checked = false; showVehicle(null);
+ if (tab === 'parts') doSearch();
+ }
+ function syncGarage() {
+ if (!Auth.getToken()) return;
+ fetch('/api/garage/', { headers: auth() }).then(function (r) { return r.ok ? r.json() : []; }).then(function (cars) {
+ var c = (cars || []).find(function (x) { return x.is_primary; }) || (cars || [])[0];
+ if (!c) return;
+ var v = { make: c.make, model: c.model, year: String(c.year) }, old = json('fitmentVehicle');
+ ls.set('fitmentVehicle', JSON.stringify(v)); setFitSelects(v); showVehicle(v);
+ if (!old || old.make !== v.make || old.model !== v.model || old.year !== v.year) { if (tab === 'parts') doSearch(); }
+ }).catch(function () {});
+ }
 
-  function hideSug() { $('sug').style.display = 'none'; }
-  function getSug(q) {
-    var box = $('sug');
-    timed('/api/unified/suggest?q=' + encodeURIComponent(q), 5000).then(function (r) { return r.json(); }).then(function (d) {
-      var s = d.suggestions || [];
-      box.innerHTML = s.length ? s.map(function (x) {
-        return '<button type="button" data-act="sug" data-url="' + esc(safeUrl(x.url)) + '"><span>' + esc(x.icon || '') + '</span><span><b>' + esc(x.label) + '</b><small>' + esc(x.sublabel) + '</small></span></button>';
-      }).join('') : '<div style="padding:14px;text-align:center;color:var(--muted);font-size:13px">No matches for "' + esc(q) + '"</div>';
-      box.style.display = 'block';
-    }).catch(hideSug);
-  }
+ function hideSug() { $('sug').style.display = 'none'; }
+ function getSug(q) {
+ var box = $('sug');
+ timed('/api/unified/suggest?q=' + encodeURIComponent(q), 5000).then(function (r) { return r.json(); }).then(function (d) {
+ var s = d.suggestions || [];
+ box.innerHTML = s.length ? s.map(function (x) {
+ return '<button type="button" data-act="sug" data-url="' + esc(safeUrl(x.url)) + '"><span>' + esc(x.icon || '') + '</span><span><b>' + esc(x.label) + '</b><small>' + esc(x.sublabel) + '</small></span></button>';
+ }).join('') : '<div style="padding:14px;text-align:center;color:var(--muted);font-size:13px">No matches for "' + esc(q) + '"</div>';
+ box.style.display = 'block';
+ }).catch(hideSug);
+ }
 
-  function fld(label, name, extra, tag, inner) {
-    tag = tag || 'input';
-    var el = tag === 'select' ? '<select class="inp" name="' + name + '" ' + (extra || '') + '>' + inner + '</select>'
-           : tag === 'textarea' ? '<textarea class="inp" name="' + name + '" rows="3"></textarea>' : '<input class="inp" name="' + name + '" ' + (extra || '') + '>';
-    return '<label class="lbl">' + label + el + '</label>';
-  }
-  function openListing(type) {
-    if (!token()) { if (confirm('Log in or register to list items. Go to the login page?')) goLogin(); return; }
-    var f = $('list-form'); f.dataset.type = type; $('list-stat').textContent = '';
-    var city = fld('Location *', 'location', 'required', 'select', opts(CITIES, 'Select city'));
-    var phone = fld('WhatsApp number *', 'contact_phone', 'required type="tel" placeholder="+232 76 123456"');
-    var desc = fld('Description', 'description', '', 'textarea');
-    if (type === 'vehicle') {
-      $('list-title').textContent = 'List your car';
-      $('list-fields').innerHTML = fld('Car title *', 'title', 'required placeholder="2015 Toyota Corolla"') + fld('Make *', 'make', 'required', 'select', opts(MAKES, 'Select make')) +
-        fld('Model *', 'model', 'required', 'select', '<option value="">Select make first</option>') + fld('Year *', 'year', 'required', 'select', opts(YEARS, 'Select year')) +
-        fld('Price (SLL) *', 'price_sll', 'required type="number" min="0"') + fld('Price (USD, optional)', 'price_usd', 'type="number" min="0"') +
-        fld('Mileage (km) *', 'mileage_km', 'required type="number" min="0"') +
-        fld('Fuel *', 'fuel_type', 'required', 'select', '<option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>') +
-        fld('Transmission *', 'transmission', 'required', 'select', '<option>Automatic</option><option>Manual</option>') + city + phone + desc;
-    } else {
-      $('list-title').textContent = 'List a part';
-      $('list-fields').innerHTML = fld('Part name *', 'name', 'required placeholder="Toyota Corolla brake pads"') + fld('Category *', 'category', 'required', 'select', opts(CATS, 'Select category')) +
-        fld('Compatible make', 'compatible_make', '', 'select', opts(MAKES, 'Any')) + fld('Compatible model', 'compatible_model', 'placeholder="Corolla"') +
-        fld('Price (SLL) *', 'price_sll', 'required type="number" min="0"') + fld('Stock quantity *', 'stock_quantity', 'required type="number" min="1" value="1"') +
-        fld('Condition *', 'condition', 'required', 'select', '<option>New</option><option>Used</option><option>Refurbished</option>') + city + phone + desc;
-    }
-    openM('list-modal');
-  }
-  function post(form, url, statEl, headers, done) {
-    var st = $(statEl), btn = form.querySelector('.submit'), payload = {}, numeric = ['year', 'price_sll', 'price_usd', 'mileage_km', 'stock_quantity', 'quantity', 'budget_sll'];
-    new FormData(form).forEach(function (v, k) { if (v === '') return; payload[k] = (numeric.indexOf(k) > -1 && !isNaN(parseFloat(v))) ? parseFloat(v) : v; });
-    if (done.extra) done.extra(payload);
-    st.style.color = 'var(--primary)'; st.textContent = 'Sending...'; btn.disabled = true;
-    return fetch(url, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, headers), body: JSON.stringify(payload) })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
-        if (!r.ok) throw new Error(r.status === 401 ? 'Session expired. Please log in again.' : (typeof d.detail === 'string' ? d.detail : 'Please check the form and try again.'));
-        st.style.color = 'var(--success)'; st.textContent = done.ok; setTimeout(done.after, 900);
-      }); })
-      .catch(function (e) { st.style.color = 'var(--danger)'; st.textContent = e.message; })
-      .finally(function () { btn.disabled = false; });
-  }
+ function fld(label, name, extra, tag, inner) {
+ tag = tag || 'input';
+ var el = tag === 'select' ? '<select class="inp" name="' + name + '" ' + (extra || '') + '>' + inner + '</select>'
+ : tag === 'textarea' ? '<textarea class="inp" name="' + name + '" rows="3"></textarea>' : '<input class="inp" name="' + name + '" ' + (extra || '') + '>';
+ return '<label class="lbl">' + label + el + '</label>';
+ }
+ function openListing(type) {
+ if (!Auth.getToken()) { if (confirm('Log in or register to list items. Go to the login page?')) Auth.goLogin(); return; }
+ var f = $('list-form'); f.dataset.type = type; $('list-stat').textContent = '';
+ var city = fld('Location *', 'location', 'required', 'select', opts(CITIES, 'Select city'));
+ var phone = fld('WhatsApp number *', 'contact_phone', 'required type="tel" placeholder="+232 76 123456"');
+ var desc = fld('Description', 'description', '', 'textarea');
+ if (type === 'vehicle') {
+ $('list-title').textContent = 'List your car';
+ $('list-fields').innerHTML = fld('Car title *', 'title', 'required placeholder="2015 Toyota Corolla"') + fld('Make *', 'make', 'required', 'select', opts(MAKES, 'Select make')) +
+ fld('Model *', 'model', 'required', 'select', '<option value="">Select make first</option>') + fld('Year *', 'year', 'required', 'select', opts(YEARS, 'Select year')) +
+ fld('Price (SLL) *', 'price_sll', 'required type="number" min="0"') + fld('Price (USD, optional)', 'price_usd', 'type="number" min="0"') +
+ fld('Mileage (km) *', 'mileage_km', 'required type="number" min="0"') +
+ fld('Fuel *', 'fuel_type', 'required', 'select', '<option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>') +
+ fld('Transmission *', 'transmission', 'required', 'select', '<option>Automatic</option><option>Manual</option>') + city + phone + desc;
+ } else {
+ $('list-title').textContent = 'List a part';
+ $('list-fields').innerHTML = fld('Part name *', 'name', 'required placeholder="Toyota Corolla brake pads"') + fld('Category *', 'category', 'required', 'select', opts(CATS, 'Select category')) +
+ fld('Compatible make', 'compatible_make', '', 'select', opts(MAKES, 'Any')) + fld('Compatible model', 'compatible_model', 'placeholder="Corolla"') +
+ fld('Price (SLL) *', 'price_sll', 'required type="number" min="0"') + fld('Stock quantity *', 'stock_quantity', 'required type="number" min="1" value="1"') +
+ fld('Condition *', 'condition', 'required', 'select', '<option>New</option><option>Used</option><option>Refurbished</option>') + city + phone + desc;
+ }
+ openM('list-modal');
+ }
+ function post(form, url, statEl, headers, done) {
+ var st = $(statEl), btn = form.querySelector('.submit'), payload = {}, numeric = ['year', 'price_sll', 'price_usd', 'mileage_km', 'stock_quantity', 'quantity', 'budget_sll'];
+ new FormData(form).forEach(function (v, k) { if (v === '') return; payload[k] = (numeric.indexOf(k) > -1 && !isNaN(parseFloat(v))) ? parseFloat(v) : v; });
+ if (done.extra) done.extra(payload);
+ st.style.color = 'var(--primary)'; st.textContent = 'Sending...'; btn.disabled = true;
+ return fetch(url, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, headers), body: JSON.stringify(payload) })
+ .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
+ if (!r.ok) throw new Error(r.status === 401 ? 'Session expired. Please log in again.' : (typeof d.detail === 'string' ? d.detail : 'Please check the form and try again.'));
+ st.style.color = 'var(--success)'; st.textContent = done.ok; setTimeout(done.after, 900);
+ }); })
+ .catch(function (e) { st.style.color = 'var(--danger)'; st.textContent = e.message; })
+ .finally(function () { btn.disabled = false; });
+ }
 
-  function idReset() { $('id-up').style.display = 'block'; $('id-res').style.display = 'none'; $('id-stat').textContent = ''; $('id-file').value = ''; }
-  function identify(file) {
-    var st = $('id-stat');
-    if (file.size > 8 * 1024 * 1024) { st.style.color = 'var(--danger)'; st.textContent = 'That image is over 8 MB. Choose a smaller photo.'; return; }
-    var t0 = Date.now(); st.style.color = 'var(--primary)'; st.textContent = 'Analyzing your photo...';
-    var iv = setInterval(function () { st.textContent = 'Analyzing your photo... ' + Math.floor((Date.now() - t0) / 1000) + 's'; }, 1000);
-    var fd = new FormData(); fd.append('file', file);
-    timed('/api/identify/car', 120000, { method: 'POST', headers: auth(), body: fd })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
-        if (!r.ok) throw new Error(r.status === 401 ? 'Session expired. Please log in again.' : r.status === 429 ? 'Daily limit reached (20 per day). Try again tomorrow.' : (d.detail || 'Identification failed.'));
-        showId(d.identification);
-      }); })
-      .catch(function (e) { st.style.color = 'var(--danger)'; st.textContent = e.name === 'AbortError' ? 'The request timed out. Try again.' : (e.message || 'Network error'); })
-      .finally(function () { clearInterval(iv); });
-  }
-  function showId(c) {
-    var h;
-    if (!c || !c.make || !c.model) {
-      h = '<h2>Could not identify the car</h2><p style="color:var(--muted)">Try a clearer photo of the front or side.</p><button type="button" class="submit" data-act="idAgain">Try another photo</button>';
-    } else {
-      h = '<h2 style="margin-bottom:4px">' + esc(c.make) + ' ' + esc(c.model) + '</h2><p style="color:var(--muted);margin-bottom:14px">' + [c.year_range, c.body_type, c.color].filter(Boolean).map(esc).join(', ') + '</p>';
-      if (c.estimated_price_sll_low && c.estimated_price_sll_high) h += '<div style="background:#dcfce7;padding:14px;border-radius:12px;text-align:center;margin-bottom:14px"><small style="color:#166534;font-weight:700">Estimated price</small><div style="font-size:20px;color:#166534;font-weight:800">SLL ' + fmt(Math.round(c.estimated_price_sll_low)) + ' to ' + fmt(Math.round(c.estimated_price_sll_high)) + '</div></div>';
-      if (c.common_parts && c.common_parts.length) h += '<div style="margin-bottom:14px"><small style="color:var(--muted);font-weight:700">Common parts</small><div>' + c.common_parts.map(function (p) { return '<span class="chip">' + esc(p) + '</span>'; }).join('') + '</div></div>';
-      if (c.description) h += '<p style="background:var(--bg);padding:12px;border-radius:8px;font-size:13px;color:#475569;margin-bottom:14px">' + esc(c.description) + '</p>';
-      var d = ' data-make="' + esc(c.make) + '" data-model="' + esc(c.model) + '"';
-      h += '<div class="row2"><button type="button" class="btn teal" data-act="findParts"' + d + '>Find parts</button><button type="button" class="btn ghost" data-act="listCar">List for sale</button></div><button type="button" class="btn ghost" style="width:100%;margin-top:10px" data-act="idAgain">Try another photo</button>';
-    }
-    $('id-res').innerHTML = h; $('id-up').style.display = 'none'; $('id-res').style.display = 'block';
-  }
+ function idReset() { $('id-up').style.display = 'block'; $('id-res').style.display = 'none'; $('id-stat').textContent = ''; $('id-file').value = ''; }
+ function identify(file) {
+ var st = $('id-stat');
+ if (file.size > 8 * 1024 * 1024) { st.style.color = 'var(--danger)'; st.textContent = 'That image is over 8 MB. Choose a smaller photo.'; return; }
+ var t0 = Date.now(); st.style.color = 'var(--primary)'; st.textContent = 'Analyzing your photo...';
+ var iv = setInterval(function () { st.textContent = 'Analyzing your photo... ' + Math.floor((Date.now() - t0) / 1000) + 's'; }, 1000);
+ var fd = new FormData(); fd.append('file', file);
+ timed('/api/identify/car', 120000, { method: 'POST', headers: auth(), body: fd })
+ .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
+ if (!r.ok) throw new Error(r.status === 401 ? 'Session expired. Please log in again.' : r.status === 429 ? 'Daily limit reached (20 per day). Try again tomorrow.' : (d.detail || 'Identification failed.'));
+ showId(d.identification);
+ }); })
+ .catch(function (e) { st.style.color = 'var(--danger)'; st.textContent = e.name === 'AbortError' ? 'The request timed out. Try again.' : (e.message || 'Network error'); })
+ .finally(function () { clearInterval(iv); });
+ }
+ function showId(c) {
+ var h;
+ if (!c || !c.make || !c.model) {
+ h = '<h2>Could not identify the car</h2><p style="color:var(--muted)">Try a clearer photo of the front or side.</p><button type="button" class="submit" data-act="idAgain">Try another photo</button>';
+ } else {
+ h = '<h2 style="margin-bottom:4px">' + esc(c.make) + ' ' + esc(c.model) + '</h2><p style="color:var(--muted);margin-bottom:14px">' + [c.year_range, c.body_type, c.color].filter(Boolean).map(esc).join(', ') + '</p>';
+ if (c.estimated_price_sll_low && c.estimated_price_sll_high) h += '<div style="background:#dcfce7;padding:14px;border-radius:12px;text-align:center;margin-bottom:14px"><small style="color:#166534;font-weight:700">Estimated price</small><div style="font-size:20px;color:#166534;font-weight:800">SLL ' + fmt(Math.round(c.estimated_price_sll_low)) + ' to ' + fmt(Math.round(c.estimated_price_sll_high)) + '</div></div>';
+ if (c.common_parts && c.common_parts.length) h += '<div style="margin-bottom:14px"><small style="color:var(--muted);font-weight:700">Common parts</small><div>' + c.common_parts.map(function (p) { return '<span class="chip">' + esc(p) + '</span>'; }).join('') + '</div></div>';
+ if (c.description) h += '<p style="background:var(--bg);padding:12px;border-radius:8px;font-size:13px;color:#475569;margin-bottom:14px">' + esc(c.description) + '</p>';
+ var d = ' data-make="' + esc(c.make) + '" data-model="' + esc(c.model) + '"';
+ h += '<div class="row2"><button type="button" class="btn teal" data-act="findParts"' + d + '>Find parts</button><button type="button" class="btn ghost" data-act="listCar">List for sale</button></div><button type="button" class="btn ghost" style="width:100%;margin-top:10px" data-act="idAgain">Try another photo</button>';
+ }
+ $('id-res').innerHTML = h; $('id-up').style.display = 'none'; $('id-res').style.display = 'block';
+ }
 
-  function runSafety() {
-    var out = $('safety-out'), btn = $('safety-btn'), vin = ($('safety-vin').value || '').replace(/ /g, '').toUpperCase();
-    if (vin.length !== 17) { out.innerHTML = '<span class="warn">Enter a full 17-character VIN.</span>'; return; }
-    out.textContent = 'Checking...'; btn.disabled = true;
-    fetch('/api/nhtsa/check/' + encodeURIComponent(vin))
-      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
-      .then(function (x) {
-        if (!x.ok) { out.innerHTML = '<span class="warn">' + esc(x.d.detail || x.d.error || 'Could not check this VIN') + '</span>'; return; }
-        var s = (x.d.decode && x.d.decode.summary) || {}, rec = x.d.recalls || {}, n = rec.count || 0;
-        var h = '<div><strong>' + esc([s.year, s.make, s.model].filter(Boolean).join(' ') || 'Vehicle') + '</strong></div>';
-        if (!n) h += '<div class="ok">No open recalls found in the US safety database.</div>';
-        else {
-          h += '<div class="warn">' + n + ' open recall' + (n > 1 ? 's' : '') + '</div><ul>';
-          (rec.recalls || []).slice(0, 5).forEach(function (r) { h += '<li><strong>' + esc(r.component || 'Recall') + '</strong>: ' + esc((r.summary || '').slice(0, 160)) + '</li>'; });
-          h += '</ul>';
-        }
-        out.innerHTML = h + '<div style="margin-top:8px;font-size:12px;color:var(--muted)">Free check via NHTSA. Not a full accident or title history.</div>';
-      })
-      .catch(function () { out.innerHTML = '<span class="warn">Network error. Try again.</span>'; })
-      .finally(function () { btn.disabled = false; });
-  }
+ function runSafety() {
+ var out = $('safety-out'), btn = $('safety-btn'), vin = ($('safety-vin').value || '').replace(/ /g, '').toUpperCase();
+ if (vin.length !== 17) { out.innerHTML = '<span class="warn">Enter a full 17-character VIN.</span>'; return; }
+ out.textContent = 'Checking...'; btn.disabled = true;
+ fetch('/api/nhtsa/check/' + encodeURIComponent(vin))
+ .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+ .then(function (x) {
+ if (!x.ok) { out.innerHTML = '<span class="warn">' + esc(x.d.detail || x.d.error || 'Could not check this VIN') + '</span>'; return; }
+ var s = (x.d.decode && x.d.decode.summary) || {}, rec = x.d.recalls || {}, n = rec.count || 0;
+ var h = '<div><strong>' + esc([s.year, s.make, s.model].filter(Boolean).join(' ') || 'Vehicle') + '</strong></div>';
+ if (!n) h += '<div class="ok">No open recalls found in the US safety database.</div>';
+ else {
+ h += '<div class="warn">' + n + ' open recall' + (n > 1 ? 's' : '') + '</div><ul>';
+ (rec.recalls || []).slice(0, 5).forEach(function (r) { h += '<li><strong>' + esc(r.component || 'Recall') + '</strong>: ' + esc((r.summary || '').slice(0, 160)) + '</li>'; });
+ h += '</ul>';
+ }
+ out.innerHTML = h + '<div style="margin-top:8px;font-size:12px;color:var(--muted)">Free check via NHTSA. Not a full accident or title history.</div>';
+ })
+ .catch(function () { out.innerHTML = '<span class="warn">Network error. Try again.</span>'; })
+ .finally(function () { btn.disabled = false; });
+ }
 
-  var A = {
-    market: function (t) { switchMarket(t.dataset.v); toResults(); },
-    search: function () { doSearch(); toResults(); },
-    cat: function (t) { $('s-cat').value = t.dataset.v; doSearch(); toResults(); },
-    open: function (t) { if (t.dataset.v === 'id-modal') { if (!token()) { toast('Log in to identify a car', 'error'); setTimeout(goLogin, 1000); return; } idReset(); } openM(t.dataset.v); },
-    close: function (t) { closeM(t.closest('.overlay').id); },
-    list: function (t) { openListing(t.dataset.v); },
-    share: share, save: save, saveFit: saveFit, clearFit: clearFit,
-    sug: function (t) { if (t.dataset.url) location.href = t.dataset.url; },
-    showall: function () { $('f-filter').checked = false; ls.del('fitmentFilterOn'); renderParts(); },
-    idAgain: idReset,
-    findParts: function (t) { closeM('id-modal'); $('s-q').value = t.dataset.make + ' ' + t.dataset.model; switchMarket('parts'); toResults(); },
-    listCar: function () { closeM('id-modal'); openListing('vehicle'); }
-  };
-  document.addEventListener('click', function (e) {
-    var t = e.target.closest('[data-act]');
-    if (t && A[t.dataset.act]) { e.preventDefault(); e.stopPropagation(); A[t.dataset.act](t, e); return; }
-    if (e.target.classList.contains('overlay')) { closeM(e.target.id); return; }
-    var c = e.target.closest('.card[data-href]');
-    if (c) { location.href = c.dataset.href; return; }
-    if (!e.target.closest('.trow')) hideSug();
-  });
+ var A = {
+ market: function (t) { switchMarket(t.dataset.v); toResults(); },
+ search: function () { doSearch(); toResults(); },
+ cat: function (t) { $('s-cat').value = t.dataset.v; doSearch(); toResults(); },
+ open: function (t) { if (t.dataset.v === 'id-modal') { if (!Auth.getToken()) { toast('Log in to identify a car', 'error'); setTimeout(goLogin, 1000); return; } idReset(); } openM(t.dataset.v); },
+ close: function (t) { closeM(t.closest('.overlay').id); },
+ list: function (t) { openListing(t.dataset.v); },
+ share: share, save: save, saveFit: saveFit, clearFit: clearFit,
+ sug: function (t) { if (t.dataset.url) location.href = t.dataset.url; },
+ showall: function () { $('f-filter').checked = false; ls.del('fitmentFilterOn'); renderParts(); },
+ idAgain: idReset,
+ findParts: function (t) { closeM('id-modal'); $('s-q').value = t.dataset.make + ' ' + t.dataset.model; switchMarket('parts'); toResults(); },
+ listCar: function () { closeM('id-modal'); openListing('vehicle'); }
+ };
+ document.addEventListener('click', function (e) {
+ var t = e.target.closest('[data-act]');
+ if (t && A[t.dataset.act]) { e.preventDefault(); e.stopPropagation(); A[t.dataset.act](t, e); return; }
+ if (e.target.classList.contains('overlay')) { closeM(e.target.id); return; }
+ var c = e.target.closest('.card[data-href]');
+ if (c) { location.href = c.dataset.href; return; }
+ if (!e.target.closest('.trow')) hideSug();
+ });
 
-  function init() {
-    $('s-make').innerHTML = opts(MAKES, 'Any make'); $('s-model').innerHTML = opts([], 'Any model'); $('s-year').innerHTML = opts(YEARS, 'Any year');
-    $('s-loc').innerHTML = opts(CITIES.slice(0, 5), 'All locations'); $('imp-city').innerHTML = opts(CITIES.slice(0, 5).concat('Other'), 'Select city');
-    $('f-make').innerHTML = opts(MAKES, 'Make'); $('f-model').innerHTML = opts([], 'Model'); $('f-year').innerHTML = opts(YEARS, 'Year');
-    var saved = json('fitmentVehicle');
-    if (saved && saved.make) { setFitSelects(saved); showVehicle(saved); }
-    $('f-filter').checked = ls.get('fitmentFilterOn') === '1';
+ function init() {
+ $('s-make').innerHTML = opts(MAKES, 'Any make'); $('s-model').innerHTML = opts([], 'Any model'); $('s-year').innerHTML = opts(YEARS, 'Any year');
+ $('s-loc').innerHTML = opts(CITIES.slice(0, 5), 'All locations'); $('imp-city').innerHTML = opts(CITIES.slice(0, 5).concat('Other'), 'Select city');
+ $('f-make').innerHTML = opts(MAKES, 'Make'); $('f-model').innerHTML = opts([], 'Model'); $('f-year').innerHTML = opts(YEARS, 'Year');
+ var saved = json('fitmentVehicle');
+ if (saved && saved.make) { setFitSelects(saved); showVehicle(saved); }
+ $('f-filter').checked = ls.get('fitmentFilterOn') === '1';
 
-    $('f-make').addEventListener('change', function () { fillModels($('f-model'), this.value, 'Model'); });
-    $('s-make').addEventListener('change', function () { fillModels($('s-model'), this.value, 'Any model'); doSearch(); });
-    ['s-cat', 's-model', 's-year', 's-loc'].forEach(function (id) { $(id).addEventListener('change', doSearch); });
-    $('sort').addEventListener('change', function () { if (tab === 'parts') { if (lastParts) renderParts(); } else renderVehicles(); });
-    $('f-filter').addEventListener('change', function () { if (this.checked) ls.set('fitmentFilterOn', '1'); else ls.del('fitmentFilterOn'); if (lastParts) renderParts(); });
-    $('s-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') { hideSug(); doSearch(); } });
-    $('s-q').addEventListener('input', function () {
-      var q = this.value.trim(); clearTimeout(sugTimer);
-      if (q.length < 2) { hideSug(); return; }
-      sugTimer = setTimeout(function () { getSug(q); }, 250);
-    });
-    $('list-form').addEventListener('change', function (e) {
-      if (e.target.name === 'make' && $('list-form').dataset.type === 'vehicle') fillModels(e.target.form.elements.model, e.target.value, 'Select model');
-    });
-    $('list-form').addEventListener('submit', function (e) {
-      e.preventDefault(); var type = this.dataset.type;
-      post(this, type === 'vehicle' ? '/api/vehicles/' : '/api/parts/', 'list-stat', auth(), {
-        ok: 'Listing published.', after: function () { closeM('list-modal'); doSearch(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
-        extra: function (p) { var u = json('userInfo'); if (u && u.id) { if (type === 'vehicle') p.seller_id = u.id; else p.vendor_id = u.id; } }
-      });
-    });
-    $('import-form').addEventListener('submit', function (e) {
-      e.preventDefault(); var f = this;
-      post(f, '/api/import-requests/', 'import-stat', {}, { ok: "Request received. We'll contact you on WhatsApp within 24 hours.", after: function () { closeM('import-modal'); f.reset(); $('import-stat').textContent = ''; } });
-    });
-    $('id-file').addEventListener('change', function () { if (this.files && this.files[0]) identify(this.files[0]); });
-    $('safety-btn').addEventListener('click', runSafety);
-    $('safety-vin').addEventListener('keydown', function (e) { if (e.key === 'Enter') runSafety(); });
+ $('f-make').addEventListener('change', function () { fillModels($('f-model'), this.value, 'Model'); });
+ $('s-make').addEventListener('change', function () { fillModels($('s-model'), this.value, 'Any model'); doSearch(); });
+ ['s-cat', 's-model', 's-year', 's-loc'].forEach(function (id) { $(id).addEventListener('change', doSearch); });
+ $('sort').addEventListener('change', function () { if (tab === 'parts') { if (lastParts) renderParts(); } else renderVehicles(); });
+ $('f-filter').addEventListener('change', function () { if (this.checked) ls.set('fitmentFilterOn', '1'); else ls.del('fitmentFilterOn'); if (lastParts) renderParts(); });
+ $('s-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') { hideSug(); doSearch(); } });
+ $('s-q').addEventListener('input', function () {
+ var q = this.value.trim(); clearTimeout(sugTimer);
+ if (q.length < 2) { hideSug(); return; }
+ sugTimer = setTimeout(function () { getSug(q); }, 250);
+ });
+ $('list-form').addEventListener('change', function (e) {
+ if (e.target.name === 'make' && $('list-form').dataset.type === 'vehicle') fillModels(e.target.form.elements.model, e.target.value, 'Select model');
+ });
+ $('list-form').addEventListener('submit', function (e) {
+ e.preventDefault(); var type = this.dataset.type;
+ post(this, type === 'vehicle' ? '/api/vehicles/' : '/api/parts/', 'list-stat', auth(), {
+ ok: 'Listing published.', after: function () { closeM('list-modal'); doSearch(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
+ extra: function (p) { var u = json('userInfo'); if (u && u.id) { if (type === 'vehicle') p.seller_id = u.id; else p.vendor_id = u.id; } }
+ });
+ });
+ $('import-form').addEventListener('submit', function (e) {
+ e.preventDefault(); var f = this;
+ post(f, '/api/import-requests/', 'import-stat', {}, { ok: "Request received. We'll contact you on WhatsApp within 24 hours.", after: function () { closeM('import-modal'); f.reset(); $('import-stat').textContent = ''; } });
+ });
+ $('id-file').addEventListener('change', function () { if (this.files && this.files[0]) identify(this.files[0]); });
+ $('safety-btn').addEventListener('click', runSafety);
+ $('safety-vin').addEventListener('keydown', function (e) { if (e.key === 'Enter') runSafety(); });
 
-    if (token()) { var l = $('signin'); l.textContent = 'My dashboard'; l.href = '/my-account'; }
-    switchMarket('parts');
-    syncGarage();
-    var act = new URLSearchParams(location.search).get('action');
-    if (act === 'list-car') openListing('vehicle'); else if (act === 'list-part') openListing('parts');
-  }
-  init();
+ if (Auth.getToken()) { var l = $('signin'); l.textContent = 'My dashboard'; l.href = '/my-account'; }
+ switchMarket('parts');
+ syncGarage();
+ var act = new URLSearchParams(location.search).get('action');
+ if (act === 'list-car') openListing('vehicle'); else if (act === 'list-part') openListing('parts');
+ }
+ init();
 })();
 </script>
+<script src="/static/auth.js"></script>
 </body>
 </html>
