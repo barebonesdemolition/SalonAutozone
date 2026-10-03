@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Logo Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+body { margin:0; font-family: Inter, system-ui, sans-serif; background:#f8fafc; color:#0f172a; }
+.top { display:flex; justify-content:space-between; align-items:center; padding:12px clamp(16px,5vw,56px); background:#fff; border-bottom:1px solid #e2e8f0; }
+.brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:#0f172a; font-weight:800; font-size:17px; }
+.brand img { height:44px; width:44px; border-radius:50%; display:block; }
+.brand em { font-style:normal; }
+.brand em span { color:#0f766e; }
+.nav { display:flex; gap:24px; font-size:14px; font-weight:600; }
+.nav a { color:#475569; text-decoration:none; }
+.nav a:hover { color:#0f766e; }
+.sub { padding:30px; max-width:820px; margin: 0 auto; }
+.sub h1 { font-size: 22px; }
+.sub h2 { font-size: 15px; color:#64748b; margin-top: 30px; }
+.demo { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding: 20px; margin: 16px 0; }
+.demo.dark { background:#0f172a; border-color:#0f172a; }
+.demo.dark .brand { color:#fff; }
+.demo.dark .brand em span { color:#5eead4; }
+</style>
+</head><body>
+
+<!-- Normal header -->
+<header class="top">
+  <a class="brand" href="/">
+    <img src="/static/logo.png" alt="SalonAutoZone logo">
+    <em>Salon<span>AutoZone</span></em>
+  </a>
+  <nav class="nav">
+    <a href="/cars">Cars</a>
+    <a href="/parts">Parts</a>
+    <a href="/businesses">Businesses</a>
+  </nav>
+</header>
+
+<div class="sub">
+  <h1>Logo Preview — Option 1</h1>
+  <p>Above: light header (default). Below: how it looks in dark mode and mobile size.</p>
+
+  <h2>Dark mode header</h2>
+  <div class="demo dark">
+    <a class="brand" href="/">
+      <img src="/static/logo.png" alt="SalonAutoZone logo">
+      <em>Salon<span>AutoZone</span></em>
+    </a>
+  </div>
+
+  <h2>Mobile size (simulated narrow)</h2>
+  <div class="demo" style="max-width:380px;">
+    <a class="brand" href="/" style="font-size:15px;">
+      <img src="/static/logo.png" alt="SalonAutoZone logo" style="height:36px;width:36px;">
+      <em>Salon<span>AutoZone</span></em>
+    </a>
+  </div>
+
+  <h2>Notes</h2>
+  <ul>
+    <li>If the image is broken, <code>app/static/logo.png</code> isn't there yet.</li>
+    <li>The circular badge renders as a small icon.</li>
+    <li>The wordmark &quot;SalonAutoZone&quot; sits next to it in your brand font.</li>
+  </ul>
+</div>
+
+</body></html>
