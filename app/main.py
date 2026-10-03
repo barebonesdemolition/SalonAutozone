@@ -514,3 +514,14 @@ async def _debug_uploads():
             result["files"].append(f)
     return result
     return FileResponse("app/templates/_preview.html")
+
+@app.get("/_model_cols")
+async def _model_cols():
+    from app import models
+    from sqlalchemy import text, inspect
+    from app.db import engine
+    model_cols = sorted([c.name for c in models.VehicleListing.__table__.columns])
+    async with engine.begin() as conn:
+        result = await conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = 'vehicle_listings'"))
+        db_cols = sorted([row[0] for row in result])
+    return {"model_has": model_cols, "db_has": db_cols, "missing_in_db": [c for c in model_cols if c not in db_cols], "extra_in_db": [c for c in db_cols if c not in model_cols]}
