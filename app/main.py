@@ -471,3 +471,18 @@ async def _migrate_businesses():
             except Exception as e:
                 results.append({"sql": stmt[:80], "ok": False, "error": str(e)[:200]})
     return {"results": results}
+
+@app.get("/_migrate_vehicles_v2")
+async def _migrate_vehicles_v2():
+    from sqlalchemy import text
+    from app.db import engine
+    statements = ['ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS condition VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS availability VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS title VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS make VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS model VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS year INTEGER', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS price_sll FLOAT', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS price_usd FLOAT', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS location VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS image_url VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS contact_phone VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS mileage_km FLOAT', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS description TEXT', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS country_of_origin VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS vin VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS duty_paid BOOLEAN', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS arrival_date TIMESTAMP', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS supplier_url VARCHAR', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS is_sold BOOLEAN DEFAULT FALSE', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS featured_until TIMESTAMP', 'ALTER TABLE vehicle_listings ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0']
+    results = []
+    async with engine.begin() as conn:
+        for stmt in statements:
+            try:
+                await conn.execute(text(stmt))
+                results.append({"col": stmt.split()[5], "ok": True})
+            except Exception as e:
+                results.append({"col": stmt.split()[5], "ok": False, "error": str(e)[:150]})
+    return {"results": results}
