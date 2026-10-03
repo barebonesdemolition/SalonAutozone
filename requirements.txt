@@ -18,3 +18,4 @@ httpx
 Pillow
 pydantic-settings>=2.0.0
 boto3
+cloudinary

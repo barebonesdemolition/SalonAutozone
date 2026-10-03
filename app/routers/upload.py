@@ -22,6 +22,24 @@ UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 # Allowed types and max size (5 MB)
+
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME', ''),
+    api_key=os.getenv('CLOUDINARY_API_KEY', ''),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET', ''),
+    secure=True,
+)
+
+def _cloudinary_configured():
+    return bool(os.getenv('CLOUDINARY_CLOUD_NAME') and os.getenv('CLOUDINARY_API_KEY') and os.getenv('CLOUDINARY_API_SECRET'))
+
+def save_to_cloudinary(file_bytes, folder='saloncarparts'):
+    result = cloudinary.uploader.upload(file_bytes, folder=folder, resource_type='image')
+    return result.get('secure_url', '')
+
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_SIZE_BYTES = 5 * 1024 * 1024
 MAX_DIMENSION = 1200  # px
@@ -59,7 +77,15 @@ def _save_and_resize(file: UploadFile) -> str:
         print('UPLOAD PIL ERROR:', traceback.format_exc()[:600])
         raise HTTPException(status_code=400, detail="PIL failed: " + type(_e).__name__ + ": " + str(_e)[:200])
 
-    # Try R2 first, fall back to local disk
+    # Try Cloudinary first, fall back to R2, then disk
+    if _cloudinary_configured():
+        try:
+            url = save_to_cloudinary(resized_bytes)
+            if url:
+                return url
+        except Exception as e:
+            print(f"Cloudinary upload failed, falling back: {e}")
+
     if R2_CONFIGURED:
         try:
             return save_to_r2(resized_bytes, ext, "image/jpeg")
