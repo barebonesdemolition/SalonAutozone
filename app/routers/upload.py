@@ -13,6 +13,7 @@ from app.db import get_db
 from app.auth import get_current_user
 from app import models
 from app.r2_storage import save_to_r2, R2_CONFIGURED
+from io import BytesIO
 
 router = APIRouter(prefix="/api/upload", tags=["Upload"])
 
