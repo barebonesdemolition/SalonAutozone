@@ -486,3 +486,15 @@ async def _migrate_vehicles_v2():
             except Exception as e:
                 results.append({"col": stmt.split()[5], "ok": False, "error": str(e)[:150]})
     return {"results": results}
+
+@app.get("/_list_vehicles")
+async def _list_vehicles():
+    from sqlalchemy import text
+    from app.db import engine
+    async with engine.begin() as conn:
+        r = await conn.execute(text("SELECT id, title, make, model, year, price_sll, image_url, created_at FROM vehicle_listings ORDER BY id DESC LIMIT 10"))
+        rows = [dict(row._mapping) for row in r]
+        for row in rows:
+            if row.get("created_at"):
+                row["created_at"] = str(row["created_at"])
+    return {"count": len(rows), "vehicles": rows}
