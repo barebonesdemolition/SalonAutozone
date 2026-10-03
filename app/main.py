@@ -439,3 +439,35 @@ from app.routers import authme
 
 app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
 
+@app.get("/_migrate_businesses")
+async def _migrate_businesses():
+    from sqlalchemy import text
+    from app.db import engine
+    statements = [
+        """CREATE TABLE IF NOT EXISTS businesses (
+            id SERIAL PRIMARY KEY,
+            owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            name VARCHAR NOT NULL,
+            slug VARCHAR,
+            business_type VARCHAR,
+            status VARCHAR DEFAULT 'pending',
+            city VARCHAR,
+            country VARCHAR,
+            whatsapp VARCHAR,
+            email VARCHAR,
+            description TEXT,
+            logo_url VARCHAR,
+            subscription_tier VARCHAR,
+            created_at TIMESTAMP DEFAULT NOW()
+        )""",
+        "CREATE INDEX IF NOT EXISTS ix_businesses_owner ON businesses(owner_id)",
+    ]
+    results = []
+    async with engine.begin() as conn:
+        for stmt in statements:
+            try:
+                await conn.execute(text(stmt))
+                results.append({"sql": stmt[:80], "ok": True})
+            except Exception as e:
+                results.append({"sql": stmt[:80], "ok": False, "error": str(e)[:200]})
+    return {"results": results}
