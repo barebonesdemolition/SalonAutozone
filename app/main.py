@@ -525,3 +525,17 @@ async def _model_cols():
         result = await conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = 'vehicle_listings'"))
         db_cols = sorted([row[0] for row in result])
     return {"model_has": model_cols, "db_has": db_cols, "missing_in_db": [c for c in model_cols if c not in db_cols], "extra_in_db": [c for c in db_cols if c not in model_cols]}
+
+@app.get("/_vehicle_list_debug")
+async def _vehicle_list_debug():
+    from app import models
+    from sqlalchemy import select
+    from app.db import AsyncSessionLocal
+    import traceback
+    try:
+        async with AsyncSessionLocal() as db:
+            r = await db.execute(select(models.VehicleListing).limit(2))
+            rows = r.scalars().all()
+            return {"ok": True, "count": len(rows), "first_id": rows[0].id if rows else None}
+    except Exception as e:
+        return {"ok": False, "error_type": type(e).__name__, "error_msg": str(e)[:400], "traceback": traceback.format_exc()[:1500]}
