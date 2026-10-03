@@ -539,3 +539,20 @@ async def _vehicle_list_debug():
             return {"ok": True, "count": len(rows), "first_id": rows[0].id if rows else None}
     except Exception as e:
         return {"ok": False, "error_type": type(e).__name__, "error_msg": str(e)[:400], "traceback": traceback.format_exc()[:1500]}
+
+@app.get("/_schema_test")
+async def _schema_test():
+    from app import models
+    from app import schemas
+    from sqlalchemy import select
+    from app.db import AsyncSessionLocal
+    errors = []
+    async with AsyncSessionLocal() as db:
+        r = await db.execute(select(models.VehicleListing).limit(20))
+        rows = r.scalars().all()
+        for row in rows:
+            try:
+                schemas.VehicleResponse.model_validate(row, from_attributes=True)
+            except Exception as e:
+                errors.append({"id": row.id, "error": str(e)[:600]})
+    return {"total_rows": len(rows), "failed": len(errors), "errors": errors[:5]}
