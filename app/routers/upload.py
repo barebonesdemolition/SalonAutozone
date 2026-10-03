@@ -54,8 +54,10 @@ def _save_and_resize(file: UploadFile) -> str:
             buf = BytesIO()
             img.save(buf, format="JPEG", quality=82, optimize=True)
             resized_bytes = buf.getvalue()
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid image file")
+    except Exception as _e:
+        import traceback
+        print('UPLOAD PIL ERROR:', traceback.format_exc()[:600])
+        raise HTTPException(status_code=400, detail="PIL failed: " + type(_e).__name__ + ": " + str(_e)[:200])
 
     # Try R2 first, fall back to local disk
     if R2_CONFIGURED:
