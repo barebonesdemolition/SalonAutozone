@@ -513,7 +513,4 @@ async def _debug_uploads():
         for f in os.listdir(base):
             result["files"].append(f)
     return result
-
-@app.get("/_preview")
-async def _preview():
     return FileResponse("app/templates/_preview.html")

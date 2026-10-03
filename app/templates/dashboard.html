@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ app_name }} - Dashboard</title>
@@ -30,12 +31,20 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; }
 .delete-btn { background: #fef2f2; color: #dc2626; }
 .empty { text-align: center; padding: 40px; color: #888; }
 .boot { position: fixed; inset: 0; background: #f4f6f8; display: flex; align-items: center; justify-content: center; color: #666; font-weight: 600; z-index: 99; }
+/* salon-logo-css */
+.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
+.brand em { font-style: normal; }
+.brand em span { color: #0f766e; }
+@media (max-width: 640px) {
+  .brand img.logo-img { height: 42px; width: 42px; }
+  .brand { font-size: 17px; }
+}
 </style>
 </head>
 <body>
 <div class="boot" id="boot">Loading dashboard…</div>
 <div class="navbar">
-<a href="/" class="logo">Salon<span>AutoZone</span></a>
+<a href="/" class="logo"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a>
 <div class="nav-links">
 <a href="/">🏠 Home</a>
 <a href="/vin-tool">🔍 VIN Lookup</a>

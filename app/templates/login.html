@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sign in – {{ app_name or 'SalonAutoZone' }}</title>
@@ -31,6 +32,14 @@ button{border:0;cursor:pointer}
 .msg{margin-top:12px;text-align:center;font-size:14px;font-weight:600}
 .msg.err{color:var(--danger)}.msg.ok{color:var(--primary)}
 .foot{text-align:center;margin-top:18px;font-size:13px;color:var(--muted)}
+/* salon-logo-css */
+.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
+.brand em { font-style: normal; }
+.brand em span { color: #0f766e; }
+@media (max-width: 640px) {
+  .brand img.logo-img { height: 42px; width: 42px; }
+  .brand { font-size: 17px; }
+}
 </style>
 </head>
 <body>

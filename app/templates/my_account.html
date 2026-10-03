@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My Account – {{ app_name or 'SalonAutoZone' }}</title>
@@ -74,6 +75,14 @@ button{cursor:pointer;border:0;background:none}
  .bnav{display:block}
  body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 }
+/* salon-logo-css */
+.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
+.brand em { font-style: normal; }
+.brand em span { color: #0f766e; }
+@media (max-width: 640px) {
+  .brand img.logo-img { height: 42px; width: 42px; }
+  .brand { font-size: 17px; }
+}
 </style>
 </head>
 <body>
@@ -84,7 +93,7 @@ button{cursor:pointer;border:0;background:none}
  <a href="tel:+23276123456">+232 76 123456</a>
 </div>
 <header class="brand">
- <a class="logo" href="/">Salon<span>AutoZone</span></a>
+ <a class="logo" href="/"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a>
  <nav class="nav">
  <a href="/">Home</a>
  <a href="/vin-tool">VIN Lookup</a>

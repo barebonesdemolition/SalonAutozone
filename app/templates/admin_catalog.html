@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Supplier Catalog Admin - {{ app_name }}</title>
@@ -48,11 +49,19 @@ h1{color:#0b1e3a;margin-bottom:8px}
 .category-row:last-child{border-bottom:none}
 .category-name{font-weight:600;color:#0b1e3a}
 .category-count{background:#e0f2fe;color:#0369a1;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700}
+/* salon-logo-css */
+.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
+.brand em { font-style: normal; }
+.brand em span { color: #0f766e; }
+@media (max-width: 640px) {
+  .brand img.logo-img { height: 42px; width: 42px; }
+  .brand { font-size: 17px; }
+}
 </style>
 </head>
 <body>
 <div class="navbar">
-<a href="/" class="logo">Salon<span>AutoZone</span></a>
+<a href="/" class="logo"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a>
 <div>
 <a href="/">Home</a>
 <a href="/vin-tool">VIN Lookup</a>

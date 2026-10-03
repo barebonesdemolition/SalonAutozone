@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <title>{{ app_name }} - Import Quote</title>
 <style>
@@ -25,11 +26,19 @@ h1{color:#0b1e3a;font-size:26px;margin-bottom:12px}
 .btn-primary{background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;border:none;padding:16px 30px;border-radius:10px;font-weight:bold;font-size:16px;cursor:pointer;width:100%;margin-top:20px;box-shadow:0 6px 20px rgba(255,107,0,0.35)}
 .btn-whatsapp{background:#25D366;margin-top:10px;box-shadow:0 6px 20px rgba(37,211,102,0.35)}
 .back-link{color:#00a8e8;text-decoration:none;font-weight:bold;margin-bottom:20px;display:inline-block}
+/* salon-logo-css */
+.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
+.brand em { font-style: normal; }
+.brand em span { color: #0f766e; }
+@media (max-width: 640px) {
+  .brand img.logo-img { height: 42px; width: 42px; }
+  .brand { font-size: 17px; }
+}
 </style>
 </head>
 <body>
 <div class="navbar">
-<a href="/" class="logo">Salon<span>AutoZone</span></a>
+<a href="/" class="logo"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a>
 <div>
 <a href="/">Home</a>
 <a href="/vin-tool">VIN Lookup</a>

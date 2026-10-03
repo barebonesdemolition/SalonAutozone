@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Business · SalonAutoZone</title>
@@ -41,10 +42,18 @@ a.btn.public-link{display:inline-flex;justify-content:center;align-items:center;
 .meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
 .note{background:#f0fdfa;border:1px solid #99f6e4;color:var(--t2);padding:12px 14px;border-radius:10px;font-size:14px;margin-top:16px}
 @media (max-width:560px){.row,.types{grid-template-columns:1fr}}
+/* salon-logo-css */
+.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
+.brand em { font-style: normal; }
+.brand em span { color: #0f766e; }
+@media (max-width: 640px) {
+  .brand img.logo-img { height: 42px; width: 42px; }
+  .brand { font-size: 17px; }
+}
 </style>
 </head>
 <body>
-<header><a class="logo" href="/">Salon<span>AutoZone</span></a><div><a class="back" href="/vin-tool">VIN Lookup</a> <a class="back" href="/">Back to marketplace</a></div></header>
+<header><a class="logo" href="/"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a><div><a class="back" href="/vin-tool">VIN Lookup</a> <a class="back" href="/">Back to marketplace</a></div></header>
 <main><div class="card" id="root"><p>Loading...</p></div></main>
 
 <script>
