@@ -730,3 +730,21 @@ async def _migrate_everything():
     ok = sum(1 for r in results if r.get("ok"))
     fail = sum(1 for r in results if r.get("ok") is False)
     return {"total": len(results), "ok": ok, "failed": fail, "details": results}
+
+@app.get("/_create_missing_tables")
+async def _create_missing_tables():
+    from app.db import Base, engine
+    from sqlalchemy import text, inspect
+    import traceback
+    results = []
+    async with engine.begin() as conn:
+        existing = await conn.run_sync(lambda sync_conn: inspect(sync_conn).get_table_names())
+        for tname, table in Base.metadata.tables.items():
+            if tname in existing:
+                continue
+            try:
+                await conn.run_sync(lambda sync_conn: table.create(sync_conn, checkfirst=True))
+                results.append({"table": tname, "created": True})
+            except Exception as e:
+                results.append({"table": tname, "created": False, "err": str(e)[:200]})
+    return {"results": results}
