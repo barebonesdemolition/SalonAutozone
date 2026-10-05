@@ -614,3 +614,19 @@ async def _list_tables():
         r = await conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename"))
         tables = [row[0] for row in r]
     return {"tables": tables, "count": len(tables)}
+
+@app.get("/_test_4_endpoints")
+async def _test_4_endpoints():
+    from app import models
+    from sqlalchemy import select
+    from app.db import AsyncSessionLocal
+    import traceback
+    results = {}
+    async with AsyncSessionLocal() as db:
+        for name, model in [("PartListing", models.PartListing), ("Inquiry", models.Inquiry), ("ImportRequest", models.ImportRequest)]:
+            try:
+                r = await db.execute(select(model).limit(1))
+                results[name] = {"ok": True, "count": len(r.scalars().all())}
+            except Exception as e:
+                results[name] = {"ok": False, "err": str(e)[:300], "tb": traceback.format_exc()[-600:]}
+    return results
