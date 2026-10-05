@@ -14,6 +14,18 @@ from app.db import get_db
 
 router = APIRouter(prefix="/api/my-account", tags=["My Account"])
 
+
+@router.get("/me")
+async def get_my_profile(current_user: models.User = Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "full_name": current_user.full_name,
+        "email": current_user.email,
+        "phone": current_user.phone,
+        "is_vendor": getattr(current_user, "is_vendor", False),
+        "roles": getattr(current_user, "roles", None),
+    }
+
 V = models.VehicleListing
 P = models.PartListing
 I = models.Inquiry
