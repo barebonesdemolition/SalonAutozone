@@ -663,3 +663,22 @@ async def _debug_4():
         except Exception as e:
             out[name] = {"ok": False, "err": str(e)[:400]}
     return out
+
+@app.get("/_fix_three")
+async def _fix_three():
+    from sqlalchemy import text
+    from app.db import engine
+    statements = [
+        "ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS price_usd FLOAT",
+        "ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS from_user_id INTEGER",
+        "ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS user_id INTEGER",
+    ]
+    results = []
+    async with engine.begin() as conn:
+        for stmt in statements:
+            try:
+                await conn.execute(text(stmt))
+                results.append({"ok": True, "sql": stmt[:60]})
+            except Exception as e:
+                results.append({"ok": False, "err": str(e)[:200]})
+    return {"results": results}
