@@ -577,3 +577,31 @@ async def _garage_schema_test():
             return {"total": len(rows), "results": out}
     except Exception as outer:
         return {"fatal": type(outer).__name__, "msg": str(outer)[:400], "tb": traceback.format_exc()[:1500]}
+
+@app.get("/_create_garage_table")
+async def _create_garage_table():
+    from sqlalchemy import text
+    from app.db import engine
+    results = []
+    statements = [
+        """CREATE TABLE IF NOT EXISTS garage (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            make VARCHAR,
+            model VARCHAR,
+            year INTEGER,
+            vin VARCHAR(17),
+            nickname VARCHAR,
+            is_primary BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT NOW()
+        )""",
+        "CREATE INDEX IF NOT EXISTS ix_garage_user_id ON garage(user_id)",
+    ]
+    async with engine.begin() as conn:
+        for stmt in statements:
+            try:
+                await conn.execute(text(stmt))
+                results.append({"ok": True})
+            except Exception as e:
+                results.append({"ok": False, "err": str(e)[:200]})
+    return {"results": results}
