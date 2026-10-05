@@ -34,11 +34,11 @@ class VehicleResponse(BaseModel):
     description: Optional[str] = None
     
     # Dealership / Import Fields
-    condition: str
-    availability: str
+    condition: Optional[str] = "used"
+    availability: Optional[str] = "in_stock"
     country_of_origin: Optional[str] = None
     vin: Optional[str] = None
-    duty_paid: bool
+    duty_paid: Optional[bool] = False
     arrival_date: Optional[datetime] = None
     supplier_url: Optional[str] = None
     
@@ -84,7 +84,7 @@ class PartResponse(BaseModel):
     contact_phone: str | None = None
     image_url: str | None = None
     stock_quantity: int = 1
-    condition: str
+    condition: Optional[str] = "used"
     description: str | None = None
     is_featured: Optional[bool] = False
     featured_until: datetime | None = None
