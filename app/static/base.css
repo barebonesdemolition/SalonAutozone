@@ -1,0 +1,13 @@
+/* Shared header/logo rules. Loaded last in <head>, so it overrides per-page patches. */
+a.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+img.logo-img {
+  width: 52px !important; height: 52px !important;
+  max-width: 52px !important; max-height: 52px !important;
+  border-radius: 50%; object-fit: cover; display: block; flex: none;
+}
+.logo em, .brand em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
+.logo em span, .brand em span { color: #0f766e; }
+@media (max-width: 640px) {
+  img.logo-img { width: 42px !important; height: 42px !important; max-width: 42px !important; max-height: 42px !important; }
+  .logo em, .brand em { font-size: 20px; }
+}
