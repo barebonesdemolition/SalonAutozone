@@ -819,3 +819,17 @@ async def _debug_parts_endpoint():
             return {"ok": True, "count": len(rows)}
     except Exception as e:
         return {"ok": False, "err": str(e)[:500], "tb": traceback.format_exc()[-1500:]}
+
+@app.get("/_debug_supplier")
+async def _debug_supplier():
+    from app import models
+    from sqlalchemy import select
+    from app.db import AsyncSessionLocal
+    import traceback
+    try:
+        async with AsyncSessionLocal() as db:
+            q = select(models.SupplierCatalog).limit(6)
+            rows = (await db.execute(q)).scalars().all()
+            return {"ok": True, "count": len(rows)}
+    except Exception as e:
+        return {"ok": False, "err": str(e)[:500], "tb": traceback.format_exc()[-1200:]}
