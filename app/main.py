@@ -805,3 +805,17 @@ async def _part_cols():
     async with engine.begin() as conn:
         r = await conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = 'part_listings' ORDER BY column_name"))
         return {"columns": [row[0] for row in r]}
+
+@app.get("/_debug_parts_endpoint")
+async def _debug_parts_endpoint():
+    from app import models
+    from sqlalchemy import select
+    from app.db import AsyncSessionLocal
+    import traceback
+    try:
+        async with AsyncSessionLocal() as db:
+            q = select(models.PartListing).order_by(models.PartListing.created_at.desc()).limit(6)
+            rows = (await db.execute(q)).scalars().all()
+            return {"ok": True, "count": len(rows)}
+    except Exception as e:
+        return {"ok": False, "err": str(e)[:500], "tb": traceback.format_exc()[-1500:]}
