@@ -783,3 +783,17 @@ async def _fix_two_more():
         except Exception as e:
             results.append({"ok": False, "err": str(e)[:200]})
     return {"results": results}
+
+@app.get("/_debug_parts")
+async def _debug_parts():
+    from app import models
+    from sqlalchemy import select
+    from app.db import AsyncSessionLocal
+    import traceback
+    try:
+        async with AsyncSessionLocal() as db:
+            r = await db.execute(select(models.PartListing).limit(3))
+            rows = r.scalars().all()
+            return {"ok": True, "count": len(rows)}
+    except Exception as e:
+        return {"ok": False, "err": str(e)[:500], "tb": traceback.format_exc()[-1200:]}
