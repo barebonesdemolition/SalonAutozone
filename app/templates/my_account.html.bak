@@ -227,32 +227,21 @@ button{cursor:pointer;border:0;background:none}
  return ROLE_ALIASES[k] || '';
  }
  function jwtRole() {
-  try {
-    var p = Auth.getToken().split('.')[1];
-    var j = JSON.parse(atob(p.replace(/-/g, '+').replace(/_/g, '/')));
-    if (j.is_admin || j.is_superuser) return 'admin';
-    var r = j.role || j.user_type ||
-            (Array.isArray(j.roles) ? j.roles[0] : j.roles);
-    var n = normRole(r);
-    if (!n && j.is_vendor) n = 'seller';
-    return n;
-  } catch (e) { return ''; }
-}
-
-  function cachedUser() {
+ try {
+ var p = Auth.getToken().split('.')[1];
+ var j = JSON.parse(atob(p.replace(/-/g, '+').replace(/_/g, '/')));
+ return normRole(j.role || (j.roles && j.roles[0]) || j.user_type || (j.is_admin ? 'admin' : ''));
+ } catch (e) { return ''; }
+ }
+ function cachedUser() {
  try { return JSON.parse(localStorage.getItem('userInfo') || 'null') || {}; } catch (e) { return {}; }
  }
  function roleOf(u) {
-  u = u || {};
-  if (u.is_admin || u.is_superuser) return 'admin';
-  var r = u.role || u.user_type || u.account_type ||
-          (Array.isArray(u.roles) ? u.roles[0] : u.roles);
-  var n = normRole(r);
-  if (!n && u.is_vendor) n = 'seller';
-  return n;
-}
-
-  function dashFor(role) { return DASHBOARDS[role] || DASHBOARDS.buyer; }
+ u = u || {};
+ if (u.is_admin || u.is_superuser) return 'admin';
+ return normRole(u.role || u.user_type || u.account_type);
+ }
+ function dashFor(role) { return DASHBOARDS[role] || DASHBOARDS.buyer; }
 
  /* Redirect to the role dashboard unless this page IS that dashboard
  or the user explicitly came here with ?stay=1 (e.g. from the Dashboard
