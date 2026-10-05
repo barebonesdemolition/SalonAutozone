@@ -682,3 +682,22 @@ async def _fix_three():
             except Exception as e:
                 results.append({"ok": False, "err": str(e)[:200]})
     return {"results": results}
+
+@app.get("/_all_missing")
+async def _all_missing():
+    from app import models
+    from app.db import Base, engine
+    from sqlalchemy import text
+    out = {}
+    async with engine.begin() as conn:
+        for tname, table in Base.metadata.tables.items():
+            try:
+                r = await conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = :t"), {"t": tname})
+                db_cols = set(row[0] for row in r)
+                model_cols = set(c.name for c in table.columns)
+                missing = sorted(model_cols - db_cols)
+                if missing:
+                    out[tname] = missing
+            except Exception as e:
+                out[tname] = "ERR: " + str(e)[:80]
+    return out
