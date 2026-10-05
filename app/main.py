@@ -605,3 +605,12 @@ async def _create_garage_table():
             except Exception as e:
                 results.append({"ok": False, "err": str(e)[:200]})
     return {"results": results}
+
+@app.get("/_list_tables")
+async def _list_tables():
+    from sqlalchemy import text
+    from app.db import engine
+    async with engine.begin() as conn:
+        r = await conn.execute(text("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename"))
+        tables = [row[0] for row in r]
+    return {"tables": tables, "count": len(tables)}
