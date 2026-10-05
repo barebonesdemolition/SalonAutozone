@@ -654,12 +654,12 @@ async def _debug_4():
     from app.db import AsyncSessionLocal
     import traceback
     out = {}
-    async with AsyncSessionLocal() as db:
-        for name, model in [("PartListing", models.PartListing), ("Inquiry", models.Inquiry), ("ImportRequest", models.ImportRequest)]:
-            try:
+    for name, model in [("PartListing", models.PartListing), ("Inquiry", models.Inquiry), ("ImportRequest", models.ImportRequest)]:
+        try:
+            async with AsyncSessionLocal() as db:
                 r = await db.execute(select(model).limit(1))
                 rows = r.scalars().all()
                 out[name] = {"ok": True, "count": len(rows)}
-            except Exception as e:
-                out[name] = {"ok": False, "err": str(e)[:400], "tb": traceback.format_exc()[-800:]}
+        except Exception as e:
+            out[name] = {"ok": False, "err": str(e)[:400]}
     return out
