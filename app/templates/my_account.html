@@ -96,7 +96,6 @@ button{cursor:pointer;border:0;background:none}
 </style>
 </head>
 <body>
-<div id="DBG-BANNER" style="position:fixed;bottom:0;left:0;right:0;background:#900;color:#fff;padding:8px;font:12px monospace;z-index:999999;">BOOT: start</div>
 
 <div class="boot" id="boot">Loading your account…</div>
 
@@ -269,7 +268,6 @@ button{cursor:pointer;border:0;background:none}
  }
 
  /* ---------- boot ---------- */
- document.getElementById("DBG-BANNER").textContent = "BOOT: after auth check";
 if (!Auth.getToken()) { Auth.goLogin(); return; }
 
  // 1) Instant guess from cache / JWT so non-buyers don't flash the buyer page
