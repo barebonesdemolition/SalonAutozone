@@ -389,7 +389,7 @@ class OrderItem(Base):
     supplier_part_id = Column(String, ForeignKey("supplier_parts.id", ondelete="RESTRICT"), nullable=True)
     listing_id = Column(String, ForeignKey("listings.id", ondelete="RESTRICT"), nullable=True)
     fulfillment_type = Column(String, default="ship_to_address", nullable=False)
-    pickup_supplier_id = Column(Integer, ForeignKey("suppliers.id", ondelete="RESTRICT"), nullable=True)
+    pickup_supplier_id = Column(String, ForeignKey("suppliers.id", ondelete="RESTRICT"), nullable=True)
     quantity = Column(Integer, default=1, nullable=False)
     unit_price = Column(Float, nullable=False)
     currency_code = Column(String, default="CAD", nullable=False)
