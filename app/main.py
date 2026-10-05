@@ -630,3 +630,19 @@ async def _test_4_endpoints():
             except Exception as e:
                 results[name] = {"ok": False, "err": str(e)[:300], "tb": traceback.format_exc()[-600:]}
     return results
+
+@app.get("/_fix_all_columns")
+async def _fix_all_columns():
+    from sqlalchemy import text
+    from app.db import engine
+    statements = ['ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS seller_id INTEGER', 'ALTER TABLE part_listings ADD COLUMN IF NOT EXISTS vendor_id INTEGER', 'ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS listing_title VARCHAR', 'ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS seller_phone VARCHAR', 'ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS from_name VARCHAR', 'ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS from_phone VARCHAR', 'ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS from_email VARCHAR', 'ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS buyer_name VARCHAR', 'ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS buyer_phone VARCHAR', 'ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS buyer_message TEXT', 'ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS notes TEXT', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS customer_name VARCHAR', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS part_name VARCHAR', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS car_make VARCHAR', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS car_model VARCHAR', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS car_year INTEGER', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS quantity INTEGER', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS budget_sll FLOAT', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS urgency VARCHAR', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS quoted_price_sll FLOAT', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS estimated_days INTEGER', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS supplier_country VARCHAR', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS admin_notes TEXT', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS make VARCHAR', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS model VARCHAR', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS year INTEGER', 'ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS notes TEXT']
+    results = []
+    async with engine.begin() as conn:
+        for stmt in statements:
+            try:
+                await conn.execute(text(stmt))
+                results.append({"ok": True})
+            except Exception as e:
+                results.append({"ok": False, "err": str(e)[:200]})
+    ok_count = sum(1 for r in results if r.get("ok"))
+    return {"total": len(results), "ok": ok_count, "failed": len(results) - ok_count}
