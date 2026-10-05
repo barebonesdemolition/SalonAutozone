@@ -833,3 +833,11 @@ async def _debug_supplier():
             return {"ok": True, "count": len(rows)}
     except Exception as e:
         return {"ok": False, "err": str(e)[:500], "tb": traceback.format_exc()[-1200:]}
+
+@app.get("/_supplier_cols")
+async def _supplier_cols():
+    from sqlalchemy import text
+    from app.db import engine
+    async with engine.begin() as conn:
+        r = await conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = 'supplier_catalog' ORDER BY column_name"))
+        return {"columns": [row[0] for row in r]}
