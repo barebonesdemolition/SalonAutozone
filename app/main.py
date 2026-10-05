@@ -708,21 +708,25 @@ async def _migrate_everything():
     from app.db import Base, engine
     from sqlalchemy import text
     results = []
-    async with engine.begin() as conn:
-        for tname, table in Base.metadata.tables.items():
-            try:
+    for tname, table in Base.metadata.tables.items():
+        try:
+            async with engine.begin() as conn:
                 r = await conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = :t"), {"t": tname})
                 db_cols = set(row[0] for row in r)
-                for col in table.columns:
-                    if col.name not in db_cols:
-                        coltype = col.type.compile(dialect=conn.dialect)
-                        stmt = f"ALTER TABLE {tname} ADD COLUMN IF NOT EXISTS {col.name} {coltype}"
-                        try:
-                            await conn.execute(text(stmt))
-                            results.append({"table": tname, "col": col.name, "ok": True})
-                        except Exception as e:
-                            results.append({"table": tname, "col": col.name, "ok": False, "err": str(e)[:150]})
+        except Exception as e:
+            results.append({"table": tname, "err": str(e)[:150]})
+            continue
+        for col in table.columns:
+            if col.name in db_cols:
+                continue
+            coltype = str(col.type)
+            stmt = f"ALTER TABLE {tname} ADD COLUMN IF NOT EXISTS {col.name} {coltype}"
+            try:
+                async with engine.begin() as conn:
+                    await conn.execute(text(stmt))
+                results.append({"table": tname, "col": col.name, "ok": True})
             except Exception as e:
-                results.append({"table": tname, "err": str(e)[:200]})
+                results.append({"table": tname, "col": col.name, "ok": False, "err": str(e)[:150]})
     ok = sum(1 for r in results if r.get("ok"))
-    return {"total_attempts": len(results), "added": ok, "results": results[:50]}
+    fail = sum(1 for r in results if r.get("ok") is False)
+    return {"total": len(results), "ok": ok, "failed": fail, "details": results}
