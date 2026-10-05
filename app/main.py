@@ -734,17 +734,19 @@ async def _migrate_everything():
 @app.get("/_create_missing_tables")
 async def _create_missing_tables():
     from app.db import Base, engine
-    from sqlalchemy import text, inspect
-    import traceback
+    from sqlalchemy import inspect
     results = []
-    async with engine.begin() as conn:
-        existing = await conn.run_sync(lambda sync_conn: inspect(sync_conn).get_table_names())
-        for tname, table in Base.metadata.tables.items():
-            if tname in existing:
-                continue
-            try:
-                await conn.run_sync(lambda sync_conn: table.create(sync_conn, checkfirst=True))
-                results.append({"table": tname, "created": True})
-            except Exception as e:
-                results.append({"table": tname, "created": False, "err": str(e)[:200]})
-    return {"results": results}
+    async with engine.connect() as conn:
+        existing = await conn.run_sync(lambda sync_conn: set(inspect(sync_conn).get_table_names()))
+    for tname, table in Base.metadata.tables.items():
+        if tname in existing:
+            results.append({"table": tname, "created": False, "skip": True})
+            continue
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(lambda sync_conn, t=table: t.create(sync_conn, checkfirst=True))
+            results.append({"table": tname, "created": True})
+        except Exception as e:
+            results.append({"table": tname, "created": False, "err": str(e)[:200]})
+    ok = sum(1 for r in results if r.get("created"))
+    return {"created": ok, "total": len(results), "results": results}
