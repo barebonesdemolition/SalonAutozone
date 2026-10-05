@@ -765,3 +765,21 @@ async def _column_types():
             except Exception as e:
                 out[t] = "ERR: " + str(e)[:100]
     return out
+
+@app.get("/_fix_two_more")
+async def _fix_two_more():
+    from sqlalchemy import text
+    from app.db import engine
+    statements = [
+        "ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS message TEXT",
+        "ALTER TABLE import_requests ADD COLUMN IF NOT EXISTS vin VARCHAR",
+    ]
+    results = []
+    for stmt in statements:
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(text(stmt))
+            results.append({"ok": True, "sql": stmt[:70]})
+        except Exception as e:
+            results.append({"ok": False, "err": str(e)[:200]})
+    return {"results": results}
