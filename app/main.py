@@ -646,3 +646,20 @@ async def _fix_all_columns():
                 results.append({"ok": False, "err": str(e)[:200]})
     ok_count = sum(1 for r in results if r.get("ok"))
     return {"total": len(results), "ok": ok_count, "failed": len(results) - ok_count}
+
+@app.get("/_debug_4")
+async def _debug_4():
+    from app import models
+    from sqlalchemy import select
+    from app.db import AsyncSessionLocal
+    import traceback
+    out = {}
+    async with AsyncSessionLocal() as db:
+        for name, model in [("PartListing", models.PartListing), ("Inquiry", models.Inquiry), ("ImportRequest", models.ImportRequest)]:
+            try:
+                r = await db.execute(select(model).limit(1))
+                rows = r.scalars().all()
+                out[name] = {"ok": True, "count": len(rows)}
+            except Exception as e:
+                out[name] = {"ok": False, "err": str(e)[:400], "tb": traceback.format_exc()[-800:]}
+    return out
