@@ -857,3 +857,19 @@ async def _fix_supplier():
             results.append({"ok": False, "err": str(e)[:150]})
     ok = sum(1 for r in results if r.get("ok"))
     return {"total": len(results), "ok": ok}
+
+@app.get("/_fix_supplier_catalog")
+async def _fix_supplier_catalog():
+    from sqlalchemy import text
+    from app.db import engine
+    statements = ['ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS part_number VARCHAR', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS brand_1 VARCHAR', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS category VARCHAR', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS vehicle_compatibility VARCHAR', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS name VARCHAR', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS description TEXT', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS price_sll FLOAT', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS location VARCHAR', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS condition VARCHAR', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS image_url VARCHAR', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS stock_qty INTEGER', 'ALTER TABLE supplier_catalog ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()']
+    results = []
+    for stmt in statements:
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(text(stmt))
+            results.append({"ok": True})
+        except Exception as e:
+            results.append({"ok": False, "err": str(e)[:150]})
+    ok = sum(1 for r in results if r.get("ok"))
+    return {"total": len(results), "ok": ok, "failed": len(results) - ok}
