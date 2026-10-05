@@ -556,3 +556,24 @@ async def _schema_test():
             except Exception as e:
                 errors.append({"id": row.id, "error": str(e)[:600]})
     return {"total_rows": len(rows), "failed": len(errors), "errors": errors[:5]}
+
+@app.get("/_garage_schema_test")
+async def _garage_schema_test():
+    from app import models, schemas
+    from sqlalchemy import select
+    from app.db import AsyncSessionLocal
+    import traceback
+    try:
+        async with AsyncSessionLocal() as db:
+            r = await db.execute(select(models.Garage).limit(5))
+            rows = r.scalars().all()
+            out = []
+            for row in rows:
+                try:
+                    schemas.GarageCarResponse.model_validate(row, from_attributes=True)
+                    out.append({"id": row.id, "ok": True})
+                except Exception as e:
+                    out.append({"id": row.id, "ok": False, "error": str(e)[:400]})
+            return {"total": len(rows), "results": out}
+    except Exception as outer:
+        return {"fatal": type(outer).__name__, "msg": str(outer)[:400], "tb": traceback.format_exc()[:1500]}
