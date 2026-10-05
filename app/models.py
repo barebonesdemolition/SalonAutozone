@@ -360,7 +360,7 @@ class ListingPhoto(Base):
     __tablename__ = "listing_photos"
 
     id = Column(String, primary_key=True)
-    listing_id = Column(Integer, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
+    listing_id = Column(String, ForeignKey("listings.id", ondelete="CASCADE"), nullable=False)
     url = Column(String, nullable=False)
     position = Column(Integer, default=0, nullable=False)
     is_hero = Column(Boolean, default=False, nullable=False)
@@ -386,8 +386,8 @@ class OrderItem(Base):
     id = Column(String, primary_key=True)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
     item_type = Column(String, nullable=False)
-    supplier_part_id = Column(Integer, ForeignKey("supplier_parts.id", ondelete="RESTRICT"), nullable=True)
-    listing_id = Column(Integer, ForeignKey("listings.id", ondelete="RESTRICT"), nullable=True)
+    supplier_part_id = Column(String, ForeignKey("supplier_parts.id", ondelete="RESTRICT"), nullable=True)
+    listing_id = Column(String, ForeignKey("listings.id", ondelete="RESTRICT"), nullable=True)
     fulfillment_type = Column(String, default="ship_to_address", nullable=False)
     pickup_supplier_id = Column(Integer, ForeignKey("suppliers.id", ondelete="RESTRICT"), nullable=True)
     quantity = Column(Integer, default=1, nullable=False)
