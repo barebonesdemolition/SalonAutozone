@@ -203,7 +203,7 @@ button{cursor:pointer;border:0;background:none}
  function fmt(n) { try { return Number(n).toLocaleString(); } catch (e) { return n; } }
 
  /* ---------- auth helpers ---------- */
- function Auth.getToken() {
+ Auth.getToken = function () {
  try {
  for (var i = 0; i < TOKEN_KEYS.length; i++) {
  var v = localStorage.getItem(TOKEN_KEYS[i]);
@@ -211,7 +211,6 @@ button{cursor:pointer;border:0;background:none}
  }
  } catch (e) {}
  return '';
- }
  }
  function auth() {
  var t = Auth.getToken();
