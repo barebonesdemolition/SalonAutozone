@@ -750,3 +750,18 @@ async def _create_missing_tables():
             results.append({"table": tname, "created": False, "err": str(e)[:200]})
     ok = sum(1 for r in results if r.get("created"))
     return {"created": ok, "total": len(results), "results": results}
+
+@app.get("/_column_types")
+async def _column_types():
+    from sqlalchemy import text
+    from app.db import engine
+    tables = ["listings", "listing_photos", "order_items", "orders", "supplier_parts", "garage"]
+    out = {}
+    async with engine.begin() as conn:
+        for t in tables:
+            try:
+                r = await conn.execute(text("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = :t ORDER BY column_name"), {"t": t})
+                out[t] = {row[0]: row[1] for row in r}
+            except Exception as e:
+                out[t] = "ERR: " + str(e)[:100]
+    return out
