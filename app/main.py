@@ -267,7 +267,7 @@ async def become_a_seller_page():
 
 @app.get("/store/{slug}")
 async def verified_business_page(slug: str):
-    return FileResponse("app/templates/business.html")
+    return FileResponse("app/templates/storefront.html")
 
 
 @app.get("/part/{part_id}")
