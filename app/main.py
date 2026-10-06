@@ -274,7 +274,14 @@ async def become_a_seller_page():
 @app.get("/businesses")
 async def businesses_page():
     return FileResponse("app/templates/businesses.html")
+@app.get("/plans")
+async def plans_page():
+    return FileResponse("app/templates/plans.html")
 
+
+@app.get("/my-subscription")
+async def my_subscription_page():
+    return FileResponse("app/templates/my_subscription.html")
 
 @app.get("/store/{slug}")
 async def verified_business_page(slug: str):
