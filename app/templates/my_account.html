@@ -233,7 +233,7 @@ button{cursor:pointer;border:0;background:none}
     var r = j.role || j.user_type ||
             (Array.isArray(j.roles) ? j.roles[0] : j.roles);
     var n = normRole(r);
-    if (!n && j.is_vendor) n = 'seller';
+    if (j.is_vendor && (!n || n === 'buyer')) n = 'seller';
     return n;
   } catch (e) { return ''; }
 }
@@ -247,7 +247,7 @@ button{cursor:pointer;border:0;background:none}
   var r = u.role || u.user_type || u.account_type ||
           (Array.isArray(u.roles) ? u.roles[0] : u.roles);
   var n = normRole(r);
-  if (!n && u.is_vendor) n = 'seller';
+  if (u.is_vendor && (!n || n === 'buyer')) n = 'seller';
   return n;
 }
 
