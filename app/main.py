@@ -472,3 +472,95 @@ async def _check_inquiries():
         r2 = await conn.execute(text("SELECT id, listing_id, seller_id, from_user_id, message, status FROM inquiries LIMIT 5"))
         rows = [{"id": row[0], "listing_id": row[1], "seller_id": row[2], "from_user_id": row[3], "message": (row[4] or "")[:60], "status": row[5]} for row in r2]
     return {"count": count, "sample": rows}
+
+
+# ============================================================
+# SUBSCRIPTIONS — migration endpoint
+# ============================================================
+
+@app.get("/_migrate_subscriptions")
+async def _migrate_subscriptions():
+    from sqlalchemy import text
+    from app.db import engine
+    results = []
+    async with engine.begin() as conn:
+        # plans table
+        try:
+            await conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS plans (
+                    id SERIAL PRIMARY KEY,
+                    code VARCHAR NOT NULL UNIQUE,
+                    name VARCHAR NOT NULL,
+                    price_sll INTEGER NOT NULL,
+                    listing_limit INTEGER,
+                    featured_slots INTEGER NOT NULL DEFAULT 0,
+                    verified_badge BOOLEAN NOT NULL DEFAULT FALSE,
+                    description TEXT,
+                    sort_order INTEGER NOT NULL DEFAULT 0,
+                    active BOOLEAN NOT NULL DEFAULT TRUE,
+                    created_at TIMESTAMP DEFAULT NOW()
+                )
+            """))
+            results.append({"step": "plans table", "ok": True})
+        except Exception as e:
+            results.append({"step": "plans table", "ok": False, "err": str(e)[:200]})
+
+        # subscriptions table
+        try:
+            await conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS subscriptions (
+                    id SERIAL PRIMARY KEY,
+                    business_id INTEGER NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+                    plan_id INTEGER NOT NULL REFERENCES plans(id),
+                    status VARCHAR NOT NULL DEFAULT 'pending',
+                    started_at TIMESTAMP,
+                    expires_at TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT NOW()
+                )
+            """))
+            await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_subscriptions_business ON subscriptions(business_id)"))
+            results.append({"step": "subscriptions table", "ok": True})
+        except Exception as e:
+            results.append({"step": "subscriptions table", "ok": False, "err": str(e)[:200]})
+
+        # payments table
+        try:
+            await conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS payments (
+                    id SERIAL PRIMARY KEY,
+                    business_id INTEGER NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+                    subscription_id INTEGER REFERENCES subscriptions(id) ON DELETE SET NULL,
+                    plan_id INTEGER NOT NULL REFERENCES plans(id),
+                    method VARCHAR NOT NULL DEFAULT 'orange_money',
+                    amount_sll INTEGER NOT NULL,
+                    reference VARCHAR NOT NULL,
+                    screenshot_url VARCHAR,
+                    status VARCHAR NOT NULL DEFAULT 'pending',
+                    note TEXT,
+                    confirmed_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+                    confirmed_at TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT NOW()
+                )
+            """))
+            await conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ux_payments_reference ON payments(reference)"))
+            await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_payments_status ON payments(status)"))
+            await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_payments_business ON payments(business_id)"))
+            results.append({"step": "payments table", "ok": True})
+        except Exception as e:
+            results.append({"step": "payments table", "ok": False, "err": str(e)[:200]})
+
+        # seed plans
+        try:
+            await conn.execute(text("""
+                INSERT INTO plans (code, name, price_sll, listing_limit, featured_slots, verified_badge, description, sort_order) VALUES
+                ('free', 'Free', 0, 5, 0, FALSE, 'Get started. 5 listings, no badge.', 1),
+                ('starter', 'Starter', 75000, 30, 0, TRUE, '30 listings, verified badge.', 2),
+                ('pro', 'Pro', 200000, 100, 3, TRUE, '100 listings, 3 featured slots.', 3),
+                ('dealer', 'Dealer', 500000, NULL, 10, TRUE, 'Unlimited listings, 10 featured slots.', 4)
+                ON CONFLICT (code) DO NOTHING
+            """))
+            results.append({"step": "seed plans", "ok": True})
+        except Exception as e:
+            results.append({"step": "seed plans", "ok": False, "err": str(e)[:200]})
+
+    return {"results": results}
