@@ -1,14 +1,22 @@
 from contextlib import asynccontextmanager
 import inspect
+import os
 import re
+from datetime import datetime, timedelta
 from typing import Optional
 
+from pydantic import BaseModel
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from fastapi.staticfiles import StaticFiles
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 from app import businesses
+from app import models
+from app.auth import get_current_user
 from app.db import ensure_business_contact_columns, get_db
 from app.routers import (
     admin,
@@ -31,12 +39,11 @@ from app.routers import (
 from app.services.parts_finder import find_recommendations as _find_recommendations
 from app.services.vehicles import list_vehicle_catalog
 
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await ensure_business_contact_columns()
     yield
-
-
 
 
 app = FastAPI(
@@ -48,7 +55,7 @@ app = FastAPI(
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-import os as _os
+_os = os
 _os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
@@ -214,8 +221,6 @@ async def health_check():
     return {"status": "ok"}
 
 
-
-
 @app.get("/login")
 async def login_page():
     return FileResponse("app/templates/login.html")
@@ -224,6 +229,7 @@ async def login_page():
 @app.get("/sell")
 async def sell_page():
     return FileResponse("app/templates/sell.html")
+
 
 @app.get("/my-account")
 async def my_account_page():
@@ -268,6 +274,7 @@ async def become_a_seller_page():
 @app.get("/businesses")
 async def businesses_page():
     return FileResponse("app/templates/businesses.html")
+
 
 @app.get("/store/{slug}")
 async def verified_business_page(slug: str):
@@ -445,26 +452,30 @@ from app.routers import authme
 
 app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
 
+
+# ============================================================
+# DIAGNOSTIC ENDPOINTS (safe to remove later)
+# ============================================================
+
 @app.get("/_check_business")
 async def _check_business():
-    from sqlalchemy import text
     from app.db import engine
     async with engine.begin() as conn:
         r = await conn.execute(text("SELECT id, name, slug, status FROM businesses"))
         rows = [{"id": row[0], "name": row[1], "slug": row[2], "status": row[3]} for row in r]
     return {"count": len(rows), "rows": rows}
 
+
 @app.get("/_link_vehicles_to_business")
 async def _link_vehicles_to_business():
-    from sqlalchemy import text
     from app.db import engine
     async with engine.begin() as conn:
         r = await conn.execute(text("UPDATE vehicle_listings SET business_id = 2 WHERE business_id IS NULL"))
     return {"updated": r.rowcount}
 
+
 @app.get("/_check_inquiries")
 async def _check_inquiries():
-    from sqlalchemy import text
     from app.db import engine
     async with engine.begin() as conn:
         r = await conn.execute(text("SELECT COUNT(*) FROM inquiries"))
@@ -480,11 +491,9 @@ async def _check_inquiries():
 
 @app.get("/_migrate_subscriptions")
 async def _migrate_subscriptions():
-    from sqlalchemy import text
     from app.db import engine
     results = []
     async with engine.begin() as conn:
-        # plans table
         try:
             await conn.execute(text("""
                 CREATE TABLE IF NOT EXISTS plans (
@@ -505,7 +514,6 @@ async def _migrate_subscriptions():
         except Exception as e:
             results.append({"step": "plans table", "ok": False, "err": str(e)[:200]})
 
-        # subscriptions table
         try:
             await conn.execute(text("""
                 CREATE TABLE IF NOT EXISTS subscriptions (
@@ -523,7 +531,6 @@ async def _migrate_subscriptions():
         except Exception as e:
             results.append({"step": "subscriptions table", "ok": False, "err": str(e)[:200]})
 
-        # payments table
         try:
             await conn.execute(text("""
                 CREATE TABLE IF NOT EXISTS payments (
@@ -549,7 +556,6 @@ async def _migrate_subscriptions():
         except Exception as e:
             results.append({"step": "payments table", "ok": False, "err": str(e)[:200]})
 
-        # seed plans
         try:
             await conn.execute(text("""
                 INSERT INTO plans (code, name, price_sll, listing_limit, featured_slots, verified_badge, description, sort_order) VALUES
@@ -564,3 +570,174 @@ async def _migrate_subscriptions():
             results.append({"step": "seed plans", "ok": False, "err": str(e)[:200]})
 
     return {"results": results}
+
+
+# ============================================================
+# SUBSCRIPTIONS — API endpoints
+# ============================================================
+
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "")
+
+
+def _check_admin(x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")):
+    if not ADMIN_SECRET or x_admin_key != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return True
+
+
+@app.get("/api/plans")
+async def list_plans(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(text(
+        "SELECT id, code, name, price_sll, listing_limit, featured_slots, verified_badge, description, sort_order "
+        "FROM plans WHERE active = TRUE ORDER BY sort_order ASC"
+    ))
+    rows = [dict(r._mapping) for r in result]
+    return {"plans": rows}
+
+
+async def _get_my_business(user: models.User, db: AsyncSession):
+    from sqlalchemy.future import select as _select
+    result = await db.execute(_select(models.Business).where(models.Business.owner_id == user.id))
+    return result.scalars().first()
+
+
+@app.get("/api/subscriptions/my")
+async def my_subscription(
+    user: models.User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    biz = await _get_my_business(user, db)
+    if not biz:
+        return {"business": None, "subscription": None, "pending_payments": []}
+
+    sub = await db.execute(text(
+        "SELECT s.id, s.status, s.started_at, s.expires_at, "
+        "p.code AS plan_code, p.name AS plan_name, p.price_sll, "
+        "p.listing_limit, p.featured_slots, p.verified_badge "
+        "FROM subscriptions s JOIN plans p ON p.id = s.plan_id "
+        "WHERE s.business_id = :bid AND s.status IN ('active', 'pending') "
+        "ORDER BY s.created_at DESC LIMIT 1"
+    ), {"bid": biz.id})
+    sub_row = sub.first()
+
+    pending = await db.execute(text(
+        "SELECT id, plan_id, amount_sll, reference, status, created_at "
+        "FROM payments WHERE business_id = :bid ORDER BY created_at DESC LIMIT 10"
+    ), {"bid": biz.id})
+    pending_rows = [dict(r._mapping) for r in pending]
+
+    return {
+        "business": {"id": biz.id, "name": biz.name, "slug": biz.slug, "status": biz.status},
+        "subscription": dict(sub_row._mapping) if sub_row else None,
+        "pending_payments": pending_rows,
+    }
+
+
+class PaymentSubmit(BaseModel):
+    plan_id: int
+    amount_sll: int
+    reference: str
+    screenshot_url: Optional[str] = None
+    note: Optional[str] = None
+
+
+@app.post("/api/subscriptions/pay")
+async def submit_payment(
+    payload: PaymentSubmit,
+    user: models.User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    biz = await _get_my_business(user, db)
+    if not biz:
+        raise HTTPException(status_code=400, detail="You must have a business account to subscribe")
+
+    dup = await db.execute(text("SELECT id FROM payments WHERE reference = :ref"), {"ref": payload.reference.strip()})
+    if dup.first():
+        raise HTTPException(status_code=400, detail="This payment reference has already been submitted")
+
+    sub = await db.execute(text(
+        "INSERT INTO subscriptions (business_id, plan_id, status) VALUES (:bid, :pid, 'pending') RETURNING id"
+    ), {"bid": biz.id, "pid": payload.plan_id})
+    sub_id = sub.scalar()
+
+    await db.execute(text(
+        "INSERT INTO payments (business_id, subscription_id, plan_id, amount_sll, reference, screenshot_url, note, status) "
+        "VALUES (:bid, :sid, :pid, :amt, :ref, :ss, :note, 'pending')"
+    ), {
+        "bid": biz.id, "sid": sub_id, "pid": payload.plan_id,
+        "amt": payload.amount_sll, "ref": payload.reference.strip(),
+        "ss": payload.screenshot_url, "note": payload.note,
+    })
+    await db.commit()
+    return {"success": True, "subscription_id": sub_id}
+
+
+@app.get("/api/admin/payments")
+async def admin_list_payments(
+    status: Optional[str] = "pending",
+    _: bool = Depends(_check_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    q = "SELECT p.id, p.business_id, p.plan_id, p.amount_sll, p.reference, p.screenshot_url, p.status, p.note, p.created_at, " \
+        "b.name AS business_name, b.slug AS business_slug, pl.name AS plan_name " \
+        "FROM payments p JOIN businesses b ON b.id = p.business_id JOIN plans pl ON pl.id = p.plan_id "
+    params = {}
+    if status:
+        q += "WHERE p.status = :st "
+        params["st"] = status
+    q += "ORDER BY p.created_at DESC LIMIT 100"
+    result = await db.execute(text(q), params)
+    rows = [dict(r._mapping) for r in result]
+    for r in rows:
+        if r.get("created_at"):
+            r["created_at"] = str(r["created_at"])
+    return {"count": len(rows), "payments": rows}
+
+
+@app.post("/api/admin/payments/{payment_id}/confirm")
+async def admin_confirm_payment(
+    payment_id: int,
+    _: bool = Depends(_check_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    r = await db.execute(text("SELECT id, business_id, subscription_id, plan_id FROM payments WHERE id = :id"), {"id": payment_id})
+    p = r.first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Payment not found")
+
+    now = datetime.utcnow()
+    expires = now + timedelta(days=30)
+
+    await db.execute(text(
+        "UPDATE payments SET status = 'confirmed', confirmed_at = :now WHERE id = :id"
+    ), {"id": payment_id, "now": now})
+
+    if p.subscription_id:
+        await db.execute(text(
+            "UPDATE subscriptions SET status = 'active', started_at = :now, expires_at = :exp WHERE id = :sid"
+        ), {"sid": p.subscription_id, "now": now, "exp": expires})
+
+    await db.execute(text(
+        "UPDATE businesses SET status = 'verified' WHERE id = :bid AND status = 'pending'"
+    ), {"bid": p.business_id})
+
+    await db.commit()
+    return {"success": True, "payment_id": payment_id, "expires_at": str(expires)}
+
+
+@app.post("/api/admin/payments/{payment_id}/reject")
+async def admin_reject_payment(
+    payment_id: int,
+    _: bool = Depends(_check_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    r = await db.execute(text("SELECT id, subscription_id FROM payments WHERE id = :id"), {"id": payment_id})
+    p = r.first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Payment not found")
+
+    await db.execute(text("UPDATE payments SET status = 'rejected' WHERE id = :id"), {"id": payment_id})
+    if p.subscription_id:
+        await db.execute(text("UPDATE subscriptions SET status = 'rejected' WHERE id = :sid"), {"sid": p.subscription_id})
+    await db.commit()
+    return {"success": True, "payment_id": payment_id}
