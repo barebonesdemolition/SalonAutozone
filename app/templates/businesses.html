@@ -71,8 +71,8 @@ h1 { font-size: 26px; margin: 0 0 6px; }
       html += '<h1>Verified businesses in Sierra Leone</h1>';
       html += '<p class="sub">Browse dealers, parts stores, and importers. Only verified businesses show a green badge.</p>';
       html += '<div class="counters">';
-      html += '  <div class="stat"><div class="n">' + (d.total || 0) + '</div><div class="l">Total</div></div>';
-      html += '  <div class="stat"><div class="n">' + (d.verified || 0) + '</div><div class="l">Verified</div></div>';
+      html += '  <div class="stat"><div class="n">' + (d.count || list.length || 0) + '</div><div class="l">Total</div></div>';
+      html += '  <div class="stat"><div class="n">' + list.filter(function(b){return b.verified}).length + '</div><div class="l">Verified</div></div>';
       html += '</div>';
 
       if (list.length === 0) {
