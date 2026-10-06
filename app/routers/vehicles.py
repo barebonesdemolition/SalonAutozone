@@ -133,8 +133,20 @@ async def search_vehicles(
         .offset(offset)
     )
 
-    result = await db.execute(query)
-    return result.scalars().all()
+    # LEFT JOIN businesses to get verified status
+    from sqlalchemy import outerjoin
+    from sqlalchemy.orm import aliased
+    biz = aliased(models.Business)
+    joined = query.outerjoin(biz, models.VehicleListing.business_id == biz.id).add_columns(biz.status.label("biz_status"))
+    result = await db.execute(joined)
+    out = []
+    for row in result.all():
+        vehicle = row[0]
+        biz_status = row[1]
+        v = schemas.VehicleResponse.model_validate(vehicle, from_attributes=True)
+        v.business_verified = (biz_status == "verified")
+        out.append(v)
+    return out
 
 
 # ============================================================

@@ -25,6 +25,7 @@ class VehicleResponse(BaseModel):
     id: int
     seller_id: int
     business_id: Optional[int] = None
+    business_verified: Optional[bool] = False
     title: str
     make: str
     model: str
