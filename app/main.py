@@ -453,3 +453,11 @@ async def _check_business():
         r = await conn.execute(text("SELECT id, name, slug, status FROM businesses"))
         rows = [{"id": row[0], "name": row[1], "slug": row[2], "status": row[3]} for row in r]
     return {"count": len(rows), "rows": rows}
+
+@app.get("/_link_vehicles_to_business")
+async def _link_vehicles_to_business():
+    from sqlalchemy import text
+    from app.db import engine
+    async with engine.begin() as conn:
+        r = await conn.execute(text("UPDATE vehicle_listings SET business_id = 2 WHERE business_id IS NULL"))
+    return {"updated": r.rowcount}
