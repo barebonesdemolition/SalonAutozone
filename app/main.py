@@ -265,6 +265,10 @@ async def become_a_seller_page():
     return FileResponse("app/templates/business.html")
 
 
+@app.get("/businesses")
+async def businesses_page():
+    return FileResponse("app/templates/businesses.html")
+
 @app.get("/store/{slug}")
 async def verified_business_page(slug: str):
     return FileResponse("app/templates/storefront.html")
