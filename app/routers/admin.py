@@ -91,7 +91,12 @@ async def admin_stats(_: dict = Depends(require_admin), db: AsyncSession = Depen
         select(func.count(models.VehicleListing.id)).where(_active_featured(models.VehicleListing, now))
     )).scalar() or 0
 
+    pending_businesses = (await db.execute(
+        select(func.count(models.Business.id)).where(models.Business.status == "pending")
+    )).scalar() or 0
+
     return {
+        "pending_businesses": pending_businesses,
         "total_users": await count(models.User.id),
         "total_vehicles": await count(models.VehicleListing.id),
         "total_parts": await count(models.PartListing.id),
