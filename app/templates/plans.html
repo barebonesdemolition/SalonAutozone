@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plans · SalonAutoZone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<style>
+* { box-sizing: border-box; }
+body { margin:0; font-family: Inter, system-ui, sans-serif; background:#f8fafc; color:#0f172a; }
+.top { display:flex; align-items:center; gap:12px; padding:14px clamp(16px,5vw,56px); background:#fff; border-bottom:1px solid #e2e8f0; }
+.brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:#0f172a; font-weight:800; font-size:17px; }
+.brand img { height:44px; width:44px; border-radius:50%; }
+.brand span { color:#0f766e; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 32px 16px 60px; text-align: center; }
+h1 { font-size: 30px; margin: 0 0 10px; }
+.sub { color:#64748b; font-size:15px; margin: 0 0 34px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:18px; text-align:left; }
+.plan { background:#fff; border:2px solid #e2e8f0; border-radius:14px; padding:24px; display:flex; flex-direction:column; transition: all .15s; }
+.plan:hover { border-color:#0f766e; transform: translateY(-2px); }
+.plan.featured { border-color:#0f766e; box-shadow: 0 8px 30px rgba(15,118,110,.12); }
+.plan h3 { margin: 0 0 4px; font-size: 19px; }
+.plan .price { font-size: 26px; font-weight:800; color:#0f766e; margin: 8px 0; }
+.plan .price small { font-size: 13px; font-weight:600; color:#64748b; }
+.plan ul { list-style:none; padding: 0; margin: 12px 0 20px; flex:1; }
+.plan ul li { font-size: 14px; padding: 6px 0; color:#334155; }
+.plan ul li::before { content:"✓ "; color:#0f766e; font-weight:800; margin-right: 6px; }
+.btn { display:inline-flex; justify-content:center; align-items:center; padding: 12px; border: 0; border-radius: 8px; background:#0f766e; color:#fff; font-weight:700; text-decoration:none; cursor:pointer; }
+.btn.ghost { background:#fff; color:#0f766e; border:1px solid #0f766e; }
+.btn:hover { opacity: .9; }
+.loading { padding: 40px; color:#64748b; text-align:center; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="/">
+    <img src="/static/logo.png" alt="SalonAutoZone">
+    <em style="font-style:normal;">Salon<span>AutoZone</span></em>
+  </a>
+</header>
+
+<div class="wrap">
+  <h1>Choose your plan</h1>
+  <p class="sub">Sell more, get verified, and reach thousands of buyers in Sierra Leone.</p>
+  <div class="grid" id="plans-grid">
+    <div class="loading">Loading plans...</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var grid = document.getElementById('plans-grid');
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function fmtPrice(sll) {
+    if (sll === 0) return 'Free';
+    return 'SLL ' + Number(sll).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
+  fetch('/api/plans')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var plans = d.plans || [];
+      if (plans.length === 0) { grid.innerHTML = '<div class="loading">No plans configured yet.</div>'; return; }
+      var html = '';
+      plans.forEach(function(p) {
+        var featured = p.code === 'pro';
+        html += '<div class="plan' + (featured ? ' featured' : '') + '">';
+        html += '  <h3>' + esc(p.name) + (featured ? ' ⭐' : '') + '</h3>';
+        html += '  <div class="price">' + fmtPrice(p.price_sll) + (p.price_sll > 0 ? ' <small>/month</small>' : '') + '</div>';
+        html += '  <ul>';
+        if (p.listing_limit == null) html += '    <li>Unlimited listings</li>';
+        else html += '    <li>' + p.listing_limit + ' active listings</li>';
+        if (p.featured_slots > 0) html += '    <li>' + p.featured_slots + ' featured slots</li>';
+        if (p.verified_badge) html += '    <li>Verified business badge</li>';
+        html += '    <li>Public storefront</li>';
+        html += '    <li>WhatsApp + phone contact</li>';
+        html += '  </ul>';
+        html += '  <a class="btn' + (featured ? '' : ' ghost') + '" href="/my-subscription?plan=' + p.id + '">' + (p.price_sll === 0 ? 'Start free' : 'Choose ' + esc(p.name)) + '</a>';
+        html += '</div>';
+      });
+      grid.innerHTML = html;
+    })
+    .catch(function() { grid.innerHTML = '<div class="loading">Could not load plans.</div>'; });
+})();
+</script>
+</body>
+</html>
