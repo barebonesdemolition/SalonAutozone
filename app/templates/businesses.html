@@ -63,7 +63,7 @@ h1 { font-size: 26px; margin: 0 0 6px; }
     return '';
   }
 
-  fetch('/api/businesses')
+  fetch('/api/businesses/')
     .then(function(r) { return r.json(); })
     .then(function(d) {
       var list = d.businesses || [];
