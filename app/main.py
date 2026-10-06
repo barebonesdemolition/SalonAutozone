@@ -441,14 +441,3 @@ from app.routers import authme
 
 app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
 
-@app.get("/_seed_test_business")
-async def _seed_test_business():
-    from sqlalchemy import text
-    from app.db import engine
-    async with engine.begin() as conn:
-        try:
-            await conn.execute(text("DELETE FROM businesses WHERE slug = 'test-store'"))
-        except Exception as e:
-            pass
-        await conn.execute(text("INSERT INTO businesses (owner_id, name, slug, business_type, status, city, country, whatsapp, email, description, subscription_tier) VALUES (6, 'Freetown Auto Traders', 'test-store', 'dealership', 'verified', 'Freetown', 'Sierra Leone', '+23276123456', 'info@freetownauto.sl', 'Premium dealer of imported and local vehicles in Freetown. We specialize in Toyota, Nissan, and Honda imports from Japan.', 'pro')"))
-    return {"ok": True, "slug": "test-store"}
