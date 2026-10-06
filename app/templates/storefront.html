@@ -67,23 +67,31 @@ body { margin:0; font-family: Inter, system-ui, sans-serif; background:#f8fafc; 
 
   fetch('/api/businesses/' + encodeURIComponent(slug))
     .then(function(r) { if (!r.ok) throw new Error('Not found'); return r.json(); })
-    .then(function(d) {
-      var b = d.business;
-      var verified = b.verified;
-      var logo = b.logo_url || '/static/logo.png';
-      var wa = b.whatsapp ? 'https://wa.me/' + b.whatsapp.replace(/[^0-9]/g,'') : null;
-      var mail = b.email ? 'mailto:' + b.email : null;
+    .then(function(b) {
+      // Handle both response shapes:
+      // 1. { business: {...}, vehicles: [...], vehicle_count: N }
+      // 2. { id, slug, name, ..., listings: { vehicles: [...] } }  (app/businesses.py)
+      var biz = b.business || b;
+      var vehicles = (b.vehicles) || (b.listings && b.listings.vehicles) || [];
+      var parts = (b.listings && b.listings.parts) || [];
+
+      var status = biz.status || (biz.verified ? 'verified' : 'pending');
+      var verified = status === 'verified';
+      var logo = biz.logo_url || '/static/logo.png';
+      var wa = biz.whatsapp ? 'https://wa.me/' + biz.whatsapp.replace(/[^0-9]/g,'') : null;
+      var mail = biz.email ? 'mailto:' + biz.email : null;
+      var typeLabel = biz.type_label || biz.business_type || biz.type || '';
 
       var html = '';
       html += '<div class="hero">';
-      html += '  <img class="logo" src="' + esc(logo) + '" alt="' + esc(b.name) + '">';
+      html += '  <img class="logo" src="' + esc(logo) + '" alt="' + esc(biz.name) + '">';
       html += '  <div class="meta">';
-      html += '    <h1>' + esc(b.name) + (verified
+      html += '    <h1>' + esc(biz.name) + (verified
                 ? ' <span class="badge">&#10003; Verified</span>'
                 : ' <span class="badge unverified">Unverified</span>') + '</h1>';
-      html += '    <p>' + esc([b.city, b.country].filter(Boolean).join(', ')) + '</p>';
-      if (b.type) html += '    <p>' + esc(b.type) + (b.subscription_tier ? ' &middot; ' + esc(b.subscription_tier) : '') + '</p>';
-      if (b.created_at) html += '    <p>Member since ' + esc(b.created_at.slice(0, 10)) + '</p>';
+      html += '    <p>' + esc([biz.city, biz.country].filter(Boolean).join(', ')) + '</p>';
+      if (typeLabel) html += '    <p>' + esc(typeLabel) + (biz.subscription_tier ? ' &middot; ' + esc(biz.subscription_tier) : '') + '</p>';
+      if (biz.created_at) html += '    <p>Member since ' + esc(String(biz.created_at).slice(0, 10)) + '</p>';
       html += '    <div class="actions">';
       if (wa) html += '<a class="btn wa" href="' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>';
       if (mail) html += '<a class="btn" href="' + esc(mail) + '">Email</a>';
@@ -92,20 +100,18 @@ body { margin:0; font-family: Inter, system-ui, sans-serif; background:#f8fafc; 
       html += '  </div>';
       html += '</div>';
 
-      if (b.description) {
-        html += '<div class="section"><h2>About</h2><div class="about">' + esc(b.description) + '</div></div>';
+      if (biz.description) {
+        html += '<div class="section"><h2>About</h2><div class="about">' + esc(biz.description) + '</div></div>';
       }
 
       html += '<div class="section">';
-      html += '  <h2>Listings (' + d.vehicle_count + ')</h2>';
-      if (d.vehicle_count === 0) {
+      html += '  <h2>Listings (' + vehicles.length + (parts.length ? ' vehicles, ' + parts.length + ' parts' : '') + ')</h2>';
+      if (vehicles.length === 0 && parts.length === 0) {
         html += '  <div class="empty">No listings yet.</div>';
       } else {
         html += '  <div class="grid">';
-        d.vehicles.forEach(function(v) {
-          var img = v.image_url || '/static/silhouettes/' + (
-            (v.make || '').toLowerCase().match(/ford|chevy|toyota|nissan|honda/) ? 'sedan.svg' : 'generic.svg'
-          );
+        vehicles.forEach(function(v) {
+          var img = v.image_url || '/static/silhouettes/generic.svg';
           html += '<a class="card" href="/vehicle/' + esc(v.id) + '">';
           html += '  <img class="img" src="' + esc(img) + '" alt="">';
           html += '  <div class="body">';
