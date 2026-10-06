@@ -63,6 +63,10 @@ def _public(b: Business) -> dict:
         "description": b.description,
         "logo_url": b.logo_url,
         "created_at": b.created_at.isoformat() if b.created_at else None,
+        "email": b.email,
+        "status": b.status,
+        "verified": b.status == "verified",
+        "subscription_tier": getattr(b, "subscription_tier", None),
     }
 
 
