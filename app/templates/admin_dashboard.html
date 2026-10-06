@@ -60,24 +60,6 @@ td{font-size:13px}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--navy);color:#fff;padding:12px 16px;border-radius:10px;font-weight:600;transform:translateY(120px);transition:transform .25s;z-index:99}
 .toast.show{transform:translateY(0)}.toast.ok{background:var(--success)}.toast.err{background:var(--danger)}
 .hidden{display:none!important}
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
 </style>
 <link rel="stylesheet" href="/static/base.css?v=1">
 </head>
@@ -117,6 +99,7 @@ td{font-size:13px}
  <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap">
  <a class="btn btn-primary" href="/admin/catalog">Manage catalog</a>
  <button class="btn btn-ghost" type="button" data-view-link="businesses">Review business applications</button>
+ <button class="btn btn-ghost" type="button" data-view-link="payments">Review payments</button>
  <a class="btn btn-ghost" href="/docs">API docs</a>
  <a class="btn btn-ghost" href="/health" target="_blank">Health check</a>
  </div>
@@ -181,6 +164,23 @@ td{font-size:13px}
  </tr></thead><tbody id="tb-businesses"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
  </div>
  </div>
+
+ <div id="view-payments" class="hidden">
+ <div class="panel">
+ <div class="bar">
+ <h2>Payments</h2>
+ <select class="inp" id="q-payments" aria-label="Payment status">
+ <option value="pending">Pending confirmation</option>
+ <option value="confirmed">Confirmed</option>
+ <option value="rejected">Rejected</option>
+ <option value="all">All payments</option>
+ </select>
+ </div>
+ <div class="table-wrap"><table><thead><tr>
+ <th>ID</th><th>Business</th><th>Plan</th><th>Amount</th><th>Reference</th><th>Status</th><th>Actions</th>
+ </tr></thead><tbody id="tb-payments"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
  </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -213,7 +213,8 @@ td{font-size:13px}
  parts: 'Part listings',
  imports: 'Import requests',
  inquiries: 'Inquiries',
- businesses: 'Business applications'
+ businesses: 'Business applications',
+ payments: 'Payments'
  };
 
  document.querySelectorAll('.side [data-view]').forEach(function (btn) {
@@ -222,7 +223,7 @@ td{font-size:13px}
  btn.classList.add('active');
  var v = btn.dataset.view;
  $('page-title').textContent = titles[v] || v;
- ['overview','vehicles','parts','imports','inquiries','businesses'].forEach(function (name) {
+ ['overview','vehicles','parts','imports','inquiries','businesses','payments'].forEach(function (name) {
  var el = $('view-' + name);
  if (el) el.classList.toggle('hidden', name !== v);
  });
@@ -242,6 +243,7 @@ td{font-size:13px}
  if (v === 'imports') loadImports();
  if (v === 'inquiries') loadInquiries();
  if (v === 'businesses') loadBusinesses();
+ if (v === 'payments') loadPayments();
  }
 
  document.querySelectorAll('[data-view-link]').forEach(function (button) {
@@ -398,6 +400,48 @@ td{font-size:13px}
  method: 'POST', headers: auth()
  }).then(function (response) { if (!response.ok) throw new Error('Could not update business status'); return response.json(); })
  .then(function () { loadBusinesses(); toast('Business status updated', true); })
+ .catch(function (error) { button.disabled = false; toast(error.message, false); });
+ });
+
+ function loadPayments() {
+ var tb = $('tb-payments');
+ var filter = $('q-payments').value;
+ tb.innerHTML = '<tr><td colspan="7" class="empty">Loading payments…</td></tr>';
+ fetch('/api/admin/payments?status=' + encodeURIComponent(filter), { headers: auth() })
+ .then(function (response) { if (!response.ok) throw new Error('Could not load payments'); return response.json(); })
+ .then(function (data) {
+ var items = data.payments || [];
+ if (!items.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">No payments in this view.</td></tr>'; return; }
+ tb.innerHTML = items.map(function (p) {
+ var actions = p.status === 'pending'
+ ? '<button class="btn btn-primary" data-pay-action="confirm" data-pay-id="' + p.id + '">Confirm</button> <button class="btn btn-danger" data-pay-action="reject" data-pay-id="' + p.id + '">Reject</button>'
+ : '<span class="badge off">Reviewed</span>';
+ var badgeClass = p.status === 'confirmed' ? 'ok' : p.status === 'rejected' ? 'bad' : 'warn';
+ return '<tr>' +
+ '<td>' + (p.id || '—') + '</td>' +
+ '<td><strong>' + esc(p.business_name || '—') + '</strong><br><small>' + esc(p.business_slug || '') + '</small></td>' +
+ '<td>' + esc(p.plan_name || '—') + '</td>' +
+ '<td>SLL ' + fmt(p.amount_sll) + '</td>' +
+ '<td>' + esc(p.reference || '—') + '</td>' +
+ '<td><span class="badge ' + badgeClass + '">' + esc(p.status) + '</span></td>' +
+ '<td>' + actions + '</td>' +
+ '</tr>';
+ }).join('');
+ })
+ .catch(function (error) { tb.innerHTML = '<tr><td colspan="7" class="empty">' + esc(error.message) + '.</td></tr>'; });
+ }
+
+ $('q-payments').addEventListener('change', loadPayments);
+ $('tb-payments').addEventListener('click', function (event) {
+ var button = event.target.closest('[data-pay-action]');
+ if (!button) return;
+ button.disabled = true;
+ var id = button.dataset.payId;
+ var action = button.dataset.payAction;
+ fetch('/api/admin/payments/' + encodeURIComponent(id) + '/' + encodeURIComponent(action), {
+ method: 'POST', headers: auth()
+ }).then(function (response) { if (!response.ok) throw new Error('Could not ' + action + ' payment'); return response.json(); })
+ .then(function () { loadPayments(); toast('Payment ' + action + 'ed', true); })
  .catch(function (error) { button.disabled = false; toast(error.message, false); });
  });
 
