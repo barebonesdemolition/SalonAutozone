@@ -215,7 +215,7 @@ button{border:0;background:none;cursor:pointer}
  t.className = 'toast show ' + (ok ? 'ok' : 'err');
  setTimeout(function () { t.classList.remove('show'); }, 2800);
  }
- function Auth.getToken() {
+ Auth.getToken = function () {
  try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; }
  }
  function auth() {
@@ -407,7 +407,7 @@ button{border:0;background:none;cursor:pointer}
  var status = document.getElementById('fit-status');
  var saveDecodedButton = document.getElementById('fit-save-decoded');
  function $(id) { return document.getElementById(id); }
- function Auth.getToken() { try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; } }
+ Auth.getToken = function () { try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; } }
  function auth() { var value = Auth.getToken(); return value ? {Authorization:'Bearer '+value} : {}; }
  function esc(value) { return String(value == null ? '' : value).replace(/[&<>"']/g,function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
  function money(value) { return 'Le '+Number(value || 0).toLocaleString('en-US'); }

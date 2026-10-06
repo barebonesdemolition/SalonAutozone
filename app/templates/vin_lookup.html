@@ -291,7 +291,7 @@ body.mode-cars .t-cars{display:inline}body.mode-cars .t-parts{display:none}
  set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
  del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
  };
- function Auth.getToken() { return ls.get('token') || ''; }
+ Auth.getToken = function () { return ls.get('token') || ''; }
  function json(k) { try { return JSON.parse(ls.get(k) || 'null'); } catch (e) { return null; } }
  function opts(list, first) { return '<option value="">' + esc(first) + '</option>' + list.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + '</option>'; }).join(''); }
  function timed(url, ms, o) { var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms); o = o || {}; o.signal = c.signal; return fetch(url, o).finally(function () { clearTimeout(t); }); }
