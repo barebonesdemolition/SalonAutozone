@@ -51,6 +51,12 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; }
 }
 </style>
 <link rel="stylesheet" href="/static/base.css?v=1">
+<style>
+.dz-badge{display:inline-block;min-width:22px;padding:2px 8px;border-radius:999px;background:#0f766e;color:#fff;font-size:13px;vertical-align:middle}
+.dz-badge:empty{display:none}
+.dz-status{display:inline-block;padding:2px 8px;border-radius:6px;background:#eef2f7;color:#334155;font-size:12px;text-transform:capitalize}
+@media (max-width:640px){.listing-row{flex-wrap:wrap;gap:8px}.action-btn{width:100%}.stat-card{min-width:0}}
+</style>
 </head>
 <body>
 <div class="boot" id="boot">Loading dashboard…</div>
@@ -79,6 +85,11 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; }
 <h2 style="color:#0b1e3a; margin-bottom:20px;">🚗 My Car Listings</h2>
 <div id="cars-list"></div>
 </div>
+
+<div class="section"><h2 style="color:#0b1e3a;margin-bottom:20px;">&#128295; My Parts <span id="parts-count" class="dz-badge"></span></h2><div id="parts-list"><div class="empty">Loading...</div></div></div>
+<div class="section"><h2 style="color:#0b1e3a;margin-bottom:20px;">&#128172; Inquiries <span id="inq-count" class="dz-badge"></span></h2><div id="inq-list"><div class="empty">Loading...</div></div></div>
+<div class="section"><h2 style="color:#0b1e3a;margin-bottom:20px;">&#128230; Import requests <span id="imp-count" class="dz-badge"></span></h2><div id="imp-list"><div class="empty">Loading...</div></div></div>
+
 </div>
 <script>
 var TOKEN_KEYS = ['token', 'access_token', 'authToken', 'jwt', 'userToken'];
@@ -173,9 +184,44 @@ async function deleteCar(id) {
 
 function logout() { Auth.clearSession(); location.href = '/'; }
 
+
+var _dzEsc = (typeof esc === 'function') ? esc : function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+function _dzDate(v) { try { return v ? new Date(v).toLocaleDateString() : ''; } catch (e) { return ''; } }
+async function _dzGet(path, key) {
+  try { var r = await authFetch('/api/my-account/' + path); if (!r.ok) return null; var d = await r.json(); return d[key] || []; } catch (e) { return null; }
+}
+function _dzFill(listId, countId, items, emptyMsg, rowFn, badgeFn) {
+  var el = document.getElementById(listId), c = document.getElementById(countId);
+  if (items === null) { el.innerHTML = '<div class="empty">Could not load this section.</div>'; return; }
+  c.textContent = badgeFn ? badgeFn(items) : (items.length || '');
+  el.innerHTML = items.length ? items.map(rowFn).join('') : '<div class="empty">' + emptyMsg + '</div>';
+}
+async function loadExtras() {
+  var parts = await _dzGet('my-parts', 'parts');
+  if (parts) document.getElementById('stat-parts').innerText = parts.length;
+  _dzFill('parts-list', 'parts-count', parts, 'No parts listed yet.', function (x) {
+    return '<div class="listing-row"><div><div class="listing-title">' + _dzEsc(x.name || x.title || x.category || 'Part') + '</div>' +
+      '<div class="listing-meta">' + _dzEsc(x.category || '') + ' &bull; Stock: ' + _dzEsc(x.stock_quantity == null ? '-' : x.stock_quantity) + ' &bull; ' + _dzEsc(x.views || 0) + ' views' + (x.is_featured ? ' &bull; Featured' : '') + '</div>' +
+      '<div class="listing-price">SLL ' + Number(x.price_sll || 0).toLocaleString() + '</div></div></div>';
+  });
+  var inq = await _dzGet('received-inquiries', 'inquiries');
+  _dzFill('inq-list', 'inq-count', inq, 'No inquiries yet. Buyers who contact you will show up here.', function (x) {
+    var ph = x.buyer_phone || x.from_phone || '';
+    return '<div class="listing-row"><div><div class="listing-title">' + _dzEsc(x.listing_title || 'Listing') + ' <span class="dz-status">' + _dzEsc(x.status || 'new') + '</span></div>' +
+      '<div class="listing-meta">' + _dzEsc(x.buyer_name || x.from_name || 'Buyer') + (ph ? ' &bull; <a href="tel:' + _dzEsc(ph) + '">' + _dzEsc(ph) + '</a>' : '') + ' &bull; ' + _dzEsc(_dzDate(x.created_at)) + '</div>' +
+      '<div class="listing-meta">' + _dzEsc(x.buyer_message || x.message || '') + '</div></div></div>';
+  }, function (items) { var n = items.filter(function (x) { return !x.status || x.status === 'new' || x.status === 'pending'; }).length; return n ? n + ' new' : ''; });
+  var imp = await _dzGet('my-import-requests', 'requests');
+  _dzFill('imp-list', 'imp-count', imp, 'No import requests yet.', function (x) {
+    return '<div class="listing-row"><div><div class="listing-title">' + _dzEsc(x.part_name || 'Part') + ' <span class="dz-status">' + _dzEsc(x.status || 'new') + '</span></div>' +
+      '<div class="listing-meta">' + _dzEsc([x.car_make, x.car_model, x.car_year].filter(Boolean).join(' ')) + ' &bull; ' + _dzEsc(_dzDate(x.created_at)) + '</div>' +
+      (x.quoted_price_sll ? '<div class="listing-price">Quote: SLL ' + Number(x.quoted_price_sll).toLocaleString() + (x.estimated_days ? ' &bull; ' + _dzEsc(x.estimated_days) + ' days' : '') + '</div>' : '') + '</div></div>';
+  });
+}
+
 async function init() {
  if (!Auth.getToken()) { Auth.goLogin('no token'); return; }
- try { await loadUser(); await loadMyCars(); } catch (e) { if (e !== null) console.error(e); }
+ try { await loadUser(); await loadMyCars(); loadExtras(); } catch (e) { if (e !== null) console.error(e); }
 }
 console.log("[DASH] TOKEN_KEYS", TOKEN_KEYS, "token=", localStorage.getItem("token"), "access=", localStorage.getItem("access_token"), "Auth.getToken()=", Auth.getToken());
 init();
