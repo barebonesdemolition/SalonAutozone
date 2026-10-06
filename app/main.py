@@ -441,3 +441,11 @@ from app.routers import authme
 
 app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
 
+@app.get("/_check_business")
+async def _check_business():
+    from sqlalchemy import text
+    from app.db import engine
+    async with engine.begin() as conn:
+        r = await conn.execute(text("SELECT id, name, slug, status FROM businesses"))
+        rows = [{"id": row[0], "name": row[1], "slug": row[2], "status": row[3]} for row in r]
+    return {"count": len(rows), "rows": rows}
