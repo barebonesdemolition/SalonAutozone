@@ -6,7 +6,7 @@ table, and permission to drive comes from delivery_drivers.status (the users.rol
 column is deliberately left alone so existing role checks keep working).
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -21,15 +21,23 @@ from app import models
 from app.auth import get_current_admin, get_current_user
 from app.db import engine, get_db
 
+__all__ = ["router", "ensure_driver_tables", "drivers"]
+
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/drivers", tags=["Drivers"])
 
 VEHICLE_TYPES = {"bike", "car", "van", "truck"}
 STATUSES = {"pending", "verified", "rejected", "suspended"}
 
+
+def _utcnow() -> datetime:
+    """Naive UTC timestamp — matches the DateTime column type (no tz)."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
 _md = MetaData()
-# Stub so the foreign key can resolve. It is never created: create_all below
-# is limited to the drivers table.
+# Stub so the foreign key to users.id can resolve. It is never created:
+# create_all below is limited to the drivers table only.
 Table("users", _md, Column("id", Integer, primary_key=True))
 
 drivers = Table(
@@ -45,7 +53,7 @@ drivers = Table(
     Column("status", String, nullable=False, server_default="pending", index=True),
     Column("is_online", Boolean, nullable=False, server_default=false()),
     Column("rejection_note", String, nullable=True),
-    Column("created_at", DateTime, nullable=False, default=datetime.utcnow),
+    Column("created_at", DateTime, nullable=False, default=_utcnow),
     Column("reviewed_at", DateTime, nullable=True),
     Column("reviewed_by", Integer, nullable=True),
 )
@@ -111,14 +119,15 @@ async def apply(
         await db.execute(
             update(drivers).where(drivers.c.id == existing.id).values(
                 **values, status="pending", rejection_note=None,
-                reviewed_at=None, reviewed_by=None, created_at=datetime.utcnow(),
+                reviewed_at=None, reviewed_by=None, created_at=_utcnow(),
             )
         )
     else:
         try:
             await db.execute(insert(drivers).values(user_id=user.id, **values))
-        except IntegrityError:
+        except IntegrityError as exc:
             await db.rollback()
+            log.warning("Driver apply IntegrityError for user %s: %s", user.id, exc)
             raise HTTPException(409, "You already have a driver application")
     await db.commit()
     return _out(await _driver_for(db, user.id))
@@ -142,57 +151,4 @@ async def set_online(
     db: AsyncSession = Depends(get_db),
 ):
     row = await _driver_for(db, user.id)
-    if not row or row.status != "verified":
-        raise HTTPException(403, "Only verified drivers can go online")
-    await db.execute(update(drivers).where(drivers.c.id == row.id).values(is_online=online))
-    await db.commit()
-    return {"is_online": online}
-
-
-# ------------------------------------------------------------------ admin side
-
-@router.get("/admin/list")
-async def admin_list(
-    status: str = Query("pending"),
-    admin: models.User = Depends(get_current_admin),
-    db: AsyncSession = Depends(get_db),
-):
-    status = status.lower()
-    if status != "all" and status not in STATUSES:
-        raise HTTPException(422, "status must be all, " + ", ".join(sorted(STATUSES)))
-    u = models.User.__table__
-    query = (
-        select(drivers, u.c.full_name, u.c.email)
-        .select_from(drivers.join(u, u.c.id == drivers.c.user_id))
-        .order_by(drivers.c.created_at.desc())
-        .limit(200)
-    )
-    if status != "all":
-        query = query.where(drivers.c.status == status)
-    rows = (await db.execute(query)).all()
-    return {"count": len(rows), "drivers": [_out(r, admin=True) for r in rows]}
-
-
-@router.post("/admin/{driver_id}/status")
-async def admin_set_status(
-    driver_id: int,
-    status: str = Query(...),
-    note: str | None = Query(None, max_length=300),
-    admin: models.User = Depends(get_current_admin),
-    db: AsyncSession = Depends(get_db),
-):
-    status = status.lower()
-    if status not in STATUSES:
-        raise HTTPException(422, "status must be one of: " + ", ".join(sorted(STATUSES)))
-    row = (await db.execute(select(drivers).where(drivers.c.id == driver_id))).first()
-    if not row:
-        raise HTTPException(404, "Driver not found")
-    values = dict(
-        status=status, reviewed_at=datetime.utcnow(), reviewed_by=admin.id,
-        rejection_note=note if status in ("rejected", "suspended") else None,
-    )
-    if status != "verified":
-        values["is_online"] = False  # a driver who is not verified can never stay online
-    await db.execute(update(drivers).where(drivers.c.id == driver_id).values(**values))
-    await db.commit()
-    return {"id": driver_id, "status": status}
+    if not
