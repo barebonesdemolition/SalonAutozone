@@ -18,16 +18,7 @@ from app import businesses
 from app import models
 from app.auth import get_current_user
 from app.db import ensure_business_contact_columns, get_db
-
-# NOTE: app.drivers module does not exist yet — drivers.py needs to be created
-# in the app/ directory before these imports can be re-enabled:
-#
-# from app.drivers import ensure_driver_tables, router as drivers_router
-#
-# For now, the driver endpoints are disabled. Re-add the import above and the
-# `ensure_driver_tables()` call inside lifespan() and the `app.include_router(drivers_router)`
-# line below once app/drivers.py exists.
-
+from app.drivers import ensure_driver_tables, router as drivers_router
 from app.routers import (
     admin,
     ai_chat,
@@ -53,7 +44,7 @@ from app.services.vehicles import list_vehicle_catalog
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await ensure_business_contact_columns()
-    # await ensure_driver_tables()  # re-enable once app/drivers.py exists
+    await ensure_driver_tables()
     yield
 
 
@@ -72,7 +63,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 app.include_router(businesses.router)
-# app.include_router(drivers_router)  # re-enable once app/drivers.py exists
+app.include_router(drivers_router)
 
 
 @app.exception_handler(HTTPException)
