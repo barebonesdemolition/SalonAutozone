@@ -18,7 +18,16 @@ from app import businesses
 from app import models
 from app.auth import get_current_user
 from app.db import ensure_business_contact_columns, get_db
-from app.drivers import ensure_driver_tables, router as drivers_router
+
+# NOTE: app.drivers module does not exist yet — drivers.py needs to be created
+# in the app/ directory before these imports can be re-enabled:
+#
+# from app.drivers import ensure_driver_tables, router as drivers_router
+#
+# For now, the driver endpoints are disabled. Re-add the import above and the
+# `ensure_driver_tables()` call inside lifespan() and the `app.include_router(drivers_router)`
+# line below once app/drivers.py exists.
+
 from app.routers import (
     admin,
     ai_chat,
@@ -44,7 +53,7 @@ from app.services.vehicles import list_vehicle_catalog
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await ensure_business_contact_columns()
-    await ensure_driver_tables()
+    # await ensure_driver_tables()  # re-enable once app/drivers.py exists
     yield
 
 
@@ -63,7 +72,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 app.include_router(businesses.router)
-app.include_router(drivers_router)
+# app.include_router(drivers_router)  # re-enable once app/drivers.py exists
 
 
 @app.exception_handler(HTTPException)
@@ -277,6 +286,8 @@ async def become_a_seller_page():
 @app.get("/businesses")
 async def businesses_page():
     return FileResponse("app/templates/businesses.html")
+
+
 @app.get("/plans")
 async def plans_page():
     return FileResponse("app/templates/plans.html")
@@ -285,6 +296,7 @@ async def plans_page():
 @app.get("/my-subscription")
 async def my_subscription_page():
     return FileResponse("app/templates/my_subscription.html")
+
 
 @app.get("/store/{slug}")
 async def verified_business_page(slug: str):
