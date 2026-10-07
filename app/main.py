@@ -18,7 +18,9 @@ from app import businesses
 from app import models
 from app.auth import get_current_user
 from app.db import ensure_business_contact_columns, get_db
+# --- drivers (must exist as app/drivers.py or the app will not boot) ---
 from app.drivers import ensure_driver_tables, router as drivers_router
+# ---------------------------------------------------------------------
 from app.routers import (
     admin,
     ai_chat,
@@ -57,8 +59,7 @@ app = FastAPI(
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-_os = os
-_os.makedirs("uploads", exist_ok=True)
+os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
@@ -460,8 +461,8 @@ app.include_router(imports_router.router)
 app.include_router(inquiries.router)
 app.include_router(catalog.router)
 app.include_router(unified_search.router)
-from app.routers import authme
 
+from app.routers import authme
 
 app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
 
@@ -589,11 +590,10 @@ async def _migrate_subscriptions():
 # SUBSCRIPTIONS — API endpoints
 # ============================================================
 
-ADMIN_SECRET = os.getenv("ADMIN_SECRET", "")
-
 
 def _check_admin(x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")):
-    if not ADMIN_SECRET or x_admin_key != ADMIN_SECRET:
+    admin_secret = os.getenv("ADMIN_SECRET", "")
+    if not admin_secret or x_admin_key != admin_secret:
         raise HTTPException(status_code=403, detail="Admin access required")
     return True
 
