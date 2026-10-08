@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Part – {{ app_name or 'SalonAutoZone' }}</title>
+<title>Part â€“ {{ app_name or 'SalonAutoZone' }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;--navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;--success:#15803d;--sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06)}
@@ -62,7 +62,7 @@ h1{font-size:clamp(20px,4vw,26px);font-weight:800;color:var(--navy)}
 <link rel="stylesheet" href="/static/base.css?v=1">
 </head>
 <body>
-<div class="top"><strong>Salon AutoZone · Freetown</strong><a href="/" style="color:#99f6e4;font-weight:700">Home</a></div>
+<div class="top"><strong>Salon AutoZone Â· Freetown</strong><a href="/" style="color:#99f6e4;font-weight:700">Home</a></div>
 <header class="brand">
  <a class="logo" href="/"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a>
  <a href="/vin-tool" style="font-weight:600;color:#475569;font-size:14px">VIN Lookup</a>
@@ -103,10 +103,10 @@ h1{font-size:clamp(20px,4vw,26px);font-weight:800;color:var(--navy)}
  (compat?'<span class="tag fit">Fits: '+esc(compat)+'</span>':'') +
  '</div>' +
  (p.description?'<div class="panel"><h2>Description</h2><p>'+esc(p.description)+'</p></div>':'') +
- '<div class="panel" id="fit-panel"><h2>Fits your garage?</h2><p class="muted" id="fit-body">Checking your garage…</p></div>' +
+ '<div class="panel" id="fit-panel"><h2>Fits your garage?</h2><p class="muted" id="fit-body">Checking your garageâ€¦</p></div>' +
  '<div class="acts">' +
  (wa?'<a class="btn btn-wa" href="'+wa+'" target="_blank" rel="noopener">WhatsApp seller</a>':'') +
- '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
+ '<button id="btn-cart" style="background:#0f766e;color:#fff;font-weight:700;border:0;border-radius:12px;padding:14px 20px;cursor:pointer;margin-right:8px">Add to cart</button><button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
  '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
  '</div>';
 
@@ -135,7 +135,7 @@ h1{font-size:clamp(20px,4vw,26px);font-weight:800;color:var(--navy)}
  }
  if (hits.length) {
  fitBody.innerHTML = '<div class="ok">Likely fits ' + hits.length + ' of your vehicle' + (hits.length>1?'s':'') + '</div><ul class="fit-list">' +
- hits.map(function(c){ return '<li>'+esc(c.year+' '+c.make+' '+c.model)+(c.is_primary?' · primary':'')+'</li>'; }).join('') +
+ hits.map(function(c){ return '<li>'+esc(c.year+' '+c.make+' '+c.model)+(c.is_primary?' Â· primary':'')+'</li>'; }).join('') +
  '</ul><p class="muted">Always confirm with the seller before buying.</p>';
  } else {
  fitBody.innerHTML = '<span class="muted">Does not match your garage vehicles' +
@@ -156,7 +156,28 @@ h1{font-size:clamp(20px,4vw,26px);font-weight:800;color:var(--navy)}
  else fitBody.innerHTML = '<a href="/login" style="color:var(--primary);font-weight:700">Sign in</a> or set your car on the home page to check fit.';
  }
 
- document.getElementById('btn-share').onclick = function(){
+ document.getElementById('btn-cart').onclick = function(){
+  try {
+    var cart = JSON.parse(localStorage.getItem('saz_cart') || '[]');
+    var existing = cart.find(function(x){ return x.part_id === Number(id); });
+    if (existing) { existing.qty = Math.min(20, existing.qty + 1); }
+    else {
+      cart.push({
+        part_id: Number(id),
+        qty: 1,
+        name: title,
+        price_sll: Number(p.price_sll || 0),
+        image_url: p.image_url || null
+      });
+    }
+    localStorage.setItem('saz_cart', JSON.stringify(cart));
+    document.dispatchEvent(new CustomEvent('saz-cart-change', { detail: cart }));
+    var btn = document.getElementById('btn-cart');
+    btn.textContent = 'Added ✓';
+    setTimeout(function(){ btn.textContent = 'Add to cart'; }, 1500);
+  } catch (e) { alert('Could not add to cart'); }
+};
+document.getElementById('btn-share').onclick = function(){
  var msg = '*' + title + '*\n' + (p.price_sll?'SLL '+fmt(p.price_sll)+'\n':'') + '\n' + location.href;
  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
  };
@@ -176,3 +197,6 @@ h1{font-size:clamp(20px,4vw,26px);font-weight:800;color:var(--navy)}
 </script>
 </body>
 </html>
+
+
+
