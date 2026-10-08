@@ -759,3 +759,7 @@ async def admin_reject_payment(
     return {"success": True, "payment_id": payment_id}
 
 # ---------------------------------------------------------------
+
+@app.get("/checkout")
+async def checkout_page():
+    return FileResponse("app/templates/checkout.html")
