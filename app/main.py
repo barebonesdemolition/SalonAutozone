@@ -763,21 +763,3 @@ async def admin_reject_payment(
 @app.get("/checkout")
 async def checkout_page():
     return FileResponse("app/templates/checkout.html")
-
-# TEMP_FEES
-@app.get("/_temp_set_fees", include_in_schema=False)
-async def _temp_set_fees(secret: str = Query(...), db: AsyncSession = Depends(get_db)):
-    import os as _os
-    if secret != _os.getenv("ADMIN_SECRET", "let-me-in-2026"):
-        raise HTTPException(status_code=403, detail="Forbidden")
-    await db.execute(text(
-        "CREATE TABLE IF NOT EXISTS delivery_settings (key VARCHAR PRIMARY KEY, value FLOAT NOT NULL)"
-    ))
-    for k, v in (("okada_fee_sll", 15000.0), ("van_fee_sll", 40000.0), ("platform_pct", 20.0)):
-        await db.execute(text(
-            "INSERT INTO delivery_settings (key, value) VALUES (:k, :v) "
-            "ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value"
-        ), {"k": k, "v": v})
-    await db.commit()
-    rows = (await db.execute(text("SELECT key, value FROM delivery_settings ORDER BY key"))).all()
-    return {"ok": True, "settings": [{"key": r[0], "value": r[1]} for r in rows]}
