@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="/static/logo.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checkout · SalonAutoZone</title>
+<style>
+:root{--primary:#0f766e;--navy:#0f172a;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--card:#fff;--ok:#15803d;--warn:#b45309;--bad:#b91c1c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--text:#e2e8f0;--muted:#94a3b8;--border:#334155;--bg:#0f172a;--card:#1e293b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border)}
+header img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+header a{color:var(--text);font-weight:800;text-decoration:none;font-size:18px}
+main{max-width:560px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:24px;margin:0 0 4px}
+h2{font-size:16px;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px}
+label{display:block;font-weight:600;margin:12px 0 6px}
+input[type=text],input[type=tel],textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font:inherit;resize:vertical}
+textarea{min-height:60px}
+.line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.line:last-child{border-bottom:0}
+.line .name{flex:1}
+.line .qty{color:var(--muted);margin:0 8px}
+.total{font-weight:800;font-size:18px;display:flex;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:2px solid var(--border)}
+button{width:100%;margin-top:18px;padding:14px;border:0;border-radius:12px;background:var(--primary);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+button:disabled{opacity:.6}
+button.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.msg{margin-top:12px;color:var(--bad);min-height:1.2em}
+.success{background:rgba(21,128,61,.1);border:1px solid var(--ok);color:var(--ok);padding:14px;border-radius:12px;margin-bottom:16px;font-weight:600}
+.code-box{font-family:monospace;font-size:28px;letter-spacing:6px;text-align:center;padding:16px;background:var(--bg);border:2px dashed var(--border);border-radius:12px;margin:12px 0;font-weight:800;color:var(--primary)}
+.info{background:rgba(15,118,110,.08);padding:12px;border-radius:10px;font-size:14px;line-height:1.6}
+.empty{text-align:center;color:var(--muted);padding:24px 0}
+</style>
+</head>
+<body>
+<header><img src="/static/logo.png" alt=""><a href="/">SalonAutoZone</a></header>
+<main>
+<h1>Checkout</h1>
+<p class="sub">Complete your order and delivery details.</p>
+<div id="root" class="card">Loading…</div>
+</main>
+<script src="/static/auth.js"></script>
+<script>
+(function () {
+  var root = document.getElementById('root');
+  function hdr(json) {
+    var h = { Authorization: 'Bearer ' + Auth.getToken() };
+    if (json) h['Content-Type'] = 'application/json';
+    return h;
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function fmt(n) { try { return Number(n).toLocaleString(); } catch (e) { return n; } }
+
+  if (!Auth.requireLogin()) return;
+
+  var params = new URLSearchParams(location.search);
+  var itemsParam = params.get('items') || '';
+  var items = itemsParam.split(',').map(function (s) {
+    var p = s.split(':');
+    return { part_id: Number(p[0]), qty: Number(p[1] || 1) };
+  }).filter(function (i) { return i.part_id > 0; });
+
+  if (!items.length) {
+    root.innerHTML = '<div class="empty">No items in your cart.<br><a href="/marketplace">Browse parts</a></div>';
+    return;
+  }
+
+  fetch('/api/parts/?limit=200').then(function (r) {
+    if (!r.ok) throw new Error('Could not load parts');
+    return r.json();
+  }).then(function (d) {
+    var all = d.items || d.results || d || [];
+    if (!Array.isArray(all)) all = [];
+    var byId = {};
+    all.forEach(function (p) { byId[p.id] = p; });
+    var rows = [];
+    var total = 0;
+    items.forEach(function (it) {
+      var p = byId[it.part_id];
+      if (!p) return;
+      var price = Number(p.price_sll != null ? p.price_sll : (p.price || 0));
+      var sub = price * it.qty;
+      total += sub;
+      rows.push({ part: p, qty: it.qty, sub: sub, price: price });
+    });
+    if (!rows.length) { root.innerHTML = '<div class="empty">Items no longer available.</div>'; return; }
+    render(rows, total);
+  }).catch(function (e) { root.textContent = e.message; });
+
+  function render(rows, total) {
+    var html = '<h2>Your items</h2>';
+    rows.forEach(function (r) {
+      html += '<div class="line"><span class="name"><b>' + esc(r.part.name) + '</b></span>' +
+        '<span class="qty">x' + r.qty + '</span>' +
+        '<span>' + fmt(r.price) + ' Le</span></div>';
+    });
+    html += '<h2>Delivery</h2>' +
+      '<label for="addr">Street address</label>' +
+      '<input id="addr" type="text" placeholder="45 Kissy Street, house 12" maxlength="200">' +
+      '<label for="area">Area</label>' +
+      '<input id="area" type="text" value="Freetown" maxlength="60">' +
+      '<label for="phone">Contact phone</label>' +
+      '<input id="phone" type="tel" placeholder="+232 76 123456" maxlength="25">' +
+      '<label for="notes">Notes for the driver (optional)</label>' +
+      '<textarea id="notes" maxlength="300" placeholder="Landmark, gate colour, etc."></textarea>';
+    html += '<div class="total"><span>Parts total</span><span>' + fmt(total) + ' Le</span></div>' +
+      '<div style="color:var(--muted);font-size:13px;margin-top:6px">Delivery fee added at next step based on part size.</div>';
+    html += '<button id="place">Place order</button>';
+    html += '<div class="msg" id="msg"></div>';
+    root.innerHTML = html;
+
+    document.getElementById('place').addEventListener('click', function () {
+      var btn = this;
+      var addr = document.getElementById('addr').value.trim();
+      var area = document.getElementById('area').value.trim();
+      var phone = document.getElementById('phone').value.trim();
+      var notes = document.getElementById('notes').value.trim();
+      var msg = document.getElementById('msg');
+      msg.textContent = '';
+      if (addr.length < 5) { msg.textContent = 'Enter your street address.'; return; }
+      if (area.length < 2) { msg.textContent = 'Enter your area.'; return; }
+      if (phone.length < 6) { msg.textContent = 'Enter your phone.'; return; }
+      btn.disabled = true; btn.textContent = 'Placing order…';
+      fetch('/api/shop/orders', {
+        method: 'POST',
+        headers: hdr(true),
+        body: JSON.stringify({
+          items: rows.map(function (r) { return { part_id: r.part.id, qty: r.qty }; }),
+          delivery_address: addr,
+          delivery_area: area,
+          phone: phone
+        })
+      }).then(function (r) {
+        if (!r.ok) return r.json().then(function (e) { throw new Error(e.detail || 'Could not place order'); });
+        return r.json();
+      }).then(function (order) {
+        showSuccess(order);
+      }).catch(function (e) {
+        btn.disabled = false; btn.textContent = 'Place order';
+        msg.textContent = e.message;
+      });
+    });
+  }
+
+  function showSuccess(order) {
+    var code = order.code;
+    var deliveryCode = order.delivery_code || '';
+    var lines = (order.items || []).map(function (it) {
+      return '<div class="line"><span class="name">' + esc(it.title) + '</span><span class="qty">x' + it.qty + '</span></div>';
+    }).join('');
+    root.innerHTML =
+      '<div class="success">Order placed successfully.</div>' +
+      '<h2>Order code</h2>' +
+      '<div class="code-box">' + esc(code) + '</div>' +
+      '<div class="info">Save this code. Track your delivery at <b>/track</b>.</div>' +
+      '<h2>Your items</h2>' + lines +
+      '<div class="total"><span>Parts</span><span>' + fmt(order.parts_total_sll) + ' Le</span></div>' +
+      '<div class="total"><span>Delivery fee</span><span>' + fmt(order.delivery_fee_sll) + ' Le</span></div>' +
+      '<div class="total" style="font-size:22px"><span>Total to pay</span><span>' + fmt(order.total_to_pay_sll) + ' Le</span></div>' +
+      '<h2>Delivery code</h2>' +
+      '<div class="code-box" style="letter-spacing:12px">' + esc(deliveryCode) + '</div>' +
+      '<div class="info">Give this 6-digit code to the driver when your parts arrive. Do not share it before.</div>' +
+      '<button class="ghost" onclick="location.href=\'/track?code=' + encodeURIComponent(code) + '\'">Track this order</button>' +
+      '<button class="ghost" onclick="location.href=\'/\'">Back to home</button>';
+  }
+})();
+</script>
+</body>
+</html>
