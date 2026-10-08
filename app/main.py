@@ -762,3 +762,7 @@ async def admin_reject_payment(
 @app.get("/checkout")
 async def checkout_page():
     return FileResponse("app/templates/checkout.html")
+
+@app.get("/cart")
+async def cart_page():
+    return FileResponse("app/templates/cart.html")

@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="/static/logo.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cart · SalonAutoZone</title>
+<style>
+:root{--primary:#0f766e;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--card:#fff;--bad:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border)}
+header img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+header a{color:var(--text);font-weight:800;text-decoration:none;font-size:18px}
+main{max-width:640px;margin:0 auto;padding:20px 16px 120px}
+h1{font-size:24px;margin:0 0 16px}
+.item{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)}
+.item .thumb{width:64px;height:64px;border-radius:10px;background:var(--border);object-fit:cover;flex:0 0 64px}
+.item .body{flex:1;min-width:0}
+.item .name{font-weight:700;margin:0 0 4px}
+.item .meta{color:var(--muted);font-size:13px}
+.item .price{font-weight:800;color:var(--primary)}
+.qty{display:flex;align-items:center;gap:6px;margin-top:6px}
+.qty button{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-weight:800;cursor:pointer}
+.qty span{min-width:24px;text-align:center;font-weight:700}
+.remove{background:transparent;border:0;color:var(--bad);font-weight:700;cursor:pointer;padding:6px;margin-left:8px}
+.total{display:flex;justify-content:space-between;font-weight:800;font-size:20px;margin-top:20px;padding-top:20px;border-top:2px solid var(--border)}
+.btn{display:block;width:100%;margin-top:20px;padding:16px;border:0;border-radius:12px;background:var(--primary);color:#fff;font:inherit;font-weight:800;font-size:16px;cursor:pointer;text-align:center;text-decoration:none}
+.btn:disabled{opacity:.6}
+.empty{text-align:center;color:var(--muted);padding:48px 0}
+.empty a{color:var(--primary);font-weight:700}
+</style>
+</head>
+<body>
+<header><img src="/static/logo.png" alt=""><a href="/">SalonAutoZone</a></header>
+<main>
+<h1>Your cart</h1>
+<div id="root">Loading…</div>
+</main>
+<script src="/static/cart.js"></script>
+<script src="/static/auth.js"></script>
+<script>
+(function () {
+  var root = document.getElementById("root");
+
+  function fmt(n) { return Number(n).toLocaleString() + " Le"; }
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function render() {
+    var items = SAZCart.read();
+    if (!items.length) {
+      root.innerHTML = '<div class="empty">Your cart is empty.<br><a href="/">Browse parts</a></div>';
+      return;
+    }
+    var html = "";
+    items.forEach(function (it) {
+      html += '<div class="item">' +
+        (it.image_url ? '<img class="thumb" src="' + esc(it.image_url) + '" alt="">' : '<div class="thumb"></div>') +
+        '<div class="body">' +
+          '<p class="name">' + esc(it.name) + '</p>' +
+          '<div class="meta">' + fmt(it.price_sll) + ' each</div>' +
+          '<div class="qty">' +
+            '<button data-act="dec" data-id="' + it.part_id + '">−</button>' +
+            '<span>' + it.qty + '</span>' +
+            '<button data-act="inc" data-id="' + it.part_id + '">+</button>' +
+          '</div>' +
+        '</div>' +
+        '<div style="text-align:right">' +
+          '<div class="price">' + fmt(it.qty * it.price_sll) + '</div>' +
+          '<button class="remove" data-act="rm" data-id="' + it.part_id + '">Remove</button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '<div class="total"><span>Total</span><span>' + fmt(SAZCart.total()) + '</span></div>';
+    html += '<button class="btn" id="checkout">Proceed to checkout</button>';
+    root.innerHTML = html;
+
+    root.querySelectorAll("[data-act]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var id = Number(b.dataset.id);
+        var items = SAZCart.read();
+        var it = items.find(function (x) { return x.part_id === id; });
+        if (!it) return;
+        if (b.dataset.act === "inc") SAZCart.setQty(id, it.qty + 1);
+        if (b.dataset.act === "dec") SAZCart.setQty(id, it.qty - 1);
+        if (b.dataset.act === "rm") SAZCart.remove(id);
+        render();
+      });
+    });
+
+    document.getElementById("checkout").addEventListener("click", function () {
+      if (!Auth || !Auth.requireLogin || !Auth.requireLogin()) return;
+      location.href = "/checkout?items=" + encodeURIComponent(SAZCart.itemsParam());
+    });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
