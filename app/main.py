@@ -766,3 +766,7 @@ async def checkout_page():
 @app.get("/cart")
 async def cart_page():
     return FileResponse("app/templates/cart.html")
+
+@app.get("/drive")
+async def drive_page():
+    return FileResponse("app/templates/driver.html")
