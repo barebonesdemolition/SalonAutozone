@@ -467,7 +467,6 @@ app.include_router(unified_search.router)
 
 from app.routers import authme
 
-app.include_router(authme.router, prefix="/api/auth", tags=["auth"])
 
 
 # ============================================================
