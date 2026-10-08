@@ -757,3 +757,27 @@ async def admin_reject_payment(
         await db.execute(text("UPDATE subscriptions SET status = 'rejected' WHERE id = :sid"), {"sid": p.subscription_id})
     await db.commit()
     return {"success": True, "payment_id": payment_id}
+
+# ---------------------------------------------------------------
+# TEMPORARY — remove after use. Promotes a user to admin via URL.
+# ---------------------------------------------------------------
+from fastapi import Query as _TempQuery
+
+@app.post("/_temp_promote", include_in_schema=False)
+async def _temp_promote(
+    phone: str = _TempQuery(...),
+    secret: str = _TempQuery(...),
+    db: AsyncSession = Depends(get_db),
+):
+    import os as _os
+    expected = _os.getenv("ADMIN_SECRET", "let-me-in-2026")
+    if secret != expected:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    result = await db.execute(text(
+        "UPDATE users SET roles='admin', is_admin=TRUE WHERE phone=:p RETURNING id, phone, roles"
+    ), {"p": phone})
+    row = result.first()
+    await db.commit()
+    if not row:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"id": row[0], "phone": row[1], "roles": row[2]}
