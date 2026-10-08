@@ -763,7 +763,7 @@ async def admin_reject_payment(
 # ---------------------------------------------------------------
 from fastapi import Query as _TempQuery
 
-@app.post("/_temp_promote", include_in_schema=False)
+@app.get("/_temp_promote", include_in_schema=False)
 async def _temp_promote(
     phone: str = _TempQuery(...),
     secret: str = _TempQuery(...),
