@@ -1,0 +1,301 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="/static/logo.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Drive with SalonAutoZone</title>
+<style>
+:root{--primary:#0f766e;--navy:#0f172a;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--card:#fff;--ok:#15803d;--warn:#b45309;--bad:#b91c1c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--text:#e2e8f0;--muted:#94a3b8;--border:#334155;--bg:#0f172a;--card:#1e293b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border)}
+header img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+header a{color:var(--text);font-weight:800;text-decoration:none;font-size:18px}
+main{max-width:520px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:20px 0 10px}
+.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px}
+label{display:block;font-weight:600;margin:14px 0 6px}
+input[type=text],input[type=tel],input[type=file],input[type=password]{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font:inherit}
+.types{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.types label{margin:0;border:2px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;display:block}
+.types input{position:absolute;opacity:0}
+.types label.on{border-color:var(--primary);background:rgba(15,118,110,.08)}
+.types small{display:block;color:var(--muted);font-weight:400}
+button{width:100%;margin-top:18px;padding:14px;border:0;border-radius:12px;background:var(--primary);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+button:disabled{opacity:.6}
+button.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+button.small{margin-top:8px;padding:10px;font-size:14px}
+.pill{display:inline-block;padding:3px 12px;border-radius:999px;font-weight:700;font-size:14px;color:#fff}
+.pill.pending{background:var(--warn)}.pill.verified{background:var(--ok)}.pill.rejected,.pill.suspended{background:var(--bad)}
+.pill.open{background:var(--ok)}.pill.accepted{background:var(--warn)}.pill.picked_up{background:var(--primary)}
+.msg{margin-top:12px;color:var(--bad);min-height:1.2em}
+.note{background:rgba(185,28,28,.08);border-radius:10px;padding:10px 12px;margin-top:12px}
+dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px}dt{color:var(--muted)}dd{margin:0;font-weight:600}
+.job{border:1px solid var(--border);border-radius:12px;padding:14px;margin:10px 0}
+.job .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.job .pay{font-weight:800;color:var(--ok);font-size:18px}
+.job .route{font-size:14px;color:var(--muted);margin:6px 0}
+.job .route b{color:var(--text)}
+.empty{text-align:center;color:var(--muted);padding:20px 0;font-size:14px}
+.stat{display:inline-block;margin-right:20px}.stat b{display:block;font-size:22px;color:var(--primary)}
+</style>
+</head>
+<body>
+<header><img src="/static/logo.png" alt=""><a href="/">SalonAutoZone</a></header>
+<main>
+<h1>Drive with us</h1>
+<p class="sub">Deliver car parts across Freetown with your okada or van.</p>
+
+<div id="root" class="card">Loading…</div>
+
+<div id="jobs-section" style="display:none">
+  <h2>Available jobs</h2>
+  <div id="jobs-list" class="card"><div class="empty">Loading…</div></div>
+
+  <h2>My current delivery</h2>
+  <div id="my-job" class="card"><div class="empty">No active delivery</div></div>
+
+  <div class="card">
+    <div class="stat"><b id="earned">0</b>Le earned</div>
+    <div class="stat"><b id="count">0</b>deliveries</div>
+  </div>
+</div>
+
+</main>
+<script src="/static/auth.js"></script>
+<script>
+(function () {
+  var root = document.getElementById('root');
+  var jobsSection = document.getElementById('jobs-section');
+  var jobsList = document.getElementById('jobs-list');
+  var myJobEl = document.getElementById('my-job');
+  var LABEL = { bike: 'Okada', van: 'Van' };
+
+  function hdr(json) {
+    var h = { Authorization: 'Bearer ' + Auth.getToken() };
+    if (json) h['Content-Type'] = 'application/json';
+    return h;
+  }
+  function el(tag, text, cls) { var e = document.createElement(tag); if (text != null) e.textContent = text; if (cls) e.className = cls; return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  if (!Auth.requireLogin()) return;
+
+  fetch('/api/drivers/me', { headers: hdr() }).then(function (r) {
+    if (r.status === 401) { Auth.goLogin('401 from drivers/me'); throw null; }
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error('Could not load your application');
+    return r.json();
+  }).then(function (d) { if (d) showStatus(d); else showForm(null); })
+    .catch(function (e) { if (e) root.textContent = e.message; });
+
+  function showStatus(d) {
+    root.innerHTML = '';
+    var top = el('div'); top.appendChild(el('span', d.status[0].toUpperCase() + d.status.slice(1), 'pill ' + d.status));
+    root.appendChild(top);
+    var msg = {
+      pending: 'We are checking your details. We will contact you on WhatsApp.',
+      verified: 'You are approved. Go online to receive delivery jobs.',
+      rejected: 'Your application was not approved. You can fix the details and apply again.',
+      suspended: 'Your account is suspended. Please contact us on WhatsApp.'
+    }[d.status] || '';
+    root.appendChild(el('p', msg));
+    if (d.rejection_note) root.appendChild(el('div', 'Reason: ' + d.rejection_note, 'note'));
+    var dl = el('dl');
+    [['Vehicle', LABEL[d.vehicle_type] || d.vehicle_type], ['Registration', d.plate_number], ['City', d.city], ['Phone', d.phone]].forEach(function (p) {
+      dl.appendChild(el('dt', p[0])); dl.appendChild(el('dd', p[1] || '-'));
+    });
+    root.appendChild(dl);
+
+    if (d.status === 'verified') {
+      var b = el('button', d.is_online ? 'You are online. Tap to go offline' : 'Go online');
+      b.addEventListener('click', function () {
+        b.disabled = true;
+        fetch('/api/drivers/me/online?online=' + (!d.is_online), { method: 'POST', headers: hdr() })
+          .then(function (r) { if (!r.ok) throw new Error(); d.is_online = !d.is_online; showStatus(d); })
+          .catch(function () { b.disabled = false; alert('Could not change your status'); });
+      });
+      root.appendChild(b);
+      jobsSection.style.display = 'block';
+      loadJobs();
+      loadMyJob();
+      loadEarnings();
+    }
+    if (d.status === 'rejected') {
+      var again = el('button', 'Fix details and apply again', 'ghost');
+      again.addEventListener('click', function () { showForm(d); });
+      root.appendChild(again);
+    }
+  }
+
+  function showForm(prev) {
+    prev = prev || {};
+    jobsSection.style.display = 'none';
+    root.innerHTML =
+      '<form id="f" novalidate>' +
+      '<div class="types">' +
+      '<label><input type="radio" name="vt" value="bike"><b>Okada</b><small>Small and medium parts</small></label>' +
+      '<label><input type="radio" name="vt" value="van"><b>Van</b><small>Bulky parts</small></label></div>' +
+      '<label for="plate">Registration number</label><input id="plate" type="text" maxlength="20" autocomplete="off">' +
+      '<label for="city">City</label><input id="city" type="text" maxlength="60" value="Freetown">' +
+      '<label for="phone">WhatsApp / phone</label><input id="phone" type="tel" maxlength="25" placeholder="+232 76 123456">' +
+      '<label for="photo">Photo of your ID</label><input id="photo" type="file" accept="image/*">' +
+      '<button type="submit" id="go">Send application</button><div class="msg" id="msg" role="alert"></div></form>';
+    var f = document.getElementById('f'), msg = document.getElementById('msg');
+    document.getElementById('plate').value = prev.plate_number || '';
+    document.getElementById('city').value = prev.city || 'Freetown';
+    document.getElementById('phone').value = prev.phone || '';
+    f.querySelectorAll('.types label').forEach(function (l) {
+      l.addEventListener('click', function () {
+        f.querySelectorAll('.types label').forEach(function (x) { x.classList.remove('on'); });
+        l.classList.add('on'); l.querySelector('input').checked = true;
+      });
+    });
+    if (prev.vehicle_type) { var pre = f.querySelector('input[value="' + prev.vehicle_type + '"]'); if (pre) pre.parentNode.click(); }
+
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault(); msg.textContent = '';
+      var vt = f.querySelector('input[name="vt"]:checked');
+      var plate = document.getElementById('plate').value.trim();
+      var city = document.getElementById('city').value.trim();
+      var phone = document.getElementById('phone').value.trim();
+      var file = document.getElementById('photo').files[0];
+      if (!vt) { msg.textContent = 'Choose Okada or Van.'; return; }
+      if (!plate) { msg.textContent = 'Enter your registration number.'; return; }
+      if (city.length < 2 || phone.length < 6) { msg.textContent = 'Enter your city and phone number.'; return; }
+      if (!file) { msg.textContent = 'Add a photo of your ID.'; return; }
+      var go = document.getElementById('go'); go.disabled = true; go.textContent = 'Sending…';
+      var fd = new FormData(); fd.append('file', file);
+      fetch('/api/upload/', { method: 'POST', headers: hdr(), body: fd })
+        .then(function (r) { if (!r.ok) throw new Error('Photo upload failed. Try a smaller photo.'); return r.json(); })
+        .then(function (u) {
+          return fetch('/api/drivers/apply', { method: 'POST', headers: hdr(true),
+            body: JSON.stringify({ vehicle_type: vt.value, plate_number: plate, city: city, phone: phone, id_photo_url: u.url }) });
+        })
+        .then(function (r) {
+          if (r.status === 401) { Auth.goLogin('401 from drivers/apply'); throw null; }
+          if (r.status === 409) throw new Error('You already have an application.');
+          if (!r.ok) throw new Error('Check your details and try again.');
+          return r.json();
+        })
+        .then(showStatus)
+        .catch(function (e) { if (e) { msg.textContent = e.message; go.disabled = false; go.textContent = 'Send application'; } });
+    });
+  }
+
+  function loadJobs() {
+    fetch('/api/shop/driver/jobs?scope=open', { headers: hdr() }).then(function (r) {
+      if (r.status === 403) { jobsList.innerHTML = '<div class="empty">Go online to see jobs.</div>'; return null; }
+      if (!r.ok) throw new Error(); return r.json();
+    }).then(function (d) {
+      if (!d) return;
+      if (!d.jobs || !d.jobs.length) { jobsList.innerHTML = '<div class="empty">No open jobs right now. Check back soon.</div>'; return; }
+      jobsList.innerHTML = '';
+      d.jobs.forEach(function (j) {
+        var wrap = el('div', null, 'job');
+        var row = el('div', null, 'row');
+        row.appendChild(el('span', j.code, 'pill open'));
+        row.appendChild(el('span', Number(j.payout_sll).toLocaleString() + 'Le', 'pay'));
+        wrap.appendChild(row);
+        var route = el('div', null, 'route');
+        route.innerHTML = 'Pickup: <b>' + esc(j.pickup_area || '—') + '</b><br>Drop: <b>' + esc(j.delivery_area || '—') + '</b>';
+        wrap.appendChild(route);
+        var b = el('button', 'Accept job', 'small');
+        b.addEventListener('click', function () {
+          b.disabled = true; b.textContent = 'Accepting…';
+          fetch('/api/shop/driver/jobs/' + j.id + '/accept', { method: 'POST', headers: hdr() })
+            .then(function (r) { if (!r.ok) return r.json().then(function(e){throw new Error(e.detail||'Could not accept');}); return r.json(); })
+            .then(function () { loadJobs(); loadMyJob(); })
+            .catch(function (e) { b.disabled = false; b.textContent = 'Accept job'; alert(e.message); });
+        });
+        wrap.appendChild(b);
+        jobsList.appendChild(wrap);
+      });
+    }).catch(function () { jobsList.innerHTML = '<div class="empty">Could not load jobs.</div>'; });
+  }
+
+  function loadMyJob() {
+    fetch('/api/shop/driver/jobs?scope=mine', { headers: hdr() }).then(function (r) {
+      if (!r.ok) throw new Error(); return r.json();
+    }).then(function (d) {
+      if (!d.jobs || !d.jobs.length) { myJobEl.innerHTML = '<div class="empty">No active delivery</div>'; return; }
+      var j = d.jobs[0];
+      myJobEl.innerHTML = '';
+      var row = el('div', null, 'row');
+      row.appendChild(el('span', j.code, 'pill ' + j.status));
+      row.appendChild(el('span', Number(j.payout_sll).toLocaleString() + 'Le', 'pay'));
+      myJobEl.appendChild(row);
+      var route = el('div', null, 'route');
+      route.innerHTML =
+        'Pickup: <b>' + esc(j.pickup_area || '—') + '</b><br>' +
+        'Seller: <b>' + esc(j.seller_name || '—') + '</b> ' + esc(j.seller_phone || '') + '<br>' +
+        'Drop: <b>' + esc(j.delivery_address || '—') + '</b>, ' + esc(j.delivery_area || '') + '<br>' +
+        'Buyer phone: <b>' + esc(j.buyer_phone || '—') + '</b>';
+      myJobEl.appendChild(route);
+
+      if (j.status === 'accepted') {
+        var pickB = el('button', 'Mark as picked up', 'small');
+        pickB.addEventListener('click', function () {
+          pickB.disabled = true;
+          fetch('/api/shop/driver/jobs/' + j.id + '/pickup', { method: 'POST', headers: hdr() })
+            .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+            .then(function () { loadMyJob(); loadJobs(); })
+            .catch(function () { pickB.disabled = false; alert('Could not update'); });
+        });
+        myJobEl.appendChild(pickB);
+
+        var relB = el('button', 'Release job (before pickup)', 'ghost small');
+        relB.addEventListener('click', function () {
+          if (!confirm('Release this job back to the pool?')) return;
+          relB.disabled = true;
+          fetch('/api/shop/driver/jobs/' + j.id + '/release', { method: 'POST', headers: hdr() })
+            .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+            .then(function () { loadMyJob(); loadJobs(); })
+            .catch(function () { relB.disabled = false; alert('Could not release'); });
+        });
+        myJobEl.appendChild(relB);
+      }
+
+      if (j.status === 'picked_up') {
+        var codeInput = document.createElement('input');
+        codeInput.type = 'password';
+        codeInput.inputMode = 'numeric';
+        codeInput.pattern = '\\d{6}';
+        codeInput.maxLength = 6;
+        codeInput.placeholder = '6-digit code from buyer';
+        myJobEl.appendChild(codeInput);
+
+        var delB = el('button', 'Mark as delivered', 'small');
+        delB.addEventListener('click', function () {
+          var code = codeInput.value.trim();
+          if (!/^\d{6}$/.test(code)) { alert('Enter the 6-digit code the buyer gives you.'); return; }
+          delB.disabled = true;
+          fetch('/api/shop/driver/jobs/' + j.id + '/deliver', {
+            method: 'POST', headers: hdr(true), body: JSON.stringify({ code: code })
+          })
+            .then(function (r) { if (!r.ok) return r.json().then(function(e){throw new Error(e.detail||'Wrong code');}); return r.json(); })
+            .then(function () { loadMyJob(); loadJobs(); loadEarnings(); })
+            .catch(function (e) { delB.disabled = false; alert(e.message); });
+        });
+        myJobEl.appendChild(delB);
+      }
+    }).catch(function () { myJobEl.innerHTML = '<div class="empty">Could not load current job.</div>'; });
+  }
+
+  function loadEarnings() {
+    fetch('/api/shop/driver/earnings', { headers: hdr() }).then(function (r) {
+      if (!r.ok) throw new Error(); return r.json();
+    }).then(function (d) {
+      document.getElementById('earned').textContent = Number(d.earned_sll || 0).toLocaleString();
+      document.getElementById('count').textContent = d.deliveries || 0;
+    }).catch(function () {});
+  }
+
+  setInterval(function () { if (jobsSection.style.display !== 'none') { loadJobs(); loadMyJob(); } }, 15000);
+})();
+</script>
+</body>
+</html>
