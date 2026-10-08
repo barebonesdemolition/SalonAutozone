@@ -118,7 +118,7 @@ a{color:inherit;text-decoration:none}
 .brand em { font-style: normal; }
 .brand em span { color: #0f766e; }
 @media (max-width: 640px) {
-  .brand img.logo-img { height: 72px; width: 72px; box-shadow: 0 4px 14px rgba(15,118,110,.28); }
+  .brand img.logo-img { height: 96px; width: 96px; border-radius: 50%; display: block; }
   .brand { font-size: 17px; }
 }
 /* big-logo */
@@ -152,7 +152,7 @@ a{color:inherit;text-decoration:none}
  <div><a href="tel:+23276123456" class="ph">+232 76 123456</a><a href="/login" id="signin">Sign in / Register</a></div>
 </div>
 
-<header class="brand">
+<header class="brand"><img src="/static/logo.png" alt="" class="logo-img">
  <div class="logo"><img src="/static/logo.png" alt="SalonAutoZone" style="height:44px;width:44px;border-radius:50%;vertical-align:middle;margin-right:10px;"><em style="font-style:normal;font-weight:800;font-size:18px;">Salon<span style="color:#0f766e;">AutoZone</span></em></div>
  <div class="tabs" role="tablist">
  <button role="tab" id="t-parts" aria-selected="true" data-act="market" data-v="parts">AutoZone Parts Store</button>
@@ -731,5 +731,7 @@ a{color:inherit;text-decoration:none}
 </script>
 </body>
 </html>
+
+
 
 
