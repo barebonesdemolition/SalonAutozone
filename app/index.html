@@ -125,7 +125,7 @@ a{color:inherit;text-decoration:none}
 .brand img.logo-img,
 .logo img,
 .brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
+.logo em { font-style: normal; font-weight: 800; font-size: 32px; vertical-align: middle; }
 @media (max-width: 640px) {
   .brand img.logo-img,
   .logo img,
@@ -159,9 +159,9 @@ a{color:inherit;text-decoration:none}
  <button role="tab" id="t-vehicles" class="cars" aria-selected="false" data-act="market" data-v="vehicles">Cars and Trucks Marketplace</button>
  </div>
  <nav class="nav">
- <a href="/vin-tool">VIN Lookup</a><a href="/garage">My Garage</a><a href="/cart">🛒 Cart<span id="header-cart-count"></span></a>
- <a href="/become-a-seller">Sell with us</a>
- <a href="#" data-act="list" data-v="vehicle">Sell a car</a>
+ <a href="/vin-tool">VIN Lookup</a><a href="/garage">My Garage</a><a id="header-cart" href="/cart">🛒 Cart<span id="header-cart-count"></span></a>
+ <a href="/become-a-seller">Register a business</a>
+ <a href="#" data-act="list" data-v="vehicle"><span id="header-sell-car" style="display:none">Sell a car</span></a>
  <a href="#" data-act="list" data-v="parts" class="btn-o">+ List a part</a>
  </nav>
 </header>
@@ -729,7 +729,7 @@ a{color:inherit;text-decoration:none}
  init();
 })();
 </script>
-</body>
+<script src="/static/header-tabs.js"></script></body>
 </html>
 
 
@@ -740,4 +740,9 @@ a{color:inherit;text-decoration:none}
 
 
 <script src="/static/auth-header.js"></script>
+
+
+
+
+
 
