@@ -118,7 +118,7 @@ a{color:inherit;text-decoration:none}
 .brand em { font-style: normal; }
 .brand em span { color: #0f766e; }
 @media (max-width: 640px) {
-  .brand img.logo-img { height: 96px; width: 96px; border-radius: 50%; display: block; }
+  .brand img.logo-img { height: 40px; width: 40px; border-radius: 50%; display: block; }
   .brand { font-size: 17px; }
 }
 /* big-logo */
@@ -130,6 +130,21 @@ a{color:inherit;text-decoration:none}
   .brand img.logo-img,
   .logo img,
   .brand em, .logo em { font-size: 20px; }
+}
+</style>
+<style id="mobile-fix">
+@media (max-width: 640px) {
+  .brand img.logo-img { height: 40px !important; width: 40px !important; }
+  .brand { padding: 6px 10px !important; gap: 6px !important; flex-wrap: nowrap !important; }
+  .brand .logo, .brand .logo em { font-size: 18px !important; line-height: 1.1 !important; }
+  .brand .logo em { white-space: nowrap; }
+}
+</style>
+<style id="mobile-logo-fix">
+@media (max-width: 640px) {
+  .brand img.logo-img { height: 40px !important; width: 40px !important; }
+  .brand .logo, .brand .logo em { font-size: 18px !important; line-height: 1.1 !important; }
+  .brand { padding: 6px 10px !important; }
 }
 </style>
 </head>
@@ -740,6 +755,8 @@ a{color:inherit;text-decoration:none}
 
 
 <script src="/static/auth-header.js"></script>
+
+
 
 
 
