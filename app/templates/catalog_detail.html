@@ -45,17 +45,15 @@ h1{color:#0b1e3a;font-size:26px;margin-bottom:12px}
   .brand em, .logo em { font-size: 20px; }
 }
 </style>
-<link rel="stylesheet" href="/static/base.css?v=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/chrome.css?v=5">
+<link rel="stylesheet" href="/static/legacy.css?v=4">
 </head>
 <body>
-<div class="navbar">
-<a href="/" class="logo"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a>
-<div>
-<a href="/">Home</a>
-<a href="/vin-tool">VIN Lookup</a>
-<a href="/admin/catalog">Catalog Admin</a>
-</div>
-</div>
+<div id="site-header"></div>
 <div class="container">
 <a href="/" class="back-link">← Back to Search</a>
 <div class="card" id="content">Loading...</div>
@@ -110,5 +108,6 @@ function whatsappUs(pn){
 }
 loadPart();
 </script>
+<script src="/static/site.js?v=4"></script>
 </body>
 </html>

@@ -67,6 +67,7 @@ async def create_part_listing(
     data = part.model_dump(exclude=PROTECTED_FIELDS, exclude_unset=True)
     # Ownership always comes from the login token, never from the client
     data["vendor_id"] = current_user.id
+    data["seller_id"] = current_user.id  # NOT NULL in the model; was never set
 
     new_part = models.PartListing(**data)
     db.add(new_part)

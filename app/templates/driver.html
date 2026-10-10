@@ -42,9 +42,14 @@ dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px}dt{c
 .empty{text-align:center;color:var(--muted);padding:20px 0;font-size:14px}
 .stat{display:inline-block;margin-right:20px}.stat b{display:block;font-size:22px;color:var(--primary)}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/chrome.css?v=5">
+<link rel="stylesheet" href="/static/legacy.css?v=4">
 </head>
 <body>
-<header><img src="/static/logo.png" alt=""><a href="/">SalonAutoZone</a></header>
+<div id="site-header"></div>
 <main>
 <h1>Drive with us</h1>
 <p class="sub">Deliver car parts across Freetown with your okada or van.</p>
@@ -297,5 +302,6 @@ dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px}dt{c
   setInterval(function () { if (jobsSection.style.display !== 'none') { loadJobs(); loadMyJob(); } }, 15000);
 })();
 </script>
+<script src="/static/site.js?v=4"></script>
 </body>
 </html>

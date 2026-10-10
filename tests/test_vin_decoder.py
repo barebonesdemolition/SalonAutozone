@@ -166,3 +166,19 @@ def test_catalog_index_links_when_make_unknown():
 def test_decode_includes_catalog_links(offline):
     result = run(vd.decode("JTDBR32E1A0000000"))
     assert [l["name"] for l in result["parts_catalogs"]] == ["Amayama", "Megazip"]
+
+
+def test_recalls_endpoint(monkeypatch):
+    async def fake(make, model, year):
+        return [{"campaign": "03V001000", "component": "AIR BAGS", "summary": "x"}]
+    monkeypatch.setattr(vd, "fetch_recalls", fake)
+    client = TestClient(app)
+    body = client.get("/api/vin/recalls?make=Honda&model=Accord&year=2003").json()
+    assert body["count"] == 1 and body["recalls"][0]["component"] == "AIR BAGS"
+
+
+def test_recalls_endpoint_when_nhtsa_down(monkeypatch):
+    async def down(make, model, year):
+        return None
+    monkeypatch.setattr(vd, "fetch_recalls", down)
+    assert TestClient(app).get("/api/vin/recalls?make=Honda&model=Accord&year=2003").status_code == 503

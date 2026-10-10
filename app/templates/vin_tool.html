@@ -2,353 +2,236 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Free VIN Lookup · SalonAutoZone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Free VIN check · SalonAutoZone</title>
+<meta name="description" content="Free VIN check: find a car's make, model, year, engine and where it was built, then find parts that fit.">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%2300a8e8' font-family='Arial'>S</text></svg>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=5">
+<link rel="stylesheet" href="/static/chrome.css?v=5">
 <style>
-:root{
-  --navy-900:#0a1729;--navy-800:#0b1e3a;--navy-600:#1a3a6b;
-  --blue-400:#00a8e8;--blue-500:#0091d5;
-  --amber-500:#ffb800;--orange-500:#ff6b00;--orange-600:#e55a00;
-  --green-500:#16a34a;--green-400:#22c55e;
-  --red-500:#dc2626;
-  --slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;
-  --slate-400:#94a3b8;--slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;
-  --slate-800:#1e293b;
-  --shadow-sm:0 1px 2px rgba(15,23,42,0.04),0 1px 3px rgba(15,23,42,0.06);
-  --shadow-md:0 2px 4px rgba(15,23,42,0.04),0 4px 12px rgba(15,23,42,0.06);
-  --shadow-lg:0 4px 8px rgba(15,23,42,0.06),0 12px 28px rgba(15,23,42,0.10);
-  --shadow-xl:0 8px 24px rgba(15,23,42,0.12),0 24px 48px rgba(15,23,42,0.14);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--slate-800);background:var(--slate-50);-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
-.navbar{background:var(--navy-800);color:white;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.logo{font-size:18px;font-weight:800;color:var(--blue-400);text-decoration:none;letter-spacing:-0.03em}
-.logo span{color:var(--amber-500)}
-.nav-links{display:flex;gap:8px;flex-wrap:wrap}
-.navbar a{color:white;text-decoration:none;font-size:13px;padding:9px 14px;border-radius:8px;background:rgba(255,255,255,0.08);transition:background 0.15s;font-weight:600}
-.navbar a:hover{background:rgba(255,255,255,0.18)}
-.hero{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-600) 100%);color:white;padding:56px 24px 96px;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(0,168,232,0.15) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(255,184,0,0.08) 0%,transparent 50%);pointer-events:none}
-.hero > *{position:relative;z-index:1}
-.hero h1{font-size:clamp(28px,5vw,40px);font-weight:800;margin-bottom:12px;letter-spacing:-0.03em;line-height:1.15}
-.hero p{font-size:16px;opacity:0.85;margin-bottom:32px;max-width:560px;margin-left:auto;margin-right:auto;line-height:1.55}
-.vin-input-box{max-width:640px;margin:0 auto;display:flex;gap:10px;background:white;padding:10px;border-radius:14px;box-shadow:0 20px 60px rgba(10,23,41,0.35),0 8px 24px rgba(10,23,41,0.2)}
-.vin-input-box input{flex:1;padding:14px 16px;border:none;font-size:16px;font-family:'Courier New',monospace;letter-spacing:2px;outline:none;color:var(--navy-800);font-weight:700;border-radius:8px;background:transparent}
-.vin-input-box input::placeholder{font-weight:400;letter-spacing:0;font-family:'Inter',sans-serif}
-.vin-input-box button{background:linear-gradient(135deg,var(--blue-400),var(--blue-500));color:white;border:none;padding:14px 28px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;white-space:nowrap;box-shadow:0 4px 12px rgba(0,168,232,0.3);transition:transform 0.15s,box-shadow 0.15s}
-.vin-input-box button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,168,232,0.4)}
-.vin-input-box button:disabled{opacity:0.6;cursor:wait}
-.example-vins{text-align:center;color:rgba(255,255,255,0.7);font-size:13px;margin-top:20px;line-height:2}
-.example-vins span{color:var(--blue-400);cursor:pointer;text-decoration:underline;margin:0 5px;transition:color 0.15s}
-.example-vins span:hover{opacity:0.8}
-.container{max-width:1000px;margin:-48px auto 60px;padding:0 20px;position:relative;z-index:10}
-.result-card{background:white;border-radius:16px;padding:32px;box-shadow:var(--shadow-lg);display:none;border:1px solid var(--slate-200)}
-.result-card.show{display:block;animation:fadeInUp 0.4s ease-out}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.result-header{display:flex;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--slate-200);align-items:center;flex-wrap:wrap}
-.result-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--blue-400),var(--blue-500));border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:30px;flex-shrink:0;box-shadow:0 6px 16px rgba(0,168,232,0.3)}
-.result-icon svg{width:34px;height:34px;stroke-width:1.5}
-.result-title{font-size:24px;color:var(--navy-800);font-weight:800;letter-spacing:-0.02em;line-height:1.2}
-.result-subtitle{color:var(--slate-500);font-size:13px;font-family:'Courier New',monospace;letter-spacing:1px;margin-top:4px;font-weight:600}
-.specs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
-.spec{background:var(--slate-50);padding:14px 16px;border-radius:10px;border-left:3px solid var(--blue-400)}
-.spec-label{font-size:10px;color:var(--slate-400);text-transform:uppercase;font-weight:700;letter-spacing:0.08em;margin-bottom:4px}
-.spec-value{font-size:16px;font-weight:700;color:var(--navy-800);line-height:1.3;word-break:break-word}
-.parts-section{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-radius:12px;padding:20px;border-left:4px solid var(--blue-400)}
-.parts-title{font-weight:800;color:var(--navy-800);margin-bottom:14px;font-size:15px;display:flex;align-items:center;gap:8px;letter-spacing:-0.01em}
-.parts-list{display:flex;gap:8px;flex-wrap:wrap}
-.part-tag{background:white;padding:8px 14px;border-radius:9999px;font-size:13px;font-weight:700;color:var(--navy-800);border:1px solid #cce7f5;transition:transform 0.15s,box-shadow 0.15s}
-.part-tag:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,168,232,0.2)}
-.error-card{background:#fef2f2;border-radius:12px;padding:20px;border-left:4px solid var(--red-500);color:#991b1b;font-weight:600;display:none;margin-bottom:20px;font-size:14px;line-height:1.5}
-.error-card.show{display:block;animation:fadeInUp 0.4s ease-out}
-.loading-card{background:white;border-radius:16px;padding:60px 24px;box-shadow:var(--shadow-lg);display:none;text-align:center;border:1px solid var(--slate-200)}
-.loading-card.show{display:block}
-.spinner{width:44px;height:44px;border:4px solid var(--slate-200);border-top-color:var(--blue-400);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{color:var(--blue-400);font-weight:700;font-size:15px}
-@media (max-width:768px){
-  .navbar{padding:12px 16px;flex-direction:column;gap:8px}
-  .nav-links{width:100%;justify-content:center}
-  .navbar a{font-size:12px;padding:8px 12px}
-  .hero{padding:40px 16px 80px}
-  .hero h1{font-size:26px;line-height:1.2}
-  .hero p{font-size:14px;padding:0 8px}
-  .vin-input-box{flex-direction:column;padding:12px;gap:8px}
-  .vin-input-box input{padding:14px;font-size:16px;text-align:center;letter-spacing:2px}
-  .vin-input-box button{width:100%;padding:16px;font-size:16px;min-height:52px}
-  .example-vins{font-size:12px;padding:0 8px}
-  .example-vins span{display:inline-block;margin:4px 4px}
-  .container{margin-top:24px;padding:0 12px;margin-bottom:40px}
-  .result-card{padding:20px;border-radius:14px}
-  .result-icon{width:52px;height:52px;border-radius:12px}
-  .result-icon svg{width:28px;height:28px}
-  .result-title{font-size:20px}
-  .specs-grid{grid-template-columns:1fr 1fr;gap:10px}
-  .spec{padding:12px 14px}
-  .spec-value{font-size:14px}
-  .parts-section{padding:16px}
-  .part-tag{padding:6px 12px;font-size:12px}
-}
-@media (max-width:400px){
-  .specs-grid{grid-template-columns:1fr}
-  .hero h1{font-size:22px}
-}
+.hero { background: var(--ink); color: #b9cbc9; padding: 30px 0 34px; }
+.hero h1 { color: #fff; font-size: clamp(30px, 6vw, 48px); font-variation-settings: "wdth" 75; }
+.hero p { margin-top: 8px; max-width: 52ch; }
+.vin-form { margin-top: 20px; display: flex; gap: 8px; max-width: 680px; }
+.vin-form .input { min-height: 56px; border: 0; font-size: 20px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-variation-settings: "wdth" 90; }
+.vin-form .input::placeholder { letter-spacing: 0; font-weight: 500; font-size: 17px; text-transform: none; }
+.vin-form .btn { min-height: 56px; padding: 0 22px; }
+.counter { margin-top: 8px; font-size: 14px; }
+.counter b { color: var(--gold); }
+.where { margin-top: 18px; font-size: 14px; }
+.where summary { cursor: pointer; color: #fff; font-weight: 600; }
+.where p { margin-top: 6px; max-width: 60ch; }
+.examples { margin-top: 12px; font-size: 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.examples button { border: 1.5px solid rgba(223, 236, 235, .22); background: none; color: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 600; min-height: 36px; }
 
-    .vin-silhouette { width: 100%; max-width: 260px; margin: 0 auto 16px; display: block; }
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
+.out { margin-top: 24px; display: grid; gap: 16px; }
+.car-head { display: flex; gap: 16px; align-items: center; padding: 18px; }
+.car-head img { width: 104px; height: auto; flex-shrink: 0; opacity: .85; }
+.car-head h2 { font-size: clamp(24px, 4.6vw, 34px); }
+.car-head .vin { margin-top: 6px; font-weight: 700; letter-spacing: .1em; color: var(--muted); font-size: 14px; word-break: break-all; }
+.source { display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 6px; background: var(--teal-50); color: var(--teal-600); }
+.source.basic { background: var(--gold-50); color: #7a4b00; }
+.specs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--line); }
+.spec { background: var(--card); padding: 12px 14px; }
+.spec dt { font-size: 13px; color: var(--muted); }
+.spec dd { margin: 2px 0 0; font-weight: 700; color: var(--ink); }
+@media (min-width: 760px) { .specs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.actions { display: grid; gap: 8px; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .actions { grid-template-columns: 1fr 1fr; } }
+.oem { padding: 18px; }
+.oem h3 { font-size: 22px; }
+.oem p { color: var(--muted); margin-top: 4px; }
+.oem .copy { margin-top: 14px; display: flex; gap: 8px; align-items: center; }
+.oem .copy code { flex: 1; min-width: 0; padding: 12px 14px; border-radius: var(--r-sm); background: var(--paper); border: 1px dashed var(--line); font-family: var(--font); font-weight: 800; letter-spacing: .1em; overflow-wrap: anywhere; }
+.oem .links { margin-top: 10px; display: grid; gap: 8px; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .oem .links { grid-template-columns: 1fr 1fr; } }
+.oem .links a { justify-content: space-between; }
+.oem .links small { font-weight: 500; color: var(--muted); }
+.oem .fine { font-size: 13px; margin-top: 10px; }
+.common { padding: 18px; }
+.common h3 { font-size: 20px; margin-bottom: 8px; }
+.common a { display: inline-block; margin: 4px 6px 0 0; padding: 7px 12px; border-radius: 999px; background: var(--teal-50); color: var(--teal-600); font-weight: 600; font-size: 14px; text-decoration: none; }
+.loading { padding: 28px; text-align: center; color: var(--muted); }
+.spinner { width: 34px; height: 34px; margin: 0 auto 10px; border: 4px solid var(--teal-50); border-top-color: var(--teal); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
-<link rel="stylesheet" href="/static/base.css?v=1">
 </head>
 <body>
+<div id="site-header"></div>
 
-<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="icon-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 7V4h6v3"/></symbol>
-</svg>
-
-<div class="navbar">
-  <a href="/" class="logo">Salon<span>AutoZone</span> & <span>AutoTrader</span></a>
-  <div class="nav-links">
-    <a href="/">🏠 Home</a>
-    <a href="/vin-tool">🔍 VIN Lookup</a>
-    <a href="/my-account">👤 My Account</a>
+<section class="hero">
+ <div class="wrap">
+  <h1>Free VIN check</h1>
+  <p>Enter the 17-character VIN to see the make, model, year and engine, then find parts that fit. Japanese imports with a chassis number work too.</p>
+  <form class="vin-form" id="vin-form" autocomplete="off">
+   <label class="sr-only" for="vin-input">VIN or chassis number</label>
+   <input class="input" id="vin-input" maxlength="22" spellcheck="false" autocapitalize="characters" placeholder="e.g. 1HGCM82633A004352" enterkeyhint="search">
+   <button class="btn btn-gold" type="submit" id="lookup-btn">Check</button>
+  </form>
+  <div class="counter" id="counter" aria-live="polite"></div>
+  <details class="where">
+   <summary>Where do I find my VIN?</summary>
+   <p>Look at the bottom corner of the windscreen on the driver's side, the sticker inside the driver's door, or your vehicle registration papers. Japanese imports often show a chassis number like NZE121-1234567 instead.</p>
+  </details>
+  <div class="examples">Try:
+   <button type="button" data-vin="1HGCM82633A004352">Honda Accord</button>
+   <button type="button" data-vin="5YJSA1DG9DFP14705">Tesla Model S</button>
+   <button type="button" data-vin="NZE121-3012345">Corolla chassis no.</button>
   </div>
-</div>
+ </div>
+</section>
 
-<div class="hero">
-  <h1>🔍 Free VIN Lookup</h1>
-  <p>Enter your 17-character VIN to decode your car's make, model, year, engine, and location — instantly and free. Works best for cars built for the US; for other cars we show the basics read from the VIN.</p>
-  <div class="vin-input-box">
-    <input type="text" id="vin-input" placeholder="Enter 17-character VIN" maxlength="17" autocomplete="off" spellcheck="false" inputmode="text">
-    <button onclick="lookupVIN()" id="lookup-btn">Decode VIN</button>
-  </div>
-  <div class="example-vins">
-    Try an example:
-    <span onclick="tryVin('JTDBR32E830123456')">Toyota Corolla</span>|
-    <span onclick="tryVin('5N1AN08U16C617716')">Nissan Xterra</span>|
-    <span onclick="tryVin('1HGCV1F30LA123456')">Honda Accord</span>|
-    <span onclick="tryVin('WBA3A5C55DF123456')">BMW 3 Series</span>
-  </div>
-</div>
+<main class="wrap">
+ <div class="out" id="out" aria-live="polite"></div>
+</main>
 
-<div class="container">
-  <div id="error" class="error-card"></div>
-  <div id="loading" class="loading-card">
-    <div class="spinner"></div>
-    <div class="loading-text">Decoding your VIN...</div>
-  </div>
-  <div id="result" class="result-card"></div>
-</div>
-
+<script src="/static/site.js?v=4"></script>
 <script>
 (function () {
-  'use strict';
+ 'use strict';
+ var $ = function (id) { return document.getElementById(id); };
+ var input = $('vin-input'), out = $('out'), btn = $('lookup-btn');
+ var CHASSIS = /^[A-Z]{2,6}\d{0,3}[A-Z]?-?\d{5,7}$/;
+ var AMAYAMA = 'https://www.amayama.com/en/genuine-catalogs';
+ var MEGAZIP = 'https://www.megazip.net/zapchasti-dlya-avtomobilej';
+ var COMMON = {
+  toyota: ['Brake pads', 'Oil filter', 'Air filter', 'Spark plugs', 'Timing belt', 'Water pump'],
+  lexus: ['Brake pads', 'Oil filter', 'Air filter', 'Spark plugs', 'Water pump'],
+  nissan: ['Brake pads', 'Oil filter', 'Air filter', 'CV joint', 'Alternator'],
+  honda: ['Brake pads', 'Oil filter', 'Air filter', 'Spark plugs', 'Timing belt'],
+  mercedes: ['Brake pads', 'Oil filter', 'Air filter', 'Battery', 'Control arms'],
+  bmw: ['Brake pads', 'Oil filter', 'Water pump', 'Control arms', 'Battery']
+ };
 
-  var inputEl = document.getElementById('vin-input');
-  var btnEl = document.getElementById('lookup-btn');
-  var resultEl = document.getElementById('result');
-  var errorEl = document.getElementById('error');
-  var loadingEl = document.getElementById('loading');
+ function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function clean(v) { return (v || '').toUpperCase().replace(/[\s.]/g, ''); }
+ function token() { try { return localStorage.getItem('token') || ''; } catch (e) { return ''; } }
+ function toast(msg, type) {
+  var t = $('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.className = 'toast ' + (type || ''); t.textContent = msg; void t.offsetWidth; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
+ }
+ function titleCase(s) { return String(s || '').toLowerCase().replace(/(^|[\s-])\S/g, function (m) { return m.toUpperCase(); }); }
 
-  function esc(s) {
-    if (s === null || s === undefined || s === '') return '';
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
+ function counter() {
+  var v = clean(input.value).replace(/-/g, '');
+  if (!v) { $('counter').textContent = ''; return; }
+  if (CHASSIS.test(clean(input.value)) && v.length !== 17) { $('counter').innerHTML = 'Looks like a <b>chassis number</b>'; return; }
+  $('counter').innerHTML = '<b>' + v.length + '</b> of 17 characters';
+ }
+
+ function copyBox(value) {
+  return '<div class="copy"><code id="copy-val">' + esc(value) + '</code><button type="button" class="btn btn-ghost" data-copy="' + esc(value) + '">Copy</button></div>';
+ }
+ function catalogLinks(links) {
+  return '<div class="links">' + links.map(function (l) {
+   return '<a class="btn btn-ghost btn-lg" href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.name) + ' <small>' + esc(l.accepts) + '</small></a>';
+  }).join('') + '</div>';
+ }
+ function oemPanel(value, links, intro) {
+  return '<section class="panel oem"><h3>Find genuine part numbers</h3><p>' + intro + '</p>' + copyBox(value) + catalogLinks(links) +
+   '<p class="fine muted">These free catalogues are run by other companies and open in a new tab. Paste the number into their search box, note the part number, then search for it here.</p></section>';
+ }
+
+ function showChassis(raw) {
+  out.innerHTML =
+   '<section class="panel car-head"><img src="/static/silhouettes/generic.svg" alt=""><div><h2>Japanese chassis number</h2>' +
+   '<div class="vin">' + esc(raw) + '</div><span class="source basic">Can\'t be decoded like a VIN</span></div></section>' +
+   oemPanel(raw, [{ name: 'Amayama', url: AMAYAMA, accepts: 'chassis number' }, { name: 'Megazip', url: MEGAZIP, accepts: 'chassis number' }],
+    'Japanese-market cars use a chassis (frame) number. These catalogues can look it up and show the exact parts for your car.') +
+   '<div class="actions"><a class="btn btn-primary btn-lg" href="/?tab=parts">Search parts by make and model</a><a class="btn btn-ghost btn-lg" href="/?action=import">Order a part from abroad</a></div>';
+ }
+
+ function render(r) {
+  var make = r.make ? titleCase(r.make) : '';
+  var title = [r.year, make, r.model].filter(Boolean).join(' ') || 'Unknown vehicle';
+  var specs = [
+   ['Make', make], ['Model', r.model], ['Year', r.year], ['Trim', [r.series, r.trim].filter(Boolean).join(' ')],
+   ['Body', r.body_class], ['Engine', r.engine], ['Fuel', r.fuel_type], ['Gearbox', r.transmission],
+   ['Drive', r.drive_type], ['Built in', r.plant_country ? titleCase(r.plant_country) : r.country_of_origin], ['Manufacturer', r.manufacturer ? titleCase(r.manufacturer) : ''], ['Doors', r.doors]
+  ].filter(function (s) { return s[1]; });
+  var nhtsa = r.source === 'NHTSA';
+  var h = '<section class="panel car-head"><img src="' + esc(r.placeholder || '/static/silhouettes/generic.svg') + '" alt=""><div>' +
+   '<h2>' + esc(title) + '</h2><div class="vin">' + esc(r.vin) + '</div>' +
+   '<span class="source' + (nhtsa ? '' : ' basic') + '">' + (nhtsa ? 'Full details' : 'Basic details from the VIN') + '</span></div></section>';
+  if (r.warnings && r.warnings.length) h += '<div class="notice notice-warn">' + r.warnings.map(esc).join('<br>') + '</div>';
+  if (specs.length) h += '<dl class="specs">' + specs.map(function (s) { return '<div class="spec"><dt>' + esc(s[0]) + '</dt><dd>' + esc(s[1]) + '</dd></div>'; }).join('') + '</dl>';
+
+  var q = new URLSearchParams();
+  if (make) q.set('make', make);
+  if (r.model) q.set('model', r.model);
+  if (r.year) q.set('year', r.year);
+  h += '<div class="actions"><a class="btn btn-primary btn-lg" href="/?' + q.toString() + '">Shop parts for this car</a>' +
+   '<button type="button" class="btn btn-ghost btn-lg" id="save-garage">Save to my garage</button></div>';
+
+  if (r.parts_catalogs && r.parts_catalogs.length) {
+   h += oemPanel(r.vin, r.parts_catalogs, 'See the exact factory parts and part numbers for this ' + esc(make || 'car') + '.');
   }
-  function show(el) { if (el) el.classList.add('show'); }
-  function hide(el) { if (el) el.classList.remove('show'); }
+  var list = COMMON[(make.toLowerCase().split('-')[0])] || ['Brake pads', 'Oil filter', 'Air filter', 'Spark plugs', 'Battery'];
+  h += '<section class="panel common"><h3>Parts people often need</h3>' + list.map(function (p) {
+   var u = new URLSearchParams(q); u.set('q', p);
+   return '<a href="/?' + u.toString() + '">' + esc(p) + '</a>';
+  }).join('') + '</section>';
+  out.innerHTML = h;
+  $('save-garage').addEventListener('click', function () { saveGarage(r, make); });
+ }
 
-  window.tryVin = function (v) {
-    inputEl.value = v;
-    lookupVIN();
-  };
+ function saveGarage(r, make) {
+  if (!token()) { location.href = '/login?next=' + encodeURIComponent('/vin-tool?vin=' + r.vin); return; }
+  if (!make || !r.model || !r.year) { toast('We need the make, model and year to save this car', 'error'); return; }
+  var b = $('save-garage'); b.disabled = true;
+  fetch('/api/garage/', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() },
+   body: JSON.stringify({ make: make, model: r.model, year: Number(r.year), vin: r.vin }) })
+   .then(function (res) { if (!res.ok) throw new Error(); b.textContent = 'Saved to my garage'; toast('Saved to your garage', 'success'); })
+   .catch(function () { b.disabled = false; toast('Could not save. Try again.', 'error'); });
+ }
 
-  inputEl.addEventListener('input', function () {
-    var v = this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, 17);
-    if (v !== this.value) this.value = v;
-  });
-
-  inputEl.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') lookupVIN();
-  });
-
-  var queryVin = new URLSearchParams(window.location.search).get('vin');
-  if (queryVin) {
-    inputEl.value = queryVin.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, 17);
-    if (inputEl.value.length === 17) setTimeout(function () { lookupVIN(); }, 0);
+ function lookup() {
+  var raw = clean(input.value);
+  if (!raw) { input.focus(); return; }
+  if (CHASSIS.test(raw) && raw.replace(/-/g, '').length !== 17) { showChassis(raw); return; }
+  var vin = raw.replace(/-/g, '');
+  if (vin.length !== 17) {
+   out.innerHTML = '<div class="notice notice-bad">A VIN has exactly 17 characters. You entered ' + vin.length + '. Check the windscreen or door sticker.</div>';
+   return;
   }
+  try { history.replaceState(null, '', '/vin-tool?vin=' + vin); } catch (e) {}
+  out.innerHTML = '<div class="panel loading"><div class="spinner"></div>Checking ' + esc(vin) + '…</div>';
+  btn.disabled = true;
+  var c = new AbortController(), t = setTimeout(function () { c.abort(); }, 20000);
+  fetch('/api/vin/decode/' + encodeURIComponent(vin), { signal: c.signal })
+   .then(function (res) { return res.json().then(function (d) { if (!res.ok) throw new Error(d.detail || 'We couldn\'t check this VIN.'); return d; }); })
+   .then(render)
+   .catch(function (e) {
+    out.innerHTML = '<div class="notice notice-bad">' + esc(e.name === 'AbortError' ? 'This took too long. Check your connection and try again.' : e.message) + '</div>';
+   })
+   .finally(function () { clearTimeout(t); btn.disabled = false; });
+ }
 
-  window.lookupVIN = async function () {
-    var vin = (inputEl.value || '').trim().toUpperCase();
-    hide(resultEl);
-    hide(errorEl);
-
-    if (!vin) {
-      errorEl.innerHTML = '❌ Please enter a VIN.';
-      show(errorEl);
-      return;
-    }
-    if (vin.length !== 17) {
-      errorEl.innerHTML = '❌ VIN must be exactly 17 characters. You entered ' + vin.length + '.';
-      show(errorEl);
-      return;
-    }
-    if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) {
-      errorEl.innerHTML = '❌ Invalid VIN. VINs cannot contain the letters I, O, or Q.';
-      show(errorEl);
-      return;
-    }
-
-    show(loadingEl);
-    btnEl.disabled = true;
-    btnEl.innerText = 'Decoding...';
-
-    try {
-      var controller = new AbortController();
-      var timeoutId = setTimeout(function () { controller.abort(); }, 15000);
-      var url = '/api/nhtsa/decode-vin/' + encodeURIComponent(vin);
-      var res = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      var row = await res.json();
-      if (!res.ok) throw new Error(row.detail || ('VIN lookup returned HTTP ' + res.status));
-      if (!row || !row.valid) throw new Error('No data returned for this VIN.');
-
-      var make = (row.make || '').trim();
-      var model = (row.model || '').trim();
-      if (!make && !model) {
-        errorEl.innerHTML = '❌ We could not decode this VIN. Please double-check the number and try again.';
-        show(errorEl);
-        return;
-      }
-
-      renderResult(vin, row);
-    } catch (err) {
-      if (err.name === 'AbortError') {
-        errorEl.innerHTML = '❌ Request timed out. Please check your connection and try again.';
-      } else {
-        errorEl.innerHTML = '❌ ' + esc(err.message || 'Failed to decode VIN.');
-      }
-      show(errorEl);
-    } finally {
-      hide(loadingEl);
-      btnEl.disabled = false;
-      btnEl.innerText = 'Decode VIN';
-    }
-  };
-
-  function renderResult(vin, row) {
-    var make = (row.make || '').trim();
-    var model = (row.model || '').trim();
-    var year = (row.year || '').trim();
-    var bodyClass = (row.body_class || '').trim();
-    var vehicleType = (row.vehicle_type || '').trim();
-    var series = (row.series || '').trim();
-    var trim = (row.trim || '').trim();
-    var engineCyl = (row.engine_cylinders || '').trim();
-    var engineDisp = (row.engine_displacement_l || '').trim();
-    var fuel = (row.fuel_type || '').trim();
-    var drive = (row.drive_type || '').trim();
-    var transmission = (row.transmission || '').trim();
-    var manufacturer = (row.manufacturer || '').trim();
-    var plantCountry = (row.plant_country || '').trim();
-    var plantCity = (row.plant_city || '').trim();
-    var builtIn = (row.country_of_origin || '').trim();
-    var engineText = (row.engine || '').trim();
-    var warnings = row.warnings || [];
-    var sourceText = row.source === 'NHTSA'
-      ? 'Full details from the official NHTSA database'
-      : 'Basic details read from the VIN itself';
-
-    var title = (year ? year + ' ' : '') + (make || '') + (model ? ' ' + model : '');
-    if (!title.trim()) title = 'Unknown Vehicle';
-
-    var specs = [
-      { label: 'Make', value: make },
-      { label: 'Model', value: model },
-      { label: 'Year', value: year },
-      { label: 'Series', value: series },
-      { label: 'Trim', value: trim },
-      { label: 'Body Type', value: bodyClass },
-      { label: 'Vehicle Type', value: vehicleType },
-      { label: 'Engine', value: engineText || (engineCyl ? engineCyl + ' cyl' + (engineDisp ? ' · ' + engineDisp + 'L' : '') : '') },
-      { label: 'Fuel', value: fuel },
-      { label: 'Drive', value: drive },
-      { label: 'Transmission', value: transmission },
-      { label: 'Manufacturer', value: manufacturer },
-      { label: 'Built in', value: builtIn },
-      { label: 'Plant Country', value: plantCountry },
-      { label: 'Plant City', value: plantCity }
-    ];
-
-    var visibleSpecs = specs.filter(function (s) { return s.value && s.value !== ''; });
-    var partsList = getCommonParts(make, model, year);
-
-    resultEl.innerHTML =
-      '<div class="result-header">' +
-        '<img class="vin-silhouette" src="' + (row.placeholder || '/static/silhouettes/generic.svg') + '" alt="Vehicle silhouette">' +
-        '<div>' +
-          '<div class="result-title">' + esc(title) + '</div>' +
-          '<div class="result-subtitle">' + esc(row.vin || vin) + ' · ' + esc(sourceText) + '</div>' +
-        '</div>' +
-      '</div>' +
-      (warnings.length ? '<div class="parts-section" style="margin:0 0 16px;background:#fff7ed;border-color:#fed7aa"><div class="parts-title">⚠️ Please note</div>' +
-        warnings.map(function (w) { return '<p style="margin:4px 0">' + esc(w) + '</p>'; }).join('') + '</div>' : '') +
-      '<div class="specs-grid">' +
-        visibleSpecs.map(function (s) {
-          return '<div class="spec"><div class="spec-label">' + esc(s.label) + '</div><div class="spec-value">' + esc(s.value) + '</div></div>';
-        }).join('') +
-      '</div>' +
-      '<div class="parts-section">' +
-        '<div class="parts-title">🔧 Common Parts to Check</div>' +
-        '<div class="parts-list">' + partsList.map(function (p) { return '<span class="part-tag">' + esc(p) + '</span>'; }).join('') + '</div>' +
-      '</div>' +
-      (row.ai_insights ? '<div class="parts-section" style="margin-top:16px"><div class="parts-title">AI vehicle guidance</div><p>' + esc(row.ai_insights) + '</p></div>' : '');
-
-    show(resultEl);
+ $('vin-form').addEventListener('submit', function (e) { e.preventDefault(); lookup(); });
+ input.addEventListener('input', counter);
+ document.addEventListener('click', function (e) {
+  var ex = e.target.closest('[data-vin]');
+  if (ex) { input.value = ex.dataset.vin; counter(); lookup(); return; }
+  var cp = e.target.closest('[data-copy]');
+  if (cp) {
+   var v = cp.dataset.copy;
+   (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(function () {
+    cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy'; }, 1800);
+   }).catch(function () {
+    var r = document.createRange(); r.selectNodeContents($('copy-val')); var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    toast('Press and hold to copy');
+   });
   }
+ });
 
-  function getCommonParts(make, model, year) {
-    var makeLower = (make || '').toLowerCase();
-    if (makeLower.indexOf('toyota') !== -1 || makeLower.indexOf('lexus') !== -1) {
-      return ['Brake Pads', 'Oil Filter', 'Air Filter', 'Spark Plugs', 'Timing Belt', 'Water Pump'];
-    }
-    if (makeLower.indexOf('nissan') !== -1 || makeLower.indexOf('infiniti') !== -1) {
-      return ['Brake Pads', 'Oil Filter', 'Air Filter', 'CVT Fluid', 'Spark Plugs', 'Alternator'];
-    }
-    if (makeLower.indexOf('honda') !== -1 || makeLower.indexOf('acura') !== -1) {
-      return ['Brake Pads', 'Oil Filter', 'Air Filter', 'Spark Plugs', 'Timing Belt', 'Water Pump'];
-    }
-    if (makeLower.indexOf('bmw') !== -1 || makeLower.indexOf('mercedes') !== -1 || makeLower.indexOf('audi') !== -1) {
-      return ['Brake Pads', 'Oil Filter', 'Air Filter', 'Spark Plugs', 'Cabin Filter', 'Control Arms'];
-    }
-    if (makeLower.indexOf('ford') !== -1 || makeLower.indexOf('chevrolet') !== -1 || makeLower.indexOf('dodge') !== -1) {
-      return ['Brake Pads', 'Oil Filter', 'Air Filter', 'Spark Plugs', 'Serpentine Belt', 'Battery'];
-    }
-    return ['Brake Pads', 'Oil Filter', 'Air Filter', 'Spark Plugs', 'Wiper Blades', 'Battery'];
-  }
+ var q = new URLSearchParams(location.search).get('vin');
+ if (q) { input.value = q.toUpperCase(); counter(); lookup(); }
 })();
 </script>
 </body>

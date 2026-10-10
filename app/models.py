@@ -104,6 +104,8 @@ class VehicleListing(Base):
     image_url = Column(String, nullable=True)
     contact_phone = Column(String, nullable=True)
     mileage_km = Column(Float, nullable=True)
+    fuel_type = Column(String, nullable=True)       # "Petrol", "Diesel", "Hybrid", "Electric"
+    transmission = Column(String, nullable=True)    # "Automatic", "Manual"
     description = Column(Text, nullable=True)
 
     # Dealership & Import Specifics

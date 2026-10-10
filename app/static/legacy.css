@@ -1,0 +1,7 @@
+/* Bridges older pages to the new look until each is rebuilt on ui.css:
+   same typeface and brand colours, without touching their layouts. */
+body { font-family: var(--font) !important; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font-family: inherit; }
+h1, h2, h3 { font-variation-settings: "wdth" 82; letter-spacing: -.01em; }
+h1 { color: var(--ink); }
+[hidden] { display: none !important; }

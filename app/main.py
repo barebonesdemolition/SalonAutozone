@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from app import businesses
 from app import models
 from app.auth import get_current_user
-from app.db import engine, ensure_business_contact_columns, get_db
+from app.db import engine, ensure_business_contact_columns, ensure_vehicle_listing_columns, get_db
 from app.routers.admin import require_admin
 # --- drivers (must exist as app/drivers.py or the app will not boot) ---
 from app.drivers import ensure_driver_tables, router as drivers_router
@@ -118,6 +118,7 @@ async def ensure_subscription_tables():
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await ensure_business_contact_columns()
+    await ensure_vehicle_listing_columns()
     await ensure_subscription_tables()
     await ensure_driver_tables()
     await ensure_delivery_tables()
@@ -210,7 +211,8 @@ async def garage_page():
 
 @app.get("/dashboard")
 async def legacy_dashboard_page():
-    return FileResponse("app/templates/dashboard.html")
+    # The seller dashboard is now the "My listings" tab of the account page.
+    return RedirectResponse("/my-account?tab=listings")
 
 
 @app.get("/admin/login")
@@ -494,6 +496,14 @@ async def checkout_page():
 @app.get("/cart")
 async def cart_page():
     return FileResponse("app/templates/cart.html")
+
+@app.get("/orders")
+async def orders_page():
+    return FileResponse("app/templates/orders.html")
+
+@app.get("/track")
+async def track_page():
+    return FileResponse("app/templates/orders.html")
 
 @app.get("/drive")
 async def drive_page():
