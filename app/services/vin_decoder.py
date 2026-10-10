@@ -439,3 +439,41 @@ async def decode(raw_vin: str, use_online: bool = True) -> dict:
     result["placeholder"] = silhouette_for(result["body_class"])
     result["title"] = " ".join(str(p) for p in (result["year"], result["make"], result["model"]) if p) or "Unknown vehicle"
     return result
+
+
+# ---------------------------------------------------------------------------
+# Free US safety recalls (NHTSA). Only cars sold in the US have recall data.
+# ---------------------------------------------------------------------------
+RECALLS_URL = "https://api.nhtsa.gov/recalls/recallsByVehicle"
+_recall_cache: dict[str, tuple[float, list]] = {}
+
+
+async def fetch_recalls(make: str, model: str, year) -> Optional[list[dict]]:
+    """Recalls for a make/model/year, or None if NHTSA can't be reached."""
+    key = f"{make}|{model}|{year}".lower()
+    now = time.time()
+    hit = _recall_cache.get(key)
+    if hit and now - hit[0] < CACHE_TTL_SECONDS:
+        return hit[1]
+    try:
+        async with httpx.AsyncClient(timeout=NHTSA_TIMEOUT_SECONDS) as client:
+            response = await client.get(RECALLS_URL, params={"make": make, "model": model, "modelYear": year})
+            if response.status_code == 400:  # NHTSA answers 400 for makes/models it doesn't know
+                rows = []
+            else:
+                response.raise_for_status()
+                rows = response.json().get("results") or []
+    except (httpx.HTTPError, ValueError):
+        return None
+    recalls = [{
+        "campaign": r.get("NHTSACampaignNumber"),
+        "date": r.get("ReportReceivedDate"),
+        "component": r.get("Component"),
+        "summary": r.get("Summary"),
+        "consequence": r.get("Consequence"),
+        "remedy": r.get("Remedy"),
+    } for r in rows]
+    if len(_recall_cache) >= CACHE_MAX_ENTRIES:
+        _recall_cache.pop(next(iter(_recall_cache)))
+    _recall_cache[key] = (now, recalls)
+    return recalls

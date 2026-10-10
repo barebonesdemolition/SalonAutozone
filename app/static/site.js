@@ -35,7 +35,7 @@
     : /^\/vin/.test(path) ? 'vin'
     : /^\/(garage)/.test(path) ? 'garage'
     : /^\/(cart|checkout)/.test(path) ? 'cart'
-    : /^\/(my-account|login|dashboard|my-subscription)/.test(path) ? 'account'
+    : /^\/(my-account|login|dashboard|my-subscription|orders)/.test(path) ? 'account'
     : /^\/(sell|become-a-seller)/.test(path) ? 'sell' : '';
   function cur(name) { return section === name ? ' aria-current="page"' : ''; }
 
@@ -44,6 +44,11 @@
   var count = cartCount();
 
   function ensureFont() {
+    if (!document.querySelector('link[href*="/static/chrome.css"]')) {
+      var c = document.createElement('link');
+      c.rel = 'stylesheet'; c.href = '/static/chrome.css?v=3';
+      document.head.appendChild(c);
+    }
     if (document.querySelector('link[data-saz-font]')) return;
     var l = document.createElement('link');
     l.rel = 'stylesheet';
@@ -53,7 +58,7 @@
   }
 
   function header() {
-    return '<header class="saz-header"><div class="wrap">' +
+    return '<header class="saz-header"><div class="saz-wrap">' +
       '<a class="saz-logo" href="/"><img src="/static/logo.png" alt="" width="40" height="40"><b>Salon<span>AutoZone</span></b></a>' +
       '<nav class="saz-nav" aria-label="Main">' +
         '<a href="/?tab=parts"' + cur('parts') + '>Parts</a>' +
@@ -62,10 +67,10 @@
         '<a href="/garage"' + cur('garage') + '>My garage</a>' +
       '</nav>' +
       '<div class="saz-actions">' +
-        '<a class="btn btn-primary btn-sell" href="/sell" data-saz-sell>' + icon('plus') + 'Sell</a>' +
-        '<a class="icon-btn" href="/cart" aria-label="Cart' + (count ? ', ' + count + ' items' : '') + '">' + icon('cart') +
-          '<span class="badge-count" id="saz-cart-count"' + (count ? '' : ' hidden') + '>' + count + '</span></a>' +
-        '<a class="icon-btn" href="' + accountHref + '" aria-label="' + (loggedIn ? 'My account' : 'Sign in') + '">' + icon('user') + '</a>' +
+        '<a class="saz-sell-btn" href="/sell" data-saz-sell>' + icon('plus') + 'Sell</a>' +
+        '<a class="saz-icon" href="/cart" aria-label="Cart' + (count ? ', ' + count + ' items' : '') + '">' + icon('cart') +
+          '<span class="saz-count" id="saz-cart-count"' + (count ? '' : ' hidden') + '>' + count + '</span></a>' +
+        '<a class="saz-icon" href="' + accountHref + '" aria-label="' + (loggedIn ? 'My account' : 'Sign in') + '">' + icon('user') + '</a>' +
       '</div>' +
     '</div></header>';
   }
@@ -81,11 +86,11 @@
   }
 
   function footer() {
-    return '<footer class="saz-footer"><div class="wrap">' +
+    return '<footer class="saz-footer"><div class="saz-wrap">' +
       '<div><h4>SalonAutoZone</h4><p>Car parts and cars from sellers across Freetown, Bo, Kenema, Makeni and beyond.</p></div>' +
       '<div><h4>Buy</h4><a href="/?tab=parts">Parts</a><a href="/?tab=cars">Cars</a><a href="/businesses">Verified sellers</a><a href="/vin-tool">VIN check</a></div>' +
       '<div><h4>Sell</h4><a href="/sell">List a part or car</a><a href="/become-a-seller">Register a business</a><a href="/plans">Seller plans</a></div>' +
-      '<div><h4>Account</h4><a href="' + accountHref + '">' + (loggedIn ? 'My account' : 'Sign in') + '</a><a href="/garage">My garage</a><a href="/drive">Deliver with us</a></div>' +
+      '<div><h4>Account</h4><a href="' + accountHref + '">' + (loggedIn ? 'My account' : 'Sign in') + '</a><a href="/orders">My orders</a><a href="/track">Track an order</a><a href="/garage">My garage</a><a href="/drive">Deliver with us</a></div>' +
     '</div></footer>';
   }
 
@@ -109,13 +114,12 @@
     var el = document.getElementById('saz-sell-sheet');
     if (!el) {
       document.body.insertAdjacentHTML('beforeend',
-        '<div class="overlay" id="saz-sell-sheet" role="dialog" aria-modal="true" aria-labelledby="saz-sell-title"><div class="modal" style="max-width:440px">' +
-        '<button class="x" type="button" aria-label="Close" data-saz-close>&times;</button>' +
+        '<div class="saz-sheet" id="saz-sell-sheet" role="dialog" aria-modal="true" aria-labelledby="saz-sell-title"><div class="saz-sheet-panel">' +
+        '<button class="saz-sheet-x" type="button" aria-label="Close" data-saz-close>&times;</button>' +
         '<h2 id="saz-sell-title">What are you selling?</h2>' +
-        '<div style="display:grid;gap:10px;margin-top:8px">' +
-        '<a class="btn btn-ghost btn-lg btn-block" style="justify-content:flex-start" href="/?action=list-part">' + icon('part') + 'A part or accessory</a>' +
-        '<a class="btn btn-ghost btn-lg btn-block" style="justify-content:flex-start" href="/sell">' + icon('car') + 'A car, truck or bike</a>' +
-        '</div></div></div>');
+        '<a class="saz-sheet-opt" href="/?action=list-part">' + icon('part') + 'A part or accessory</a>' +
+        '<a class="saz-sheet-opt" href="/sell">' + icon('car') + 'A car, truck or bike</a>' +
+        '</div></div>');
       el = document.getElementById('saz-sell-sheet');
       el.addEventListener('click', function (e) {
         if (e.target === el || e.target.closest('[data-saz-close]')) el.classList.remove('open');

@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>My subscription · SalonAutoZone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="/static/logo.png">
 <style>
 * { box-sizing: border-box; }
@@ -43,15 +41,15 @@ textarea { resize: vertical; min-height: 70px; }
 .empty { color:#94a3b8; font-style:italic; padding: 12px 0; }
 .note { background:#fffbeb; border:1px solid #fde68a; padding: 14px 16px; border-radius: 10px; color:#78350f; font-size: 14px; margin-bottom: 20px; }
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/chrome.css?v=4">
+<link rel="stylesheet" href="/static/legacy.css?v=4">
 </head>
 <body>
 
-<header class="top">
-  <a class="brand" href="/">
-    <img src="/static/logo.png" alt="SalonAutoZone">
-    <em style="font-style:normal;">Salon<span>AutoZone</span></em>
-  </a>
-</header>
+<div id="site-header"></div>
 
 <div class="wrap" id="content">
   <div class="loading">Loading your subscription...</div>
@@ -194,5 +192,6 @@ textarea { resize: vertical; min-height: 70px; }
   }
 })();
 </script>
+<script src="/static/site.js?v=4"></script>
 </body>
 </html>

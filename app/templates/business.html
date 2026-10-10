@@ -5,9 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Business · SalonAutoZone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--t:#0f766e;--t2:#0b5f58;--n:#0a1729;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s500:#64748b;--s600:#475569;--r:#dc2626;--g:#16a34a;--am:#b45309}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -69,10 +66,15 @@ a.btn.public-link{display:inline-flex;justify-content:center;align-items:center;
 header img, .top img, .brand img, .logo img, img.logo-img, img[alt*="Salon"] {
 }
 </style>
-<link rel="stylesheet" href="/static/base.css?v=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/chrome.css?v=4">
+<link rel="stylesheet" href="/static/legacy.css?v=4">
 </head>
 <body>
-<header><a class="logo" href="/" style="display:flex;align-items:center;gap:10px"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone" width="52" height="52" style="height:52px;width:52px;border-radius:50%;display:block"><em>Salon<span>AutoZone</span></em></a><div><a class="back" href="/vin-tool">VIN Lookup</a> <a class="back" href="/">Back to marketplace</a></div></header>
+<div id="site-header"></div>
 <main><div class="card" id="root"><p>Loading...</p></div></main>
 
 <script>
@@ -192,5 +194,6 @@ header img, .top img, .brand img, .logo img, img.logo-img, img[alt*="Salon"] {
  else showApply();
 })();
 </script>
+<script src="/static/site.js?v=4"></script>
 </body>
 </html>

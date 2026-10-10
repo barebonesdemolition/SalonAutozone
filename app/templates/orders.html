@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My orders · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=4">
+<link rel="stylesheet" href="/static/chrome.css?v=4">
+<style>
+.page-title { font-size: clamp(28px, 5vw, 40px); margin: 22px 0 16px; font-variation-settings: "wdth" 78; }
+.two { display: grid; gap: 16px; }
+@media (min-width: 900px) { .two { grid-template-columns: minmax(0, 1fr) 360px; align-items: start; } }
+.code { font-size: 30px; font-weight: 800; letter-spacing: .12em; color: var(--ink); font-variation-settings: "wdth" 85; }
+.pin { font-size: 40px; font-weight: 800; letter-spacing: .3em; color: var(--ink); background: var(--gold-50); border: 2px dashed var(--gold); border-radius: var(--r-md); text-align: center; padding: 10px; margin-top: 8px; }
+.steps { list-style: none; margin: 8px 0 0; padding: 0; }
+.steps li { position: relative; padding: 0 0 18px 30px; color: var(--muted); }
+.steps li::before { content: ""; position: absolute; left: 6px; top: 5px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); background: var(--card); }
+.steps li::after { content: ""; position: absolute; left: 12px; top: 20px; bottom: 0; width: 2px; background: var(--line); }
+.steps li:last-child::after { display: none; }
+.steps li.done { color: var(--ink); font-weight: 600; }
+.steps li.done::before { background: var(--teal); border-color: var(--teal); }
+.steps li.now { color: var(--ink); font-weight: 800; }
+.steps li.now::before { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 0 4px var(--gold-50); }
+.steps small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+.row { display: flex; justify-content: space-between; padding: 6px 0; gap: 10px; }
+.row b { white-space: nowrap; }
+.row.total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 12px; font-size: 20px; font-weight: 800; color: var(--ink); }
+.olist { display: grid; gap: 10px; }
+.orow { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); text-decoration: none; color: inherit; }
+.orow:hover { border-color: var(--teal); }
+.orow b { color: var(--ink); letter-spacing: .06em; }
+.status { display: inline-block; font-size: 13px; font-weight: 800; padding: 3px 9px; border-radius: 6px; background: var(--teal-50); color: var(--teal-600); white-space: nowrap; }
+.status.wait { background: var(--gold-50); color: #7a4b00; }
+.status.off { background: var(--bad-50); color: var(--bad); }
+.status.done { background: var(--ok-50); color: var(--ok); }
+.track-form { display: flex; gap: 8px; max-width: 460px; }
+.track-form .input { text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main class="wrap" id="root"></main>
+<script src="/static/site.js?v=4"></script>
+<script>
+(function () {
+ 'use strict';
+ var root = document.getElementById('root');
+ var q = new URLSearchParams(location.search);
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+ function when(iso) { if (!iso) return ''; var d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
+ function token() { try { return localStorage.getItem('token') || ''; } catch (e) { return ''; } }
+
+ var STEPS = [
+  ['awaiting_payment', 'Order placed', 'We\'ll contact you to confirm payment'],
+  ['confirmed', 'Payment confirmed', 'The seller is getting your parts ready'],
+  ['ready_for_pickup', 'Ready for pickup', 'Waiting for a driver'],
+  ['driver_assigned', 'Driver on the way to the seller', ''],
+  ['picked_up', 'On the way to you', 'Have your delivery code ready'],
+  ['delivered', 'Delivered', '']
+ ];
+ var LABEL = { cancelled: 'Cancelled' };
+ STEPS.forEach(function (s) { LABEL[s[0]] = s[1]; });
+ function statusChip(s) {
+  var cls = s === 'awaiting_payment' ? 'wait' : s === 'cancelled' ? 'off' : s === 'delivered' ? 'done' : '';
+  return '<span class="status ' + cls + '">' + esc(LABEL[s] || s) + '</span>';
+ }
+ function timeline(status, events) {
+  if (status === 'cancelled') return '<p class="fit-no">This order was cancelled.</p>';
+  var at = {}; (events || []).forEach(function (e) { at[e.status] = e.created_at || e.at; });
+  var idx = STEPS.findIndex(function (s) { return s[0] === status; });
+  return '<ol class="steps">' + STEPS.map(function (s, i) {
+   var cls = i < idx ? 'done' : i === idx ? 'now' : '';
+   var note = i === idx ? s[2] : (at[s[0]] ? when(at[s[0]]) : '');
+   return '<li class="' + cls + '">' + esc(s[1]) + (note ? '<small>' + esc(note) + '</small>' : '') + '</li>';
+  }).join('') + '</ol>';
+ }
+
+ // ---------- public tracking by code ----------
+ function trackPage(code) {
+  document.title = 'Track an order · SalonAutoZone';
+  root.innerHTML = '<h1 class="page-title">Track an order</h1>' +
+   '<form class="track-form" id="tf"><label class="sr-only" for="code">Order code</label><input class="input" id="code" placeholder="SAZ-ABC123" value="' + esc(code || '') + '"><button class="btn btn-primary" type="submit">Track</button></form>' +
+   '<div id="tr" style="margin-top:16px;max-width:560px"></div>';
+  document.getElementById('tf').addEventListener('submit', function (e) { e.preventDefault(); load(document.getElementById('code').value.trim()); });
+  function load(c) {
+   if (!c) return;
+   var out = document.getElementById('tr');
+   out.innerHTML = '<p class="hint">Looking up ' + esc(c) + '…</p>';
+   fetch('/api/shop/track/' + encodeURIComponent(c)).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (x) {
+    if (!x.ok) { out.innerHTML = '<div class="notice notice-bad">' + esc(x.d.detail || 'No order with that code.') + '</div>'; return; }
+    out.innerHTML = '<div class="box"><div class="code">' + esc(x.d.code) + '</div><p style="margin:4px 0 8px">' + statusChip(x.d.status) + ' Delivering to ' + esc(x.d.delivery_area) + '</p>' + timeline(x.d.status, x.d.events) + '</div>';
+   }).catch(function () { out.innerHTML = '<div class="notice notice-bad">No connection. Try again.</div>'; });
+  }
+  if (code) load(code);
+ }
+
+ // ---------- one order (buyer) ----------
+ function orderPage(id) {
+  root.innerHTML = '<div class="lcard skeleton" style="margin-top:22px"></div>';
+  fetch('/api/shop/orders/' + encodeURIComponent(id), { headers: { Authorization: 'Bearer ' + token() } })
+   .then(function (r) { if (r.status === 401) { location.href = '/login?next=' + encodeURIComponent(location.pathname + location.search); throw null; } return r.ok ? r.json() : null; })
+   .then(function (o) {
+    if (!o) { root.innerHTML = '<h1 class="page-title">Order not found</h1><a class="btn btn-primary" href="/orders">My orders</a>'; return; }
+    document.title = 'Order ' + o.code + ' · SalonAutoZone';
+    var canCancel = o.status === 'awaiting_payment' || o.status === 'confirmed';
+    var showPin = ['confirmed', 'ready_for_pickup', 'driver_assigned', 'picked_up', 'awaiting_payment'].indexOf(o.status) > -1 && o.delivery_code;
+    root.innerHTML =
+     (q.get('new') ? '<div class="notice notice-ok" style="margin-top:20px"><b>Order placed.</b> We\'ll contact you on ' + esc(o.buyer_phone) + ' to confirm payment.</div>' : '') +
+     '<h1 class="page-title">Order <span style="letter-spacing:.06em">' + esc(o.code) + '</span></h1>' +
+     '<div class="two"><div style="display:grid;gap:16px">' +
+      '<section class="box"><h2>Progress</h2>' + timeline(o.status, o.events) + '</section>' +
+      '<section class="box"><h2>Items</h2>' + (o.items || []).map(function (it) {
+        return '<div class="row"><span>' + esc(it.title) + ' <span style="color:var(--muted)">× ' + it.qty + '</span></span><b>SLL ' + fmt(it.unit_price_sll * it.qty) + '</b></div>';
+       }).join('') +
+       '<div class="row"><span>Delivery (' + esc(o.vehicle_class === 'van' ? 'van' : 'okada') + ')</span><b>SLL ' + fmt(o.delivery_fee_sll) + '</b></div>' +
+       '<div class="row total"><span>Total to pay</span><span>SLL ' + fmt(o.total_to_pay_sll) + '</span></div></section>' +
+     '</div><aside style="display:grid;gap:16px">' +
+      (showPin ? '<section class="box"><h2>Your delivery code</h2><div class="pin">' + esc(o.delivery_code) + '</div><p class="hint">Give this code to the driver only when your parts arrive and you\'ve checked them.</p></section>' : '') +
+      '<section class="box"><h2>Delivering to</h2><p>' + esc(o.delivery_address) + '<br>' + esc(o.delivery_area) + '</p><p class="hint">Driver will call ' + esc(o.buyer_phone) + '</p></section>' +
+      (canCancel ? '<button class="btn btn-ghost btn-block" id="cancel">Cancel order</button>' : '') +
+      '<a class="btn btn-ghost btn-block" href="/orders">All my orders</a>' +
+     '</aside></div>';
+    var c = document.getElementById('cancel');
+    if (c) c.addEventListener('click', function () {
+     if (!confirm('Cancel this order?')) return;
+     c.disabled = true;
+     fetch('/api/shop/orders/' + encodeURIComponent(id) + '/cancel', { method: 'POST', headers: { Authorization: 'Bearer ' + token() } })
+      .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not cancel'); }); })
+      .then(function () { location.href = '/orders?id=' + encodeURIComponent(id); })
+      .catch(function (e) { c.disabled = false; alert(e.message); });
+    });
+   }).catch(function (e) { if (e) root.innerHTML = '<div class="notice notice-bad" style="margin-top:20px">We couldn\'t load this order.</div>'; });
+ }
+
+ // ---------- list (buyer) ----------
+ function listPage() {
+  root.innerHTML = '<h1 class="page-title">My orders</h1><div id="ol"><div class="lcard skeleton" style="min-height:80px"></div></div>';
+  fetch('/api/shop/orders', { headers: { Authorization: 'Bearer ' + token() } })
+   .then(function (r) { if (r.status === 401) { location.href = '/login?next=/orders'; throw null; } return r.json(); })
+   .then(function (d) {
+    var list = d.orders || [];
+    document.getElementById('ol').innerHTML = list.length ? '<div class="olist">' + list.map(function (o) {
+     return '<a class="orow" href="/orders?id=' + encodeURIComponent(o.id) + '"><div><b>' + esc(o.code) + '</b><div class="hint" style="margin:2px 0 0">' + esc(when(o.created_at)) + ', ' + esc(o.delivery_area) + '</div></div>' +
+      '<div style="text-align:right">' + statusChip(o.status) + '<div style="font-weight:800;margin-top:4px">SLL ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + '</div></div></a>';
+    }).join('') + '</div>' : '<div class="box" style="text-align:center;padding:40px 16px"><h2>No orders yet</h2><p style="color:var(--muted);margin:6px 0 16px">Parts you buy will show up here.</p><a class="btn btn-primary" href="/">Browse parts</a></div>';
+   }).catch(function (e) { if (e) document.getElementById('ol').innerHTML = '<div class="notice notice-bad">We couldn\'t load your orders.</div>'; });
+ }
+
+ if (location.pathname.indexOf('/track') === 0) trackPage(q.get('code'));
+ else if (!token()) location.replace('/login?next=' + encodeURIComponent(location.pathname + location.search));
+ else if (q.get('id')) orderPage(q.get('id'));
+ else listPage();
+})();
+</script>
+</body>
+</html>

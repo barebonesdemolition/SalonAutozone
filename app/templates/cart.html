@@ -1,100 +1,101 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cart · SalonAutoZone</title>
+<title>Your cart · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=4">
+<link rel="stylesheet" href="/static/chrome.css?v=4">
 <style>
-:root{--primary:#0f766e;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--card:#fff;--bad:#b91c1c}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border)}
-header img{width:40px;height:40px;border-radius:50%;object-fit:cover}
-header a{color:var(--text);font-weight:800;text-decoration:none;font-size:18px}
-main{max-width:640px;margin:0 auto;padding:20px 16px 120px}
-h1{font-size:24px;margin:0 0 16px}
-.item{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)}
-.item .thumb{width:64px;height:64px;border-radius:10px;background:var(--border);object-fit:cover;flex:0 0 64px}
-.item .body{flex:1;min-width:0}
-.item .name{font-weight:700;margin:0 0 4px}
-.item .meta{color:var(--muted);font-size:13px}
-.item .price{font-weight:800;color:var(--primary)}
-.qty{display:flex;align-items:center;gap:6px;margin-top:6px}
-.qty button{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-weight:800;cursor:pointer}
-.qty span{min-width:24px;text-align:center;font-weight:700}
-.remove{background:transparent;border:0;color:var(--bad);font-weight:700;cursor:pointer;padding:6px;margin-left:8px}
-.total{display:flex;justify-content:space-between;font-weight:800;font-size:20px;margin-top:20px;padding-top:20px;border-top:2px solid var(--border)}
-.btn{display:block;width:100%;margin-top:20px;padding:16px;border:0;border-radius:12px;background:var(--primary);color:#fff;font:inherit;font-weight:800;font-size:16px;cursor:pointer;text-align:center;text-decoration:none}
-.btn:disabled{opacity:.6}
-.empty{text-align:center;color:var(--muted);padding:48px 0}
-.empty a{color:var(--primary);font-weight:700}
+.page-title { font-size: clamp(28px, 5vw, 40px); margin: 22px 0 16px; font-variation-settings: "wdth" 78; }
+.cart { display: grid; gap: 20px; }
+@media (min-width: 900px) { .cart { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; } }
+.lines { display: grid; gap: 10px; }
+.line { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; gap: 12px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); padding: 10px; }
+.line .th { width: 76px; height: 76px; border-radius: var(--r-sm); background: var(--teal-50) center / cover no-repeat; }
+.line a.name { font-weight: 700; color: var(--ink); text-decoration: none; display: block; line-height: 1.3; }
+.line .each { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.line .right { text-align: right; display: grid; gap: 6px; justify-items: end; }
+.line .sum { font-weight: 800; color: var(--ink); white-space: nowrap; }
+.stepper { display: inline-flex; align-items: center; border: 1.5px solid var(--line); border-radius: var(--r-sm); overflow: hidden; }
+.stepper button { width: 38px; height: 36px; border: 0; background: var(--card); font-size: 18px; font-weight: 700; color: var(--ink); }
+.stepper button:disabled { color: var(--line); }
+.stepper span { min-width: 30px; text-align: center; font-weight: 700; }
+.remove { border: 0; background: none; color: var(--muted); font-size: 14px; text-decoration: underline; padding: 4px 0; }
+.summary { position: sticky; top: calc(var(--header-h) + 16px); }
+.summary .row { display: flex; justify-content: space-between; padding: 6px 0; }
+.summary .row.total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 12px; font-size: 20px; font-weight: 800; color: var(--ink); }
+.empty { text-align: center; padding: 56px 16px; }
+.empty h2 { font-size: 24px; }
+.empty p { color: var(--muted); margin: 6px 0 18px; }
 </style>
 </head>
 <body>
-<header><img src="/static/logo.png" alt=""><a href="/">SalonAutoZone</a></header>
-<main>
-<h1>Your cart</h1>
-<div id="root">Loading…</div>
+<div id="site-header"></div>
+<main class="wrap">
+ <h1 class="page-title">Your cart</h1>
+ <div id="root"></div>
 </main>
-<script src="/static/cart.js"></script>
-<script src="/static/auth.js"></script>
+<script src="/static/cart.js?v=4"></script>
+<script src="/static/site.js?v=4"></script>
 <script>
 (function () {
-  var root = document.getElementById("root");
+ 'use strict';
+ var root = document.getElementById('root');
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function safeUrl(u) { u = String(u || '').trim(); return (/^https?:\/\//i.test(u) || /^\/(?!\/)/.test(u)) ? u : ''; }
+ function token() { try { return localStorage.getItem('token') || ''; } catch (e) { return ''; } }
 
-  function fmt(n) { return Number(n).toLocaleString() + " Le"; }
-  function esc(s) { return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-
-  function render() {
-    var items = SAZCart.read();
-    if (!items.length) {
-      root.innerHTML = '<div class="empty">Your cart is empty.<br><a href="/">Browse parts</a></div>';
-      return;
-    }
-    var html = "";
-    items.forEach(function (it) {
-      html += '<div class="item">' +
-        (it.image_url ? '<img class="thumb" src="' + esc(it.image_url) + '" alt="">' : '<div class="thumb"></div>') +
-        '<div class="body">' +
-          '<p class="name">' + esc(it.name) + '</p>' +
-          '<div class="meta">' + fmt(it.price_sll) + ' each</div>' +
-          '<div class="qty">' +
-            '<button data-act="dec" data-id="' + it.part_id + '">−</button>' +
-            '<span>' + it.qty + '</span>' +
-            '<button data-act="inc" data-id="' + it.part_id + '">+</button>' +
-          '</div>' +
-        '</div>' +
-        '<div style="text-align:right">' +
-          '<div class="price">' + fmt(it.qty * it.price_sll) + '</div>' +
-          '<button class="remove" data-act="rm" data-id="' + it.part_id + '">Remove</button>' +
-        '</div>' +
-      '</div>';
-    });
-    html += '<div class="total"><span>Total</span><span>' + fmt(SAZCart.total()) + '</span></div>';
-    html += '<button class="btn" id="checkout">Proceed to checkout</button>';
-    root.innerHTML = html;
-
-    root.querySelectorAll("[data-act]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        var id = Number(b.dataset.id);
-        var items = SAZCart.read();
-        var it = items.find(function (x) { return x.part_id === id; });
-        if (!it) return;
-        if (b.dataset.act === "inc") SAZCart.setQty(id, it.qty + 1);
-        if (b.dataset.act === "dec") SAZCart.setQty(id, it.qty - 1);
-        if (b.dataset.act === "rm") SAZCart.remove(id);
-        render();
-      });
-    });
-
-    document.getElementById("checkout").addEventListener("click", function () {
-      if (!Auth || !Auth.requireLogin || !Auth.requireLogin()) return;
-      location.href = "/checkout?items=" + encodeURIComponent(SAZCart.itemsParam());
-    });
+ function render() {
+  var items = SAZCart.read();
+  if (!items.length) {
+   root.innerHTML = '<div class="panel empty"><h2>Your cart is empty</h2><p>Find a part that fits your car, then add it here.</p><a class="btn btn-primary btn-lg" href="/">Browse parts</a></div>';
+   return;
   }
+  var count = SAZCart.count();
+  root.innerHTML = '<div class="cart"><div class="lines">' + items.map(function (it) {
+   var img = safeUrl(it.image_url);
+   return '<div class="line">' +
+    '<div class="th"' + (img ? ' style="background-image:url(\'' + esc(img) + '\')"' : '') + '></div>' +
+    '<div><a class="name" href="/part/' + encodeURIComponent(it.part_id) + '">' + esc(it.name) + '</a><div class="each">SLL ' + fmt(it.price_sll) + ' each</div>' +
+     '<button class="remove" data-act="rm" data-id="' + it.part_id + '">Remove</button></div>' +
+    '<div class="right"><div class="sum">SLL ' + fmt(it.qty * it.price_sll) + '</div>' +
+     '<div class="stepper"><button data-act="dec" data-id="' + it.part_id + '" aria-label="One fewer"' + (it.qty <= 1 ? ' disabled' : '') + '>−</button><span aria-live="polite">' + it.qty + '</span><button data-act="inc" data-id="' + it.part_id + '" aria-label="One more"' + (it.qty >= 20 ? ' disabled' : '') + '>+</button></div></div>' +
+   '</div>';
+  }).join('') + '</div>' +
+  '<aside class="box summary"><h2>Order summary</h2>' +
+   '<div class="row"><span>Parts (' + count + ')</span><span>SLL ' + fmt(SAZCart.total()) + '</span></div>' +
+   '<div class="row"><span>Delivery</span><span class="muted" style="color:var(--muted)">Next step</span></div>' +
+   '<div class="row total"><span>Subtotal</span><span>SLL ' + fmt(SAZCart.total()) + '</span></div>' +
+   '<button class="btn btn-primary btn-lg btn-block" style="margin-top:14px" id="checkout">Continue to delivery</button>' +
+   '<p class="hint">One seller per order. Delivery is by okada or van, based on the size of the parts.</p>' +
+  '</aside></div>';
+ }
 
-  render();
+ root.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-act]');
+  if (b) {
+   var id = Number(b.dataset.id);
+   var it = SAZCart.read().find(function (x) { return x.part_id === id; });
+   if (!it) return;
+   if (b.dataset.act === 'inc') SAZCart.setQty(id, it.qty + 1);
+   if (b.dataset.act === 'dec') SAZCart.setQty(id, it.qty - 1);
+   if (b.dataset.act === 'rm') SAZCart.remove(id);
+   render();
+   return;
+  }
+  if (e.target.id === 'checkout') {
+   var dest = '/checkout?items=' + encodeURIComponent(SAZCart.itemsParam());
+   location.href = token() ? dest : '/login?next=' + encodeURIComponent(dest);
+  }
+ });
+ render();
 })();
 </script>
 </body>

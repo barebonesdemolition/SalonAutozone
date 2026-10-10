@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My Garage – {{ app_name or 'SalonAutoZone' }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
  --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
@@ -89,21 +88,16 @@ button{border:0;background:none;cursor:pointer}
   .brand em, .logo em { font-size: 20px; }
 }
 </style>
-<link rel="stylesheet" href="/static/base.css?v=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/chrome.css?v=4">
+<link rel="stylesheet" href="/static/legacy.css?v=4">
+<script src="/static/auth.js"></script>
 </head>
 <body>
-<div class="top">
- <strong>Salon AutoZone · Freetown</strong>
- <span>Parts that fit your cars</span>
-</div>
-<header class="brand">
- <a class="logo" href="/"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a>
- <nav class="nav">
- <a href="/">Home</a>
- <a href="/vin-tool">VIN Lookup</a>
- <a href="/my-account">Account</a>
- </nav>
-</header>
+<div id="site-header"></div>
 
 <main class="wrap">
  <div class="hero">
@@ -185,26 +179,7 @@ button{border:0;background:none;cursor:pointer}
 
 <div class="toast" id="toast"></div>
 
-<div class="bnav" role="navigation" aria-label="Main">
- <nav>
- <a href="/">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
- Home
- </a>
- <a href="/garage" class="active">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
- Garage
- </a>
- <a href="/my-account">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>
- Saved
- </a>
- <a href="/my-account">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
- Account
- </a>
- </nav>
-</div>
+
 
 <script>
 (function () {
@@ -478,6 +453,6 @@ button{border:0;background:none;cursor:pointer}
  renderColors();renderParts();renderCart();loadCars();
 })();
 </script>
-<script src="/static/auth.js"></script>
+<script src="/static/site.js?v=4"></script>
 </body>
 </html>

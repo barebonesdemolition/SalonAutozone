@@ -1,0 +1,86 @@
+/* SalonAutoZone page chrome: header, phone tab bar, footer and the "Sell" sheet.
+   Safe to load on any page; every class is prefixed with saz-. Loaded by site.js. */
+:root {
+  --ink: #0e2a2b;          /* headings, dark surfaces */
+  --ink-2: #163b3c;
+  --teal: #0e7c7b;         /* brand, primary actions */
+  --teal-600: #0a6665;
+  --teal-50: #e3f3f1;
+  --gold: #f2b233;         /* featured, highlights */
+  --gold-50: #fdf3dc;
+  --paper: #f5f7f6;        /* page background */
+  --card: #ffffff;
+  --line: #dde4e2;
+  --text: #1c2b2b;
+  --muted: #5d6f6e;
+  --ok: #18794e;
+  --ok-50: #e2f4ea;
+  --bad: #b42318;
+  --bad-50: #fdeceb;
+  --warn-50: #fff4e5;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --shadow: 0 1px 0 rgba(14, 42, 43, .04), 0 8px 24px -12px rgba(14, 42, 43, .18);
+  --font: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --header-h: 64px;
+}
+.saz-header, .saz-tabbar, .saz-footer, .saz-sheet { font-family: var(--font); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+.saz-header *, .saz-tabbar *, .saz-footer *, .saz-sheet * { box-sizing: border-box; }
+.saz-header h4, .saz-footer h4, .saz-sheet h2 { margin: 0; font-weight: 800; }
+.saz-footer p { margin: 0; }
+/* ---------- Header ---------- */
+.saz-header { position: sticky; top: 0; z-index: 200; background: var(--card); border-bottom: 1px solid var(--line); }
+.saz-wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 768px) { .saz-wrap { padding: 0 28px; } }
+.saz-header .saz-wrap { height: var(--header-h); display: flex; align-items: center; gap: 20px; }
+.saz-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); flex-shrink: 0; }
+.saz-logo img { width: 40px; height: 40px; border-radius: 50%; }
+.saz-logo b { font-size: 20px; font-weight: 800; font-variation-settings: "wdth" 80; letter-spacing: -.01em; }
+.saz-logo b span { color: var(--teal); }
+.saz-nav { display: none; align-items: center; gap: 4px; margin-left: 8px; }
+.saz-nav a { padding: 8px 12px; border-radius: var(--r-sm); color: var(--muted); font-weight: 600; font-size: 15px; text-decoration: none; }
+.saz-nav a:hover { color: var(--ink); background: var(--paper); }
+.saz-nav a[aria-current="page"] { color: var(--ink); background: var(--teal-50); }
+.saz-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.saz-icon { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; color: var(--ink); text-decoration: none; border: 0; background: none; }
+.saz-icon:hover { background: var(--paper); }
+.saz-icon svg { width: 24px; height: 24px; }
+.saz-count { position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--gold); color: var(--ink); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.saz-sell-btn { display: none; align-items: center; gap: 6px; min-height: 44px; padding: 10px 18px; border-radius: 8px; background: var(--teal); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; }
+.saz-sell-btn:hover { background: var(--teal-600); }
+.saz-sell-btn svg { width: 20px; height: 20px; }
+@media (min-width: 900px) {
+  .saz-nav { display: flex; }
+  .saz-sell-btn { display: inline-flex; }
+}
+
+/* ---------- Bottom tab bar (phones) ---------- */
+.saz-tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 200; background: var(--card); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom); }
+.saz-tabbar a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 7px; font-size: 11px; font-weight: 700; color: var(--muted); text-decoration: none; }
+.saz-tabbar a svg { width: 24px; height: 24px; }
+.saz-tabbar a[aria-current="page"] { color: var(--teal); }
+.saz-tabbar a.sell span.plus { width: 40px; height: 40px; margin-top: -18px; border-radius: 50%; background: var(--teal); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 14px -4px rgba(14, 124, 123, .6); border: 3px solid var(--card); }
+body.has-tabbar { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+@media (min-width: 900px) { .saz-tabbar { display: none; } body.has-tabbar { padding-bottom: 0; } }
+
+/* ---------- Footer ---------- */
+.saz-footer { margin-top: 64px; background: var(--ink); color: #b9cbc9; font-size: 14px; }
+.saz-footer .saz-wrap { padding-top: 36px; padding-bottom: 36px; display: grid; gap: 24px; grid-template-columns: 1fr; }
+.saz-footer h4 { color: #fff; font-size: 15px; margin-bottom: 10px; }
+.saz-footer a { color: #e3f3f1; text-decoration: none; display: block; padding: 3px 0; }
+.saz-footer a:hover { text-decoration: underline; }
+@media (min-width: 768px) { .saz-footer .saz-wrap { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+
+
+/* ---------- "What are you selling?" sheet ---------- */
+.saz-sheet { position: fixed; inset: 0; z-index: 3000; background: rgba(14, 42, 43, .6); display: none; align-items: flex-end; justify-content: center; }
+.saz-sheet.open { display: flex; }
+.saz-sheet-panel { position: relative; width: 100%; max-width: 440px; background: #fff; border-radius: 20px 20px 0 0; padding: 24px 18px calc(24px + env(safe-area-inset-bottom)); }
+.saz-sheet h2 { font-size: 24px; color: var(--ink); font-variation-settings: "wdth" 82; padding-right: 44px; }
+.saz-sheet-x { position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--paper); font-size: 24px; color: var(--ink); cursor: pointer; }
+.saz-sheet-opt { display: flex; align-items: center; gap: 10px; margin-top: 10px; min-height: 52px; padding: 12px 16px; border: 1.5px solid var(--line); border-radius: 8px; color: var(--ink); font-weight: 700; text-decoration: none; }
+.saz-sheet-opt:hover { border-color: var(--teal); }
+.saz-sheet-opt svg { width: 22px; height: 22px; color: var(--teal); }
+@media (min-width: 700px) { .saz-sheet { align-items: center; padding: 16px; } .saz-sheet-panel { border-radius: 20px; } }
+.saz-count[hidden] { display: none; }

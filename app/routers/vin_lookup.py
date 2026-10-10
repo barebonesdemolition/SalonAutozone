@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
 from app.services import vin_decoder
@@ -53,3 +53,16 @@ async def decode_vin(payload: VinRequest):
 @router.get("/decode/{vin}")
 async def decode_vin_get(vin: str):
     return await _decode_or_400(vin)
+
+
+@router.get("/recalls")
+async def vehicle_recalls(
+    make: str = Query(..., min_length=1, max_length=40),
+    model: str = Query(..., min_length=1, max_length=60),
+    year: int = Query(..., ge=1950, le=2100),
+):
+    """Free US safety recalls for a make/model/year (NHTSA). Cars never sold in the US have none listed."""
+    recalls = await vin_decoder.fetch_recalls(make, model, year)
+    if recalls is None:
+        raise HTTPException(status_code=503, detail="The recall service is unavailable right now. Try again later.")
+    return {"make": make, "model": model, "year": year, "count": len(recalls), "recalls": recalls}

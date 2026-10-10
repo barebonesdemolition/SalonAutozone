@@ -50,24 +50,23 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f8; }
   .brand em, .logo em { font-size: 20px; }
 }
 </style>
-<link rel="stylesheet" href="/static/base.css?v=1">
+
 <style>
 .dz-badge{display:inline-block;min-width:22px;padding:2px 8px;border-radius:999px;background:#0f766e;color:#fff;font-size:13px;vertical-align:middle}
 .dz-badge:empty{display:none}
 .dz-status{display:inline-block;padding:2px 8px;border-radius:6px;background:#eef2f7;color:#334155;font-size:12px;text-transform:capitalize}
 @media (max-width:640px){.listing-row{flex-wrap:wrap;gap:8px}.action-btn{width:100%}.stat-card{min-width:0}}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/chrome.css?v=4">
+<link rel="stylesheet" href="/static/legacy.css?v=4">
+<script src="/static/auth.js"></script>
 </head>
 <body>
 <div class="boot" id="boot">Loading dashboard…</div>
-<div class="navbar">
-<a href="/" class="logo"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a>
-<div class="nav-links">
-<a href="/">🏠 Home</a>
-<a href="/vin-tool">🔍 VIN Lookup</a>
-<a href="/my-account?stay=1">👤 My Account</a>
-</div>
-</div>
+<div id="site-header"></div>
 <div class="container">
 <div class="welcome">
 <div>
@@ -226,6 +225,6 @@ async function init() {
 console.log("[DASH] TOKEN_KEYS", TOKEN_KEYS, "token=", localStorage.getItem("token"), "access=", localStorage.getItem("access_token"), "Auth.getToken()=", Auth.getToken());
 init();
 </script>
-<script src="/static/auth.js"></script>
+<script src="/static/site.js?v=4"></script>
 </body>
 </html>

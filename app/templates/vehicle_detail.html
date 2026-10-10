@@ -1,165 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Vehicle – {{ app_name or 'SalonAutoZone' }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Car · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=4">
+<link rel="stylesheet" href="/static/chrome.css?v=4">
 <style>
-:root{--primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;--navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;--success:#15803d;--warn:#b45309;--sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06)}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding-bottom:80px}
-a{color:inherit;text-decoration:none}button,input{font:inherit}button{border:0;background:none;cursor:pointer}
-.top{background:var(--navy);color:#94a3b8;padding:10px 20px;font-size:12px;display:flex;justify-content:space-between}
-.top strong{color:#fff}
-.brand{background:#fff;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:40}
-.logo{font-weight:800;font-size:18px}.logo span{color:var(--primary)}
-.wrap{max-width:900px;margin:0 auto;padding:20px 16px}
-.hero-img{height:220px;background:linear-gradient(135deg,#e2e8f0,#f1f5f9);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--muted);margin-bottom:16px;background-size:cover;background-position:center}
-h1{font-size:clamp(22px,4vw,28px);font-weight:800;color:var(--navy);letter-spacing:-.02em}
-.price{font-size:24px;font-weight:800;color:var(--primary);margin:8px 0}
-.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
-.tag{background:#f1f5f9;color:#475569;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600}
-.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--sh);margin:16px 0}
-.panel h2{font-size:15px;font-weight:800;margin-bottom:10px}
-.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:8px;font-weight:700;min-height:48px;flex:1}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-wa{background:#25d366;color:#fff}
-.btn-ghost{background:#f1f5f9}
-.safety .ok{color:var(--success);font-weight:700}
-.safety .warn{color:var(--warn);font-weight:700}
-.safety ul{margin:8px 0 0 18px;font-size:13px;color:var(--muted)}
-.muted{color:var(--muted);font-size:13px}
-.sk{height:160px;border-radius:12px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:s 1.2s infinite}
-@keyframes s{to{background-position:-200% 0}}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px);z-index:50}
-.bnav nav{display:grid;grid-template-columns:repeat(4,1fr);max-width:500px;margin:0 auto}
-.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center}
-.bnav a.active{color:var(--primary);background:var(--primary-light);border-radius:10px}
-.bnav svg{width:22px;height:22px}
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
+.check-row { display: flex; gap: 8px; margin-top: 10px; }
+.check-row .input { text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.recalls { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.recalls li { padding: 10px 12px; border-radius: var(--r-sm); background: var(--warn-50); }
+.recalls b { display: block; color: var(--ink); }
+.seller { display: flex; gap: 12px; align-items: center; }
+.seller .av { width: 44px; height: 44px; border-radius: 50%; background: var(--teal-50); color: var(--teal); font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tips { margin: 8px 0 0; padding-left: 18px; color: var(--muted); }
+.tips li + li { margin-top: 4px; }
 </style>
-<link rel="stylesheet" href="/static/base.css?v=1">
 </head>
 <body>
-<div class="top"><strong>Salon AutoZone · Freetown</strong><a href="/" style="color:#99f6e4;font-weight:700">Home</a></div>
-<header class="brand">
- <a class="logo" href="/"><img class="logo-img" src="/static/logo.png" alt="SalonAutoZone"><em>Salon<span>AutoZone</span></em></a>
- <a href="/vin-tool" style="font-weight:600;color:#475569;font-size:14px">VIN Lookup</a>
- <a href="/my-account" style="font-weight:600;color:#475569;font-size:14px">Account</a>
-</header>
-<main class="wrap" id="app"><div class="sk"></div></main>
-<div class="bnav"><nav>
- <a href="/" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>Home</a>
- <a href="/garage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Garage</a>
- <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><circle cx="12" cy="13" r="3"/></svg>Saved</a>
- <a href="/my-account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>Account</a>
-</nav></div>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+ <symbol id="i-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><path d="M5 12h14"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/></symbol>
+</svg>
+<div id="site-header"></div>
+<main class="wrap" id="app">
+ <div class="detail"><div class="gallery lcard skeleton" style="border-radius:20px"></div><div class="lcard skeleton"></div></div>
+</main>
+<script src="/static/site.js?v=4"></script>
 <script>
 (function () {
+ 'use strict';
  var id = location.pathname.split('/').pop();
  var app = document.getElementById('app');
- function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
- function fmt(n){try{return Number(n).toLocaleString()}catch(e){return n}}
- function token(){try{return localStorage.getItem('token')||localStorage.getItem('access_token')||''}catch(e){return ''}}
- function auth(){var t=token();return t?{Authorization:'Bearer '+t}:{}}
-
- fetch('/api/vehicles/' + id).then(function(r){return r.ok?r.json():null}).then(function(v){
- if(!v){app.innerHTML='<p class="muted">Vehicle not found.</p>';return}
- var title = v.title || [v.year,v.make,v.model].filter(Boolean).join(' ');
- var img = v.image_url || v.photo_url || '';
- var phone = (v.contact_phone||'').replace(/\s+/g,'');
- var wa = phone ? 'https://wa.me/' + phone.replace(/^\+/,'') + '?text=' + encodeURIComponent('Hi, I saw your ' + title + ' on SalonAutoZone') : null;
- app.innerHTML =
- '<div class="hero-img"' + (img?' style="background-image:url(\''+esc(img)+'\')"':'') + '>' + (img?'':'No photo') + '</div>' +
- '<h1>' + esc(title) + '</h1>' +
- '<div class="price">' + (v.price_sll!=null?'SLL '+fmt(v.price_sll):'Price on request') + '</div>' +
- (v.price_usd?'<div class="muted">≈ USD '+fmt(v.price_usd)+'</div>':'') +
- '<div class="meta">' +
- (v.year?'<span class="tag">'+esc(v.year)+'</span>':'') +
- (v.mileage_km!=null?'<span class="tag">'+fmt(v.mileage_km)+' km</span>':'') +
- (v.fuel_type?'<span class="tag">'+esc(v.fuel_type)+'</span>':'') +
- (v.transmission?'<span class="tag">'+esc(v.transmission)+'</span>':'') +
- (v.location?'<span class="tag">'+esc(v.location)+'</span>':'') +
- '</div>' +
- (v.description?'<div class="panel"><h2>Description</h2><p>'+esc(v.description)+'</p></div>':'') +
- '<div class="panel safety" id="safety"><h2>Free safety check</h2><p class="muted" id="safety-body">Enter or load VIN to check open recalls (US database).</p></div>' +
- '<div class="acts">' +
- (wa?'<a class="btn btn-wa" href="'+wa+'" target="_blank" rel="noopener">WhatsApp seller</a>':'') +
- '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
- '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
- '</div>';
-
- // Safety check
- var vin = v.vin || v.chassis_number || '';
- var safetyBody = document.getElementById('safety-body');
- function runCheck(vinCode) {
- if (!vinCode || vinCode.length < 11) {
- safetyBody.innerHTML = '<span class="muted">No VIN on this listing. Ask the seller for the chassis number.</span>';
- return;
+ function $(x) { return document.getElementById(x); }
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+ function safeUrl(u) { u = String(u || '').trim(); return (/^https?:\/\//i.test(u) || /^\/(?!\/)/.test(u)) ? u : ''; }
+ function token() { try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; } }
+ function auth() { var t = token(); return t ? { Authorization: 'Bearer ' + t } : {}; }
+ function cap(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' '); }
+ function toast(msg, type) {
+  var t = $('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.className = 'toast ' + (type || ''); t.textContent = msg; void t.offsetWidth; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
  }
- safetyBody.textContent = 'Checking…';
- fetch('/api/nhtsa/check/' + encodeURIComponent(vinCode)).then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d}})}).then(function(x){
- if (!x.ok) { safetyBody.innerHTML = '<span class="warn">' + esc(x.d.detail||x.d.error||'Check failed') + '</span>'; return; }
- var s = (x.d.decode&&x.d.decode.summary)||{};
- var rec = x.d.recalls||{};
- var name = [s.year,s.make,s.model].filter(Boolean).join(' ');
- var n = rec.count||0;
- var h = name ? '<div><strong>'+esc(name)+'</strong></div>' : '';
- if (n===0) h += '<div class="ok">No open recalls found.</div>';
- else {
- h += '<div class="warn">'+n+' open recall'+(n>1?'s':'')+'</div><ul>';
- (rec.recalls||[]).slice(0,5).forEach(function(r){ h += '<li><strong>'+esc(r.component||'Recall')+'</strong>: '+esc((r.summary||'').slice(0,140))+'</li>'; });
- h += '</ul>';
- }
- h += '<p class="muted" style="margin-top:8px">Free NHTSA check — not full accident history. VIN: '+esc(vinCode)+'</p>';
- safetyBody.innerHTML = h;
- }).catch(function(){ safetyBody.innerHTML = '<span class="warn">Network error</span>'; });
- }
- if (vin) runCheck(vin);
- else {
- safetyBody.innerHTML = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
- '<input id="vin-in" maxlength="17" placeholder="17-character VIN" style="flex:1;min-width:180px;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;text-transform:uppercase">' +
- '<button type="button" class="btn btn-primary" id="vin-go" style="flex:0">Check free</button></div>';
- document.getElementById('vin-go').onclick = function(){ runCheck((document.getElementById('vin-in').value||'').replace(/\s+/g,'').toUpperCase()); };
+ function notFound(msg) {
+  app.innerHTML = '<div style="padding:64px 0;text-align:center"><h1 style="font-size:28px">' + esc(msg) + '</h1><p style="margin:8px 0 16px;color:var(--muted)">It may have been sold or removed.</p><a class="btn btn-primary" href="/?tab=cars">Browse cars</a></div>';
  }
 
- document.getElementById('btn-share').onclick = function(){
- var url = location.href;
- var msg = '*' + title + '*\n' + (v.price_sll?'SLL '+fmt(v.price_sll)+'\n':'') + '\n' + url;
- window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
- };
- document.getElementById('btn-save').onclick = function(){
- if (!token()) { location.href='/login?next='+encodeURIComponent(location.pathname); return; }
- fetch('/api/my-account/saved', {
- method:'POST',
- headers: Object.assign({'Content-Type':'application/json'}, auth()),
- body: JSON.stringify({listing_type:'vehicle', listing_id: Number(id)})
- }).then(function(r){
- if (r.status===401) location.href='/login';
- else if (r.ok) { document.getElementById('btn-save').textContent='Saved'; }
- });
- };
- }).catch(function(){ app.innerHTML='<p class="muted">Could not load vehicle.</p>'; });
+ fetch('/api/vehicles/' + encodeURIComponent(id)).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
+  if (!v) return notFound('We couldn\'t find this car');
+  var title = v.title || [v.year, v.make, v.model].filter(Boolean).join(' ');
+  document.title = title + ' · SalonAutoZone';
+  var img = safeUrl(v.image_url || v.photo_url);
+  var phone = String(v.contact_phone || '').replace(/[^\d+]/g, '');
+  var wa = phone ? 'https://wa.me/' + phone.replace(/^\+/, '') + '?text=' + encodeURIComponent('Hi, is your ' + title + ' still available? ' + location.href) : '';
+  var facts = [
+   ['Year', v.year], ['Mileage', v.mileage_km != null ? fmt(Math.round(v.mileage_km)) + ' km' : ''], ['Fuel', v.fuel_type], ['Gearbox', v.transmission],
+   ['Condition', cap(v.condition)], ['Location', v.location], ['Status', v.availability && v.availability !== 'in_stock' ? cap(v.availability) : ''],
+   ['Duty', v.duty_paid ? 'Paid' : ''], ['From', v.country_of_origin]
+  ].filter(function (f) { return f[1]; });
+
+  app.innerHTML =
+   '<nav class="crumbs" aria-label="Breadcrumb"><a href="/?tab=cars">Cars</a><span>/</span>' + (v.make ? '<a href="/?tab=cars&make=' + encodeURIComponent(v.make) + '">' + esc(v.make) + '</a><span>/</span>' : '') + '<span>' + esc(title) + '</span></nav>' +
+   '<div class="detail">' +
+    '<div>' +
+     '<div class="gallery">' + (img ? '<img src="' + esc(img) + '" alt="' + esc(title) + '">' : '<svg aria-hidden="true"><use href="#i-car"/></svg>') + '</div>' +
+     (v.description ? '<section class="box" style="margin-top:16px"><h2>From the seller</h2><p style="white-space:pre-line">' + esc(v.description) + '</p></section>' : '') +
+     '<section class="box" style="margin-top:16px" id="check"><h2>Free VIN and safety check</h2><div id="check-body"></div></section>' +
+    '</div>' +
+    '<aside class="buybox">' +
+     '<h1>' + esc(title) + '</h1>' +
+     '<div><div class="big-price"><small>SLL</small>' + fmt(v.price_sll) + '</div>' + (v.price_usd ? '<div class="sub-price">About $' + fmt(v.price_usd) + '</div>' : '') + '</div>' +
+     '<dl class="facts">' + facts.map(function (f) { return '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>'; }).join('') + '</dl>' +
+     '<div class="cta-row">' +
+      (wa ? '<a class="btn btn-wa btn-lg wide" href="' + esc(wa) + '" target="_blank" rel="noopener">Message the seller on WhatsApp</a>' : '') +
+      (phone ? '<a class="btn btn-ghost btn-lg wide" href="tel:' + esc(phone) + '">Call ' + esc(v.contact_phone) + '</a>' : '') +
+      '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
+      '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
+     '</div>' +
+     '<div class="box"><h2>Before you pay</h2><ul class="tips"><li>See the car in person, in daylight.</li><li>Check the VIN on the car matches the papers.</li><li>Take a mechanic you trust for a test drive.</li><li>Never send money before you\'ve seen the car.</li></ul></div>' +
+    '</aside>' +
+   '</div>';
+
+  if (wa || phone) {
+   document.body.insertAdjacentHTML('beforeend',
+    '<div class="sticky-cta"><span class="price-mini">SLL ' + fmt(v.price_sll) + '</span>' +
+    (phone ? '<a class="btn btn-ghost" href="tel:' + esc(phone) + '">Call</a>' : '') +
+    (wa ? '<a class="btn btn-wa" href="' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') + '</div>');
+   document.body.classList.add('has-sticky-cta');
+  }
+
+  // ---- VIN + recall check ----
+  var body = $('check-body');
+  function showRecalls(make, model, year) {
+   var box = document.createElement('div');
+   box.innerHTML = '<p class="hint">Checking safety recalls…</p>';
+   body.appendChild(box);
+   fetch('/api/vin/recalls?make=' + encodeURIComponent(make) + '&model=' + encodeURIComponent(model) + '&year=' + encodeURIComponent(year))
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+     if (!d) { box.innerHTML = '<p class="hint">The recall service is unavailable right now.</p>'; return; }
+     if (!d.count) { box.innerHTML = '<p style="margin-top:10px"><span class="fit-yes">No US safety recalls found</span> for the ' + esc(year + ' ' + make + ' ' + model) + '.</p><p class="hint">Recalls are only recorded for cars sold in the US.</p>'; return; }
+     box.innerHTML = '<p style="margin-top:10px"><span class="fit-no">' + d.count + ' US safety recall' + (d.count > 1 ? 's' : '') + '</span> for this model. Ask the seller if the repairs were done.</p><ul class="recalls">' +
+      d.recalls.slice(0, 4).map(function (r) { return '<li><b>' + esc(cap(String(r.component || 'Recall').toLowerCase())) + '</b>' + esc(String(r.summary || '').slice(0, 180)) + (String(r.summary || '').length > 180 ? '…' : '') + '</li>'; }).join('') + '</ul>' +
+      (d.count > 4 ? '<p class="hint">and ' + (d.count - 4) + ' more.</p>' : '');
+    }).catch(function () { box.innerHTML = '<p class="hint">The recall service is unavailable right now.</p>'; });
+  }
+  function runCheck(vin) {
+   body.innerHTML = '<p class="hint">Checking ' + esc(vin) + '…</p>';
+   fetch('/api/vin/decode/' + encodeURIComponent(vin)).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (x) {
+    if (!x.ok) { body.innerHTML = '<p class="fit-no">' + esc(x.d.detail || 'We couldn\'t check this VIN.') + '</p>'; return; }
+    var d = x.d, decoded = [d.year, d.make, d.model].filter(Boolean).join(' ');
+    var makeMatch = !d.make || !v.make || String(d.make).toLowerCase().indexOf(String(v.make).toLowerCase().split('-')[0]) > -1 || String(v.make).toLowerCase().indexOf(String(d.make).toLowerCase()) > -1;
+    var yearMatch = !d.year || !v.year || Math.abs(Number(d.year) - Number(v.year)) <= 1;
+    var h = '<p>VIN <b>' + esc(d.vin) + '</b> belongs to a <b>' + esc(decoded || 'vehicle we can\'t identify') + '</b>.</p>';
+    h += (makeMatch && yearMatch)
+     ? '<p class="fit-yes" style="margin-top:6px">Matches this listing.</p>'
+     : '<p class="fit-no" style="margin-top:6px">This doesn\'t match the listing (' + esc([v.year, v.make, v.model].join(' ')) + '). Ask the seller to explain before you go further.</p>';
+    h += '<p class="hint"><a href="/vin-tool?vin=' + encodeURIComponent(d.vin) + '">See the full VIN report</a></p>';
+    body.innerHTML = h;
+    var mk = d.make || v.make, md = d.model || v.model, yr = d.year || v.year;
+    if (mk && md && yr) showRecalls(mk, md, yr);
+   }).catch(function () { body.innerHTML = '<p class="hint">We couldn\'t reach the VIN checker. Try again later.</p>'; });
+  }
+  if (v.vin && v.vin.length === 17) runCheck(v.vin);
+  else {
+   body.innerHTML = '<p class="muted" style="color:var(--muted)">The seller hasn\'t added the VIN. Ask them for it (it\'s on the windscreen and the papers), then check it here.</p>' +
+    '<form class="check-row" id="vin-form"><label class="sr-only" for="vin-in">VIN</label><input class="input" id="vin-in" maxlength="17" placeholder="17-character VIN" autocomplete="off"><button class="btn btn-primary" type="submit">Check</button></form>';
+   $('vin-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var val = ($('vin-in').value || '').replace(/\s+/g, '').toUpperCase();
+    if (val.length !== 17) { toast('A VIN has 17 characters', 'error'); return; }
+    runCheck(val);
+   });
+   if (v.make && v.model && v.year) showRecalls(v.make, v.model, v.year);
+  }
+
+  // ---- actions ----
+  $('btn-share').onclick = function () {
+   var text = title + ' · SLL ' + fmt(v.price_sll);
+   if (navigator.share) { navigator.share({ title: title, text: text, url: location.href }).catch(function () {}); return; }
+   window.open('https://wa.me/?text=' + encodeURIComponent(text + '\n' + location.href), '_blank', 'noopener');
+  };
+  $('btn-save').onclick = function () {
+   var b = this;
+   if (!token()) { location.href = '/login?next=' + encodeURIComponent(location.pathname); return; }
+   fetch('/api/my-account/saved', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ listing_type: 'vehicle', listing_id: Number(id) }) })
+    .then(function (r) {
+     if (r.status === 401) { location.href = '/login?next=' + encodeURIComponent(location.pathname); return; }
+     if (r.ok) { b.textContent = 'Saved'; toast('Saved', 'success'); } else toast('Could not save', 'error');
+    });
+  };
+  fetch('/api/vehicles/' + encodeURIComponent(id) + '/view', { method: 'POST' }).catch(function () {});
+ }).catch(function () { notFound('We couldn\'t load this car'); });
 })();
 </script>
 </body>
