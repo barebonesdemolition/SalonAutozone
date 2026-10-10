@@ -10,7 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.staticfiles import StaticFiles
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi import Request
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
+from sqlalchemy.future import select as _orm_select
+
+from app import share_meta
 
 from app import businesses
 from app import models
@@ -169,11 +173,22 @@ if _allowed_origins:
     )
 
 
+def _public_base(request: Request) -> str:
+    """The site's public address (https on Render, which sits behind a proxy)."""
+    configured = os.getenv("PUBLIC_BASE_URL", "").strip().rstrip("/")
+    if configured:
+        return configured
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme).split(",")[0].strip()
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc
+    return f"{proto}://{host}"
+
+
 # ---------- Root & Health Endpoints ----------
 
 @app.get("/", tags=["Health"])
-async def root():
-    return FileResponse("app/index.html")
+async def root(request: Request):
+    base = _public_base(request)
+    return HTMLResponse(share_meta.home_page(base, base + "/"))
 
 
 @app.get("/api/status", tags=["Health"])
@@ -264,13 +279,25 @@ async def verified_business_page(slug: str):
 
 
 @app.get("/part/{part_id}")
-async def part_detail_page(part_id: str):
-    return FileResponse("app/templates/part_detail.html")
+async def part_detail_page(part_id: str, request: Request, db: AsyncSession = Depends(get_db)):
+    part = None
+    if part_id.isdigit():
+        part = (await db.execute(_orm_select(models.PartListing).where(models.PartListing.id == int(part_id)))).scalars().first()
+    if part is None:
+        return FileResponse("app/templates/part_detail.html")  # the page shows "not found" itself
+    base = _public_base(request)
+    return HTMLResponse(share_meta.part_page(part, base, f"{base}/part/{part.id}"))
 
 
 @app.get("/vehicle/{vehicle_id}")
-async def vehicle_detail_page(vehicle_id: str):
-    return FileResponse("app/templates/vehicle_detail.html")
+async def vehicle_detail_page(vehicle_id: str, request: Request, db: AsyncSession = Depends(get_db)):
+    car = None
+    if vehicle_id.isdigit():
+        car = (await db.execute(_orm_select(models.VehicleListing).where(models.VehicleListing.id == int(vehicle_id)))).scalars().first()
+    if car is None:
+        return FileResponse("app/templates/vehicle_detail.html")
+    base = _public_base(request)
+    return HTMLResponse(share_meta.vehicle_page(car, base, f"{base}/vehicle/{car.id}"))
 
 
 @app.get("/catalog/{catalog_id}")

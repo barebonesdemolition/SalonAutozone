@@ -19,12 +19,12 @@
         h += '<div class="gallery"><svg aria-hidden="true"><use href="#' + o.icon + '"/></svg></div>';
       } else {
         h += '<div class="gal-main" tabindex="0" aria-label="Photos">' + list.map(function (p, i) {
-          return '<img src="' + esc(safeUrl(p.url)) + '" alt="' + esc(o.title) + ', photo ' + (i + 1) + '"' + (i ? ' loading="lazy"' : '') + '>';
+          return '<img src="' + esc(safeUrl(global.SAZImg ? global.SAZImg(p.url, 1000) : p.url)) + '" alt="' + esc(o.title) + ', photo ' + (i + 1) + '"' + (i ? ' loading="lazy"' : '') + '>';
         }).join('') + '</div>';
         if (list.length > 1) {
           h += '<span class="gal-count" aria-hidden="true">1 / ' + list.length + '</span>';
           h += '<div class="gal-thumbs">' + list.map(function (p, i) {
-            return '<button type="button" data-i="' + i + '" style="background-image:url(\'' + esc(safeUrl(p.url)) + '\')" aria-label="Photo ' + (i + 1) + '"' + (i === 0 ? ' aria-current="true"' : '') + '></button>';
+            return '<button type="button" data-i="' + i + '" style="background-image:url(\'' + esc(safeUrl(global.SAZImg ? global.SAZImg(p.url, 160) : p.url)) + '\')" aria-label="Photo ' + (i + 1) + '"' + (i === 0 ? ' aria-current="true"' : '') + '></button>';
           }).join('') + '</div>';
         }
       }

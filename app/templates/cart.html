@@ -42,7 +42,7 @@
  <div id="root"></div>
 </main>
 <script src="/static/cart.js?v=4"></script>
-<script src="/static/site.js?v=4"></script>
+<script src="/static/site.js?v=5"></script>
 <script>
 (function () {
  'use strict';
@@ -60,7 +60,7 @@
   }
   var count = SAZCart.count();
   root.innerHTML = '<div class="cart"><div class="lines">' + items.map(function (it) {
-   var img = safeUrl(it.image_url);
+   var img = safeUrl(window.SAZImg ? SAZImg(it.image_url, 160) : it.image_url);
    return '<div class="line">' +
     '<div class="th"' + (img ? ' style="background-image:url(\'' + esc(img) + '\')"' : '') + '></div>' +
     '<div><a class="name" href="/part/' + encodeURIComponent(it.part_id) + '">' + esc(it.name) + '</a><div class="each">SLL ' + fmt(it.price_sll) + ' each</div>' +
