@@ -5,6 +5,14 @@
 (function () {
   'use strict';
 
+  // Smaller, mobile-friendly photos: ask Cloudinary for a resized, compressed copy
+  // (auto WebP/AVIF where the phone supports it). Other URLs are returned unchanged.
+  window.SAZImg = function (url, width) {
+    url = String(url || '');
+    if (url.indexOf('res.cloudinary.com') === -1 || url.indexOf('/image/upload/') === -1) return url;
+    return url.replace('/image/upload/', '/image/upload/f_auto,q_auto,c_limit,w_' + (width || 600) + '/');
+  };
+
   var ICONS = {
     part: '<path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',
     car: '<path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><path d="M5 12h14"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/>',

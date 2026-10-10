@@ -67,7 +67,7 @@
  </div>
  <section id="panel" aria-live="polite"></section>
 </main>
-<script src="/static/site.js?v=4"></script>
+<script src="/static/site.js?v=5"></script>
 <script>
 (function () {
  'use strict';
@@ -98,7 +98,7 @@
  }
  function empty(title, text, cta) { return '<div class="empty"><h2>' + title + '</h2><p>' + text + '</p>' + (cta || '') + '</div>'; }
  function item(o) {
-  var img = safeUrl(o.img);
+  var img = safeUrl(window.SAZImg ? SAZImg(o.img, 160) : o.img);
   return '<div class="item' + (o.noimg ? ' noimg' : '') + '">' + (o.noimg ? '' : '<div class="th"' + (img ? ' style="background-image:url(\'' + esc(img) + '\')"' : '') + '></div>') +
    '<div><a class="t" href="' + esc(o.href || '#') + '">' + esc(o.title) + '</a><div class="m">' + o.meta + '</div>' + (o.extra || '') + (o.ops ? '<div class="ops">' + o.ops + '</div>' : '') + '</div></div>';
  }

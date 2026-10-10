@@ -261,7 +261,7 @@
  </div>
 </div>
 
-<script src="/static/site.js?v=4"></script>
+<script src="/static/site.js?v=5"></script>
 <script>
 (function () {
  'use strict';
@@ -335,7 +335,7 @@
 
  // ---------- cards ----------
  function media(url, icon) {
-  var u = safeUrl(url);
+  var u = safeUrl(window.SAZImg ? SAZImg(url, 480) : url);
   if (u) return '<div class="ph" style="background-image:url(\'' + esc(cssUrl(u)) + '\')" role="img" aria-label="Photo"></div>';
   return '<div class="ph"><svg aria-hidden="true"><use href="#' + icon + '"/></svg></div>';
  }
