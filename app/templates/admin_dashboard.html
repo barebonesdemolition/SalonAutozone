@@ -78,6 +78,9 @@ td{font-size:13px}
  <button type="button" data-view="inquiries">Inquiries</button>
  <button type="button" data-view="businesses">Business applications</button>
  <button type="button" data-view="payments">Payments</button>
+ <button type="button" data-view="orders">Parts orders</button>
+ <button type="button" data-view="drivers">Drivers</button>
+ <button type="button" data-view="delivery">Delivery fees</button>
  <a href="/admin/catalog">Supplier catalog</a>
  <a href="/vin-tool">VIN lookup</a>
  <a href="/">← Back to site</a>
@@ -185,6 +188,59 @@ td{font-size:13px}
  </tr></thead><tbody id="tb-payments"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
  </div>
  </div>
+
+ <div id="view-orders" class="hidden">
+ <div class="panel">
+ <div class="bar">
+ <h2>Parts orders</h2>
+ <select class="inp" id="q-orders" aria-label="Order status">
+ <option value="awaiting_payment">Waiting for payment</option>
+ <option value="confirmed">Paid, seller preparing</option>
+ <option value="ready_for_pickup">Ready for pickup</option>
+ <option value="driver_assigned">Driver assigned</option>
+ <option value="out_for_delivery">Out for delivery</option>
+ <option value="delivered">Delivered</option>
+ <option value="cancelled">Cancelled</option>
+ <option value="all">All orders</option>
+ </select>
+ </div>
+ <p style="margin:0 0 12px;color:#64748b">Call the buyer to take payment, then confirm it here. The seller is then asked to get the parts ready.</p>
+ <div class="table-wrap"><table><thead><tr>
+ <th>Order</th><th>Buyer</th><th>Delivery</th><th>Parts</th><th>Delivery fee</th><th>To pay</th><th>Status</th><th>Actions</th>
+ </tr></thead><tbody id="tb-orders"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
+
+ <div id="view-drivers" class="hidden">
+ <div class="panel">
+ <div class="bar">
+ <h2>Drivers</h2>
+ <select class="inp" id="q-drivers" aria-label="Driver status">
+ <option value="pending">Waiting for review</option>
+ <option value="verified">Approved</option>
+ <option value="rejected">Rejected</option>
+ <option value="suspended">Suspended</option>
+ <option value="all">All drivers</option>
+ </select>
+ </div>
+ <div class="table-wrap"><table><thead><tr>
+ <th>Driver</th><th>Vehicle</th><th>City</th><th>Phone</th><th>ID photo</th><th>Status</th><th>Actions</th>
+ </tr></thead><tbody id="tb-drivers"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
+
+ <div id="view-delivery" class="hidden">
+ <div class="panel" style="max-width:560px">
+ <div class="bar"><h2>Delivery fees</h2></div>
+ <p style="margin:0 0 12px;color:#64748b">Buyers can't check out until these are set. The platform share is kept from each delivery fee; the rest goes to the driver.</p>
+ <form id="fees-form">
+ <label style="display:block;margin-top:10px;font-weight:600">Okada (small and medium parts), SLL<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-okada" required></label>
+ <label style="display:block;margin-top:10px;font-weight:600">Van (bulky parts), SLL<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-van" required></label>
+ <label style="display:block;margin-top:10px;font-weight:600">Platform share of the delivery fee, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="100" step="0.5" id="fee-pct" required></label>
+ <button class="btn btn-primary" style="margin-top:16px" type="submit">Save fees</button>
+ </form>
+ </div>
+ </div>
  </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -218,7 +274,10 @@ td{font-size:13px}
  imports: 'Import requests',
  inquiries: 'Inquiries',
  businesses: 'Business applications',
- payments: 'Payments'
+ payments: 'Payments',
+ orders: 'Parts orders',
+ drivers: 'Drivers',
+ delivery: 'Delivery fees'
  };
 
  document.querySelectorAll('.side [data-view]').forEach(function (btn) {
@@ -227,7 +286,7 @@ td{font-size:13px}
  btn.classList.add('active');
  var v = btn.dataset.view;
  $('page-title').textContent = titles[v] || v;
- ['overview','vehicles','parts','imports','inquiries','businesses','payments'].forEach(function (name) {
+ ['overview','vehicles','parts','imports','inquiries','businesses','payments','orders','drivers','delivery'].forEach(function (name) {
  var el = $('view-' + name);
  if (el) el.classList.toggle('hidden', name !== v);
  });
@@ -248,6 +307,9 @@ td{font-size:13px}
  if (v === 'inquiries') loadInquiries();
  if (v === 'businesses') loadBusinesses();
  if (v === 'payments') loadPayments();
+ if (v === 'orders') loadOrders();
+ if (v === 'drivers') loadDrivers();
+ if (v === 'delivery') loadFees();
  }
 
  document.querySelectorAll('[data-view-link]').forEach(function (button) {
@@ -449,6 +511,105 @@ td{font-size:13px}
  .catch(function (error) { button.disabled = false; toast(error.message, false); });
  });
 
+
+ // ---------- parts orders ----------
+ var ORDER_LABEL = { awaiting_payment: ['Waiting for payment', 'warn'], confirmed: ['Paid', 'ok'], ready_for_pickup: ['Ready for pickup', 'ok'], driver_assigned: ['Driver assigned', 'ok'], out_for_delivery: ['Out for delivery', 'ok'], delivered: ['Delivered', 'ok'], cancelled: ['Cancelled', 'bad'] };
+ function loadOrders() {
+ var tb = $('tb-orders');
+ tb.innerHTML = '<tr><td colspan="8" class="empty">Loading orders…</td></tr>';
+ fetch('/api/shop/admin/orders?status=' + encodeURIComponent($('q-orders').value), { headers: auth() })
+ .then(function (r) { if (!r.ok) throw new Error('Could not load orders'); return r.json(); })
+ .then(function (d) {
+ var items = d.orders || [];
+ if (!items.length) { tb.innerHTML = '<tr><td colspan="8" class="empty">No orders in this view.</td></tr>'; return; }
+ tb.innerHTML = items.map(function (o) {
+ var l = ORDER_LABEL[o.status] || [o.status, 'off'];
+ var act = o.status === 'awaiting_payment' ? '<button class="btn btn-primary" data-order-pay="' + o.id + '">Payment received</button>'
+ : (o.status === 'driver_assigned' || o.status === 'out_for_delivery') ? '<button class="btn" data-order-done="' + o.id + '">Mark delivered</button>' : '';
+ var phone = String(o.buyer_phone || '').replace(/[^\d+]/g, '');
+ return '<tr><td><strong>' + esc(o.code) + '</strong><br><small>' + esc(String(o.created_at || '').slice(0, 16).replace('T', ' ')) + '</small></td>' +
+ '<td>' + (phone ? '<a href="tel:' + esc(phone) + '">' + esc(o.buyer_phone) + '</a>' : '—') + '</td>' +
+ '<td>' + esc(o.delivery_address || '') + '<br><small>' + esc(o.delivery_area || '') + ', ' + esc(o.vehicle_class || '') + '</small></td>' +
+ '<td>SLL ' + fmt(o.parts_total_sll) + '</td><td>SLL ' + fmt(o.delivery_fee_sll) + '</td>' +
+ '<td><strong>SLL ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + '</strong></td>' +
+ '<td><span class="badge ' + l[1] + '">' + esc(l[0]) + '</span></td><td>' + act + '</td></tr>';
+ }).join('');
+ }).catch(function (e) { tb.innerHTML = '<tr><td colspan="8" class="empty">' + esc(e.message) + '.</td></tr>'; });
+ }
+ $('q-orders').addEventListener('change', loadOrders);
+ $('tb-orders').addEventListener('click', function (e) {
+ var pay = e.target.closest('[data-order-pay]'), done = e.target.closest('[data-order-done]');
+ if (pay) {
+ if (!confirm('Confirm you have received the full payment for this order?')) return;
+ pay.disabled = true;
+ fetch('/api/shop/admin/orders/' + pay.dataset.orderPay + '/confirm-payment', { method: 'POST', headers: auth() })
+ .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not confirm'); }); })
+ .then(function () { toast('Payment confirmed. The seller has been asked to get the parts ready.', true); loadOrders(); })
+ .catch(function (err) { pay.disabled = false; toast(err.message, false); });
+ }
+ if (done) {
+ var note = prompt('Why are you marking this delivered by hand? (e.g. "Buyer confirmed by phone")');
+ if (!note || note.trim().length < 3) return;
+ done.disabled = true;
+ fetch('/api/shop/admin/orders/' + done.dataset.orderDone + '/complete?note=' + encodeURIComponent(note.trim()), { method: 'POST', headers: auth() })
+ .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not complete'); }); })
+ .then(function () { toast('Order marked delivered', true); loadOrders(); })
+ .catch(function (err) { done.disabled = false; toast(err.message, false); });
+ }
+ });
+
+ // ---------- drivers ----------
+ function loadDrivers() {
+ var tb = $('tb-drivers');
+ tb.innerHTML = '<tr><td colspan="7" class="empty">Loading drivers…</td></tr>';
+ fetch('/api/drivers/admin/list?status=' + encodeURIComponent($('q-drivers').value), { headers: auth() })
+ .then(function (r) { if (!r.ok) throw new Error('Could not load drivers'); return r.json(); })
+ .then(function (d) {
+ var items = d.drivers || [];
+ if (!items.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">No drivers in this view.</td></tr>'; return; }
+ tb.innerHTML = items.map(function (x) {
+ var st = x.status, badge = st === 'verified' ? 'ok' : st === 'pending' ? 'warn' : 'bad';
+ var acts = (st !== 'verified' ? '<button class="btn btn-primary" data-drv="' + x.id + '" data-drv-status="verified">Approve</button> ' : '') +
+ (st === 'pending' ? '<button class="btn btn-danger" data-drv="' + x.id + '" data-drv-status="rejected">Reject</button>' : '') +
+ (st === 'verified' ? '<button class="btn btn-danger" data-drv="' + x.id + '" data-drv-status="suspended">Suspend</button>' : '');
+ var idp = x.id_photo_url && /^(https?:\/\/|\/)/.test(x.id_photo_url) ? '<a href="' + esc(x.id_photo_url) + '" target="_blank" rel="noopener">View</a>' : '—';
+ return '<tr><td><strong>' + esc(x.full_name || '—') + '</strong><br><small>' + esc(x.email || '') + '</small></td>' +
+ '<td>' + esc(x.vehicle_type) + (x.plate_number ? '<br><small>' + esc(x.plate_number) + '</small>' : '') + '</td>' +
+ '<td>' + esc(x.city) + '</td><td>' + esc(x.phone) + '</td><td>' + idp + '</td>' +
+ '<td><span class="badge ' + badge + '">' + esc(st) + '</span></td><td>' + acts + '</td></tr>';
+ }).join('');
+ }).catch(function (e) { tb.innerHTML = '<tr><td colspan="7" class="empty">' + esc(e.message) + '.</td></tr>'; });
+ }
+ $('q-drivers').addEventListener('change', loadDrivers);
+ $('tb-drivers').addEventListener('click', function (e) {
+ var b = e.target.closest('[data-drv]');
+ if (!b) return;
+ var st = b.dataset.drvStatus, note = '';
+ if (st !== 'verified') { note = prompt('Reason (the driver will see this):') || ''; }
+ b.disabled = true;
+ fetch('/api/drivers/admin/' + b.dataset.drv + '/status?status=' + st + (note ? '&note=' + encodeURIComponent(note) : ''), { method: 'POST', headers: auth() })
+ .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not update'); }); })
+ .then(function () { toast('Driver ' + (st === 'verified' ? 'approved' : st), true); loadDrivers(); })
+ .catch(function (err) { b.disabled = false; toast(err.message, false); });
+ });
+
+ // ---------- delivery fees ----------
+ function loadFees() {
+ fetch('/api/shop/admin/settings', { headers: auth() }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+ $('fee-okada').value = d.okada_fee_sll != null ? d.okada_fee_sll : '';
+ $('fee-van').value = d.van_fee_sll != null ? d.van_fee_sll : '';
+ $('fee-pct').value = d.platform_pct != null ? d.platform_pct : '';
+ if (d.okada_fee_sll == null) toast('Delivery fees are not set yet, so buyers cannot check out.', false);
+ });
+ }
+ $('fees-form').addEventListener('submit', function (e) {
+ e.preventDefault();
+ var body = { okada_fee_sll: Number($('fee-okada').value), van_fee_sll: Number($('fee-van').value), platform_pct: Number($('fee-pct').value) };
+ fetch('/api/shop/admin/settings', { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify(body) })
+ .then(function (r) { if (!r.ok) throw new Error('Could not save fees'); return r.json(); })
+ .then(function () { toast('Delivery fees saved', true); })
+ .catch(function (err) { toast(err.message, false); });
+ });
  function requireAdmin() {
  fetch('/api/admin/stats', { headers: auth() }).then(function (response) {
  if (!response.ok) throw new Error('Admin access required');

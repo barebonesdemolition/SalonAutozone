@@ -18,7 +18,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models
-from app.auth import get_current_admin, get_current_user
+from app.auth import get_current_user
+from app.routers.admin import admin_actor
 from app.db import engine, get_db
 
 __all__ = ["router", "ensure_driver_tables", "drivers"]
@@ -163,7 +164,7 @@ async def set_online(
 @router.get("/admin/list")
 async def admin_list(
     status: str = Query("pending"),
-    admin: models.User = Depends(get_current_admin),
+    admin=Depends(admin_actor),
     db: AsyncSession = Depends(get_db),
 ):
     status = status.lower()
@@ -187,7 +188,7 @@ async def admin_set_status(
     driver_id: int,
     status: str = Query(...),
     note: str | None = Query(None, max_length=300),
-    admin: models.User = Depends(get_current_admin),
+    admin=Depends(admin_actor),
     db: AsyncSession = Depends(get_db),
 ):
     status = status.lower()
