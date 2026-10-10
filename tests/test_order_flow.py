@@ -37,7 +37,8 @@ def test_order_from_checkout_to_delivery(client):
     part = client.post("/api/parts/", headers=seller, json={"name": "Brake pads", "category": "Brakes", "price_sll": 100000, "stock_quantity": 5}).json()
 
     order = client.post("/api/shop/orders", headers=buyer, json={
-        "items": [{"part_id": part["id"], "qty": 2}], "delivery_address": "12 Kissy Road", "delivery_area": "Freetown", "phone": "+23276111222"})
+        "items": [{"part_id": part["id"], "qty": 2}], "delivery_address": "12 Kissy Road", "delivery_area": "Freetown", "phone": "+23276111222",
+        "delivery_lat": 8.4844, "delivery_lng": -13.2344})
     assert order.status_code == 201, order.text
     order = order.json()
     assert order["total_to_pay_sll"] == 225000
@@ -59,7 +60,15 @@ def test_order_from_checkout_to_delivery(client):
     assert client.post("/api/drivers/me/online?online=true", headers=driver).status_code == 200
 
     job = client.get("/api/shop/driver/jobs?scope=open", headers=driver).json()["jobs"][0]
+    assert client.get(f"/api/shop/orders/{order['id']}", headers=buyer).json()["driver"] is None
     assert client.post(f"/api/shop/driver/jobs/{job['id']}/accept", headers=driver).status_code == 200
+
+    # The buyer can now see and call the driver; the driver gets the buyer's pin.
+    seen = client.get(f"/api/shop/orders/{order['id']}", headers=buyer).json()
+    assert seen["driver"]["phone"] == "+23277000111" and seen["driver"]["vehicle_type"] == "bike"
+    assert seen["delivery_lat"] == 8.4844
+    mine = client.get("/api/shop/driver/jobs?scope=mine", headers=driver).json()["jobs"][0]
+    assert mine["delivery_lng"] == -13.2344 and mine["buyer_name"] == "Buyer Person"
     assert client.post(f"/api/shop/driver/jobs/{job['id']}/pickup", headers=driver).status_code == 200
     assert client.get(f"/api/shop/orders/{order['id']}", headers=buyer).json()["status"] == "out_for_delivery"
     assert client.post(f"/api/shop/driver/jobs/{job['id']}/deliver", headers=driver, json={"code": "000000" if order["delivery_code"] != "000000" else "111111"}).status_code == 400

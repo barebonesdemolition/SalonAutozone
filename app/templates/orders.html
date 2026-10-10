@@ -100,6 +100,17 @@
   if (code) load(code);
  }
 
+ function driverBox(d, status) {
+  if (!d || status === 'delivered' || status === 'cancelled') return '';
+  var phone = String(d.phone || '').replace(/[^\d+]/g, '');
+  var vehicle = { bike: 'Okada', car: 'Car', van: 'Van', truck: 'Truck' }[d.vehicle_type] || d.vehicle_type || '';
+  return '<section class="box"><h2>Your driver</h2><p style="font-size:18px;font-weight:800;color:var(--ink)">' + esc(d.name || 'Driver') + '</p>' +
+   '<p class="hint" style="margin-top:2px">' + esc([vehicle, d.plate_number].filter(Boolean).join(', ')) + '</p>' +
+   (phone ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><a class="btn btn-ghost" href="tel:' + esc(phone) + '">Call</a>' +
+    '<a class="btn btn-wa" href="https://wa.me/' + esc(phone.replace(/^\+/, '')) + '" target="_blank" rel="noopener">WhatsApp</a></div>' : '') +
+   '</section>';
+ }
+
  // ---------- one order (buyer) ----------
  function orderPage(id) {
   root.innerHTML = '<div class="lcard skeleton" style="margin-top:22px"></div>';
@@ -114,6 +125,7 @@
      (q.get('new') ? '<div class="notice notice-ok" style="margin-top:20px"><b>Order placed.</b> We\'ll contact you on ' + esc(o.buyer_phone) + ' to confirm payment.</div>' : '') +
      '<h1 class="page-title">Order <span style="letter-spacing:.06em">' + esc(o.code) + '</span></h1>' +
      '<div class="two"><div style="display:grid;gap:16px">' +
+      driverBox(o.driver, o.status) +
       '<section class="box"><h2>Progress</h2>' + timeline(o.status, o.events) + '</section>' +
       '<section class="box"><h2>Items</h2>' + (o.items || []).map(function (it) {
         return '<div class="row"><span>' + esc(it.title) + ' <span style="color:var(--muted)">× ' + it.qty + '</span></span><b>SLL ' + fmt(it.unit_price_sll * it.qty) + '</b></div>';
@@ -122,7 +134,9 @@
        '<div class="row total"><span>Total to pay</span><span>SLL ' + fmt(o.total_to_pay_sll) + '</span></div></section>' +
      '</div><aside style="display:grid;gap:16px">' +
       (showPin ? '<section class="box"><h2>Your delivery code</h2><div class="pin">' + esc(o.delivery_code) + '</div><p class="hint">Give this code to the driver only when your parts arrive and you\'ve checked them.</p></section>' : '') +
-      '<section class="box"><h2>Delivering to</h2><p>' + esc(o.delivery_address) + '<br>' + esc(o.delivery_area) + '</p><p class="hint">Driver will call ' + esc(o.buyer_phone) + '</p></section>' +
+      '<section class="box"><h2>Delivering to</h2><p>' + esc(o.delivery_address) + '<br>' + esc(o.delivery_area) + '</p>' +
+       (o.delivery_lat != null ? '<p><a href="https://www.google.com/maps?q=' + encodeURIComponent(o.delivery_lat + ',' + o.delivery_lng) + '" target="_blank" rel="noopener">See your pin on the map</a></p>' : '') +
+       '<p class="hint">The driver will call ' + esc(o.buyer_phone) + '</p></section>' +
       (canCancel ? '<button class="btn btn-ghost btn-block" id="cancel">Cancel order</button>' : '') +
       '<a class="btn btn-ghost btn-block" href="/orders">All my orders</a>' +
      '</aside></div>';
