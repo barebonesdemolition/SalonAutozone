@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
-<link rel="stylesheet" href="/static/ui.css?v=5">
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
 <style>
 .sell { max-width: 760px; margin: 0 auto; padding: 22px 0 40px; }
@@ -29,6 +29,11 @@ legend + * { clear: both; }
 .photo-drop:hover { border-color: var(--teal); }
 .photo-drop .pv { width: 96px; height: 72px; border-radius: var(--r-sm); background: var(--teal-50) center / cover no-repeat; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--teal); font-size: 28px; }
 .photo-drop b { display: block; color: var(--ink); }
+.thumbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+@media (min-width: 560px) { .thumbs { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.thumb { position: relative; aspect-ratio: 1; border-radius: var(--r-sm); background: var(--teal-50) center / cover no-repeat; }
+.thumb .rm { position: absolute; top: 4px; right: 4px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(14, 42, 43, .75); color: #fff; font-size: 16px; line-height: 1; }
+.thumb .cv { position: absolute; left: 4px; bottom: 4px; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 5px; background: var(--gold); color: var(--ink); }
 .submit-bar { margin-top: 18px; display: grid; gap: 8px; }
 .status { font-weight: 600; text-align: center; min-height: 1.5em; }
 .status.err { color: var(--bad); }
@@ -94,9 +99,10 @@ legend + * { clear: both; }
    </fieldset>
 
    <fieldset>
-    <legend>Photo</legend>
-    <label class="photo-drop" for="photo"><span class="pv" id="pv">+</span><span><b id="photo-label">Add a photo</b><span class="hint" style="display:block;margin:0">A clear photo in daylight sells faster. JPG, PNG or WEBP up to 5 MB.</span></span></label>
-    <input type="file" id="photo" accept="image/jpeg,image/png,image/webp" class="sr-only">
+    <legend>Photos</legend>
+    <label class="photo-drop" for="photo"><span class="pv" id="pv">+</span><span><b id="photo-label">Add photos</b><span class="hint" style="display:block;margin:0">Up to 8. The first one is the cover. Clear photos in daylight sell faster. JPG, PNG or WEBP up to 5 MB each.</span></span></label>
+    <input type="file" id="photo" accept="image/jpeg,image/png,image/webp" multiple class="sr-only">
+    <div class="thumbs" id="thumbs"></div>
    </fieldset>
 
    <fieldset>
@@ -188,17 +194,32 @@ legend + * { clear: both; }
    }).catch(function (e) { setStatus(e.message, 'err'); });
  });
 
- // ---- photo ----
- var photo = null;
+ // ---- photos ----
+ var photos = [], MAX = 8;
+ function drawThumbs() {
+  $('thumbs').innerHTML = photos.map(function (f, i) {
+   return '<div class="thumb" style="background-image:url(' + f._url + ')">' + (i === 0 ? '<span class="cv">Cover</span>' : '') +
+    '<button type="button" class="rm" data-rm="' + i + '" aria-label="Remove photo ' + (i + 1) + '">&times;</button></div>';
+  }).join('');
+  $('photo-label').textContent = photos.length ? (photos.length < MAX ? 'Add more photos (' + photos.length + ' of ' + MAX + ')' : MAX + ' photos added') : 'Add photos';
+ }
  $('photo').addEventListener('change', function () {
-  var f = this.files && this.files[0];
-  if (!f) return;
-  if (f.size > 5 * 1024 * 1024) { setStatus('That photo is over 5 MB. Choose a smaller one.', 'err'); this.value = ''; return; }
-  photo = f;
-  $('pv').style.backgroundImage = 'url(' + URL.createObjectURL(f) + ')';
-  $('pv').textContent = '';
-  $('photo-label').textContent = 'Change photo';
-  setStatus('');
+  var skipped = 0;
+  Array.from(this.files || []).forEach(function (f) {
+   if (photos.length >= MAX) { skipped++; return; }
+   if (f.size > 5 * 1024 * 1024) { skipped++; return; }
+   f._url = URL.createObjectURL(f);
+   photos.push(f);
+  });
+  this.value = '';
+  drawThumbs();
+  setStatus(skipped ? skipped + ' photo' + (skipped > 1 ? 's were' : ' was') + ' skipped (over 5 MB, or more than ' + MAX + ').' : '', skipped ? 'err' : '');
+ });
+ $('thumbs').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-rm]');
+  if (!b) return;
+  photos.splice(Number(b.dataset.rm), 1);
+  drawThumbs();
  });
 
  // ---- submit ----
@@ -246,14 +267,21 @@ legend + * { clear: both; }
    })
    .then(function (d) {
     var dest = (type === 'part' ? '/part/' : '/vehicle/') + d.id;
-    if (!photo) { location.href = dest; return; }
-    setStatus('Uploading your photo…');
-    var fd = new FormData(); fd.append('file', photo);
-    return fetch('/api/upload/' + (type === 'part' ? 'part/' : 'vehicle/') + d.id, { method: 'POST', headers: auth(), body: fd })
-     .then(function (r) {
-      if (!r.ok) { setStatus('Published, but the photo didn\'t upload. You can add it later from your dashboard.', 'err'); setTimeout(function () { location.href = dest; }, 2500); return; }
-      location.href = dest;
-     });
+    if (!photos.length) { location.href = dest; return; }
+    var kind = type === 'part' ? 'part' : 'vehicle', failed = 0, i = 0;
+    function next() {
+     if (i >= photos.length) {
+      if (failed) { setStatus('Published, but ' + failed + ' photo' + (failed > 1 ? 's' : '') + ' didn\'t upload. You can add them from the listing page.', 'err'); setTimeout(function () { location.href = dest; }, 2500); }
+      else location.href = dest;
+      return;
+     }
+     setStatus('Uploading photo ' + (i + 1) + ' of ' + photos.length + '…');
+     var fd = new FormData(); fd.append('file', photos[i]);
+     return fetch('/api/photos/' + kind + '/' + d.id, { method: 'POST', headers: auth(), body: fd })
+      .then(function (r) { if (!r.ok) failed++; }, function () { failed++; })
+      .then(function () { i++; return next(); });
+    }
+    return next();
    })
    .catch(function (err) { if (err) { setStatus(err.message || 'No connection. Try again.', 'err'); submit.disabled = false; } });
  });
