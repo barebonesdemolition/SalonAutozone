@@ -211,7 +211,8 @@ async def garage_page():
 
 @app.get("/dashboard")
 async def legacy_dashboard_page():
-    return FileResponse("app/templates/dashboard.html")
+    # The seller dashboard is now the "My listings" tab of the account page.
+    return RedirectResponse("/my-account?tab=listings")
 
 
 @app.get("/admin/login")

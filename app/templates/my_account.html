@@ -1,422 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>My Account – {{ app_name or 'SalonAutoZone' }}</title>
-<style>
-:root{
- --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
- --navy:#0f172a;--text:#1e293b;--muted:#64748b;
- --border:#e2e8f0;--bg:#f8fafc;--success:#15803d;--danger:#b91c1c;
- --sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,-apple-system,sans-serif;font-size:15px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.5}
-a{color:inherit;text-decoration:none}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:0;background:none}
-:focus-visible{outline:3px solid var(--primary-hover);outline-offset:2px}
-[hidden]{display:none!important}
-
-.top{background:var(--navy);color:#94a3b8;padding:10px 24px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.top strong{color:#fff}.top a{color:#99f6e4;font-weight:700}
-.brand{background:#fff;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:var(--sh)}
-.logo{font-size:18px;font-weight:800;color:var(--navy)}.logo span{color:var(--primary)}
-.nav{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-.nav a{font-size:14px;font-weight:600;color:#475569}.nav a:hover{color:var(--primary)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:8px;font-weight:700;font-size:14px;min-height:44px}
-.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
-.btn-ghost{background:#f1f5f9;color:var(--text)}.btn-ghost:hover{background:#e2e8f0}
-
-.wrap{max-width:1100px;margin:0 auto;padding:24px 20px 64px}
-.hero{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px}
-.hero h1{font-size:26px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
-.hero p{color:var(--muted);margin-top:4px}
-.hero .ctas{display:flex;gap:8px;flex-wrap:wrap}
-
-.tabs{display:flex;gap:6px;background:#f1f5f9;padding:4px;border-radius:10px;margin-bottom:20px;flex-wrap:wrap}
-.tabs button{padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;color:var(--muted);min-height:42px}
-.tabs button.active{background:var(--primary);color:#fff}
-
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--sh)}
-.card h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px}
-.card .meta{font-size:13px;color:var(--muted)}
-.card .price{font-size:18px;font-weight:800;color:var(--primary);margin:8px 0}
-.card .acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.card .acts a,.card .acts button{flex:1;text-align:center;padding:9px;border-radius:8px;font-weight:700;font-size:12px;background:#f1f5f9;min-height:40px}
-
-.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--sh);margin-bottom:16px}
-.panel h2{font-size:16px;font-weight:800;margin-bottom:14px;color:var(--navy)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.lbl{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:6px}
-.inp{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;min-height:44px}
-.inp:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
-.empty{text-align:center;padding:40px 16px;color:var(--muted)}
-.empty a{color:var(--primary);font-weight:700}
-.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:var(--primary-light);color:var(--primary);text-transform:capitalize}
-.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;font-weight:600;z-index:99;transition:transform .25s;max-width:90vw}
-.toast.show{transform:translate(-50%,0)}.toast.ok{background:var(--success)}.toast.err{background:var(--danger)}
-.sk{height:120px;border-radius:12px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:sk 1.2s infinite}
-@keyframes sk{to{background-position:-200% 0}}
-.boot{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600;z-index:500}
-@media(max-width:700px){.row{grid-template-columns:1fr}.hero h1{font-size:22px}}
-
-.bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px);box-shadow:0 -4px 16px rgba(15,23,42,.06)}
-.bnav nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:500px;margin:0 auto}
-.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center}
-.bnav a svg{width:22px;height:22px}
-.bnav a.active,.bnav a:hover{color:var(--primary);background:var(--primary-light)}
-@media(max-width:768px){
- .bnav{display:block}
- body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
-}
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
-</style>
-
+<title>My account · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
-<link rel="stylesheet" href="/static/chrome.css?v=4">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<link rel="stylesheet" href="/static/ui.css?v=5">
+<link rel="stylesheet" href="/static/chrome.css?v=5">
+<style>
+.acc-head { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; padding: 22px 0 6px; }
+.acc-head h1 { font-size: clamp(28px, 5vw, 40px); font-variation-settings: "wdth" 78; }
+.acc-head p { color: var(--muted); margin-top: 4px; }
+.acc-head .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+@media (min-width: 760px) { .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px 16px; }
+.stat b { display: block; font-size: 28px; color: var(--ink); font-variation-settings: "wdth" 85; line-height: 1.1; }
+.stat span { color: var(--muted); font-size: 14px; }
+.biz { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px; }
+.tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex-shrink: 0; border: 0; background: none; padding: 12px 14px; font-weight: 700; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-color: var(--teal); }
+.tabs .n { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 4px; border-radius: 10px; background: var(--paper); font-size: 12px; }
+.list { display: grid; gap: 10px; }
+.item { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: center; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); }
+.item.noimg { grid-template-columns: minmax(0, 1fr); }
+.item .th { width: 64px; height: 64px; border-radius: var(--r-sm); background: var(--teal-50) center / cover no-repeat; }
+.item a.t { font-weight: 700; color: var(--ink); text-decoration: none; }
+.item .m { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.item .ops { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.item .ops .btn { min-height: 36px; padding: 6px 12px; font-size: 14px; }
+.tag { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 6px; background: var(--teal-50); color: var(--teal-600); margin-right: 4px; }
+.tag.gold { background: var(--gold-50); color: #7a4b00; }
+.tag.off { background: var(--paper); color: var(--muted); }
+.empty { text-align: center; padding: 40px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); }
+.empty h2 { font-size: 22px; }
+.empty p { color: var(--muted); margin: 6px 0 16px; }
+.msg { white-space: pre-line; margin-top: 6px; }
+</style>
 </head>
 <body>
-
-<div class="boot" id="boot">Loading your account…</div>
-
 <div id="site-header"></div>
-
 <main class="wrap">
- <div class="hero">
- <div>
- <h1>My account</h1>
- <p id="user-line">Loading your profile…</p>
+ <div class="acc-head">
+  <div><h1 id="hello">My account</h1><p id="who">Loading…</p></div>
+  <div class="acts">
+   <a class="btn btn-primary" href="/sell" data-saz-sell>Sell something</a>
+   <a class="btn btn-ghost" href="/garage">My cars</a>
+   <button type="button" class="btn btn-ghost" id="logout">Sign out</button>
+  </div>
  </div>
- <div class="ctas">
- <a class="btn btn-ghost" id="btn-dash" href="#" hidden>Go to dashboard</a>
- <a class="btn btn-ghost" href="/orders">My orders</a>
- <a class="btn btn-primary" href="/sell" data-saz-sell>+ Sell something</a>
- <button type="button" class="btn btn-ghost" id="btn-logout">Sign out</button>
+ <div class="stats" id="stats"></div>
+ <div id="biz"></div>
+ <div class="tabs" role="tablist" id="tabs">
+  <button role="tab" data-tab="orders" aria-selected="true">Orders</button>
+  <button role="tab" data-tab="listings" aria-selected="false">My listings</button>
+  <button role="tab" data-tab="enquiries" aria-selected="false">Enquiries</button>
+  <button role="tab" data-tab="saved" aria-selected="false">Saved</button>
+  <button role="tab" data-tab="requests" aria-selected="false">Import requests</button>
  </div>
- </div>
-
- <div class="tabs" role="tablist">
- <button type="button" class="active" data-tab="saved">Saved</button>
- <button type="button" data-tab="garage">Garage</button>
- <button type="button" data-tab="profile">Profile</button>
- </div>
-
- <section id="tab-saved">
- <div class="grid" id="saved-grid"><div class="sk"></div><div class="sk"></div></div>
- </section>
-
- <section id="tab-garage" hidden>
- <div class="panel">
- <h2>Add a vehicle to your garage</h2>
- <form id="garage-form">
- <div class="row">
- <div><label class="lbl">Make *</label><input class="inp" name="make" required placeholder="Toyota"></div>
- <div><label class="lbl">Model *</label><input class="inp" name="model" required placeholder="Corolla"></div>
- </div>
- <div class="row" style="margin-top:12px">
- <div><label class="lbl">Year *</label><input class="inp" name="year" type="number" min="1980" max="2030" required placeholder="2015"></div>
- <div><label class="lbl">Nickname</label><input class="inp" name="nickname" placeholder="My daily"></div>
- </div>
- <label style="display:flex;gap:8px;align-items:center;margin:14px 0;font-size:14px;font-weight:600">
- <input type="checkbox" name="is_primary"> Set as primary vehicle
- </label>
- <button type="submit" class="btn btn-primary">Save to garage</button>
- </form>
- </div>
- <div class="grid" id="garage-grid"></div>
- </section>
-
- <section id="tab-profile" hidden>
- <div class="panel">
- <h2>Profile</h2>
- <div id="profile-body"><div class="sk"></div></div>
- </div>
- </section>
+ <section id="panel" aria-live="polite"></section>
 </main>
-
-<div class="toast" id="toast"></div>
-
-<script src="/static/auth.js"></script>
+<script src="/static/site.js?v=4"></script>
 <script>
 (function () {
- /* ============ CONFIG: edit these to match your routes ============ */
- var LOGIN_URL = '/login';
- var DASHBOARDS = {
- admin: '/admin/dashboard',
- business: '/become-a-seller',
- seller: '/dashboard',
- buyer: '/my-account'
+ 'use strict';
+ var token = '';
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
+ if (!token) { location.replace('/login?next=' + encodeURIComponent('/my-account')); return; }
+ var $ = function (id) { return document.getElementById(id); };
+ var panel = $('panel');
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+ function plural(n, one, many) { return fmt(n) + ' ' + (Number(n) === 1 ? one : many); }
+ function when(iso) { if (!iso) return ''; var d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+ function safeUrl(u) { u = String(u || '').trim(); return (/^https?:\/\//i.test(u) || /^\/(?!\/)/.test(u)) ? u : ''; }
+ function signOut() { try { ['token', 'access_token', 'userInfo'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {} location.href = '/'; }
+ function api(url, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign({ Authorization: 'Bearer ' + token }, opts.headers || {});
+  return fetch(url, opts).then(function (r) {
+   if (r.status === 401) { signOut(); throw null; }
+   return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(d.detail || 'Something went wrong'); return d; });
+  });
+ }
+ function toast(msg, type) {
+  var t = $('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.className = 'toast ' + (type || ''); t.textContent = msg; void t.offsetWidth; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
+ }
+ function empty(title, text, cta) { return '<div class="empty"><h2>' + title + '</h2><p>' + text + '</p>' + (cta || '') + '</div>'; }
+ function item(o) {
+  var img = safeUrl(o.img);
+  return '<div class="item' + (o.noimg ? ' noimg' : '') + '">' + (o.noimg ? '' : '<div class="th"' + (img ? ' style="background-image:url(\'' + esc(img) + '\')"' : '') + '></div>') +
+   '<div><a class="t" href="' + esc(o.href || '#') + '">' + esc(o.title) + '</a><div class="m">' + o.meta + '</div>' + (o.extra || '') + (o.ops ? '<div class="ops">' + o.ops + '</div>' : '') + '</div></div>';
+ }
+ $('logout').addEventListener('click', signOut);
+
+ // ---------- header + stats ----------
+ api('/api/auth/me').then(function (u) {
+  $('hello').textContent = 'Hi, ' + (String(u.full_name || '').split(' ')[0] || 'there');
+  $('who').textContent = [u.phone, u.email].filter(Boolean).join(', ');
+  try { localStorage.setItem('userInfo', JSON.stringify(u)); } catch (e) {}
+  if (u.is_admin) $('biz').innerHTML = '<div class="box biz"><div><b>You\'re an admin</b><div class="hint" style="margin:0">Manage listings, payments and orders.</div></div><a class="btn btn-dark" href="/admin/dashboard">Open admin</a></div>';
+ }).catch(function () {});
+ api('/api/my-account/stats').then(function (s) {
+  var tiles = [[s.total_parts + s.total_cars, 'Listings'], [s.total_inquiries_received, 'Enquiries received'], [s.saved_items, 'Saved'], [s.total_import_requests, 'Import requests']];
+  $('stats').innerHTML = tiles.map(function (t) { return '<div class="stat"><b>' + fmt(t[0]) + '</b><span>' + t[1] + '</span></div>'; }).join('');
+ }).catch(function () { $('stats').hidden = true; });
+ api('/api/businesses/mine').then(function (d) {
+  var b = d.business;
+  if (!b) return;
+  var label = b.status === 'verified' ? '<span class="tag">Verified</span>' : b.status === 'rejected' ? '<span class="tag off">Not approved</span>' : '<span class="tag gold">Waiting for approval</span>';
+  $('biz').insertAdjacentHTML('beforeend', '<div class="box biz"><div><b>' + esc(b.name) + '</b> ' + label + '<div class="hint" style="margin:0">Your business page and plan</div></div><div style="display:flex;gap:8px;flex-wrap:wrap">' +
+   (b.slug ? '<a class="btn btn-ghost" href="/store/' + encodeURIComponent(b.slug) + '">View page</a>' : '') + '<a class="btn btn-ghost" href="/my-subscription">Plan</a><a class="btn btn-ghost" href="/become-a-seller">Edit</a></div></div>');
+ }).catch(function () {});
+
+ // ---------- tabs ----------
+ var loaders = {
+  orders: function () {
+   return api('/api/shop/orders').then(function (d) {
+    var list = d.orders || [];
+    if (!list.length) return empty('No orders yet', 'Parts you buy will show up here.', '<a class="btn btn-primary" href="/">Browse parts</a>');
+    var L = { awaiting_payment: ['Waiting for payment', 'gold'], confirmed: ['Paid', ''], ready_for_pickup: ['Ready for pickup', ''], driver_assigned: ['Driver assigned', ''], picked_up: ['On the way', ''], delivered: ['Delivered', ''], cancelled: ['Cancelled', 'off'] };
+    return '<div class="list">' + list.map(function (o) {
+     var s = L[o.status] || [o.status, ''];
+     return item({ noimg: true, href: '/orders?id=' + o.id, title: 'Order ' + o.code, meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> SLL ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + ', ' + esc(when(o.created_at)) });
+    }).join('') + '</div>';
+   });
+  },
+  listings: function () {
+   return Promise.all([api('/api/my-account/my-parts'), api('/api/my-account/my-cars')]).then(function (r) {
+    var parts = r[0].parts || [], cars = r[1].vehicles || [];
+    if (!parts.length && !cars.length) return empty('You haven\'t listed anything yet', 'Listing a part or a car is free and takes two minutes.', '<a class="btn btn-primary" href="/sell" data-saz-sell>Sell something</a>');
+    var h = '<div class="list">';
+    h += parts.map(function (p) {
+     return item({ img: p.image_url, href: '/part/' + p.id, title: p.name,
+      meta: (p.is_featured ? '<span class="tag gold">Featured</span>' : '') + 'SLL ' + fmt(p.price_sll) + ', ' + fmt(p.stock_quantity) + ' in stock, ' + plural(p.views, 'view', 'views') + ', ' + plural(p.inquiry_count, 'enquiry', 'enquiries'),
+      ops: '<a class="btn btn-ghost" href="/part/' + p.id + '">View</a><button class="btn btn-ghost" data-del="part" data-id="' + p.id + '">Delete</button>' });
+    }).join('');
+    h += cars.map(function (v) {
+     return item({ img: v.image_url, href: '/vehicle/' + v.id, title: v.title,
+      meta: (v.is_sold ? '<span class="tag off">Sold</span>' : '') + (v.is_featured ? '<span class="tag gold">Featured</span>' : '') + 'SLL ' + fmt(v.price_sll) + ', ' + plural(v.views, 'view', 'views') + ', ' + plural(v.inquiry_count, 'enquiry', 'enquiries'),
+      ops: '<a class="btn btn-ghost" href="/vehicle/' + v.id + '">View</a>' + (v.is_sold ? '' : '<button class="btn btn-ghost" data-sold="' + v.id + '">Mark as sold</button>') + '<button class="btn btn-ghost" data-del="vehicle" data-id="' + v.id + '">Delete</button>' });
+    }).join('');
+    return h + '</div>';
+   });
+  },
+  enquiries: function () {
+   return Promise.all([api('/api/my-account/received-inquiries'), api('/api/my-account/my-inquiries')]).then(function (r) {
+    var got = r[0].inquiries || [], sent = r[1].inquiries || [];
+    if (!got.length && !sent.length) return empty('No enquiries yet', 'Messages from buyers about your listings, and the ones you send, show up here.', '');
+    var h = '';
+    if (got.length) h += '<h2 style="font-size:20px;margin:4px 0 10px">From buyers</h2><div class="list">' + got.map(function (i) {
+     var phone = String(i.buyer_phone || '').replace(/[^\d+]/g, '');
+     return item({ noimg: true, href: (i.listing_type === 'part' ? '/part/' : '/vehicle/') + i.listing_id, title: i.listing_title || 'Your listing',
+      meta: esc(i.buyer_name || 'A buyer') + ', ' + esc(when(i.created_at)), extra: i.buyer_message ? '<p class="msg">' + esc(i.buyer_message) + '</p>' : '',
+      ops: phone ? '<a class="btn btn-wa" href="https://wa.me/' + esc(phone.replace(/^\+/, '')) + '" target="_blank" rel="noopener">Reply on WhatsApp</a><a class="btn btn-ghost" href="tel:' + esc(phone) + '">Call</a>' : '' });
+    }).join('') + '</div>';
+    if (sent.length) h += '<h2 style="font-size:20px;margin:20px 0 10px">You sent</h2><div class="list">' + sent.map(function (i) {
+     return item({ noimg: true, href: (i.listing_type === 'part' ? '/part/' : '/vehicle/') + i.listing_id, title: i.listing_title || 'Listing', meta: esc(when(i.created_at)), extra: i.buyer_message ? '<p class="msg">' + esc(i.buyer_message) + '</p>' : '' });
+    }).join('') + '</div>';
+    return h;
+   });
+  },
+  saved: function () {
+   return api('/api/my-account/saved').then(function (d) {
+    var list = d.items || [];
+    if (!list.length) return empty('Nothing saved yet', 'Tap the heart on a part or car to keep it here.', '<a class="btn btn-primary" href="/">Browse</a>');
+    return '<div class="list">' + list.map(function (s) {
+     return item({ img: s.listing_image_url, href: (s.listing_type === 'part' ? '/part/' : '/vehicle/') + s.listing_id, title: s.listing_title || (s.listing_type === 'part' ? 'Part' : 'Car'),
+      meta: s.listing_price_sll ? 'SLL ' + fmt(s.listing_price_sll) : '', ops: '<button class="btn btn-ghost" data-unsave="' + s.id + '">Remove</button>' });
+    }).join('') + '</div>';
+   });
+  },
+  requests: function () {
+   return api('/api/my-account/my-import-requests').then(function (d) {
+    var list = d.requests || [];
+    if (!list.length) return empty('No import requests', 'Can\'t find a part locally? We can source it from abroad.', '<a class="btn btn-primary" href="/?action=import">Order a part from abroad</a>');
+    return '<div class="list">' + list.map(function (r) {
+     var quote = r.quoted_price_sll ? 'Quoted SLL ' + fmt(r.quoted_price_sll) + (r.estimated_days ? ', about ' + r.estimated_days + ' days' : '') : 'Waiting for a quote';
+     return item({ noimg: true, title: r.part_name || 'Part', meta: esc([r.car_year, r.car_make, r.car_model].filter(Boolean).join(' ')) + ', ' + esc(when(r.created_at)),
+      extra: '<p class="msg"><span class="tag ' + (r.quoted_price_sll ? '' : 'gold') + '">' + esc(r.status || 'open') + '</span>' + esc(quote) + '</p>' + (r.admin_notes ? '<p class="msg hint">' + esc(r.admin_notes) + '</p>' : '') });
+    }).join('') + '</div>';
+   });
+  }
  };
- // Alternate role names your backend might return -> canonical role
- var ROLE_ALIASES = {
- admin: 'admin', administrator: 'admin', superadmin: 'admin', super_admin: 'admin', staff: 'admin',
- business: 'business', businesses: 'business', dealer: 'business', dealership: 'business', business_owner: 'business',
- seller: 'seller', vendor: 'seller', merchant: 'seller',
- buyer: 'buyer', user: 'buyer', customer: 'buyer', member: 'buyer'
- };
- var TOKEN_KEYS = ['token', 'access_token', 'authToken', 'jwt', 'userToken'];
- /* ================================================================= */
+ var current = 'orders';
+ function show(tab) {
+  current = tab;
+  document.querySelectorAll('#tabs button').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === tab); });
+  try { history.replaceState(null, '', '/my-account?tab=' + tab); } catch (e) {}
+  panel.innerHTML = '<div class="lcard skeleton" style="min-height:90px"></div>';
+  loaders[tab]().then(function (h) { if (current === tab) panel.innerHTML = h; })
+   .catch(function (e) { if (e && current === tab) panel.innerHTML = '<div class="notice notice-bad">We couldn\'t load this. Try again in a moment.</div>'; });
+ }
+ document.querySelectorAll('#tabs button').forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.tab); }); });
 
- function $(id) { return document.getElementById(id); }
- function esc(s) {
- return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
- }
- function toast(msg, ok) {
- var t = $('toast');
- t.textContent = msg;
- t.className = 'toast show ' + (ok ? 'ok' : 'err');
- setTimeout(function () { t.classList.remove('show'); }, 2800);
- }
- function fmt(n) { try { return Number(n).toLocaleString(); } catch (e) { return n; } }
-
- /* ---------- auth helpers ---------- */
- Auth.getToken = function () {
- try {
- for (var i = 0; i < TOKEN_KEYS.length; i++) {
- var v = localStorage.getItem(TOKEN_KEYS[i]);
- if (v) return v;
- }
- } catch (e) {}
- return '';
- }
- function auth() {
- var t = Auth.getToken();
- return t ? { Authorization: 'Bearer ' + t } : {};
- }
- // Clear the bad token first so login can't bounce straight back here
- 
-
- /* ---------- role helpers ---------- */
- function normRole(r) {
- if (!r) return '';
- var k = String(r).toLowerCase().trim().replace(/[\s-]+/g, '_');
- return ROLE_ALIASES[k] || '';
- }
- function jwtRole() {
-  try {
-    var p = Auth.getToken().split('.')[1];
-    var j = JSON.parse(atob(p.replace(/-/g, '+').replace(/_/g, '/')));
-    if (j.is_admin || j.is_superuser) return 'admin';
-    var r = j.role || j.user_type ||
-            (Array.isArray(j.roles) ? j.roles[0] : j.roles);
-    var n = normRole(r);
-    if (j.is_vendor && (!n || n === 'buyer')) n = 'seller';
-    return n;
-  } catch (e) { return ''; }
-}
-
-  function cachedUser() {
- try { return JSON.parse(localStorage.getItem('userInfo') || 'null') || {}; } catch (e) { return {}; }
- }
- function roleOf(u) {
-  u = u || {};
-  if (u.is_admin || u.is_superuser) return 'admin';
-  var r = u.role || u.user_type || u.account_type ||
-          (Array.isArray(u.roles) ? u.roles[0] : u.roles);
-  var n = normRole(r);
-  if (u.is_vendor && (!n || n === 'buyer')) n = 'seller';
-  return n;
-}
-
-  function dashFor(role) { return DASHBOARDS[role] || DASHBOARDS.buyer; }
-
- /* Redirect to the role dashboard unless this page IS that dashboard
- or the user explicitly came here with ?stay=1 (e.g. from the Dashboard
- link's "My account" counterpart). */
- function routeByRole(role) {
- var target = dashFor(role);
- var here = location.pathname.replace(/\/+$/, '') || '/';
- var stay = /[?&]stay=1\b/.test(location.search);
- var isHere = target.replace(/\/+$/, '') === here;
- if (role && role !== 'buyer' && !isHere && !stay) {
- location.replace(target);
- return true;
- }
- return false;
- }
-
- /* ---------- boot ---------- */
-if (!Auth.getToken()) { Auth.goLogin(); return; }
-
- // 1) Instant guess from cache / JWT so non-buyers don't flash the buyer page
- var user = cachedUser();
- var role = roleOf(user) || jwtRole();
- if (routeByRole(role)) return;
-
- // 2) Confirm with the server
- fetch('/api/my-account/me', { headers: auth() })
- .then(function (r) {
- if (r.status === 401 || r.status === 403) { Auth.goLogin(); throw null; }
- // 404 / 5xx: do NOT log out, keep going with cached data
- return r.ok ? r.json() : null;
- })
- .then(function (d) {
- if (d) {
- user = d;
- try { localStorage.setItem('userInfo', JSON.stringify(d)); } catch (e) {}
- }
- var serverRole = roleOf(user) || role || 'buyer';
- if (routeByRole(serverRole)) return;
- role = serverRole;
- init();
- })
- .catch(function (e) {
- if (e === null) return; // goLogin already fired
- role = role || 'buyer'; // network error: stay, use cache
- init();
+ panel.addEventListener('click', function (e) {
+  var del = e.target.closest('[data-del]'), sold = e.target.closest('[data-sold]'), uns = e.target.closest('[data-unsave]');
+  if (del) {
+   if (!confirm('Delete this listing? Buyers will no longer see it.')) return;
+   del.disabled = true;
+   api('/api/my-account/' + del.dataset.del + '/' + del.dataset.id, { method: 'DELETE' }).then(function () { toast('Listing deleted', 'success'); show('listings'); })
+    .catch(function (err) { del.disabled = false; if (err) toast(err.message, 'error'); });
+  } else if (sold) {
+   sold.disabled = true;
+   api('/api/vehicles/' + sold.dataset.sold + '/sold', { method: 'POST' }).then(function () { toast('Marked as sold', 'success'); show('listings'); })
+    .catch(function (err) { sold.disabled = false; if (err) toast(err.message, 'error'); });
+  } else if (uns) {
+   uns.disabled = true;
+   api('/api/my-account/saved/' + uns.dataset.unsave, { method: 'DELETE' }).then(function () { show('saved'); })
+    .catch(function (err) { uns.disabled = false; if (err) toast(err.message, 'error'); });
+  }
  });
 
- /* ---------- page ---------- */
- function init() {
- $('boot').hidden = true;
-
- if (role !== 'buyer') {
- var d = dashFor(role);
- ['btn-dash'].forEach(function (id) { $(id).href = d; $(id).hidden = false; });
- }
- renderUserLine();
-
- document.querySelectorAll('.tabs button').forEach(function (b) {
- b.addEventListener('click', function () {
- document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
- b.classList.add('active');
- ['saved', 'garage', 'profile'].forEach(function (name) { $('tab-' + name).hidden = name !== b.dataset.tab; });
- if (b.dataset.tab === 'garage') loadGarage();
- if (b.dataset.tab === 'profile') renderProfile();
- });
- });
-
- $('btn-logout').addEventListener('click', function () { Auth.clearSession(); location.href = '/'; });
- $('garage-form').addEventListener('submit', saveVehicle);
-
- loadSaved();
- renderProfile();
- }
-
- function renderUserLine() {
- $('user-line').textContent = (user.full_name || user.name || user.phone || 'Member') + (user.email ? ' · ' + user.email : '');
- }
-
- function renderProfile() {
- $('profile-body').innerHTML =
- '<p><strong>Name</strong><br>' + esc(user.full_name || user.name || '—') + '</p>' +
- '<p style="margin-top:12px"><strong>Phone</strong><br>' + esc(user.phone || '—') + '</p>' +
- '<p style="margin-top:12px"><strong>Email</strong><br>' + esc(user.email || '—') + '</p>' +
- '<p style="margin-top:12px"><strong>Role</strong><br><span class="badge">' + esc(role) + '</span></p>';
- }
-
- function loadSaved() {
- var grid = $('saved-grid');
- fetch('/api/my-account/saved', { headers: auth() })
- .then(function (r) {
- if (r.status === 401) { Auth.goLogin(); throw null; }
- return r.ok ? r.json() : { items: [] };
- })
- .then(function (d) {
- var items = Array.isArray(d) ? d : (d.items || []);
- if (!items.length) {
- grid.innerHTML = '<div class="empty">No saved listings yet.<br><a href="/">Browse cars &amp; parts</a></div>';
- return;
- }
- grid.innerHTML = items.map(function (i) {
- var href = (i.listing_type === 'vehicle' ? '/vehicle/' : '/part/') + i.listing_id;
- var price = i.listing_price_sll ? 'SLL ' + fmt(i.listing_price_sll) : '';
- return '<div class="card"><h3>' + esc(i.listing_title || (i.listing_type + ' #' + i.listing_id)) + '</h3>' +
- '<div class="meta">' + esc(i.listing_type || '') + '</div>' +
- (price ? '<div class="price">' + price + '</div>' : '') +
- '<div class="acts"><a href="' + href + '">View</a>' +
- '<button type="button" data-unsave="' + i.id + '">Remove</button></div></div>';
- }).join('');
- grid.querySelectorAll('[data-unsave]').forEach(function (btn) {
- btn.addEventListener('click', function () {
- fetch('/api/my-account/saved/' + btn.dataset.unsave, { method: 'DELETE', headers: auth() })
- .then(function (r) { if (r.ok) { toast('Removed', true); loadSaved(); } else toast('Could not remove', false); });
- });
- });
- })
- .catch(function (e) { if (e !== null) grid.innerHTML = '<div class="empty">Could not load saved items.</div>'; });
- }
-
- function loadGarage() {
- var grid = $('garage-grid');
- grid.innerHTML = '<div class="sk"></div>';
- fetch('/api/garage/', { headers: auth() })
- .then(function (r) {
- if (r.status === 401) { Auth.goLogin(); throw null; }
- return r.ok ? r.json() : [];
- })
- .then(function (cars) {
- cars = Array.isArray(cars) ? cars : (cars && cars.items) || [];
- if (!cars.length) { grid.innerHTML = '<div class="empty">No vehicles in your garage yet. Add one above.</div>'; return; }
- grid.innerHTML = cars.map(function (c) {
- return '<div class="card"><h3>' + esc(c.year + ' ' + c.make + ' ' + c.model) + '</h3>' +
- '<div class="meta">' + esc(c.nickname || 'No nickname') + (c.is_primary ? ' · <span class="badge">Primary</span>' : '') + '</div>' +
- '<div class="acts"><a href="/?make=' + encodeURIComponent(c.make) + '&model=' + encodeURIComponent(c.model) + '&year=' + c.year + '">Find parts</a>' +
- '<button type="button" data-del-garage="' + c.id + '">Remove</button></div></div>';
- }).join('');
- grid.querySelectorAll('[data-del-garage]').forEach(function (btn) {
- btn.addEventListener('click', function () {
- if (!confirm('Remove this vehicle from your garage?')) return;
- fetch('/api/garage/' + btn.dataset.delGarage, { method: 'DELETE', headers: auth() })
- .then(function (r) { if (r.ok) { toast('Removed', true); loadGarage(); } else toast('Could not remove', false); });
- });
- });
- })
- .catch(function (e) { if (e !== null) grid.innerHTML = '<div class="empty">Could not load garage.</div>'; });
- }
-
- function saveVehicle(e) {
- e.preventDefault();
- var fd = new FormData(e.target);
- var body = {
- make: fd.get('make'), model: fd.get('model'),
- year: parseInt(fd.get('year'), 10),
- nickname: fd.get('nickname') || null,
- is_primary: !!fd.get('is_primary')
- };
- fetch('/api/garage/', {
- method: 'POST',
- headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
- body: JSON.stringify(body)
- }).then(function (r) {
- if (r.status === 401) { Auth.goLogin(); return; }
- if (!r.ok) throw new Error('Could not save');
- toast('Vehicle saved', true);
- e.target.reset();
- loadGarage();
- }).catch(function () { toast('Could not save vehicle', false); });
- }
+ var start = new URLSearchParams(location.search).get('tab');
+ show(loaders[start] ? start : 'orders');
 })();
 </script>
-
-
-
-
-
-<script src="/static/site.js?v=4"></script>
 </body>
 </html>
