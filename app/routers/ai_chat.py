@@ -15,7 +15,7 @@ from typing import List
 from app.db import get_db
 from app import models
 from app.config import get_settings
-from app.routers.nhtsa import decode_vin_official
+from app.services import vin_decoder
 
 router = APIRouter(prefix="/api/ai", tags=["AI Assistant"])
 
@@ -86,9 +86,9 @@ async def chat(request: ChatRequest, http_request: Request, db: AsyncSession = D
     vin_match = re.search(r"\b[A-HJ-NPR-Z0-9]{17}\b", request.message.upper())
     if vin_match:
         try:
-            decoded_vin = await decode_vin_official(vin_match.group(0))
-            vin_context = f"\n\nOFFICIAL VIN DECODE:\n{decoded_vin}"
-        except HTTPException:
+            decoded_vin = await vin_decoder.decode(vin_match.group(0))
+            vin_context = f"\n\nVIN DECODE (source: {decoded_vin['source']}):\n{decoded_vin}"
+        except vin_decoder.VinError:
             vin_context = "\n\nVIN NOTE: The official VIN decoder could not verify this VIN. Do not guess its vehicle details."
 
     system_prompt = f"""You are the Salon AutoZone AI Assistant for Sierra Leone's #1 automotive marketplace.
