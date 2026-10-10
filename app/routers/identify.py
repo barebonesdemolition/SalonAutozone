@@ -1,8 +1,10 @@
+import logging
 import os
 import base64
 import uuid
 import tempfile
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Header
+from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta
@@ -18,6 +20,7 @@ import json
 import re
 from app.auth import decode_access_token
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/identify", tags=["AI Identification"])
 settings = get_settings()
 
@@ -122,7 +125,8 @@ Rules:
 
         client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-        response = client.models.generate_content(
+        response = await run_in_threadpool(
+            client.models.generate_content,
             model=settings.GEMINI_MODEL,
             contents=[
                 types.Part.from_bytes(
@@ -145,11 +149,12 @@ Rules:
         }
 
     except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="AI returned invalid response. Please try again.")
+        raise HTTPException(status_code=502, detail="We couldn't read the result. Please try again.")
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Identification failed: {str(e)}")
+    except Exception:
+        logger.exception("Car identification failed")
+        raise HTTPException(status_code=502, detail="Photo identification isn't working right now. Please try again later.")
 
 
 @router.get("/status")
