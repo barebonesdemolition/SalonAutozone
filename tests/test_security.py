@@ -59,3 +59,12 @@ def test_ai_status_does_not_leak_key(client):
 def test_cors_is_not_open_to_every_site(client):
     response = client.get("/health", headers={"Origin": "https://evil.example"})
     assert "access-control-allow-origin" not in {k.lower() for k in response.headers}
+
+
+def test_settings_ignore_stray_whitespace(monkeypatch):
+    # A trailing newline pasted into GEMINI_MODEL on Render broke every AI request.
+    from app.config import Settings
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-model-name\n")
+    monkeypatch.setenv("GEMINI_API_KEY", "  key-123 \n")
+    s = Settings()
+    assert s.GEMINI_MODEL == "gemini-model-name" and s.GEMINI_API_KEY == "key-123"

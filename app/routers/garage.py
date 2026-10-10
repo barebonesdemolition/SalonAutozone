@@ -41,7 +41,7 @@ class GarageCar(BaseModel):
 
 
 class GarageCarResponse(BaseModel):
-    id: str
+    id: int | str  # the garage table uses integer ids; str kept for older rows
     make: str
     model: str
     year: int
@@ -119,7 +119,7 @@ async def add_car(
 # ============================================================
 @router.delete("/{car_id}")
 async def delete_car(
-    car_id: str,
+    car_id: int,
     user: models.User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -158,7 +158,7 @@ async def delete_car(
 # ============================================================
 @router.put("/{car_id}/primary", response_model=GarageCarResponse)
 async def set_primary(
-    car_id: str,
+    car_id: int,
     user: models.User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -191,7 +191,7 @@ async def set_primary(
 # ============================================================
 @router.put("/{car_id}", response_model=GarageCarResponse)
 async def update_car(
-    car_id: str,
+    car_id: int,
     car: GarageCar,
     user: models.User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -211,6 +211,11 @@ async def update_car(
     existing.year = car.year
     existing.vin = car.vin
     existing.nickname = (car.nickname or '').strip() or None
+    if car.is_primary and not existing.is_primary:
+        await db.execute(
+            update(models.Garage).where(models.Garage.user_id == user.id).values(is_primary=False)
+        )
+        existing.is_primary = True
 
     await db.commit()
     await db.refresh(existing)

@@ -64,6 +64,10 @@
   .filters .full { grid-column: auto; }
   #filter-toggle { display: none; }
 }
+.active-filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 16px; }
+.active-filters .af { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 4px 6px 4px 12px; border-radius: 999px; background: var(--ink); color: #fff; border: 0; font-weight: 600; font-size: 14px; }
+.active-filters .af span { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.18); display: inline-flex; align-items: center; justify-content: center; font-size: 15px; line-height: 1; }
+.active-filters .clear { border: 0; background: none; color: var(--teal); font-weight: 700; text-decoration: underline; padding: 6px; }
 .count { font-size: 14px; color: var(--muted); font-weight: 600; }
 .only-fit { display: none; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink); }
 .only-fit input { width: 20px; height: 20px; accent-color: var(--teal); }
@@ -177,6 +181,8 @@
   <select class="select" id="s-loc" aria-label="Location"></select>
   <select class="select full" id="sort" aria-label="Sort by"><option value="">Newest first</option><option value="asc">Price: low to high</option><option value="desc">Price: high to low</option></select>
  </div>
+
+ <div class="active-filters" id="active" hidden></div>
 
  <section class="featured" id="feat-sec" hidden>
   <h2 id="feat-title">Featured</h2>
@@ -411,7 +417,7 @@
   $('feat-sec').hidden = !feat.length;
   $('feat-title').textContent = 'Featured cars';
   $('feat').innerHTML = feat.map(vehicleCard).join('');
-  $('results').innerHTML = reg.length ? reg.map(vehicleCard).join('') : (feat.length ? '' : '<div class="empty-state"><h3>No cars match</h3><p>Try fewer filters or a different search.</p></div>');
+  $('results').innerHTML = reg.length ? reg.map(vehicleCard).join('') : (feat.length ? '' : '<div class="empty-state"><h3>' + (filterText() ? 'No ' + esc(filterText()) + ' for sale right now' : 'No cars match') + '</h3><p>Try fewer filters or a different search.</p>' + (hasFilters() ? '<button type="button" class="btn btn-primary" data-act="clearfilters">Show all cars</button>' : '') + '</div>');
   markSaved();
  }
  function renderParts() {
@@ -436,12 +442,33 @@
   if (cat.length) h += '<h3 class="group-title">Order from abroad<small>Usually arrives in 7–14 days</small></h3>' + cat.map(catalogCard).join('');
   if (!h && !feat.length) {
    h = only ? '<div class="empty-state"><h3>Nothing here fits your car yet</h3><p>Show every part, or order one from abroad.</p><button type="button" class="btn btn-primary" data-act="showall">Show all parts</button></div>'
-    : '<div class="empty-state"><h3>No parts match</h3><p>Try a different search, or let us find it abroad for you.</p><button type="button" class="btn btn-primary" data-act="open" data-v="import-modal">Order from abroad</button></div>';
+    : '<div class="empty-state"><h3>' + (filterText() ? 'No parts for the ' + esc(filterText()) + ' yet' : 'No parts match') + '</h3><p>' + (hasFilters() ? 'Show every part, or let us find this one abroad for you.' : 'Try a different search, or let us find it abroad for you.') + '</p>' +
+     '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">' + (hasFilters() ? '<button type="button" class="btn btn-primary" data-act="clearfilters">Show all parts</button>' : '') + '<button type="button" class="btn ' + (hasFilters() ? 'btn-ghost' : 'btn-primary') + '" data-act="open" data-v="import-modal">Order from abroad</button></div></div>';
   }
   $('results').innerHTML = h;
   markSaved();
  }
+ var FILTERS = [['s-cat', ''], ['s-make', ''], ['s-model', ''], ['s-year', ''], ['s-loc', 'in ']];
+ function hasFilters() { return !!($('s-q').value.trim() || FILTERS.some(function (f) { return $(f[0]).value && !$(f[0]).hidden; })); }
+ function filterText() { return [$('s-year').value, $('s-make').value, $('s-model').value].filter(Boolean).join(' '); }
+ function renderActive() {
+  var chips = [];
+  if ($('s-q').value.trim()) chips.push(['s-q', '“' + $('s-q').value.trim() + '”']);
+  FILTERS.forEach(function (f) { var el = $(f[0]); if (el.value && !el.hidden) chips.push([f[0], f[1] + el.value]); });
+  var box = $('active');
+  box.hidden = !chips.length;
+  box.innerHTML = chips.map(function (c) { return '<button type="button" class="af" data-act="unfilter" data-v="' + c[0] + '" aria-label="Remove filter ' + esc(c[1]) + '">' + esc(c[1]) + '<span aria-hidden="true">&times;</span></button>'; }).join('') +
+   (chips.length > 1 ? '<button type="button" class="clear" data-act="clearfilters">Clear all</button>' : '');
+ }
+ function clearFilters() {
+  $('s-q').value = '';
+  FILTERS.forEach(function (f) { $(f[0]).value = ''; });
+  fillModels($('s-model'), '', 'Any model');
+  try { history.replaceState(null, '', tab === 'parts' ? '/' : '/?tab=cars'); } catch (e) {}
+  doSearch();
+ }
  function syncChips() {
+  renderActive();
   var v = $('s-cat').value;
   document.querySelectorAll('#cats .chip').forEach(function (c) { c.setAttribute('aria-pressed', c.dataset.v === v); });
  }
@@ -627,12 +654,23 @@
   cat: function (t) { $('s-cat').value = t.dataset.v; doSearch(); },
   open: function (t) {
    if (t.dataset.v === 'id-modal') { if (!token()) { toast('Sign in to identify a car', 'error'); setTimeout(goLogin, 1000); return; } idReset(); }
+   if (t.dataset.v === 'import-modal') {
+    var f = $('import-form').elements, car = json('fitmentVehicle') || {};
+    var fill = { car_make: $('s-make').value || car.make, car_model: $('s-model').value || car.model, car_year: $('s-year').value || car.year, part_name: $('s-q').value.trim() };
+    Object.keys(fill).forEach(function (k) { if (fill[k] && !f.namedItem(k).value) f.namedItem(k).value = fill[k]; });
+   }
    openM(t.dataset.v);
   },
   close: function (t) { closeM(t.closest('.overlay').id); },
   list: function (t) { openListing(t.dataset.v); },
   save: save, saveFit: saveFit, clearFit: clearFit,
   sug: function (t) { if (t.dataset.url) location.href = t.dataset.url; },
+  unfilter: function (t) {
+   var el = $(t.dataset.v); el.value = '';
+   if (t.dataset.v === 's-make') { fillModels($('s-model'), '', 'Any model'); }
+   doSearch();
+  },
+  clearfilters: clearFilters,
   showall: function () { $('f-filter').checked = false; ls.del('fitmentFilterOn'); renderParts(); },
   idAgain: idReset,
   findParts: function (t) { closeM('id-modal'); $('s-q').value = t.dataset.make + ' ' + t.dataset.model; switchMarket('parts'); },

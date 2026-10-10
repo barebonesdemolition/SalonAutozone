@@ -1,458 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>My Garage – {{ app_name or 'SalonAutoZone' }}</title>
-<style>
-:root{
- --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
- --navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;
- --success:#15803d;--danger:#b91c1c;
- --sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
-a{color:inherit;text-decoration:none}
-button,input,select{font:inherit}
-button{border:0;background:none;cursor:pointer}
-:focus-visible{outline:3px solid var(--primary-hover);outline-offset:2px}
-.top{background:var(--navy);color:#94a3b8;padding:10px 20px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.top strong{color:#fff}
-.brand{background:#fff;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:40;box-shadow:var(--sh)}
-.logo{font-weight:800;font-size:18px;color:var(--navy)}.logo span{color:var(--primary)}
-.nav a{font-size:14px;font-weight:600;color:#475569;margin-left:14px}
-.nav a:hover{color:var(--primary)}
-.wrap{max-width:820px;margin:0 auto;padding:24px 16px}
-.hero{margin-bottom:16px}
-.hero h1{font-size:clamp(22px,4vw,28px);font-weight:800;color:var(--navy);letter-spacing:-.02em}
-.hero p{color:var(--muted);font-size:14px;margin-top:4px}
-.panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--sh);margin-bottom:16px}
-.panel h2{font-size:15px;font-weight:800;margin-bottom:14px;color:var(--navy)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:600px){.row{grid-template-columns:1fr}}
-.lbl{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:6px}
-.inp{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;min-height:48px;background:#fff}
-.inp:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
-.check{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin:14px 0;color:#475569}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border-radius:8px;font-weight:700;font-size:14px;min-height:48px}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:disabled{opacity:.6;cursor:wait}
-.btn-ghost{background:#f1f5f9;color:var(--text)}
-.btn-danger{background:#fef2f2;color:var(--danger)}
-.btn-sm{min-height:40px;padding:8px 12px;font-size:12px}
-.list{display:grid;gap:12px}
-.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:var(--sh)}
-.card.primary{border-color:var(--primary)}
-.card h3{font-size:17px;font-weight:800;color:var(--navy)}
-.meta{font-size:13px;color:var(--muted);margin-top:4px}
-.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:var(--primary-light);color:var(--primary)}
-.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.acts .btn{flex:1;min-width:100px}
-.empty{text-align:center;padding:40px 16px;color:var(--muted)}
-.empty strong{display:block;color:var(--navy);font-size:16px;margin-bottom:6px}
-.sk{height:88px;border-radius:14px;background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9);background-size:200% 100%;animation:sk 1.2s infinite}
-@keyframes sk{to{background-position:-200% 0}}
-.toast{position:fixed;bottom:90px;left:50%;transform:translate(-50%,80px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-weight:600;z-index:99;transition:transform .25s;max-width:90vw;text-align:center}
-.toast.show{transform:translate(-50%,0)}
-.toast.ok{background:var(--success)}.toast.err{background:var(--danger)}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:6px 8px env(safe-area-inset-bottom,8px);z-index:50;box-shadow:0 -4px 16px rgba(15,23,42,.06)}
-.bnav nav{display:grid;grid-template-columns:repeat(4,1fr);max-width:500px;margin:0 auto}
-.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;font-size:11px;font-weight:700;color:var(--muted);min-height:52px;justify-content:center;border-radius:10px}
-.bnav a.active{color:var(--primary);background:var(--primary-light)}
-.bnav svg{width:22px;height:22px}
-.tip{background:var(--primary-light);border-radius:10px;padding:12px 14px;font-size:13px;color:#0f766e;margin-bottom:16px;font-weight:500}
-.fit-tool{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--sh);margin-top:18px}
-.fit-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}.fit-head h2{font-size:16px;color:var(--navy)}
-.fit-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}.fit-car{background:linear-gradient(160deg,#e8f3ef,#f8fafc);border-radius:10px;padding:18px 12px 8px;min-height:150px;display:grid;place-items:center}.fit-car svg{width:100%;height:auto}.fit-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fit-controls label{font-size:12px;font-weight:700;color:var(--muted)}.fit-controls select{width:100%;margin-top:5px;padding:10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text)}
-.fit-colors{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.fit-color{width:30px;height:30px;border-radius:50%;border:2px solid var(--border)}.fit-color[aria-pressed=true]{outline:3px solid var(--primary);outline-offset:2px}.fit-vin{display:flex;gap:8px;margin-top:12px}.fit-vin input{flex:1;min-width:0;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:monospace;text-transform:uppercase}.fit-vin button{background:var(--primary);color:#fff;border-radius:8px;padding:9px 12px;font-weight:700}.fit-status{min-height:22px;margin-top:8px;font-size:12px;color:var(--muted)}
-.fit-parts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.fit-part{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--border);border-radius:9px;min-width:0}.fit-part>span{flex:1;min-width:0;font-size:12px;font-weight:700}.fit-part small{display:block;font-weight:500;color:var(--muted)}.fit-part button{width:32px;height:32px;border-radius:7px;background:var(--primary-light);color:var(--primary);font-weight:800}.fit-order{border-top:1px solid var(--border);margin-top:14px;padding-top:12px}.fit-order-row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:13px}.fit-total{display:flex;justify-content:space-between;font-weight:800;padding:10px 0}.fit-links{display:flex;gap:8px;flex-wrap:wrap}.fit-note{font-size:12px;color:var(--muted);margin-top:10px}
-@media(max-width:620px){.fit-grid{grid-template-columns:1fr}.fit-parts{grid-template-columns:1fr}.fit-head{align-items:flex-start}}
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
-</style>
-
+<title>My garage · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
-<script src="/static/auth.js"></script>
+<style>
+.page-head { padding: 22px 0 8px; display: flex; gap: 12px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; }
+.page-head h1 { font-size: clamp(28px, 5vw, 40px); font-variation-settings: "wdth" 78; }
+.page-head p { color: var(--muted); margin-top: 4px; max-width: 52ch; }
+.cars { display: grid; gap: 12px; margin-top: 14px; }
+@media (min-width: 760px) { .cars { grid-template-columns: 1fr 1fr; } }
+.car { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px; display: grid; gap: 12px; }
+.car.primary { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.plate { display: inline-flex; align-items: stretch; border-radius: 9px; overflow: hidden; border: 2px solid var(--gold); background: var(--gold); color: var(--ink); max-width: 100%; }
+.plate .tag { display: flex; align-items: center; padding: 0 9px; background: var(--ink); color: var(--gold); font-weight: 800; font-size: 11px; font-variation-settings: "wdth" 75; white-space: nowrap; }
+.plate .val { padding: 6px 12px; font-weight: 800; font-size: 19px; font-variation-settings: "wdth" 80; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plate.plain { background: var(--card); border-color: var(--line); }
+.plate.plain .tag { background: var(--paper); color: var(--muted); }
+.car .sub { color: var(--muted); font-size: 14px; }
+.car .vin { font-weight: 700; letter-spacing: .08em; color: var(--ink); }
+.car .ops { display: flex; gap: 6px; flex-wrap: wrap; }
+.car .ops .btn { min-height: 38px; padding: 6px 12px; font-size: 14px; }
+.add { margin-top: 22px; padding: 18px; }
+.add h2 { font-size: 22px; }
+.grid3 { display: grid; gap: 0 12px; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .grid3 { grid-template-columns: 1fr 1fr 1fr; } }
+.vin-row { display: flex; gap: 8px; }
+.vin-row .input { text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.check { display: flex; gap: 10px; align-items: center; margin-top: 14px; font-weight: 600; }
+.check input { width: 20px; height: 20px; accent-color: var(--teal); }
+.status { margin-top: 10px; font-weight: 600; }
+.status.err { color: var(--bad); }
+.status.ok { color: var(--ok); }
+.empty { text-align: center; padding: 36px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); margin-top: 14px; }
+.empty h2 { font-size: 22px; }
+.empty p { color: var(--muted); margin-top: 6px; }
+</style>
 </head>
 <body>
 <div id="site-header"></div>
-
 <main class="wrap">
- <div class="hero">
- <h1>My Garage</h1>
- <p>Save your vehicles so we can show parts that fit.</p>
+ <div class="page-head">
+  <div>
+   <h1>My garage</h1>
+   <p>Save the cars you look after. Your main car is used to mark the parts that fit across the site.</p>
+  </div>
  </div>
+ <div id="list"><div class="lcard skeleton" style="min-height:120px;margin-top:14px"></div></div>
 
- <div class="tip">Tip: set one car as <strong>primary</strong> — the home page uses it for fitment.</div>
-
- <div class="panel">
- <h2 id="form-title">Add a vehicle</h2>
- <form id="garage-form">
- <input type="hidden" name="id" id="f-id" value="">
- <div class="row">
- <div>
- <label class="lbl" for="f-make">Make *</label>
- <input class="inp" id="f-make" name="make" required placeholder="Toyota" list="makes">
- <datalist id="makes">
- <option>Toyota</option><option>Honda</option><option>Nissan</option>
- <option>Hyundai</option><option>Kia</option><option>Mercedes-Benz</option>
- <option>BMW</option><option>Ford</option><option>Volkswagen</option>
- <option>Mazda</option><option>Mitsubishi</option><option>Suzuki</option>
- <option>Lexus</option><option>Peugeot</option><option>Land Rover</option>
- </datalist>
- </div>
- <div>
- <label class="lbl" for="f-model">Model *</label>
- <input class="inp" id="f-model" name="model" required placeholder="Corolla">
- </div>
- </div>
- <div class="row" style="margin-top:12px">
- <div>
- <label class="lbl" for="f-year">Year *</label>
- <input class="inp" id="f-year" name="year" type="number" required min="1980" max="2030" placeholder="2015">
- </div>
- <div>
- <label class="lbl" for="f-nick">Nickname</label>
- <input class="inp" id="f-nick" name="nickname" placeholder="My daily driver">
- </div>
- </div>
- <label class="check">
- <input type="checkbox" id="f-primary" name="is_primary">
- Set as primary vehicle
- </label>
- <div style="display:flex;gap:10px;flex-wrap:wrap">
- <button type="submit" class="btn btn-primary" id="btn-save">Add to garage</button>
- <button type="button" class="btn btn-ghost" id="btn-cancel" hidden>Cancel edit</button>
- </div>
- </form>
- </div>
-
- <div class="list" id="list">
- <div class="sk"></div>
- <div class="sk"></div>
- </div>
-
- <section class="fit-tool" id="parts-for-my-car" aria-labelledby="fit-title">
- <div class="fit-head"><h2 id="fit-title">Parts for my car</h2><a class="btn btn-ghost btn-sm" href="/vin-tool">Full VIN report</a></div>
- <div class="fit-grid">
- <div>
- <div class="fit-car" id="fit-car-art" aria-label="Selected car illustration"></div>
- <label class="lbl" for="fit-car-select" style="margin-top:12px">Choose a saved vehicle</label>
- <select class="inp" id="fit-car-select" aria-label="Choose a saved vehicle"><option value="">Add a vehicle to your garage first</option></select>
- <div class="fit-colors" id="fit-colors" role="group" aria-label="Car colour"></div>
- <form class="fit-vin" id="fit-vin-form"><input id="fit-vin" maxlength="17" autocomplete="off" placeholder="Enter a 17-character VIN" aria-label="Vehicle identification number"><button type="submit">Decode VIN</button></form>
- <p class="fit-note">Auto.dev is used when the site has an API key configured; otherwise the official NHTSA decoder is used.</p>
- <div class="fit-status" id="fit-status" aria-live="polite"></div>
- <button class="btn btn-primary btn-sm" type="button" id="fit-save-decoded" hidden>Save decoded car to Garage</button>
- </div>
- <div>
- <strong id="fit-car-name">Select a vehicle</strong>
- <div class="fit-parts" id="fit-parts"></div>
- <div class="fit-order"><strong>Sample order</strong><div id="fit-order-lines"></div><div class="fit-total"><span>Estimated total</span><span id="fit-total">Le 0</span></div><div class="fit-links"><a class="btn btn-primary btn-sm" id="fit-browse" href="/">Browse live listings</a><a class="btn btn-ghost btn-sm" href="/vin-tool">VIN details</a></div></div>
- <p class="fit-note">Checklist prices are examples, not live inventory or verified fitment. Confirm compatibility and price with the seller.</p>
- </div>
- </div>
+ <section class="box add" id="add">
+  <h2 id="form-title">Add a car</h2>
+  <form id="car-form" novalidate>
+   <label class="field"><span>VIN (optional)</span>
+    <div class="vin-row"><input class="input" id="vin" maxlength="17" placeholder="17-character VIN" autocomplete="off"><button type="button" class="btn btn-ghost" id="fill">Fill in</button></div>
+   </label>
+   <div class="grid3">
+    <label class="field"><span>Make</span><select class="select" id="make"></select></label>
+    <label class="field"><span>Model</span><input class="input" id="model" list="models" placeholder="Corolla"></label>
+    <label class="field"><span>Year</span><select class="select" id="year"></select></label>
+   </div>
+   <datalist id="models"></datalist>
+   <label class="field"><span>Nickname (optional)</span><input class="input" id="nickname" maxlength="40" placeholder="Work car, Mum's Prado…"></label>
+   <label class="check"><input type="checkbox" id="primary"> This is my main car</label>
+   <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
+    <button class="btn btn-primary btn-lg" type="submit" id="save">Save car</button>
+    <button class="btn btn-ghost btn-lg" type="button" id="cancel" hidden>Cancel</button>
+   </div>
+   <div class="status" id="status" aria-live="polite"></div>
+  </form>
  </section>
 </main>
-
-<div class="toast" id="toast"></div>
-
-
-
-<script>
-(function () {
- function $(id) { return document.getElementById(id); }
- function toast(msg, ok) {
- var t = $('toast');
- t.textContent = msg;
- t.className = 'toast show ' + (ok ? 'ok' : 'err');
- setTimeout(function () { t.classList.remove('show'); }, 2800);
- }
- Auth.getToken = function () {
- try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; }
- }
- function auth() {
- var t = Auth.getToken();
- return t ? { Authorization: 'Bearer ' + t } : {};
- }
- function esc(s) {
- return String(s == null ? '' : s)
- .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
- }
- 
-
- if (!Auth.getToken()) { Auth.goLogin(); return; }
-
- var form = $('garage-form');
- var list = $('list');
- var editingId = null;
-
- function syncFitmentLocal(car) {
- if (!car) return;
- try {
- localStorage.setItem('fitmentVehicle', JSON.stringify({
- make: car.make,
- model: car.model,
- year: String(car.year)
- }));
- } catch (e) {}
- }
-
- function resetForm() {
- editingId = null;
- form.reset();
- $('f-id').value = '';
- $('form-title').textContent = 'Add a vehicle';
- $('btn-save').textContent = 'Add to garage';
- $('btn-cancel').hidden = true;
- }
-
- $('btn-cancel').addEventListener('click', resetForm);
-
- function load() {
- list.innerHTML = '<div class="sk"></div><div class="sk"></div>';
- fetch('/api/garage/', { headers: auth() })
- .then(function (r) {
- if (r.status === 401) { Auth.goLogin(); throw null; }
- return r.ok ? r.json() : [];
- })
- .then(function (cars) {
- cars = Array.isArray(cars) ? cars : (cars.items || []);
- window.dispatchEvent(new Event('garage-cars-updated'));
- if (!cars.length) {
- list.innerHTML = '<div class="empty"><strong>No vehicles yet</strong>Add your car above to get better part matches.</div>';
- return;
- }
- cars.sort(function (a, b) { return (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0); });
- var primary = cars.find(function (c) { return c.is_primary; }) || cars[0];
- if (primary) syncFitmentLocal(primary);
-
- list.innerHTML = cars.map(function (c) {
- return '<article class="card' + (c.is_primary ? ' primary' : '') + '" data-id="' + c.id + '">' +
- '<h3>' + esc(c.year + ' ' + c.make + ' ' + c.model) + '</h3>' +
- '<div class="meta">' + esc(c.nickname || 'No nickname') +
- (c.is_primary ? ' · <span class="badge">Primary</span>' : '') +
- '</div>' +
- '<div class="acts">' +
- '<a class="btn btn-primary btn-sm" href="/">Find parts</a>' +
- (!c.is_primary ? '<button type="button" class="btn btn-ghost btn-sm" data-act="primary">Set primary</button>' : '') +
- '<button type="button" class="btn btn-ghost btn-sm" data-act="edit">Edit</button>' +
- '<button type="button" class="btn btn-danger btn-sm" data-act="delete">Remove</button>' +
- '</div>' +
- '</article>';
- }).join('');
-
- list.querySelectorAll('.card').forEach(function (card) {
- var id = card.dataset.id;
- var car = cars.find(function (x) { return String(x.id) === String(id); });
- card.querySelectorAll('[data-act]').forEach(function (btn) {
- btn.addEventListener('click', function () {
- var act = btn.dataset.act;
- if (act === 'delete') removeCar(id);
- if (act === 'edit' && car) startEdit(car);
- if (act === 'primary' && car) setPrimary(id, car);
- });
- });
- });
- })
- .catch(function (e) {
- if (e !== null) list.innerHTML = '<div class="empty"><strong>Could not load garage</strong>Check your connection and try again.</div>';
- });
- }
-
- function startEdit(car) {
- editingId = car.id;
- $('f-id').value = car.id;
- $('f-make').value = car.make || '';
- $('f-model').value = car.model || '';
- $('f-year').value = car.year || '';
- $('f-nick').value = car.nickname || '';
- $('f-primary').checked = !!car.is_primary;
- $('form-title').textContent = 'Edit vehicle';
- $('btn-save').textContent = 'Save changes';
- $('btn-cancel').hidden = false;
- window.scrollTo({ top: 0, behavior: 'smooth' });
- }
-
- function removeCar(id) {
- if (!confirm('Remove this vehicle from your garage?')) return;
- fetch('/api/garage/' + id, { method: 'DELETE', headers: auth() })
- .then(function (r) {
- if (r.status === 401) { Auth.goLogin(); return; }
- if (!r.ok) throw new Error();
- toast('Vehicle removed', true);
- if (String(editingId) === String(id)) resetForm();
- load();
- })
- .catch(function () { toast('Could not remove', false); });
- }
-
- function setPrimary(id, car) {
- fetch('/api/garage/' + id + '/primary', {
- method: 'PUT',
- headers: auth()
- }).then(function (r) {
- if (r.status === 401) { Auth.goLogin(); return null; }
- if (!r.ok) throw new Error();
- return r;
- }).then(function (r) {
- if (!r) return;
- if (!r.ok) throw new Error();
- toast('Primary vehicle updated', true);
- syncFitmentLocal(car);
- load();
- }).catch(function () { toast('Could not update primary', false); });
- }
-
- form.addEventListener('submit', function (e) {
- e.preventDefault();
- var btn = $('btn-save');
- btn.disabled = true;
- var body = {
- make: $('f-make').value.trim(),
- model: $('f-model').value.trim(),
- year: parseInt($('f-year').value, 10),
- nickname: $('f-nick').value.trim() || null,
- is_primary: $('f-primary').checked
- };
- var isEdit = !!editingId;
- var url = isEdit ? '/api/garage/' + editingId : '/api/garage/';
- var method = isEdit ? 'PUT' : 'POST';
-
- fetch(url, {
- method: method,
- headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
- body: JSON.stringify(body)
- }).then(function (r) {
- if (r.status === 401) { Auth.goLogin(); return null; }
- if (!r.ok && isEdit) {
- return fetch('/api/garage/' + editingId, {
- method: 'PATCH',
- headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
- body: JSON.stringify(body)
- });
- }
- return r;
- }).then(function (r) {
- if (!r) return;
- if (!r.ok) throw new Error();
- toast(isEdit ? 'Vehicle updated' : 'Vehicle added', true);
- if (body.is_primary) syncFitmentLocal(body);
- resetForm();
- load();
- }).catch(function () {
- toast(isEdit ? 'Could not update' : 'Could not add vehicle', false);
- }).finally(function () { btn.disabled = false; });
- });
-
- load();
-})();
-</script>
+<script src="/static/site.js?v=4"></script>
 <script>
 (function () {
  'use strict';
- var colors = [['White','#f4f4f2'],['Silver','#b8bfc4'],['Grey','#5f686e'],['Black','#1f2326'],['Red','#c2262e'],['Blue','#2b5fa8'],['Gold','#b99a5b']];
- var parts = [['pads','Front brake pads','Set of 4',450],['oil','Oil filter','Spin-on',90],['air','Air filter','Engine intake',140],['plugs','Spark plugs','Set of 4',320],['belt','Serpentine belt','Drive belt',260],['battery','Battery 12V 60Ah','Sealed',1500]];
- var state = {car:null, color:'#f4f4f2', cart:{}, decoded:null};
- var savedCars = [];
- var select = document.getElementById('fit-car-select');
- var vinInput = document.getElementById('fit-vin');
- var status = document.getElementById('fit-status');
- var saveDecodedButton = document.getElementById('fit-save-decoded');
- function $(id) { return document.getElementById(id); }
- Auth.getToken = function () { try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; } }
- function auth() { var value = Auth.getToken(); return value ? {Authorization:'Bearer '+value} : {}; }
- function esc(value) { return String(value == null ? '' : value).replace(/[&<>"']/g,function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
- function money(value) { return 'Le '+Number(value || 0).toLocaleString('en-US'); }
- function saveLocal(key,value) { try { localStorage.setItem(key,value); } catch (e) {} }
- function setCar(car) {
- state.car = car;
- if (!car) { $('fit-car-name').textContent = 'Select a vehicle'; $('fit-car-art').innerHTML = ''; $('fit-browse').href = '/'; renderParts(); renderCart(); return; }
- $('fit-car-name').textContent = car.year+' '+car.make+' '+car.model;
- $('fit-car-art').innerHTML = '<svg viewBox="0 0 400 160" role="img" aria-label="'+esc(car.year+' '+car.make+' '+car.model)+'"><ellipse cx="200" cy="151" rx="185" ry="7" fill="#000" opacity=".12"/><path d="M16 124V104q4-12 30-15l68-9 27-27q10-10 30-10h75q21 2 37 22l23 25 46 6q27 4 27 19v9H16z" fill="'+state.color+'" stroke="#485b54" stroke-width="3"/><path d="m145 82 29-32h34v33zm73 1V50h26q16 2 29 20l10 13z" fill="#bcd7e2" stroke="#485b54" stroke-width="3"/><circle cx="96" cy="124" r="29" fill="#20272a"/><circle cx="96" cy="124" r="16" fill="#c9d1d4"/><circle cx="312" cy="124" r="29" fill="#20272a"/><circle cx="312" cy="124" r="16" fill="#c9d1d4"/></svg>';
- var query = new URLSearchParams({make:car.make,model:car.model,year:String(car.year)});
- $('fit-browse').href = '/?'+query.toString();
- saveLocal('fitmentVehicle',JSON.stringify({make:car.make,model:car.model,year:String(car.year)}));
- renderParts();
- renderCart();
+ var token = '';
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
+ if (!token) { location.replace('/login?next=/garage'); return; }
+ var $ = function (id) { return document.getElementById(id); };
+ var RAW = 'Toyota:Corolla,Camry,Hilux,RAV4,Land Cruiser,Prado,Vitz,Yaris,Avensis,Prius,Highlander,Hiace;Nissan:X-Trail,Altima,Sunny,Patrol,Navara,Qashqai,Juke,Note,Murano;Honda:Civic,Accord,CR-V,Fit,Jazz,Pilot;Mitsubishi:Pajero,Lancer,Outlander,L200;Mazda:CX-5,Mazda3,Mazda6,BT-50;Suzuki:Swift,Vitara,Jimny,Alto;Subaru:Forester,Outback,Impreza;Isuzu:D-Max,MU-X,Trooper;Lexus:RX,NX,ES,GX,LX;Hyundai:Tucson,Santa Fe,Elantra,Sonata,i10,Accent,Creta;Kia:Sportage,Sorento,Rio,Cerato,Picanto;Mercedes-Benz:C-Class,E-Class,S-Class,GLC,GLE,ML,G-Class,Sprinter;BMW:3 Series,5 Series,X3,X5,X6;Volkswagen:Golf,Passat,Tiguan,Polo,Jetta;Audi:A3,A4,A6,Q5,Q7;Ford:Focus,Fiesta,Ranger,Explorer,Escape;Chevrolet:Cruze,Malibu,Equinox,Tahoe;Jeep:Wrangler,Grand Cherokee;Peugeot:208,308,3008,Partner;Renault:Clio,Duster,Logan;Land Rover:Defender,Discovery,Range Rover,Evoque;Volvo:XC60,XC90;Chery:Tiggo 4,Tiggo 7;Geely:Coolray,Emgrand;BYD:Atto 3,Han,Seal';
+ var MAKES = [], MODELS = {};
+ RAW.split(';').forEach(function (p) { var a = p.split(':'); MAKES.push(a[0]); MODELS[a[0]] = a[1].split(','); });
+ MAKES.push('Other');
+ var cars = [], editing = null;
+
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function opts(list, first) { return '<option value="">' + esc(first) + '</option>' + list.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + '</option>'; }).join(''); }
+ function setStatus(m, k) { $('status').textContent = m; $('status').className = 'status' + (k ? ' ' + k : ''); }
+ function api(url, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign({ Authorization: 'Bearer ' + token }, opts.body ? { 'Content-Type': 'application/json' } : {}, opts.headers || {});
+  return fetch(url, opts).then(function (r) {
+   if (r.status === 401) { location.href = '/login?next=/garage'; throw null; }
+   return r.json().catch(function () { return {}; }).then(function (d) {
+    if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : 'Please check the details and try again.');
+    return d;
+   });
+  });
  }
- function renderParts() {
- $('fit-parts').innerHTML = parts.map(function (part) { return '<div class="fit-part"><span>'+esc(part[1])+'<small>'+esc(part[2])+' · confirm exact fit</small></span><strong>'+money(part[3])+'</strong><button type="button" data-add="'+part[0]+'" aria-label="Add '+esc(part[1])+'">+</button></div>'; }).join('');
+ function syncFitment() {
+  var main = cars.find(function (c) { return c.is_primary; }) || cars[0];
+  try {
+   if (main) localStorage.setItem('fitmentVehicle', JSON.stringify({ make: main.make, model: main.model, year: String(main.year) }));
+   else localStorage.removeItem('fitmentVehicle');
+  } catch (e) {}
  }
- function renderCart() {
- var selected = parts.filter(function (part) { return Number(state.cart[part[0]]) > 0; });
- var total = 0;
- $('fit-order-lines').innerHTML = selected.length ? selected.map(function (part) { var count = Number(state.cart[part[0]]); total += count*part[3]; return '<div class="fit-order-row"><span>'+count+' × '+esc(part[1])+'</span><span>'+money(count*part[3])+' <button type="button" data-remove="'+part[0]+'" aria-label="Remove one '+esc(part[1])+'">−</button></span></div>'; }).join('') : '<p class="fit-note">Your sample order is empty.</p>';
- $('fit-total').textContent = money(total);
+ function shopUrl(c) { var q = new URLSearchParams({ make: c.make, model: c.model, year: String(c.year) }); return '/?' + q.toString(); }
+
+ function render() {
+  if (!cars.length) {
+   $('list').innerHTML = '<div class="empty"><h2>No cars yet</h2><p>Add your car below and we\'ll mark the parts that fit it.</p></div>';
+   return;
+  }
+  $('list').innerHTML = '<div class="cars">' + cars.map(function (c) {
+   var name = [c.year, c.make, c.model].join(' ');
+   return '<article class="car' + (c.is_primary ? ' primary' : '') + '">' +
+    '<div><span class="plate' + (c.is_primary ? '' : ' plain') + '"><span class="tag">' + (c.is_primary ? 'MAIN CAR' : 'CAR') + '</span><span class="val">' + esc(name) + '</span></span></div>' +
+    '<div>' + (c.nickname ? '<div style="font-weight:700;color:var(--ink)">' + esc(c.nickname) + '</div>' : '') +
+     (c.vin ? '<div class="sub">VIN <span class="vin">' + esc(c.vin) + '</span></div>' : '<div class="sub">No VIN saved</div>') + '</div>' +
+    '<div class="ops">' +
+     '<a class="btn btn-primary" href="' + shopUrl(c) + '">Shop parts</a>' +
+     (c.vin ? '<a class="btn btn-ghost" href="/vin-tool?vin=' + encodeURIComponent(c.vin) + '">VIN report</a>' : '') +
+     (c.is_primary ? '' : '<button class="btn btn-ghost" data-primary="' + c.id + '">Make main car</button>') +
+     '<button class="btn btn-ghost" data-edit="' + c.id + '">Edit</button>' +
+     '<button class="btn btn-ghost" data-del="' + c.id + '">Remove</button>' +
+    '</div></article>';
+  }).join('') + '</div>';
  }
- function renderColors() {
- $('fit-colors').innerHTML = colors.map(function (color) { return '<button type="button" class="fit-color" data-color="'+color[1]+'" style="background:'+color[1]+'" aria-label="'+color[0]+'" aria-pressed="'+(state.color===color[1])+'"></button>'; }).join('');
+ function load() {
+  return api('/api/garage/').then(function (list) { cars = list || []; syncFitment(); render(); })
+   .catch(function (e) { if (e) $('list').innerHTML = '<div class="notice notice-bad" style="margin-top:14px">We couldn\'t load your cars. Try again in a moment.</div>'; });
  }
- function loadCars(preferred) {
- fetch('/api/garage/',{headers:auth()}).then(function (response) {
- if (response.status===401) throw new Error('Sign in again to load your Garage.');
- if (!response.ok) throw new Error('Could not load Garage vehicles.');
- return response.json();
- }).then(function (cars) {
- cars = Array.isArray(cars) ? cars : [];
- savedCars = cars;
- select.replaceChildren(new Option(cars.length?'Choose a saved car':'Add a vehicle above or decode a VIN',''));
- cars.forEach(function (car) { select.add(new Option(car.year+' '+car.make+' '+car.model+(car.nickname?' · '+car.nickname:''),String(car.id))); });
- var current = preferred && cars.find(function (car) { return String(car.id)===String(preferred.id); });
- if (!current) {
- var local = null;
- try { local=JSON.parse(localStorage.getItem('fitmentVehicle')||'null'); } catch(e) {}
- if (local) current=cars.find(function (car) { return car.make===local.make&&car.model===local.model&&String(car.year)===String(local.year); });
+
+ // ---- form ----
+ $('make').innerHTML = opts(MAKES, 'Choose a make');
+ var years = []; for (var y = new Date().getFullYear() + 1; y >= 1975; y--) years.push(y);
+ $('year').innerHTML = opts(years, 'Choose a year');
+ $('make').addEventListener('change', function () { $('models').innerHTML = (MODELS[this.value] || []).map(function (m) { return '<option value="' + esc(m) + '">'; }).join(''); });
+ function setMake(make) {
+  var match = MAKES.find(function (m) { return m.toLowerCase() === String(make || '').toLowerCase(); });
+  if (!match && make) { match = make.charAt(0).toUpperCase() + make.slice(1).toLowerCase(); $('make').add(new Option(match, match)); }
+  $('make').value = match || '';
+  $('make').dispatchEvent(new Event('change'));
  }
- current = current || cars.find(function (car) { return car.is_primary; }) || cars[0] || null;
- if (current) { select.value=String(current.id); setCar(current); }
- else setCar(null);
- }).catch(function (error) { status.textContent=error.message; });
+ function resetForm() {
+  editing = null;
+  $('car-form').reset();
+  $('form-title').textContent = 'Add a car';
+  $('save').textContent = 'Save car';
+  $('cancel').hidden = true;
+  $('primary').checked = !cars.length;
  }
- window.addEventListener('garage-cars-updated',function(){loadCars(state.car)});
- select.addEventListener('change',function () { setCar(savedCars.find(function(car){return String(car.id)===select.value})||null); });
- $('fit-colors').addEventListener('click',function(event){var button=event.target.closest('[data-color]');if(!button)return;state.color=button.dataset.color;renderColors();if(state.car)setCar(state.car)});
- $('fit-parts').addEventListener('click',function(event){var button=event.target.closest('[data-add]');if(!button)return;state.cart[button.dataset.add]=Number(state.cart[button.dataset.add]||0)+1;saveLocal('garageSampleCart',JSON.stringify(state.cart));renderCart()});
- $('fit-order-lines').addEventListener('click',function(event){var button=event.target.closest('[data-remove]');if(!button)return;state.cart[button.dataset.remove]=Math.max(0,Number(state.cart[button.dataset.remove]||0)-1);saveLocal('garageSampleCart',JSON.stringify(state.cart));renderCart()});
- vinInput.addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,'').slice(0,17)});
- $('fit-vin-form').addEventListener('submit',async function(event){
- event.preventDefault();var vin=vinInput.value.trim();state.decoded=null;saveDecodedButton.hidden=true;
- if(!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)){status.textContent='Enter a valid 17-character VIN.';return}
- status.textContent='Decoding VIN…';var button=this.querySelector('button');button.disabled=true;
- try{var response=await fetch('/api/nhtsa/decode-vin/'+encodeURIComponent(vin));var data=await response.json();if(!response.ok)throw new Error(data.detail||'VIN lookup failed.');
- var decoded={vin:data.vin||vin,make:data.make,model:data.model,year:Number(data.year),ai_insights:data.ai_insights};if(!decoded.make||!decoded.model||!decoded.year)throw new Error('VIN decoder did not return a complete make, model, and year.');
- var saved=savedCars.find(function(car){return car.make.toLowerCase()===decoded.make.toLowerCase()&&car.model.toLowerCase()===decoded.model.toLowerCase()&&Number(car.year)===decoded.year});
- if(saved){select.value=String(saved.id);setCar(saved);status.textContent='VIN decoded. Selected the matching vehicle already in your Garage.';}
- else{state.decoded=decoded;status.textContent='Decoded '+decoded.year+' '+decoded.make+' '+decoded.model+'. Save it to your Garage to use it here.'+(decoded.ai_insights?' '+decoded.ai_insights:'');saveDecodedButton.hidden=false;}
- }catch(error){status.textContent=error.message||'VIN lookup failed.'}finally{button.disabled=false}
+ $('cancel').addEventListener('click', function () { resetForm(); setStatus(''); });
+
+ $('fill').addEventListener('click', function () {
+  var vin = $('vin').value.replace(/\s+/g, '').toUpperCase();
+  if (vin.length !== 17) { setStatus('A VIN has 17 characters.', 'err'); return; }
+  setStatus('Reading the VIN…');
+  fetch('/api/vin/decode/' + encodeURIComponent(vin)).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'We couldn\'t read this VIN.'); return d; }); })
+   .then(function (d) {
+    if (d.make) setMake(d.make);
+    if (d.model) $('model').value = d.model;
+    if (d.year) $('year').value = d.year;
+    setStatus(d.model ? 'Filled in from the VIN. Check it\'s right.' : 'We found the make and year. Please add the model.', 'ok');
+   }).catch(function (e) { setStatus(e.message, 'err'); });
  });
- saveDecodedButton.addEventListener('click',async function(){if(!state.decoded)return;this.disabled=true;try{var response=await fetch('/api/garage/',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},auth()),body:JSON.stringify({make:state.decoded.make,model:state.decoded.model,year:state.decoded.year,vin:state.decoded.vin,nickname:'VIN lookup',is_primary:false})});var data=await response.json();if(!response.ok)throw new Error(data.detail||'Could not save this vehicle.');state.decoded=null;this.hidden=true;status.textContent='Vehicle saved to Garage.';await loadCars(data);}catch(error){status.textContent=error.message||'Could not save this vehicle.'}finally{this.disabled=false}});
- try{state.cart=JSON.parse(localStorage.getItem('garageSampleCart')||'{}')||{}}catch(e){}
- renderColors();renderParts();renderCart();loadCars();
+
+ $('car-form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var body = {
+   make: $('make').value, model: $('model').value.trim(), year: parseInt($('year').value, 10),
+   vin: $('vin').value.replace(/\s+/g, '').toUpperCase() || null, nickname: $('nickname').value.trim() || null,
+   is_primary: $('primary').checked
+  };
+  if (!body.make || !body.model || !body.year) { setStatus('Choose the make, model and year.', 'err'); return; }
+  if (body.vin && body.vin.length !== 17) { setStatus('A VIN has 17 characters. Leave it empty if you don\'t have it.', 'err'); return; }
+  $('save').disabled = true; setStatus('Saving…');
+  var req = editing ? api('/api/garage/' + editing, { method: 'PUT', body: JSON.stringify(body) }) : api('/api/garage/', { method: 'POST', body: JSON.stringify(body) });
+  var wasEditing = editing;
+  req.then(function () { return load(); }).then(function () { resetForm(); setStatus(wasEditing ? 'Saved.' : 'Car added.', 'ok'); })
+   .catch(function (err) { if (err) setStatus(err.message, 'err'); })
+   .finally(function () { $('save').disabled = false; });
+ });
+
+ $('list').addEventListener('click', function (e) {
+  var p = e.target.closest('[data-primary]'), ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]');
+  if (p) { p.disabled = true; api('/api/garage/' + p.dataset.primary + '/primary', { method: 'PUT' }).then(load).catch(function (err) { p.disabled = false; if (err) alert(err.message); }); }
+  if (del) {
+   if (!confirm('Remove this car from your garage?')) return;
+   del.disabled = true;
+   api('/api/garage/' + del.dataset.del, { method: 'DELETE' }).then(load).catch(function (err) { del.disabled = false; if (err) alert(err.message); });
+  }
+  if (ed) {
+   var c = cars.find(function (x) { return String(x.id) === ed.dataset.edit; });
+   if (!c) return;
+   editing = c.id;
+   setMake(c.make); $('model').value = c.model; $('year').value = c.year; $('vin').value = c.vin || '';
+   $('nickname').value = c.nickname || ''; $('primary').checked = !!c.is_primary;
+   $('form-title').textContent = 'Edit ' + [c.year, c.make, c.model].join(' ');
+   $('save').textContent = 'Save changes'; $('cancel').hidden = false; setStatus('');
+   $('add').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+ });
+
+ load().then(resetForm);
 })();
 </script>
-<script src="/static/site.js?v=4"></script>
 </body>
 </html>

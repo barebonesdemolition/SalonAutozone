@@ -20,7 +20,7 @@ from app.services import vin_decoder
 router = APIRouter(prefix="/api/ai", tags=["AI Assistant"])
 
 settings = get_settings()
-GEMINI_API_KEY = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")
+GEMINI_API_KEY = (settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")).strip()
 
 
 class ChatRequest(BaseModel):
