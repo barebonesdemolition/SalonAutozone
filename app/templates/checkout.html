@@ -20,6 +20,13 @@
 .row { display: flex; justify-content: space-between; padding: 6px 0; }
 .row.total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 12px; font-size: 20px; font-weight: 800; color: var(--ink); }
 .msg { margin-top: 10px; font-weight: 600; color: var(--bad); }
+.pin-box { margin-top: 16px; padding: 14px; border: 1.5px dashed var(--line); border-radius: var(--r-md); background: var(--paper); }
+.pin-box b { color: var(--ink); }
+.pin-box .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+#map { height: 280px; border-radius: var(--r-sm); margin-top: 10px; display: none; }
+#map.on { display: block; }
+.pin-state { font-weight: 700; margin-top: 8px; }
+.pin-state.ok { color: var(--ok); }
 </style>
 </head>
 <body>
@@ -68,6 +75,9 @@
     '<label class="field"><span>Street address</span><input class="input" id="addr" maxlength="200" placeholder="12 Kissy Road, near the mosque" autocomplete="street-address"></label>' +
     '<label class="field"><span>Area or town</span><input class="input" id="area" maxlength="60" value="Freetown" autocomplete="address-level2"></label>' +
     '<label class="field"><span>Phone number for the driver</span><input class="input" id="phone" type="tel" maxlength="25" placeholder="+232 76 123456" autocomplete="tel" value="' + esc(u.phone || '') + '"></label>' +
+    '<div class="pin-box"><b>Show the driver exactly where you are</b><p class="hint" style="margin:2px 0 0">Optional, but it helps when the address is hard to find. Uses a little mobile data for the map.</p>' +
+     '<div class="acts"><button type="button" class="btn btn-ghost" id="pin-here">Use my current location</button><button type="button" class="btn btn-ghost" id="pin-map">Drop a pin on the map</button></div>' +
+     '<div id="map" aria-label="Map: tap to move your pin"></div><div class="pin-state" id="pin-state" aria-live="polite"></div></div>' +
     '<button class="btn btn-primary btn-lg btn-block" style="margin-top:20px" type="submit" id="place">Place order</button>' +
     '<div class="msg" id="msg" aria-live="polite"></div>' +
     '<p class="hint">After you order, we contact you on this number to confirm payment. The delivery fee depends on the size of the parts and is shown on the next screen.</p>' +
@@ -78,6 +88,50 @@
     '<div class="row total"><span>Parts</span><span>SLL ' + fmt(total) + '</span></div>' +
     '<a href="/cart" class="hint" style="display:inline-block">Edit cart</a>' +
    '</aside></div>';
+
+  // ---- delivery pin (Leaflet + OpenStreetMap, loaded only if the buyer asks for it) ----
+  var pin = null, map = null, marker = null;
+  var FREETOWN = [8.4844, -13.2344];
+  function pinState(text, ok) { var el = document.getElementById('pin-state'); el.textContent = text; el.className = 'pin-state' + (ok ? ' ok' : ''); }
+  function setPin(lat, lng) {
+   pin = { lat: Math.round(lat * 1e6) / 1e6, lng: Math.round(lng * 1e6) / 1e6 };
+   if (map) {
+    if (marker) marker.setLatLng([lat, lng]);
+    else { marker = L.marker([lat, lng], { draggable: true }).addTo(map); marker.on('dragend', function () { var p = marker.getLatLng(); setPin(p.lat, p.lng); }); }
+   }
+   pinState('Pin set. The driver will get directions to it. Tap the map or drag the pin to adjust.', true);
+  }
+  function loadLeaflet() {
+   if (window.L) return Promise.resolve();
+   return new Promise(function (ok, fail) {
+    var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'; document.head.appendChild(css);
+    var js = document.createElement('script'); js.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'; js.onload = ok; js.onerror = fail; document.head.appendChild(js);
+   });
+  }
+  function openMap(center) {
+   pinState('Loading the map…');
+   return loadLeaflet().then(function () {
+    var el = document.getElementById('map'); el.classList.add('on');
+    if (!map) {
+     map = L.map(el).setView(center || FREETOWN, center ? 17 : 13);
+     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+     map.on('click', function (ev) { setPin(ev.latlng.lat, ev.latlng.lng); });
+    } else if (center) map.setView(center, 17);
+    if (pin) setPin(pin.lat, pin.lng); else pinState('Tap the map where the driver should come.');
+   }).catch(function () {
+    if (pin) pinState('Pin set from your location. (The map couldn\'t load to show it.)', true);
+    else pinState('The map couldn\'t load. You can still use your current location, or skip this.');
+   });
+  }
+  document.getElementById('pin-map').addEventListener('click', function () { openMap(pin ? [pin.lat, pin.lng] : null); });
+  document.getElementById('pin-here').addEventListener('click', function () {
+   if (!navigator.geolocation) { pinState('Your phone didn\'t share a location. Drop a pin on the map instead.'); return; }
+   pinState('Finding you…');
+   navigator.geolocation.getCurrentPosition(function (pos) {
+    setPin(pos.coords.latitude, pos.coords.longitude);
+    openMap([pos.coords.latitude, pos.coords.longitude]);
+   }, function () { pinState('We couldn\'t get your location. Allow location access, or drop a pin on the map.'); }, { enableHighAccuracy: true, timeout: 15000 });
+  });
 
   document.getElementById('co-form').addEventListener('submit', function (e) {
    e.preventDefault();
@@ -90,7 +144,7 @@
    btn.disabled = true; btn.textContent = 'Placing order…';
    fetch('/api/shop/orders', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
-    body: JSON.stringify({ items: rows.map(function (r) { return { part_id: r.part.id, qty: r.qty }; }), delivery_address: addr, delivery_area: area, phone: phone })
+    body: JSON.stringify({ items: rows.map(function (r) { return { part_id: r.part.id, qty: r.qty }; }), delivery_address: addr, delivery_area: area, phone: phone, delivery_lat: pin ? pin.lat : null, delivery_lng: pin ? pin.lng : null })
    }).then(function (r) {
     return r.json().catch(function () { return {}; }).then(function (d) {
      if (r.status === 401) { location.href = '/login?next=' + encodeURIComponent(location.pathname + location.search); return; }

@@ -41,6 +41,13 @@ dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px}dt{c
 .job .route b{color:var(--text)}
 .empty{text-align:center;color:var(--muted);padding:20px 0;font-size:14px}
 .stat{display:inline-block;margin-right:20px}.stat b{display:block;font-size:22px;color:var(--primary)}
+.contact { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 6px 0 10px; }
+.contact span { flex: 1 1 100%; }
+.cbtn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 14px; border-radius: 8px; border: 1.5px solid #dde4e2; color: #0e2a2b; font-weight: 700; text-decoration: none; background: #fff; }
+.cbtn.wa { background: #1f9d55; border-color: #1f9d55; color: #fff; }
+.cbtn.dir { width: 100%; margin: 4px 0 10px; background: #0e7c7b; border-color: #0e7c7b; color: #fff; }
+.leg small { display: block; color: #5d6f6e; font-weight: 600; }
+.pin { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: #fdf3dc; color: #7a4b00; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -234,11 +241,24 @@ dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px}dt{c
       row.appendChild(el('span', Number(j.payout_sll).toLocaleString() + 'Le', 'pay'));
       myJobEl.appendChild(row);
       var route = el('div', null, 'route');
+      function digits(p) { return String(p || '').replace(/[^\d+]/g, ''); }
+      function contact(label, name, phone) {
+        var d = digits(phone);
+        if (!d) return '';
+        return '<div class="contact"><span>' + label + ': <b>' + esc(name || '—') + '</b></span>' +
+          '<a class="cbtn" href="tel:' + esc(d) + '">Call</a>' +
+          '<a class="cbtn wa" href="https://wa.me/' + esc(d.replace(/^\+/, '')) + '" target="_blank" rel="noopener">WhatsApp</a></div>';
+      }
+      var hasPin = j.delivery_lat != null && j.delivery_lng != null;
+      var dest = hasPin ? (j.delivery_lat + ',' + j.delivery_lng) : (j.delivery_address + ', ' + j.delivery_area + ', Sierra Leone');
+      var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(dest);
       route.innerHTML =
-        'Pickup: <b>' + esc(j.pickup_area || '—') + '</b><br>' +
-        'Seller: <b>' + esc(j.seller_name || '—') + '</b> ' + esc(j.seller_phone || '') + '<br>' +
-        'Drop: <b>' + esc(j.delivery_address || '—') + '</b>, ' + esc(j.delivery_area || '') + '<br>' +
-        'Buyer phone: <b>' + esc(j.buyer_phone || '—') + '</b>';
+        '<div class="leg"><small>1. Collect from</small><b>' + esc(j.pickup_area || '—') + '</b></div>' +
+        contact('Seller', j.seller_name, j.seller_phone) +
+        '<div class="leg"><small>2. Deliver to</small><b>' + esc(j.delivery_address || '—') + '</b>, ' + esc(j.delivery_area || '') +
+        (hasPin ? ' <span class="pin">Pin on map</span>' : '') + '</div>' +
+        '<a class="cbtn dir" href="' + esc(mapsUrl) + '" target="_blank" rel="noopener">' + (hasPin ? 'Directions to the buyer\'s pin' : 'Search the address in Maps') + '</a>' +
+        contact('Buyer', j.buyer_name, j.buyer_phone);
       myJobEl.appendChild(route);
 
       if (j.status === 'accepted') {

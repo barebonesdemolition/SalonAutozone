@@ -5,6 +5,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
+from sqlalchemy import inspect as sa_inspect, text
 from sqlalchemy import (
     Column, DateTime, Float, ForeignKey, Integer, MetaData, String, Table,
     func, insert, select, update,
@@ -54,6 +55,8 @@ orders = Table("shop_orders", _md,
     Column("platform_fee_sll", Float, nullable=False),
     Column("driver_payout_sll", Float, nullable=False),
     Column("delivery_code", String, nullable=False),
+    Column("delivery_lat", Float, nullable=True),   # pin the buyer dropped at checkout
+    Column("delivery_lng", Float, nullable=True),
     Column("code_attempts", Integer, nullable=False, server_default="0"),
     Column("created_at", DateTime, nullable=False, default=datetime.utcnow),
     Column("updated_at", DateTime, nullable=False, default=datetime.utcnow),
@@ -105,6 +108,13 @@ async def ensure_delivery_tables():
     try:
         async with engine.begin() as conn:
             await conn.run_sync(lambda c: _md.create_all(c, tables=_OWN_TABLES, checkfirst=True))
+
+            def missing_pin_columns(sync_conn):
+                have = {col["name"] for col in sa_inspect(sync_conn).get_columns("shop_orders")}
+                return [c for c in ("delivery_lat", "delivery_lng") if c not in have]
+
+            for column in await conn.run_sync(missing_pin_columns):
+                await conn.execute(text(f"ALTER TABLE shop_orders ADD COLUMN {column} FLOAT"))
     except Exception:
         log.exception("Could not create delivery tables")
 
@@ -186,6 +196,8 @@ class OrderIn(BaseModel):
     delivery_address: str = Field(min_length=5, max_length=200)
     delivery_area: str = Field(min_length=2, max_length=60)
     phone: str = Field(min_length=6, max_length=25)
+    delivery_lat: float | None = Field(default=None, ge=-90, le=90)
+    delivery_lng: float | None = Field(default=None, ge=-180, le=180)
 
 
 class CodeIn(BaseModel):
@@ -236,7 +248,9 @@ async def place_order(body: OrderIn, user: models.User = Depends(get_current_use
             delivery_address=body.delivery_address.strip(), delivery_area=body.delivery_area.strip(),
             pickup_area=(lines[0][0].location or None), buyer_phone=body.phone.strip(),
             vehicle_class=vehicle, parts_total_sll=round(total, 2), delivery_fee_sll=fee,
-            platform_fee_sll=cut, driver_payout_sll=payout, delivery_code=delivery_code))
+            platform_fee_sll=cut, driver_payout_sll=payout, delivery_code=delivery_code,
+            delivery_lat=body.delivery_lat if body.delivery_lng is not None else None,
+            delivery_lng=body.delivery_lng if body.delivery_lat is not None else None))
     except IntegrityError:
         await db.rollback()
         raise HTTPException(409, "Please try again")
@@ -261,7 +275,20 @@ async def _buyer_view(db, order_id):
     d["total_to_pay_sll"] = round(d["parts_total_sll"] + d["delivery_fee_sll"], 2)
     for hidden in ("platform_fee_sll", "driver_payout_sll", "code_attempts"):
         d.pop(hidden, None)
+    d["driver"] = await _assigned_driver(db, order_id)
     return d
+
+
+async def _assigned_driver(db, order_id):
+    """Name, phone and vehicle of the driver who took the job, so the buyer can reach them."""
+    row = (await db.execute(
+        select(jobs.c.status, drivers_t.c.vehicle_type, drivers_t.c.plate_number, drivers_t.c.phone, USERS.c.full_name)
+        .select_from(jobs.join(drivers_t, drivers_t.c.id == jobs.c.driver_id).join(USERS, USERS.c.id == drivers_t.c.user_id))
+        .where(jobs.c.order_id == order_id, jobs.c.status.in_(["accepted", "picked_up", "delivered"]))
+    )).first()
+    if not row:
+        return None
+    return {"name": row.full_name, "phone": row.phone, "vehicle_type": row.vehicle_type, "plate_number": row.plate_number}
 
 
 @router.get("/orders")
@@ -347,7 +374,11 @@ async def driver_jobs(scope: str = Query("open"), user: models.User = Depends(ge
              "pickup_area": r.pickup_area, "delivery_area": r.delivery_area} for r in rows]}
     if scope == "mine":
         rows = (await db.execute(
-            select(jobs, orders).select_from(jobs.join(orders, orders.c.id == jobs.c.order_id))
+            select(jobs.c.id, jobs.c.status, jobs.c.payout_sll, jobs.c.order_id,
+                   orders.c.code, orders.c.pickup_area, orders.c.seller_id, orders.c.buyer_id,
+                   orders.c.delivery_address, orders.c.delivery_area, orders.c.buyer_phone,
+                   orders.c.delivery_lat, orders.c.delivery_lng)
+            .select_from(jobs.join(orders, orders.c.id == jobs.c.order_id))
             .where(jobs.c.driver_id == driver.id, jobs.c.status.in_(["accepted","picked_up"])))).all()
         out = []
         for r in rows:
@@ -359,7 +390,10 @@ async def driver_jobs(scope: str = Query("open"), user: models.User = Depends(ge
                 "pickup_area": m["pickup_area"], "seller_name": seller.full_name if seller else None,
                 "seller_phone": seller.phone if seller else None,
                 "delivery_address": m["delivery_address"], "delivery_area": m["delivery_area"],
-                "buyer_phone": m["buyer_phone"], "items": await _order_items(db, m["order_id"])}))
+                "buyer_phone": m["buyer_phone"], "buyer_name": (await db.execute(
+                    select(USERS.c.full_name).where(USERS.c.id == m["buyer_id"]))).scalar(),
+                "delivery_lat": m["delivery_lat"], "delivery_lng": m["delivery_lng"],
+                "items": await _order_items(db, m["order_id"])}))
         return {"count": len(out), "jobs": out}
     raise HTTPException(422, "scope must be open or mine")
 
