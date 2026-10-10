@@ -1,299 +1,260 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SalonAutoZone - Sierra Leone Auto Marketplace</title>
+<title>SalonAutoZone · Car parts and cars in Sierra Leone</title>
+<meta name="description" content="Buy and sell car parts and cars across Sierra Leone. Find parts that fit your car, check a VIN, or request a part from abroad.">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1e3a'/><text x='50' y='68' font-size='60' font-weight='900' text-anchor='middle' fill='%2300a8e8' font-family='Arial'>S</text></svg>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=2">
 <style>
-:root{--n9:#0f172a;--n8:#0f172a;--n6:#1e293b;--b5:#0f766e;--b4:#0d9488;--am:#e8a317;--o5:#0f766e;--o6:#0d9488;--g4:#15803d;--r5:#b91c1c;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s600:#475569;--s800:#1e293b;--tl:#ccfbf1;--sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06)}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
-body{font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;color:var(--s800);background:var(--s50);-webkit-font-smoothing:antialiased}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:0;background:none}
-a{color:inherit;text-decoration:none}
-:focus-visible{outline:3px solid var(--b4);outline-offset:2px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.top{background:var(--n9);color:var(--s400);padding:10px 32px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.top strong{color:#fff}.top .ph{color:var(--am);font-weight:700}.top div{display:flex;gap:20px;flex-wrap:wrap}
-.brand{background:#fff;padding:4px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--s200);position:sticky;top:0;z-index:100}
-.logo{font-size:20px;font-weight:800;color:var(--n8);letter-spacing:-.03em}.logo span{color:var(--b4)}.logo em{color:var(--am);font-style:normal}
-.tabs{display:flex;background:var(--s100);border-radius:12px;padding:4px;gap:4px}
-.tabs button{padding:10px 20px;border-radius:8px;font-weight:600;font-size:13px;color:var(--s500);white-space:nowrap;min-height:44px}
-.tabs button[aria-selected=true]{background:var(--o5);color:#fff}.tabs button[aria-selected=true].cars{background:var(--b4)}
-.nav{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.nav a{font-size:14px;font-weight:600;color:var(--s600)}.nav a:hover{color:var(--b4)}
-.btn-o{background:linear-gradient(135deg,var(--o5),var(--o6));color:#fff!important;padding:11px 20px;border-radius:8px;font-weight:700;box-shadow:0 4px 12px rgba(13,148,136,.2)}
-.fit{background:linear-gradient(90deg,var(--n8),var(--n6));color:#fff;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
-.fit small{display:block;font-size:11px;color:var(--s400);font-weight:700}.fit b{font-size:14px}
-.fit .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.fit select{padding:9px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.1);color:#fff;font-size:13px;font-weight:600;min-height:40px}
-.fit select option{color:var(--s800)}
-.fit .save{background:var(--b4);color:#fff;padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px;min-height:40px}
-.fit .clear{background:rgba(255,255,255,.12);color:#fff;padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px;display:none;min-height:40px}
-.fit label.only{display:none;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer}
-.hero{background:linear-gradient(135deg,var(--n8),var(--n6));color:#fff;padding:52px 24px 92px;text-align:center}
-.hero h1{font-size:clamp(22px,3.5vw,36px);font-weight:800;line-height:1.15;letter-spacing:-.03em;;margin:0 auto 12px}
-.hero p{opacity:.85;margin:0 auto 30px;max-width:600px}
-.sbox{max-width:1100px;margin:0 auto;background:#fff;padding:16px;border-radius:16px;box-shadow:0 20px 60px rgba(10,23,41,.35);text-align:left}
-.srow{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr auto;gap:8px}
-.sbox select,.sbox input{padding:13px 14px;border:1.5px solid var(--s200);border-radius:8px;font-weight:500;color:var(--s800);background:#fff;width:100%;min-height:48px}
-.sbox select:focus,.sbox input:focus,.inp:focus{outline:0;border-color:var(--b4);box-shadow:0 0 0 4px rgba(13,148,136,.14)}
-.go{background:linear-gradient(135deg,var(--o5),var(--o6));color:#fff;padding:13px 28px;border-radius:8px;font-weight:700;min-height:48px}
-.trow{position:relative;margin-top:8px}
-.sug{position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.18);z-index:50;margin-top:6px;max-height:380px;overflow-y:auto;display:none;border:1px solid var(--s200)}
-.sug button{width:100%;text-align:left;padding:12px 16px;border-bottom:1px solid var(--s100);display:flex;gap:12px;align-items:center}
-.sug button:hover{background:var(--s50)}.sug b{display:block;font-size:14px;color:var(--n8)}.sug small{color:var(--s400)}
-.abroad{margin-top:18px;background:linear-gradient(135deg,var(--o5),var(--o6));color:#fff;padding:15px 26px;border-radius:10px;font-weight:700;box-shadow:0 8px 20px rgba(13,148,136,.22)}
-.idw{max-width:800px;margin:16px auto 0;padding:0 16px}
-.id{width:100%;background:linear-gradient(135deg,var(--b4),var(--b5));color:#fff;padding:16px;border-radius:12px;font-weight:700;min-height:56px;box-shadow:0 8px 24px rgba(13,148,136,.22)}
-.cats{max-width:1200px;margin:24px auto 8px;padding:0 20px;display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
-.cat{background:#fff;border-radius:12px;padding:20px 8px;text-align:center;box-shadow:var(--sh);border:1px solid var(--s200);font-weight:700;font-size:13px;color:var(--n8)}
-.cat:hover{border-color:var(--b4)}.cat svg{width:30px;height:30px;color:var(--b4);display:block;margin:0 auto 6px}
-.sec{max-width:1300px;margin:32px auto 72px;padding:0 20px}
-.rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.rh h2{font-size:24px;font-weight:800;color:var(--n8);letter-spacing:-.02em}
-.rh .r{display:flex;gap:10px;align-items:center}
-.cnt{background:var(--tl);color:var(--b5);padding:7px 16px;border-radius:99px;font-size:13px;font-weight:700}
-.rh select{padding:8px 12px;border:1.5px solid var(--s200);border-radius:8px;background:#fff;font-weight:600;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
-.grid h3.grp{grid-column:1/-1;font-size:18px;font-weight:800;color:var(--n8);margin-top:8px}
-.feat{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,280px);gap:16px;overflow-x:auto;padding:4px 4px 14px;scroll-snap-type:x mandatory}
-.feat .card{scroll-snap-align:start;border:2px solid var(--am)}
-.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--sh);border:1px solid var(--s200);cursor:pointer;position:relative;display:flex;flex-direction:column}
-.card:hover{border-color:var(--b4)}
-.card-img{height:190px;background:linear-gradient(135deg,var(--s100),var(--s200));background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.card-img svg{width:52px;height:52px;color:var(--s400);opacity:.6}
-.card-img.imp{background:linear-gradient(135deg,#f0fdfa,#ccfbf1)}.card-img.imp svg{color:var(--b5)}
-.badges{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap}
-.bd{padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;color:#fff;background:var(--b4)}
-.bd.g{background:#16a34a}.bd.f{background:var(--am);color:var(--n9)}.bd.o{background:var(--o5)}
-.body{padding:16px;display:flex;flex-direction:column;flex:1}
-.title{font-size:15px;font-weight:700;color:var(--n8);line-height:1.35;margin-bottom:6px}
-.price{color:var(--b5);font-size:21px;font-weight:800;letter-spacing:-.02em}
-.usd{color:var(--s500);font-size:12px;margin-bottom:8px}
-.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.tag{background:var(--s100);color:var(--s600);padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600}.tag.loc{background:#fef3c7;color:#92400e}
-.acts{display:flex;gap:8px;margin-top:auto;padding-top:12px}
-.acts button{flex:1;padding:9px;border-radius:8px;font-weight:700;font-size:12px;background:var(--s100);color:var(--n8);min-height:40px}
-.acts .share{background:#dcfce7;color:#166534}.acts .saved{background:var(--g4);color:#fff}
-.empty{grid-column:1/-1;text-align:center;padding:64px 16px;color:var(--s500)}
-.empty button{margin-top:14px;background:var(--b4);color:#fff;padding:10px 20px;border-radius:8px;font-weight:700}
-.sk{pointer-events:none;height:300px;background:linear-gradient(90deg,#f0f4f8,#e0e6ed,#f0f4f8);background-size:200% 100%;animation:sk 1.2s infinite}
-@keyframes sk{to{background-position:-200% 0}}
-.overlay{position:fixed;inset:0;background:rgba(10,23,41,.65);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
-.overlay.open{display:flex}
-.modal{background:#fff;border-radius:16px;max-width:640px;width:100%;padding:28px;position:relative;max-height:92vh;overflow-y:auto}
-.x{position:absolute;top:12px;right:14px;font-size:28px;line-height:1;color:var(--s400);width:44px;height:44px}
-.modal h2{margin-bottom:16px;color:var(--n8);font-size:26px;font-weight:800}
-.lbl{display:block;font-size:13px;color:var(--s600);margin-top:12px;font-weight:600}
-.inp{display:block;width:100%;margin-top:6px;padding:12px;border:1.5px solid var(--s200);border-radius:8px;font-size:16px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.submit{background:linear-gradient(135deg,var(--o5),var(--o6));color:#fff;padding:15px;border-radius:10px;width:100%;font-weight:700;font-size:16px;margin-top:20px;min-height:52px}
-.submit:disabled{opacity:.6;cursor:wait}
-.stat{margin-top:14px;text-align:center;font-weight:700;font-size:14px}
-.drop{display:flex;flex-direction:column;align-items:center;gap:8px;min-height:170px;justify-content:center;background:var(--s100);border:2px dashed var(--s300);border-radius:12px;font-weight:700;cursor:pointer;text-align:center;padding:20px}
-.chip{display:inline-block;background:var(--tl);color:var(--b5);padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;margin:4px 4px 0 0}
-.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:var(--n8);color:#fff;padding:13px 22px;border-radius:10px;font-weight:600;transition:transform .25s;z-index:9999;max-width:90vw;text-align:center}
-.toast.show{transform:translate(-50%,0)}.toast.success{background:#16a34a}.toast.error{background:var(--r5)}
-@media (max-width:1100px){.srow{grid-template-columns:1fr 1fr 1fr}.go{grid-column:1/-1}}
-@media (max-width:900px){.cats{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:768px){
- .top,.brand,.fit{padding-left:16px;padding-right:16px}
- .brand{position:static;flex-direction:column;align-items:stretch}.tabs button{flex:1;padding:10px 6px}
- .nav{justify-content:center}.fit .ctl,.fit select,.fit button{width:100%}
- .srow{grid-template-columns:1fr}.hero{padding:36px 16px 72px}
- .sec{padding:0 16px}.grid{grid-template-columns:1fr;gap:14px}
- .card{flex-direction:row}.card-img{width:120px;height:auto;min-height:150px}.badges{top:8px;left:8px}.bd{font-size:9px;padding:3px 7px}
- .feat .card{flex-direction:column}.feat .card-img{width:auto;height:170px}
- .modal{padding:22px 16px}.row{grid-template-columns:1fr}
+/* ---------- Hero: "which car are you fixing?" ---------- */
+.hero { background: var(--ink); color: #dfeceb; padding: 28px 0 32px; position: relative; overflow: hidden; }
+.hero::after { content: ""; position: absolute; right: -120px; top: -140px; width: 420px; height: 420px; border-radius: 50%; border: 56px solid rgba(242, 178, 51, .07); pointer-events: none; }
+.hero h1 { color: #fff; font-size: clamp(30px, 6.4vw, 54px); font-variation-settings: "wdth" 75; max-width: 14ch; letter-spacing: -.015em; }
+.hero p.lede { margin-top: 10px; max-width: 46ch; font-size: 16px; color: #b9cbc9; }
+.searchbar { margin-top: 22px; display: flex; gap: 8px; max-width: 760px; position: relative; }
+.searchbar .input { min-height: 54px; font-size: 17px; border: 0; padding-left: 46px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d6f6e' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") 14px center / 22px no-repeat; }
+.searchbar .btn { min-height: 54px; padding: 0 22px; }
+.sug { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 60; background: #fff; color: var(--text); border-radius: var(--r-md); box-shadow: 0 18px 40px -12px rgba(0,0,0,.45); max-height: 360px; overflow-y: auto; display: none; }
+.sug button { width: 100%; text-align: left; padding: 12px 16px; border: 0; border-bottom: 1px solid var(--line); background: none; display: flex; gap: 12px; align-items: center; }
+.sug button:hover { background: var(--paper); }
+.sug b { display: block; font-size: 15px; color: var(--ink); }
+.sug small { color: var(--muted); }
+
+/* The number-plate chip: the one bold element on the page. */
+.mycar { margin-top: 14px; display: inline-flex; align-items: stretch; border-radius: 10px; overflow: hidden; border: 2px solid var(--gold); background: var(--gold); color: var(--ink); text-align: left; max-width: 100%; }
+.mycar .tag { white-space: nowrap; display: flex; align-items: center; padding: 0 10px; background: var(--ink); color: var(--gold); font-weight: 800; font-size: 12px; font-variation-settings: "wdth" 75; }
+.mycar .val { padding: 8px 14px; font-weight: 800; font-size: 17px; font-variation-settings: "wdth" 80; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mycar .act { display: flex; align-items: center; padding: 0 12px; font-weight: 700; font-size: 14px; border-left: 2px solid rgba(14, 42, 43, .2); }
+.mycar.empty { background: transparent; color: #fff; }
+.mycar.empty .act { border-color: rgba(242, 178, 51, .4); color: var(--gold); }
+.quick { margin-top: 18px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; }
+.quick::-webkit-scrollbar { display: none; }
+.quick a, .quick button { flex-shrink: 0; }
+@media (max-width: 560px) {
+  .mycar { display: flex; width: 100%; }
+  .mycar .val { flex: 1; }
+  .mycar.empty .act { display: none; }
+  .searchbar .btn { padding: 0 16px; }
 }
-@media (max-width:400px){.cats{grid-template-columns:repeat(2,1fr)}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-/* salon-logo-css */
-.brand img.logo-img { height: 96px; width: 96px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 40px; width: 40px; border-radius: 50%; display: block; }
-  .brand { font-size: 17px; }
+.quick a, .quick button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(223, 236, 235, .22); background: transparent; color: #fff; font-weight: 600; font-size: 14px; text-decoration: none; }
+.quick a:hover, .quick button:hover { border-color: var(--gold); }
+.quick svg { width: 18px; height: 18px; color: var(--gold); }
+
+/* ---------- Browse area ---------- */
+.browse { padding-top: 22px; }
+.seg { display: inline-grid; grid-template-columns: 1fr 1fr; background: #e7eceb; border-radius: 12px; padding: 4px; }
+.seg button { min-height: 42px; padding: 0 22px; border: 0; border-radius: 9px; background: none; font-weight: 700; color: var(--muted); }
+.seg button[aria-selected="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(14, 42, 43, .15); }
+.toolbar { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin: 16px 0 12px; }
+.toolbar .left { display: flex; gap: 10px; align-items: center; }
+#cats { margin-bottom: 14px; }
+.filters { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; padding: 14px; }
+.filters.open { display: grid; }
+.filters .select { min-height: 44px; font-size: 15px; }
+.filters .full { grid-column: 1 / -1; }
+@media (min-width: 900px) {
+  .filters { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); padding: 0; border: 0; background: none; }
+  .filters .full { grid-column: auto; }
+  #filter-toggle { display: none; }
 }
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 40px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
-</style>
-<style id="mobile-fix">
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 40px !important; width: 40px !important; }
-  .brand { padding: 6px 10px !important; gap: 6px !important; flex-wrap: nowrap !important; }
-  .brand .logo, .brand .logo em { font-size: 18px !important; line-height: 1.1 !important; }
-  .brand .logo em { white-space: nowrap; }
-}
-</style>
-<style id="mobile-logo-fix">
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 40px !important; width: 40px !important; }
-  .brand .logo, .brand .logo em { font-size: 18px !important; line-height: 1.1 !important; }
-  .brand { padding: 6px 10px !important; }
-}
+.count { font-size: 14px; color: var(--muted); font-weight: 600; }
+.only-fit { display: none; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.only-fit input { width: 20px; height: 20px; accent-color: var(--teal); }
+.group-title { grid-column: 1 / -1; font-size: 20px; margin: 8px 0 2px; }
+.group-title small { display: block; font-size: 14px; font-weight: 500; color: var(--muted); font-variation-settings: "wdth" 100; margin-top: 2px; }
+.featured { margin-bottom: 26px; }
+.featured h2 { font-size: 22px; margin-bottom: 10px; }
+.strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(200px, 46%); gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; }
+.strip .lcard { scroll-snap-align: start; border-color: var(--gold); }
+@media (min-width: 700px) { .strip { grid-auto-columns: minmax(230px, 260px); } }
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 48px 16px; color: var(--muted); }
+.empty-state h3 { font-size: 20px; margin-bottom: 6px; }
+.empty-state .btn { margin-top: 14px; }
+
+/* ---------- Abroad banner ---------- */
+.abroad { margin-top: 36px; padding: 22px; display: grid; gap: 14px; align-items: center; background: var(--teal-50); border: 1px solid #c6e6e2; border-radius: var(--r-lg); }
+.abroad h2 { font-size: 24px; }
+.abroad p { color: var(--muted); margin-top: 4px; }
+@media (min-width: 700px) { .abroad { grid-template-columns: 1fr auto; padding: 26px 30px; } }
+
+/* ---------- Modal bits ---------- */
+.row2 { display: grid; grid-template-columns: 1fr; gap: 0 12px; }
+.row3 { display: grid; grid-template-columns: 1fr; gap: 0 12px; }
+@media (min-width: 560px) { .row2 { grid-template-columns: 1fr 1fr; } .row3 { grid-template-columns: 1fr 1fr 1fr; } }
+.stat { margin-top: 12px; text-align: center; font-weight: 700; font-size: 15px; }
+.drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 170px; padding: 20px; margin-top: 8px; border: 2px dashed var(--line); border-radius: var(--r-md); background: var(--paper); cursor: pointer; text-align: center; font-weight: 700; }
+.pill { display: inline-block; margin: 4px 4px 0 0; padding: 5px 11px; border-radius: 999px; background: var(--teal-50); color: var(--teal-600); font-size: 13px; font-weight: 600; }
+.muted { color: var(--muted); }
 </style>
 </head>
 <body>
 
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-<symbol id="i-brakes" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></symbol>
-<symbol id="i-engine" viewBox="0 0 24 24"><path d="M3 10h3l2-3h7l2 3h3v7H3z"/><path d="M8 7V5h4"/></symbol>
-<symbol id="i-susp" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M8 6h8M8 18h8M9 9h6M9 15h6M10 12h4"/></symbol>
-<symbol id="i-elec" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
-<symbol id="i-tire" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
-<symbol id="i-acc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
-<symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
-<symbol id="i-part" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
-<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-brakes" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-engine" viewBox="0 0 24 24"><path d="M3 10h3l2-3h7l2 3h3v7H3z"/><path d="M8 7V5h4"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-susp" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M8 6h8M8 18h8M9 9h6M9 15h6M10 12h4"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-elec" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-tire" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-oil" viewBox="0 0 24 24"><path d="M12 3s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 8v6l-4-2v-4z"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-battery" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M7 7V5M17 7V5M7 13h4M15 11v4M13 13h4"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-acc" viewBox="0 0 24 24"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9 5.5-.8z"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-car" viewBox="0 0 24 24"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><path d="M5 12h14"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-part" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-vin" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6m3-6v6m3-6v6m4-6v6"/></symbol>
+<symbol stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
 </svg>
 
-<div class="top">
- <strong>Salon AutoZone HQ, Freetown, Sierra Leone</strong>
- <div><a href="tel:+23276123456" class="ph">+232 76 123456</a><a href="/login" id="signin">Sign in / Register</a></div>
-</div>
-
-<header class="brand"><img src="/static/logo.png" alt="" class="logo-img">
- <div class="logo"><em style="font-style:normal;font-weight:800;font-size:44px;">Salon<span style="color:#0f766e;">AutoZone</span></em></div>
- <div class="tabs" role="tablist">
- <button role="tab" id="t-parts" aria-selected="true" data-act="market" data-v="parts">AutoZone Parts Store</button>
- <button role="tab" id="t-vehicles" class="cars" aria-selected="false" data-act="market" data-v="vehicles">Cars and Trucks Marketplace</button>
- </div>
- <nav class="nav">
- <a href="/vin-tool">VIN Lookup</a><a href="/garage">My Garage</a><a id="header-cart" href="/cart">🛒 Cart<span id="header-cart-count"></span></a>
- <a href="/become-a-seller">Register a business</a>
- <a href="#" data-act="list" data-v="vehicle"><span id="header-sell-car" style="display:none">Sell a car</span></a>
- <a href="#" data-act="list" data-v="parts" class="btn-o">+ List a part</a>
- </nav>
-</header>
-
-<div class="fit">
- <div><small>Your vehicle</small><b id="fit-label">Not set. Choose your car to see parts that fit.</b></div>
- <div class="ctl">
- <select id="f-make" aria-label="Your car make"></select>
- <select id="f-model" aria-label="Your car model"></select>
- <select id="f-year" aria-label="Your car year"></select>
- <button type="button" class="save" data-act="saveFit">Save car</button>
- <button type="button" class="clear" id="f-clear" data-act="clearFit">Clear</button>
- <label class="only" id="f-only"><input type="checkbox" id="f-filter"> Only show parts that fit</label>
- </div>
-</div>
+<div id="site-header"></div>
 
 <section class="hero">
- <h1>Find your next car or part in Sierra Leone</h1>
- <p>Buy and sell cars and parts across Freetown, Bo, Kenema, Makeni and beyond.</p>
- <div class="sbox">
- <div class="srow">
- <select id="s-cat" aria-label="Category">
- <option value="">All categories</option>
- <optgroup label="Fluids &amp; oils"><option value="Fluids">All fluids &amp; oils</option><option>Engine Oil</option><option>Transmission Fluid</option><option>Power Steering Fluid</option><option>Brake Fluid</option><option value="Coolant / Antifreeze">Coolant / Antifreeze</option><option>Differential Oil</option><option value="Windshield Washer">Windshield washer fluid</option><option>Grease</option></optgroup>
- <optgroup label="Parts"><option>Filters</option><option>Batteries</option><option>Brakes</option><option>Engine</option><option>Suspension</option><option>Electrical</option><option value="Tires &amp; Wheels">Tires &amp; Wheels</option><option>Transmission</option><option>Body</option><option>Interior</option><option>Exhaust</option><option>Lighting</option><option>Audio</option><option>Accessories</option></optgroup>
- </select>
- <select id="s-make" aria-label="Make"></select>
- <select id="s-model" aria-label="Model"></select>
- <select id="s-year" aria-label="Year"></select>
- <select id="s-loc" aria-label="Location"><option value="">All locations</option></select>
- <button type="button" class="go" data-act="search">Search</button>
+ <div class="wrap">
+  <h1 id="hero-title">Find the part that fits your car</h1>
+  <p class="lede" id="hero-lede">New and used parts from sellers in Freetown, Bo, Kenema, Makeni and beyond.</p>
+  <div class="searchbar">
+   <label class="sr-only" for="s-q">Search</label>
+   <input class="input" type="search" id="s-q" placeholder="Brake pads, alternator, Corolla…" autocomplete="off" enterkeyhint="search">
+   <button type="button" class="btn btn-gold" data-act="search">Search</button>
+   <div class="sug" id="sug"></div>
+  </div>
+  <button type="button" class="mycar empty" id="mycar" data-act="open" data-v="car-modal">
+   <span class="tag">MY CAR</span><span class="val" id="fit-label">Add your car</span><span class="act" id="mycar-act">See parts that fit</span>
+  </button>
+  <div class="quick">
+   <a href="/vin-tool"><svg><use href="#i-vin"/></svg>Check a VIN</a>
+   <button type="button" data-act="open" data-v="id-modal"><svg><use href="#i-camera"/></svg>Identify a car from a photo</button>
+   <button type="button" data-act="open" data-v="import-modal"><svg><use href="#i-globe"/></svg>Order a part from abroad</button>
+  </div>
  </div>
- <div class="trow">
- <label class="sr" for="s-q">Search by part or car name</label>
- <input type="search" id="s-q" placeholder="Or type a part or car name..." autocomplete="off">
- <div class="sug" id="sug"></div>
- </div>
- </div>
- <button type="button" class="abroad" data-act="open" data-v="import-modal">Can't find it locally? Request it from abroad</button>
 </section>
 
-<div class="idw"><button type="button" class="id" data-act="open" data-v="id-modal">Identify your car from a photo (AI)</button></div>
-
-<div class="cats" id="cats">
- <button class="cat" data-act="cat" data-v="Brakes"><svg><use href="#i-brakes"/></svg>Brakes</button>
- <button class="cat" data-act="cat" data-v="Engine"><svg><use href="#i-engine"/></svg>Engine</button>
- <button class="cat" data-act="cat" data-v="Suspension"><svg><use href="#i-susp"/></svg>Suspension</button>
- <button class="cat" data-act="cat" data-v="Electrical"><svg><use href="#i-elec"/></svg>Electrical</button>
- <button class="cat" data-act="cat" data-v="Tires &amp; Wheels"><svg><use href="#i-tire"/></svg>Tires</button>
- <button class="cat" data-act="cat" data-v="Accessories"><svg><use href="#i-acc"/></svg>Accessories</button>
-</div>
-
-<section class="sec" id="feat-sec" style="display:none;margin-bottom:24px">
- <div class="rh"><h2 id="feat-title">Featured listings</h2><span style="font-size:13px;color:var(--s500)">Promoted by sellers</span></div>
- <div class="feat" id="feat"></div>
-</section>
-
-<main class="sec">
- <div class="rh">
- <h2 id="sec-title">Latest auto parts</h2>
- <div class="r">
- <label class="sr" for="sort">Sort by</label>
- <select id="sort"><option value="">Newest</option><option value="asc">Price: low to high</option><option value="desc">Price: high to low</option></select>
- <span class="cnt" id="cnt" aria-live="polite">Loading...</span>
+<main class="wrap browse">
+ <div class="seg" role="tablist" aria-label="What are you looking for?">
+  <button role="tab" id="t-parts" aria-selected="true" data-act="market" data-v="parts">Parts</button>
+  <button role="tab" id="t-vehicles" aria-selected="false" data-act="market" data-v="vehicles">Cars</button>
  </div>
+
+ <div class="toolbar">
+  <div class="left">
+   <button type="button" class="btn btn-ghost" id="filter-toggle" aria-expanded="false" aria-controls="filters"><svg><use href="#i-sliders"/></svg>Filters</button>
+   <span class="count" id="cnt" aria-live="polite">Loading…</span>
+  </div>
+  <label class="only-fit" id="f-only"><input type="checkbox" id="f-filter"> Only parts that fit my car</label>
  </div>
- <div id="results" class="grid"></div>
+
+ <div class="chips" id="cats" role="group" aria-label="Categories">
+  <button class="chip" data-act="cat" data-v="" aria-pressed="true">All parts</button>
+  <button class="chip" data-act="cat" data-v="Brakes" aria-pressed="false"><svg><use href="#i-brakes"/></svg>Brakes</button>
+  <button class="chip" data-act="cat" data-v="Engine" aria-pressed="false"><svg><use href="#i-engine"/></svg>Engine</button>
+  <button class="chip" data-act="cat" data-v="Fluids" aria-pressed="false"><svg><use href="#i-oil"/></svg>Oils &amp; fluids</button>
+  <button class="chip" data-act="cat" data-v="Filters" aria-pressed="false"><svg><use href="#i-filter"/></svg>Filters</button>
+  <button class="chip" data-act="cat" data-v="Batteries" aria-pressed="false"><svg><use href="#i-battery"/></svg>Batteries</button>
+  <button class="chip" data-act="cat" data-v="Suspension" aria-pressed="false"><svg><use href="#i-susp"/></svg>Suspension</button>
+  <button class="chip" data-act="cat" data-v="Electrical" aria-pressed="false"><svg><use href="#i-elec"/></svg>Electrical</button>
+  <button class="chip" data-act="cat" data-v="Tires &amp; Wheels" aria-pressed="false"><svg><use href="#i-tire"/></svg>Tyres &amp; wheels</button>
+  <button class="chip" data-act="cat" data-v="Accessories" aria-pressed="false"><svg><use href="#i-acc"/></svg>Accessories</button>
+ </div>
+
+ <div class="filters panel" id="filters">
+  <select class="select full" id="s-cat" aria-label="Category">
+   <option value="">All categories</option>
+   <optgroup label="Fluids &amp; oils"><option value="Fluids">All fluids &amp; oils</option><option>Engine Oil</option><option>Transmission Fluid</option><option>Power Steering Fluid</option><option>Brake Fluid</option><option value="Coolant / Antifreeze">Coolant / Antifreeze</option><option>Differential Oil</option><option value="Windshield Washer">Windshield washer fluid</option><option>Grease</option></optgroup>
+   <optgroup label="Parts"><option>Filters</option><option>Batteries</option><option>Brakes</option><option>Engine</option><option>Suspension</option><option>Electrical</option><option value="Tires &amp; Wheels">Tyres &amp; wheels</option><option>Transmission</option><option>Body</option><option>Interior</option><option>Exhaust</option><option>Lighting</option><option>Audio</option><option>Accessories</option></optgroup>
+  </select>
+  <select class="select" id="s-make" aria-label="Make"></select>
+  <select class="select" id="s-model" aria-label="Model"></select>
+  <select class="select" id="s-year" aria-label="Year"></select>
+  <select class="select" id="s-loc" aria-label="Location"></select>
+  <select class="select full" id="sort" aria-label="Sort by"><option value="">Newest first</option><option value="asc">Price: low to high</option><option value="desc">Price: high to low</option></select>
+ </div>
+
+ <section class="featured" id="feat-sec" hidden>
+  <h2 id="feat-title">Featured</h2>
+  <div class="strip" id="feat"></div>
+ </section>
+
+ <div id="results" class="listing-grid"></div>
+
+ <section class="abroad">
+  <div>
+   <h2>Can't find it in Sierra Leone?</h2>
+   <p>Tell us the part and your car. We source from Dubai, China, the UK and the USA and message you a price on WhatsApp.</p>
+  </div>
+  <button type="button" class="btn btn-dark btn-lg" data-act="open" data-v="import-modal">Order from abroad</button>
+ </section>
 </main>
 
+<!-- My car -->
+<div class="overlay" id="car-modal" role="dialog" aria-modal="true" aria-labelledby="car-title">
+ <div class="modal" style="max-width:480px"><button class="x" type="button" data-act="close" aria-label="Close">&times;</button>
+  <h2 id="car-title">Which car are you fixing?</h2>
+  <p class="muted">We'll mark the parts that fit it. You can also <a href="/vin-tool">check your VIN</a>.</p>
+  <label class="field"><span>Make</span><select class="select" id="f-make"></select></label>
+  <label class="field"><span>Model</span><select class="select" id="f-model"></select></label>
+  <label class="field"><span>Year</span><select class="select" id="f-year"></select></label>
+  <button type="button" class="btn btn-primary btn-lg btn-block" style="margin-top:20px" data-act="saveFit">Save my car</button>
+  <button type="button" class="btn btn-ghost btn-block" style="margin-top:8px" id="f-clear" data-act="clearFit" hidden>Remove my car</button>
+ </div>
+</div>
+
 <div class="overlay" id="list-modal" role="dialog" aria-modal="true" aria-labelledby="list-title">
- <div class="modal"><button class="x" data-act="close" aria-label="Close">&times;</button>
- <h2 id="list-title">List an item</h2>
- <form id="list-form"><div id="list-fields"></div><button type="submit" class="submit">Publish listing</button><div class="stat" id="list-stat" aria-live="polite"></div></form>
+ <div class="modal"><button class="x" type="button" data-act="close" aria-label="Close">&times;</button>
+  <h2 id="list-title">List an item</h2>
+  <form id="list-form"><div id="list-fields"></div><button type="submit" class="btn btn-primary btn-lg btn-block submit" style="margin-top:20px">Publish listing</button><div class="stat" id="list-stat" aria-live="polite"></div></form>
  </div>
 </div>
 
 <div class="overlay" id="import-modal" role="dialog" aria-modal="true" aria-labelledby="imp-title">
- <div class="modal"><button class="x" data-act="close" aria-label="Close">&times;</button>
- <h2 id="imp-title">Request a part from abroad</h2>
- <p style="color:var(--s500);font-size:14px">We source from Dubai, China, the UK and the USA, and deliver to you in Sierra Leone.</p>
- <form id="import-form">
- <div class="row">
- <label class="lbl">Your name *<input class="inp" name="customer_name" required placeholder="Aminata Kamara"></label>
- <label class="lbl">WhatsApp number *<input class="inp" name="customer_phone" type="tel" required placeholder="+232 76 123456"></label>
- <label class="lbl">Your city *<select class="inp" name="customer_location" id="imp-city" required></select></label>
- <label class="lbl">Email (optional)<input class="inp" name="customer_email" type="email" placeholder="you@example.com"></label>
- </div>
- <label class="lbl">Part name *<input class="inp" name="part_name" required placeholder="e.g. Front bumper, alternator, turbo"></label>
- <div class="row" style="grid-template-columns:1fr 1fr 1fr">
- <label class="lbl">Make *<input class="inp" name="car_make" required placeholder="Toyota"></label>
- <label class="lbl">Model *<input class="inp" name="car_model" required placeholder="Corolla"></label>
- <label class="lbl">Year *<input class="inp" name="car_year" required inputmode="numeric" placeholder="2018"></label>
- </div>
- <div class="row">
- <label class="lbl">Quantity<input class="inp" name="quantity" type="number" value="1" min="1"></label>
- <label class="lbl">Budget in SLL (optional)<input class="inp" name="budget_sll" type="number" min="0"></label>
- </div>
- <label class="lbl">Urgency<select class="inp" name="urgency"><option>Normal</option><option>Urgent (need within 1 week)</option><option>Flexible (can wait 1+ month)</option></select></label>
- <label class="lbl">Notes<textarea class="inp" name="notes" rows="3" placeholder="e.g. OEM preferred, any colour is fine"></textarea></label>
- <button type="submit" class="submit">Send request</button>
- <div class="stat" id="import-stat" aria-live="polite"></div>
- </form>
+ <div class="modal"><button class="x" type="button" data-act="close" aria-label="Close">&times;</button>
+  <h2 id="imp-title">Order a part from abroad</h2>
+  <p class="muted">We source from Dubai, China, the UK and the USA and deliver to you in Sierra Leone.</p>
+  <form id="import-form">
+   <div class="row2">
+    <label class="field"><span>Your name</span><input class="input" name="customer_name" required placeholder="Aminata Kamara" autocomplete="name"></label>
+    <label class="field"><span>WhatsApp number</span><input class="input" name="customer_phone" type="tel" required placeholder="+232 76 123456" autocomplete="tel"></label>
+    <label class="field"><span>Your city</span><select class="select" name="customer_location" id="imp-city" required></select></label>
+    <label class="field"><span>Email (optional)</span><input class="input" name="customer_email" type="email" placeholder="you@example.com" autocomplete="email"></label>
+   </div>
+   <label class="field"><span>Part</span><input class="input" name="part_name" required placeholder="Front bumper, alternator, turbo…"></label>
+   <div class="row3">
+    <label class="field"><span>Make</span><input class="input" name="car_make" required placeholder="Toyota"></label>
+    <label class="field"><span>Model</span><input class="input" name="car_model" required placeholder="Corolla"></label>
+    <label class="field"><span>Year</span><input class="input" name="car_year" required inputmode="numeric" placeholder="2018"></label>
+   </div>
+   <div class="row2">
+    <label class="field"><span>Quantity</span><input class="input" name="quantity" type="number" value="1" min="1"></label>
+    <label class="field"><span>Budget in SLL (optional)</span><input class="input" name="budget_sll" type="number" min="0"></label>
+   </div>
+   <label class="field"><span>How soon do you need it?</span><select class="select" name="urgency"><option>Normal</option><option>Urgent (need within 1 week)</option><option>Flexible (can wait 1+ month)</option></select></label>
+   <label class="field"><span>Notes</span><textarea class="input" name="notes" rows="3" placeholder="OEM preferred, any colour is fine…"></textarea></label>
+   <button type="submit" class="btn btn-primary btn-lg btn-block submit" style="margin-top:20px">Send request</button>
+   <div class="stat" id="import-stat" aria-live="polite"></div>
+  </form>
  </div>
 </div>
 
 <div class="overlay" id="id-modal" role="dialog" aria-modal="true" aria-labelledby="id-title">
- <div class="modal" style="max-width:520px"><button class="x" data-act="close" aria-label="Close">&times;</button>
- <div id="id-up">
- <h2 id="id-title">Identify your car</h2>
- <p style="color:var(--s500);font-size:14px;margin-bottom:16px">Take a clear photo of the front or side of the car. You'll get the make, model, and an estimated price in Leones.</p>
- <label class="drop" for="id-file"><input type="file" id="id-file" accept="image/*" class="sr"><b>Tap to take a photo or upload</b><small style="color:var(--s500);font-weight:400">JPG, PNG or WEBP, up to 8 MB</small></label>
- <div class="stat" id="id-stat" aria-live="polite"></div>
- </div>
- <div id="id-res" style="display:none"></div>
+ <div class="modal" style="max-width:520px"><button class="x" type="button" data-act="close" aria-label="Close">&times;</button>
+  <div id="id-up">
+   <h2 id="id-title">Identify a car from a photo</h2>
+   <p class="muted">Take a clear photo of the front or side. You'll get the make, model and an estimated price in Leones.</p>
+   <label class="drop" for="id-file"><input type="file" id="id-file" accept="image/*" class="sr-only">Tap to take a photo or upload<small class="muted" style="font-weight:400">JPG, PNG or WEBP, up to 8 MB</small></label>
+   <div class="stat" id="id-stat" aria-live="polite"></div>
+  </div>
+  <div id="id-res" hidden></div>
  </div>
 </div>
 
+<script src="/static/site.js?v=2"></script>
 <script>
 (function () {
  'use strict';
@@ -313,460 +274,464 @@ a{color:inherit;text-decoration:none}
  function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
  function safeUrl(u) { u = String(u || '').trim(); return (/^https?:\/\//i.test(u) || /^data:image\//i.test(u) || /^\/(?!\/)/.test(u)) ? u : ''; }
  function cssUrl(u) { return u.replace(/['"()\s\\]/g, function (c) { return '%' + c.charCodeAt(0).toString(16); }); }
- function fmt(n) { return Number(n || 0).toLocaleString(); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
  var ls = {
- get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
- set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
- del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+  get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
  };
  function token() { return ls.get('token') || ''; }
  function json(k) { try { return JSON.parse(ls.get(k) || 'null'); } catch (e) { return null; } }
  function opts(list, first) { return '<option value="">' + esc(first) + '</option>' + list.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + '</option>'; }).join(''); }
  function timed(url, ms, o) {
- var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms);
- o = o || {}; o.signal = c.signal;
- return fetch(url, o).finally(function () { clearTimeout(t); });
+  var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms);
+  o = o || {}; o.signal = c.signal;
+  return fetch(url, o).finally(function () { clearTimeout(t); });
  }
  function auth() { return { 'Authorization': 'Bearer ' + token() }; }
  function toast(msg, type) {
- var t = $('toast');
- if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
- t.className = 'toast ' + (type || '');
- t.textContent = msg;
- void t.offsetWidth; t.classList.add('show');
- clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('show'); }, 2800);
+  var t = $('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.className = 'toast ' + (type || '');
+  t.textContent = msg;
+  void t.offsetWidth; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('show'); }, 2800);
  }
- function goLogin() { location.href = '/login?next=' + encodeURIComponent(location.pathname); }
+ function goLogin() { location.href = '/login?next=' + encodeURIComponent(location.pathname + location.search); }
 
  // ---------- modals ----------
  var lastFocus = null;
- function openM(id) { lastFocus = document.activeElement; $(id).classList.add('open'); var f = $(id).querySelector('input:not(.sr),select,button.x'); if (f) f.focus(); }
+ function openM(id) { lastFocus = document.activeElement; $(id).classList.add('open'); var f = $(id).querySelector('input:not(.sr-only),select,button.x'); if (f) f.focus(); }
  function closeM(id) { $(id).classList.remove('open'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
  document.addEventListener('keydown', function (e) {
- if (e.key === 'Escape') { document.querySelectorAll('.overlay.open').forEach(function (m) { closeM(m.id); }); hideSug(); }
- if ((e.key === 'Enter') && e.target.classList && e.target.classList.contains('card')) location.href = e.target.dataset.href;
+  if (e.key === 'Escape') { document.querySelectorAll('.overlay.open').forEach(function (m) { closeM(m.id); }); hideSug(); }
+  if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('lcard')) location.href = e.target.dataset.href;
  });
 
- // ---------- market switch ----------
+ // ---------- parts / cars switch ----------
  function switchMarket(m) {
- tab = m;
- $('t-parts').setAttribute('aria-selected', m === 'parts');
- $('t-vehicles').setAttribute('aria-selected', m === 'vehicles');
- $('sec-title').textContent = m === 'parts' ? 'Latest auto parts' : 'Latest cars & trucks';
- $('cats').style.display = m === 'parts' ? 'grid' : 'none';
- $('s-cat').style.display = m === 'parts' ? '' : 'none';
- $('feat-sec').style.display = 'none';
- doSearch();
+  tab = m;
+  $('t-parts').setAttribute('aria-selected', m === 'parts');
+  $('t-vehicles').setAttribute('aria-selected', m === 'vehicles');
+  var parts = m === 'parts';
+  $('hero-title').textContent = parts ? 'Find the part that fits your car' : 'Find your next car';
+  $('hero-lede').textContent = parts ? 'New and used parts from sellers in Freetown, Bo, Kenema, Makeni and beyond.' : 'Cars, trucks and SUVs from private sellers and verified dealers across Sierra Leone.';
+  $('s-q').placeholder = parts ? 'Brake pads, alternator, Corolla…' : 'RAV4, Hilux, Mercedes…';
+  $('cats').hidden = !parts;
+  $('mycar').hidden = !parts;
+  $('s-cat').hidden = !parts;
+  updateOnlyFit();
+  $('feat-sec').hidden = true;
+  try { history.replaceState(null, '', parts ? '/' : '/?tab=cars'); } catch (e) {}
+  doSearch();
  }
 
  // ---------- cards ----------
- function media(url, cls, icon) {
- var u = safeUrl(url);
- if (u) return '<div class="card-img" style="background-image:url(\'' + esc(cssUrl(u)) + '\')" role="img" aria-label="Listing photo"></div>';
- return '<div class="card-img ' + cls + '"><svg aria-hidden="true"><use href="#' + icon + '"/></svg></div>';
+ function media(url, icon) {
+  var u = safeUrl(url);
+  if (u) return '<div class="ph" style="background-image:url(\'' + esc(cssUrl(u)) + '\')" role="img" aria-label="Photo"></div>';
+  return '<div class="ph"><svg aria-hidden="true"><use href="#' + icon + '"/></svg></div>';
  }
  function card(o) {
- var h = '<article class="card" tabindex="0" role="link" data-href="' + esc(o.href) + '">' + o.img + '<div class="badges">' + (o.badges || '') + '</div>';
- h += '<div class="body"><h3 class="title">' + esc(o.title) + '</h3>' + o.body;
- if (o.type) {
- var d = ' data-type="' + o.type + '" data-id="' + esc(o.id) + '" data-title="' + esc(o.title) + '" data-price="' + esc(o.price || 0) + '"';
- h += '<div class="acts"><button type="button" class="share" data-act="share"' + d + '>Share</button><button type="button" data-act="save"' + d + '>Save</button></div>';
+  var h = '<article class="lcard" tabindex="0" role="link" data-href="' + esc(o.href) + '">' + o.img;
+  if (o.flags) h += '<div class="flags">' + o.flags + '</div>';
+  if (o.type) h += '<button type="button" class="save-btn" aria-label="Save ' + esc(o.title) + '" data-act="save" data-type="' + o.type + '" data-id="' + esc(o.id) + '"><svg><use href="#i-heart"/></svg></button>';
+  return h + '<div class="bd">' + o.body + '</div></article>';
  }
- return h + '</div></article>';
- }
+ function price(n) { return '<div class="price"><small>SLL</small>' + fmt(n) + '</div>'; }
  function partCard(p, featured, fits) {
- var badges = featured ? '<span class="bd f">Featured</span>' : '<span class="bd">' + esc(p.condition || 'New') + '</span>';
- if (fits) badges += '<span class="bd g">Fits your car</span>';
- return card({
- href: '/part/' + encodeURIComponent(p.id), id: p.id, type: 'part', title: p.name, price: p.price_sll, badges: badges,
- img: media(p.image_url, '', 'i-part'),
- body: '<div class="price">SLL ' + fmt(p.price_sll) + '</div><div class="meta"><span class="tag">' + esc(p.category) + '</span><span class="tag">Stock: ' + (p.stock_quantity || 0) + '</span><span class="tag loc">' + esc(p.location) + '</span></div>'
- });
+  var flags = (featured ? '<span class="flag gold">Featured</span>' : '') + (fits ? '<span class="flag fit">Fits your car</span>' : '');
+  var cond = p.condition ? String(p.condition).charAt(0).toUpperCase() + String(p.condition).slice(1) : '';
+  return card({
+   href: '/part/' + encodeURIComponent(p.id), id: p.id, type: 'part', title: p.name, flags: flags,
+   img: media(p.image_url, 'i-part'),
+   body: price(p.price_sll) + '<div class="ttl">' + esc(p.name) + '</div><div class="meta">' + (cond ? '<span>' + esc(cond) + '</span>' : '') + (p.location ? '<span class="loc">' + esc(p.location) + '</span>' : '') + '</div>'
+  });
  }
  function vehicleCard(v) {
- return card({
- href: '/vehicle/' + encodeURIComponent(v.id), id: v.id, type: 'vehicle', title: v.title, price: v.price_sll,
- badges: (v.is_featured ? '<span class="bd f">Featured</span>' : '') + (v.business_verified ? '<span class="bd g" title="Verified business">&#10003; Verified</span>' : ''),
- img: media(v.image_url, '', 'i-car'),
- body: '<div class="price">SLL ' + fmt(v.price_sll) + '</div>' + (v.price_usd ? '<div class="usd">About $' + fmt(v.price_usd) + ' USD</div>' : '') +
- '<div class="meta"><span class="tag">' + esc(v.year) + '</span><span class="tag">' + esc(v.transmission) + '</span><span class="tag loc">' + esc(v.location) + '</span></div>'
- });
+  var km = v.mileage_km ? fmt(Math.round(v.mileage_km)) + ' km' : '';
+  return card({
+   href: '/vehicle/' + encodeURIComponent(v.id), id: v.id, type: 'vehicle', title: v.title,
+   flags: (v.is_featured ? '<span class="flag gold">Featured</span>' : '') + (v.business_verified ? '<span class="flag fit">Verified dealer</span>' : ''),
+   img: media(v.image_url, 'i-car'),
+   body: price(v.price_sll) + '<div class="ttl">' + esc(v.title) + '</div><div class="meta">' + [v.year, v.transmission, km].filter(Boolean).map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + (v.location ? '<span class="loc">' + esc(v.location) + '</span>' : '') + '</div>'
+  });
  }
  function catalogCard(c) {
- return card({
- href: '/catalog/' + encodeURIComponent(c.id), title: c.category || 'Part', badges: '<span class="bd o">Import available</span>',
- img: '<div class="card-img imp"><svg aria-hidden="true"><use href="#i-globe"/></svg></div>',
- body: '<div style="font-family:monospace;font-size:12px;color:var(--s500)">' + esc(c.part_number) + '</div><div style="font-size:13px;color:var(--s500)">Fits: ' + esc(c.vehicle_compatibility || 'Universal') + '</div><div style="color:var(--o5);font-weight:700;font-size:13px;margin-top:6px">Request a quote</div>'
- });
+  return card({
+   href: '/catalog/' + encodeURIComponent(c.id), title: c.category || 'Part', flags: '<span class="flag import">Import</span>',
+   img: media(null, 'i-globe'),
+   body: '<div class="ttl">' + esc(c.name || c.category || 'Part') + '</div><div class="meta"><span>' + esc(c.part_number) + '</span><span>Fits ' + esc(c.vehicle_compatibility || 'most cars') + '</span></div><div style="color:var(--teal);font-weight:700;font-size:14px;margin-top:6px">Ask for a price</div>'
+  });
  }
  function sortBy(list) {
- var s = $('sort').value;
- if (!s) return list;
- return list.slice().sort(function (a, b) { return s === 'asc' ? (a.price_sll || 0) - (b.price_sll || 0) : (b.price_sll || 0) - (a.price_sll || 0); });
+  var s = $('sort').value;
+  if (!s) return list;
+  return list.slice().sort(function (a, b) { return s === 'asc' ? (a.price_sll || 0) - (b.price_sll || 0) : (b.price_sll || 0) - (a.price_sll || 0); });
  }
 
  // ---------- search ----------
  function failMsg(what) {
- return '<div class="empty">Could not load ' + what + '. Check your connection and try again.<br><button type="button" data-act="search">Try again</button></div>';
+  return '<div class="empty-state"><h3>We couldn\'t load ' + what + '</h3><p>Check your connection, then try again.</p><button type="button" class="btn btn-primary" data-act="search">Try again</button></div>';
  }
  function doSearch() {
- var my = ++seq, res = $('results'), cnt = $('cnt');
- cnt.textContent = 'Loading...';
- var sk = ''; for (var i = 0; i < 6; i++) sk += '<div class="card sk"></div>';
- res.innerHTML = sk;
- var p = new URLSearchParams(), q = $('s-q').value.trim();
- if ($('s-loc').value) p.append('location', $('s-loc').value);
- if ($('s-make').value) p.append('make', $('s-make').value);
- if ($('s-model').value) p.append('model', $('s-model').value);
- if ($('s-year').value) p.append('year', $('s-year').value);
- if (q) p.append('q', q);
- var vehicles = tab === 'vehicles';
- if (!vehicles && $('s-cat').value) p.append('category', $('s-cat').value);
- timed((vehicles ? '/api/vehicles/?' : '/api/unified/parts?') + p.toString(), 10000)
- .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
- .then(function (data) {
- if (my !== seq) return;
- if (vehicles) { lastVehicles = Array.isArray(data) ? data : (data.items || []); renderVehicles(); }
- else { lastParts = data; renderParts(); }
- })
- .catch(function (err) {
- if (my !== seq) return;
- console.error('[search]', err);
- cnt.textContent = 'Error';
- res.innerHTML = failMsg(vehicles ? 'cars' : 'parts');
- });
+  var my = ++seq, res = $('results'), cnt = $('cnt');
+  cnt.textContent = 'Loading…';
+  var sk = ''; for (var i = 0; i < 8; i++) sk += '<div class="lcard skeleton"></div>';
+  res.innerHTML = sk;
+  var p = new URLSearchParams(), q = $('s-q').value.trim();
+  if ($('s-loc').value) p.append('location', $('s-loc').value);
+  if ($('s-make').value) p.append('make', $('s-make').value);
+  if ($('s-model').value) p.append('model', $('s-model').value);
+  if ($('s-year').value) p.append('year', $('s-year').value);
+  if (q) p.append('q', q);
+  var vehicles = tab === 'vehicles';
+  if (!vehicles && $('s-cat').value) p.append('category', $('s-cat').value);
+  syncChips();
+  timed((vehicles ? '/api/vehicles/?' : '/api/unified/parts?') + p.toString(), 10000)
+   .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+   .then(function (data) {
+    if (my !== seq) return;
+    if (vehicles) { lastVehicles = Array.isArray(data) ? data : (data.items || []); renderVehicles(); }
+    else { lastParts = data; renderParts(); }
+   })
+   .catch(function (err) {
+    if (my !== seq) return;
+    console.error('[search]', err);
+    cnt.textContent = '';
+    res.innerHTML = failMsg(vehicles ? 'cars' : 'parts');
+   });
  }
  function renderVehicles() {
- var items = lastVehicles;
- $('cnt').textContent = items.length + (items.length === 1 ? ' car' : ' cars') + ' found';
- var feat = sortBy(items.filter(function (v) { return v.is_featured; }));
- var reg = sortBy(items.filter(function (v) { return !v.is_featured; }));
- $('feat-sec').style.display = feat.length ? 'block' : 'none';
- $('feat-title').textContent = 'Featured cars';
- $('feat').innerHTML = feat.map(vehicleCard).join('');
- $('results').innerHTML = reg.length ? reg.map(vehicleCard).join('') : (feat.length ? '' : '<div class="empty">No cars found. Try a different search.</div>');
- markSaved();
+  var items = lastVehicles;
+  $('cnt').textContent = items.length + (items.length === 1 ? ' car' : ' cars');
+  var feat = sortBy(items.filter(function (v) { return v.is_featured; }));
+  var reg = sortBy(items.filter(function (v) { return !v.is_featured; }));
+  $('feat-sec').hidden = !feat.length;
+  $('feat-title').textContent = 'Featured cars';
+  $('feat').innerHTML = feat.map(vehicleCard).join('');
+  $('results').innerHTML = reg.length ? reg.map(vehicleCard).join('') : (feat.length ? '' : '<div class="empty-state"><h3>No cars match</h3><p>Try fewer filters or a different search.</p></div>');
+  markSaved();
  }
  function renderParts() {
- var data = lastParts || {}, local = data.local_parts || [], cat = data.catalog_parts || [];
- $('cnt').textContent = (data.total || 0) + ' results (' + (data.local_count || 0) + ' local, ' + (data.catalog_count || 0) + ' importable)';
- var fit = json('fitmentVehicle'), only = ls.get('fitmentFilterOn') === '1' && fit && fit.make;
- function fits(p) {
- if (!fit || !fit.make || !p.compatible_make) return false;
- var mk = String(p.compatible_make).toLowerCase() === fit.make.toLowerCase();
- var md = !p.compatible_model || !fit.model || String(p.compatible_model).toLowerCase().indexOf(fit.model.toLowerCase()) !== -1;
- return mk && md;
+  var data = lastParts || {}, local = data.local_parts || [], cat = data.catalog_parts || [];
+  var total = data.total || 0;
+  $('cnt').textContent = total + (total === 1 ? ' result' : ' results') + (data.catalog_count ? ' (' + data.catalog_count + ' to import)' : '');
+  var fit = json('fitmentVehicle'), only = ls.get('fitmentFilterOn') === '1' && fit && fit.make;
+  function fits(p) {
+   if (!fit || !fit.make || !p.compatible_make) return false;
+   var mk = String(p.compatible_make).toLowerCase() === fit.make.toLowerCase();
+   var md = !p.compatible_model || !fit.model || String(p.compatible_model).toLowerCase().indexOf(fit.model.toLowerCase()) !== -1;
+   return mk && md;
+  }
+  var feat = sortBy(local.filter(function (p) { return p.is_featured; }));
+  var reg = sortBy(local.filter(function (p) { return !p.is_featured; }));
+  $('feat-sec').hidden = !feat.length;
+  $('feat-title').textContent = 'Featured parts';
+  $('feat').innerHTML = feat.map(function (p) { return partCard(p, true, fits(p)); }).join('');
+  if (only) reg = reg.filter(fits);
+  var h = '';
+  if (reg.length) h += reg.map(function (p) { return partCard(p, false, fits(p)); }).join('');
+  if (cat.length) h += '<h3 class="group-title">Order from abroad<small>Usually arrives in 7–14 days</small></h3>' + cat.map(catalogCard).join('');
+  if (!h && !feat.length) {
+   h = only ? '<div class="empty-state"><h3>Nothing here fits your car yet</h3><p>Show every part, or order one from abroad.</p><button type="button" class="btn btn-primary" data-act="showall">Show all parts</button></div>'
+    : '<div class="empty-state"><h3>No parts match</h3><p>Try a different search, or let us find it abroad for you.</p><button type="button" class="btn btn-primary" data-act="open" data-v="import-modal">Order from abroad</button></div>';
+  }
+  $('results').innerHTML = h;
+  markSaved();
  }
- var feat = sortBy(local.filter(function (p) { return p.is_featured; }));
- var reg = sortBy(local.filter(function (p) { return !p.is_featured; }));
- $('feat-sec').style.display = feat.length ? 'block' : 'none';
- $('feat-title').textContent = 'Featured listings';
- $('feat').innerHTML = feat.map(function (p) { return partCard(p, true, fits(p)); }).join('');
- if (only) reg = reg.filter(fits);
- var h = '';
- if (reg.length) h += '<h3 class="grp">Available in Sierra Leone</h3>' + reg.map(function (p) { return partCard(p, false, fits(p)); }).join('');
- if (cat.length) h += '<h3 class="grp" style="margin-top:20px">Import from abroad (7-14 days)</h3>' + cat.map(catalogCard).join('');
- if (!h && !feat.length) {
- h = only ? '<div class="empty">No parts here fit your car.<br><button type="button" data-act="showall">Show all parts</button></div>'
- : '<div class="empty">No parts found. Try a different search, or<br><button type="button" data-act="open" data-v="import-modal">request it from abroad</button></div>';
- }
- $('results').innerHTML = h;
- markSaved();
+ function syncChips() {
+  var v = $('s-cat').value;
+  document.querySelectorAll('#cats .chip').forEach(function (c) { c.setAttribute('aria-pressed', c.dataset.v === v); });
  }
 
- // ---------- save / share ----------
- function share(t) {
- var d = t.dataset, url = location.origin + (d.type === 'vehicle' ? '/vehicle/' : '/part/') + d.id;
- var msg = '*' + d.title + '*\n' + (Number(d.price) ? 'SLL ' + fmt(d.price) + '\n' : '') + '\nView on SalonAutoZone:\n' + url;
- window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener,noreferrer');
- }
+ // ---------- save ----------
  function save(btn) {
- if (!token()) { toast('Log in to save items', 'error'); setTimeout(goLogin, 1000); return; }
- btn.disabled = true; btn.textContent = 'Saving...';
- fetch('/api/my-account/saved', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ listing_type: btn.dataset.type, listing_id: Number(btn.dataset.id) }) })
- .then(function (r) {
- if (r.status === 401) { toast('Session expired. Log in again.', 'error'); setTimeout(goLogin, 1000); throw null; }
- if (!r.ok) throw new Error('Could not save. Try again.');
- return r.json();
- })
- .then(function (d) { btn.textContent = 'Saved'; btn.classList.add('saved'); toast(d.already_saved ? 'Already in your saved items' : 'Saved to your account', 'success'); })
- .catch(function (e) { if (e) toast(e.message, 'error'); btn.textContent = 'Save'; })
- .finally(function () { btn.disabled = false; });
+  if (!token()) { toast('Sign in to save items', 'error'); setTimeout(goLogin, 1000); return; }
+  if (btn.classList.contains('saved')) { toast('Already in your saved items'); return; }
+  btn.disabled = true;
+  fetch('/api/my-account/saved', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ listing_type: btn.dataset.type, listing_id: Number(btn.dataset.id) }) })
+   .then(function (r) {
+    if (r.status === 401) { toast('Your session has ended. Sign in again.', 'error'); setTimeout(goLogin, 1000); throw null; }
+    if (!r.ok) throw new Error('Could not save. Try again.');
+    return r.json();
+   })
+   .then(function (d) { btn.classList.add('saved'); toast(d.already_saved ? 'Already in your saved items' : 'Saved', 'success'); })
+   .catch(function (e) { if (e) toast(e.message, 'error'); })
+   .finally(function () { btn.disabled = false; });
  }
  function markSaved() {
- if (!token()) return;
- fetch('/api/my-account/saved', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
- if (!d) return;
- var s = {}; (d.items || []).forEach(function (i) { s[i.listing_type + '-' + i.listing_id] = 1; });
- document.querySelectorAll('[data-act=save]').forEach(function (b) { if (s[b.dataset.type + '-' + b.dataset.id]) { b.textContent = 'Saved'; b.classList.add('saved'); } });
- }).catch(function () {});
+  if (!token()) return;
+  fetch('/api/my-account/saved', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+   if (!d) return;
+   var s = {}; (d.items || []).forEach(function (i) { s[i.listing_type + '-' + i.listing_id] = 1; });
+   document.querySelectorAll('[data-act=save]').forEach(function (b) { if (s[b.dataset.type + '-' + b.dataset.id]) b.classList.add('saved'); });
+  }).catch(function () {});
  }
 
- // ---------- fitment ----------
+ // ---------- my car ----------
  function fillModels(sel, make, first) { sel.innerHTML = opts(make ? (MODELS[make] || ['Other']) : [], first); }
+ function updateOnlyFit() {
+  var v = json('fitmentVehicle');
+  $('f-only').style.display = (tab === 'parts' && v && v.make) ? 'inline-flex' : 'none';
+ }
  function fitLabel(v) {
- $('fit-label').textContent = v.year + ' ' + v.make + ' ' + v.model;
- $('f-only').style.display = 'inline-flex';
- $('f-clear').style.display = 'inline-block';
+  var car = $('mycar');
+  if (v && v.make) {
+   $('fit-label').textContent = [v.year, v.make, v.model].filter(Boolean).join(' ');
+   $('mycar-act').textContent = 'Change';
+   car.classList.remove('empty');
+   $('f-clear').hidden = false;
+  } else {
+   $('fit-label').textContent = 'Add your car';
+   $('mycar-act').textContent = 'See parts that fit';
+   car.classList.add('empty');
+   $('f-clear').hidden = true;
+  }
+  updateOnlyFit();
  }
  function setFitSelects(v) {
- $('f-make').value = v.make || '';
- fillModels($('f-model'), v.make, 'Model');
- $('f-model').value = v.model || '';
- $('f-year').value = v.year || '';
+  $('f-make').value = v.make || '';
+  fillModels($('f-model'), v.make, 'Model');
+  $('f-model').value = v.model || '';
+  $('f-year').value = v.year || '';
  }
  function saveFit() {
- var v = { make: $('f-make').value, model: $('f-model').value, year: $('f-year').value };
- if (!v.make || !v.model || !v.year) { toast('Choose make, model and year first', 'error'); return; }
- ls.set('fitmentVehicle', JSON.stringify(v)); fitLabel(v);
- if (tab === 'parts') doSearch();
+  var v = { make: $('f-make').value, model: $('f-model').value, year: $('f-year').value };
+  if (!v.make || !v.model || !v.year) { toast('Choose the make, model and year', 'error'); return; }
+  ls.set('fitmentVehicle', JSON.stringify(v)); fitLabel(v); closeM('car-modal');
+  toast('Saved. Parts that fit are now marked.', 'success');
+  if (tab === 'parts') doSearch();
  }
  function clearFit() {
- ls.del('fitmentVehicle'); ls.del('fitmentFilterOn');
- $('fit-label').textContent = 'Not set. Choose your car to see parts that fit.';
- setFitSelects({}); $('f-clear').style.display = 'none'; $('f-only').style.display = 'none'; $('f-filter').checked = false;
- if (tab === 'parts') doSearch();
+  ls.del('fitmentVehicle'); ls.del('fitmentFilterOn');
+  setFitSelects({}); $('f-filter').checked = false; fitLabel(null); closeM('car-modal');
+  if (tab === 'parts') doSearch();
  }
  function syncGarage() {
- if (!token()) return;
- if (new URLSearchParams(location.search).has('make')) return;
- fetch('/api/garage/', { headers: auth() }).then(function (r) { return r.ok ? r.json() : []; }).then(function (cars) {
- var c = (cars || []).find(function (x) { return x.is_primary; }) || (cars || [])[0];
- if (!c) return;
- var v = { make: c.make, model: c.model, year: String(c.year) }, old = json('fitmentVehicle');
- ls.set('fitmentVehicle', JSON.stringify(v)); setFitSelects(v); fitLabel(v);
- if (!old || old.make !== v.make || old.model !== v.model || old.year !== v.year) { if (tab === 'parts') doSearch(); }
- }).catch(function () {});
+  if (!token()) return;
+  if (new URLSearchParams(location.search).has('make')) return;
+  fetch('/api/garage/', { headers: auth() }).then(function (r) { return r.ok ? r.json() : []; }).then(function (cars) {
+   var c = (cars || []).find(function (x) { return x.is_primary; }) || (cars || [])[0];
+   if (!c) return;
+   var v = { make: c.make, model: c.model, year: String(c.year) }, old = json('fitmentVehicle');
+   ls.set('fitmentVehicle', JSON.stringify(v)); setFitSelects(v); fitLabel(v);
+   if (!old || old.make !== v.make || old.model !== v.model || old.year !== v.year) { if (tab === 'parts') doSearch(); }
+  }).catch(function () {});
  }
 
  // ---------- suggestions ----------
  function hideSug() { $('sug').style.display = 'none'; }
  function getSug(q) {
- var box = $('sug');
- timed('/api/unified/suggest?q=' + encodeURIComponent(q), 5000).then(function (r) { return r.json(); }).then(function (d) {
- var s = d.suggestions || [];
- box.innerHTML = s.length ? s.map(function (x) {
- var url = safeUrl(x.url);
- return '<button type="button" data-act="sug" data-url="' + esc(url) + '"><span>' + esc(x.icon || '') + '</span><span><b>' + esc(x.label) + '</b><small>' + esc(x.sublabel) + '</small></span></button>';
- }).join('') : '<div style="padding:14px;text-align:center;color:var(--s500);font-size:13px">No matches for "' + esc(q) + '"</div>';
- box.style.display = 'block';
- }).catch(hideSug);
+  var box = $('sug');
+  timed('/api/unified/suggest?q=' + encodeURIComponent(q), 5000).then(function (r) { return r.json(); }).then(function (d) {
+   var s = d.suggestions || [];
+   box.innerHTML = s.length ? s.map(function (x) {
+    var url = safeUrl(x.url);
+    return '<button type="button" data-act="sug" data-url="' + esc(url) + '"><span>' + esc(x.icon || '') + '</span><span><b>' + esc(x.label) + '</b><small>' + esc(x.sublabel) + '</small></span></button>';
+   }).join('') : '<div style="padding:14px;text-align:center;color:var(--muted);font-size:14px">No matches for “' + esc(q) + '”</div>';
+   box.style.display = 'block';
+  }).catch(hideSug);
  }
 
  // ---------- listing form ----------
  function fld(label, name, extra, tag, inner) {
- tag = tag || 'input';
- var el = tag === 'select' ? '<select class="inp" name="' + name + '" ' + (extra || '') + '>' + inner + '</select>'
- : tag === 'textarea' ? '<textarea class="inp" name="' + name + '" rows="3"></textarea>'
- : '<input class="inp" name="' + name + '" ' + (extra || '') + '>';
- return '<label class="lbl">' + label + el + '</label>';
+  tag = tag || 'input';
+  var el = tag === 'select' ? '<select class="select" name="' + name + '" ' + (extra || '') + '>' + inner + '</select>'
+   : tag === 'textarea' ? '<textarea class="input" name="' + name + '" rows="3"></textarea>'
+   : '<input class="input" name="' + name + '" ' + (extra || '') + '>';
+  return '<label class="field"><span>' + label + '</span>' + el + '</label>';
  }
  function openListing(type) {
- if (!token()) { if (confirm('Log in or register to list items. Go to the login page?')) goLogin(); return; }
- var f = $('list-form'); f.dataset.type = type; $('list-stat').textContent = '';
- var city = fld('Location *', 'location', 'required', 'select', opts(CITIES, 'Select city'));
- var phone = fld('WhatsApp number *', 'contact_phone', 'required type="tel" placeholder="+232 76 123456"');
- var desc = fld('Description', 'description', '', 'textarea');
- if (type === 'vehicle') {
- $('list-title').textContent = 'List your car';
- $('list-fields').innerHTML = fld('Car title *', 'title', 'required placeholder="2015 Toyota Corolla"') +
- fld('Make *', 'make', 'required', 'select', opts(MAKES, 'Select make')) +
- fld('Model *', 'model', 'required', 'select', '<option value="">Select make first</option>') +
- fld('Year *', 'year', 'required', 'select', opts(YEARS, 'Select year')) +
- fld('Price (SLL) *', 'price_sll', 'required type="number" min="0"') + fld('Price (USD, optional)', 'price_usd', 'type="number" min="0"') +
- fld('Mileage (km) *', 'mileage_km', 'required type="number" min="0"') +
- fld('Fuel *', 'fuel_type', 'required', 'select', '<option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>') +
- fld('Transmission *', 'transmission', 'required', 'select', '<option>Automatic</option><option>Manual</option>') + city + phone + desc;
- } else {
- $('list-title').textContent = 'List a part';
- $('list-fields').innerHTML = fld('Part name *', 'name', 'required placeholder="Toyota Corolla brake pads"') +
- fld('Category *', 'category', 'required', 'select', opts(CATS, 'Select category')) +
- fld('Compatible make', 'compatible_make', '', 'select', opts(MAKES, 'Any')) + fld('Compatible model', 'compatible_model', 'placeholder="Corolla"') +
- fld('Price (SLL) *', 'price_sll', 'required type="number" min="0"') + fld('Stock quantity *', 'stock_quantity', 'required type="number" min="1" value="1"') +
- fld('Condition *', 'condition', 'required', 'select', '<option>New</option><option>Used</option><option>Refurbished</option>') + city + phone + desc;
- }
- openM('list-modal');
+  if (!token()) { toast('Sign in or create an account to sell', 'error'); setTimeout(goLogin, 1000); return; }
+  var f = $('list-form'); f.dataset.type = type; $('list-stat').textContent = '';
+  var city = fld('Location', 'location', 'required', 'select', opts(CITIES, 'Choose a city'));
+  var phone = fld('WhatsApp number', 'contact_phone', 'required type="tel" placeholder="+232 76 123456"');
+  var desc = fld('Description (optional)', 'description', '', 'textarea');
+  if (type === 'vehicle') {
+   $('list-title').textContent = 'Sell your car';
+   $('list-fields').innerHTML = fld('Listing title', 'title', 'required placeholder="2015 Toyota Corolla, clean"') +
+    '<div class="row3">' + fld('Make', 'make', 'required', 'select', opts(MAKES, 'Make')) +
+    fld('Model', 'model', 'required', 'select', '<option value="">Choose make first</option>') +
+    fld('Year', 'year', 'required', 'select', opts(YEARS, 'Year')) + '</div>' +
+    '<div class="row2">' + fld('Price (SLL)', 'price_sll', 'required type="number" min="0" inputmode="numeric"') + fld('Price in USD (optional)', 'price_usd', 'type="number" min="0"') +
+    fld('Mileage (km)', 'mileage_km', 'required type="number" min="0" inputmode="numeric"') +
+    fld('Fuel', 'fuel_type', 'required', 'select', '<option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>') +
+    fld('Gearbox', 'transmission', 'required', 'select', '<option>Automatic</option><option>Manual</option>') + city + '</div>' + phone + desc;
+  } else {
+   $('list-title').textContent = 'Sell a part';
+   $('list-fields').innerHTML = fld('Part name', 'name', 'required placeholder="Toyota Corolla front brake pads"') +
+    '<div class="row2">' + fld('Category', 'category', 'required', 'select', opts(CATS, 'Choose a category')) +
+    fld('Condition', 'condition', 'required', 'select', '<option>New</option><option>Used</option><option>Refurbished</option>') +
+    fld('Fits make (optional)', 'compatible_make', '', 'select', opts(MAKES, 'Any make')) + fld('Fits model (optional)', 'compatible_model', 'placeholder="Corolla"') +
+    fld('Price (SLL)', 'price_sll', 'required type="number" min="0" inputmode="numeric"') + fld('How many do you have?', 'stock_quantity', 'required type="number" min="1" value="1"') + '</div>' +
+    city + phone + desc;
+  }
+  openM('list-modal');
  }
  function post(form, url, statEl, headers, done) {
- var st = $(statEl), btn = form.querySelector('.submit');
- var payload = {}, numeric = ['year', 'price_sll', 'price_usd', 'mileage_km', 'stock_quantity', 'quantity', 'budget_sll'];
- new FormData(form).forEach(function (v, k) {
- if (v === '') return;
- if (numeric.indexOf(k) > -1 && !isNaN(parseFloat(v))) payload[k] = parseFloat(v); else payload[k] = v;
- });
- if (done.extra) done.extra(payload);
- st.style.color = 'var(--b5)'; st.textContent = 'Sending...'; btn.disabled = true;
- return fetch(url, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, headers), body: JSON.stringify(payload) })
- .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
- if (!r.ok) throw new Error(r.status === 401 ? 'Session expired. Please log in again.' : (typeof d.detail === 'string' ? d.detail : 'Please check the form and try again.'));
- st.style.color = 'var(--g4)'; st.textContent = done.ok; setTimeout(done.after, 900);
- }); })
- .catch(function (e) { st.style.color = 'var(--r5)'; st.textContent = e.message; })
- .finally(function () { btn.disabled = false; });
+  var st = $(statEl), btn = form.querySelector('.submit');
+  var payload = {}, numeric = ['year', 'price_sll', 'price_usd', 'mileage_km', 'stock_quantity', 'quantity', 'budget_sll'];
+  new FormData(form).forEach(function (v, k) {
+   if (v === '') return;
+   if (numeric.indexOf(k) > -1 && !isNaN(parseFloat(v))) payload[k] = parseFloat(v); else payload[k] = v;
+  });
+  if (done.extra) done.extra(payload);
+  st.style.color = 'var(--teal)'; st.textContent = 'Sending…'; btn.disabled = true;
+  return fetch(url, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, headers), body: JSON.stringify(payload) })
+   .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
+    if (!r.ok) throw new Error(r.status === 401 ? 'Your session has ended. Sign in again.' : (typeof d.detail === 'string' ? d.detail : 'Please check the form and try again.'));
+    st.style.color = 'var(--ok)'; st.textContent = done.ok; setTimeout(done.after, 900);
+   }); })
+   .catch(function (e) { st.style.color = 'var(--bad)'; st.textContent = e.message; })
+   .finally(function () { btn.disabled = false; });
  }
 
  // ---------- identify ----------
- function idReset() { $('id-up').style.display = 'block'; $('id-res').style.display = 'none'; $('id-stat').textContent = ''; $('id-file').value = ''; }
+ function idReset() { $('id-up').hidden = false; $('id-res').hidden = true; $('id-stat').textContent = ''; $('id-file').value = ''; }
  function identify(file) {
- var st = $('id-stat');
- if (file.size > 8 * 1024 * 1024) { st.style.color = 'var(--r5)'; st.textContent = 'That image is over 8 MB. Choose a smaller photo.'; return; }
- var t0 = Date.now();
- st.style.color = 'var(--b5)'; st.textContent = 'Analyzing your photo...';
- var iv = setInterval(function () { st.textContent = 'Analyzing your photo... ' + Math.floor((Date.now() - t0) / 1000) + 's'; }, 1000);
- var fd = new FormData(); fd.append('file', file);
- timed('/api/identify/car', 120000, { method: 'POST', headers: auth(), body: fd })
- .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
- if (!r.ok) throw new Error(r.status === 401 ? 'Session expired. Please log in again.' : r.status === 429 ? 'Daily limit reached (20 per day). Try again tomorrow.' : (d.detail || 'Identification failed.'));
- showId(d.identification);
- }); })
- .catch(function (e) { st.style.color = 'var(--r5)'; st.textContent = e.name === 'AbortError' ? 'The request timed out. Try again.' : (e.message || 'Network error'); })
- .finally(function () { clearInterval(iv); });
+  var st = $('id-stat');
+  if (file.size > 8 * 1024 * 1024) { st.style.color = 'var(--bad)'; st.textContent = 'That photo is over 8 MB. Choose a smaller one.'; return; }
+  var t0 = Date.now();
+  st.style.color = 'var(--teal)'; st.textContent = 'Looking at your photo…';
+  var iv = setInterval(function () { st.textContent = 'Looking at your photo… ' + Math.floor((Date.now() - t0) / 1000) + 's'; }, 1000);
+  var fd = new FormData(); fd.append('file', file);
+  timed('/api/identify/car', 120000, { method: 'POST', headers: auth(), body: fd })
+   .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
+    if (!r.ok) throw new Error(r.status === 401 ? 'Your session has ended. Sign in again.' : r.status === 429 ? 'You\'ve used today\'s 20 photo checks. Try again tomorrow.' : (d.detail || 'We couldn\'t identify this car.'));
+    showId(d.identification);
+   }); })
+   .catch(function (e) { st.style.color = 'var(--bad)'; st.textContent = e.name === 'AbortError' ? 'This took too long. Try again.' : (e.message || 'Network error'); })
+   .finally(function () { clearInterval(iv); });
  }
  function showId(c) {
- var h;
- if (!c || !c.make || !c.model) {
- h = '<h2>Could not identify the car</h2><p style="color:var(--s500)">Try a clearer photo of the front or side.</p><button type="button" class="submit" data-act="idAgain">Try another photo</button>';
- } else {
- h = '<h2 style="margin-bottom:4px">' + esc(c.make) + ' ' + esc(c.model) + '</h2><p style="color:var(--s500);margin-bottom:14px">' + [c.year_range, c.body_type, c.color].filter(Boolean).map(esc).join(', ') + '</p>';
- if (c.estimated_price_sll_low && c.estimated_price_sll_high) h += '<div style="background:#dcfce7;padding:14px;border-radius:12px;text-align:center;margin-bottom:14px"><small style="color:#166534;font-weight:700">Estimated price</small><div style="font-size:20px;color:#166534;font-weight:800">SLL ' + fmt(Math.round(c.estimated_price_sll_low)) + ' to ' + fmt(Math.round(c.estimated_price_sll_high)) + '</div></div>';
- if (c.common_parts && c.common_parts.length) h += '<div style="margin-bottom:14px"><small style="color:var(--s500);font-weight:700">Common parts</small><div>' + c.common_parts.map(function (p) { return '<span class="chip">' + esc(p) + '</span>'; }).join('') + '</div></div>';
- if (c.description) h += '<p style="background:var(--s50);padding:12px;border-radius:8px;font-size:13px;color:var(--s600);margin-bottom:14px">' + esc(c.description) + '</p>';
- var d = ' data-make="' + esc(c.make) + '" data-model="' + esc(c.model) + '"';
- h += '<div class="row"><button type="button" class="go" data-act="findParts"' + d + '>Find parts</button><button type="button" class="submit" style="margin:0" data-act="listCar">List for sale</button></div><button type="button" class="acts" style="width:100%;margin-top:10px" data-act="idAgain"><span style="flex:1;padding:12px;background:var(--s100);border-radius:8px;font-weight:600">Try another photo</span></button>';
- }
- $('id-res').innerHTML = h; $('id-up').style.display = 'none'; $('id-res').style.display = 'block';
+  var h;
+  if (!c || !c.make || !c.model) {
+   h = '<h2>We couldn\'t identify this car</h2><p class="muted">Try a clearer photo of the front or side.</p><button type="button" class="btn btn-primary btn-block btn-lg" style="margin-top:16px" data-act="idAgain">Try another photo</button>';
+  } else {
+   h = '<h2 style="margin-bottom:4px">' + esc(c.make) + ' ' + esc(c.model) + '</h2><p class="muted" style="margin-bottom:14px">' + [c.year_range, c.body_type, c.color].filter(Boolean).map(esc).join(', ') + '</p>';
+   if (c.estimated_price_sll_low && c.estimated_price_sll_high) h += '<div class="notice notice-ok" style="margin-bottom:14px"><b>Estimated price:</b> SLL ' + fmt(Math.round(c.estimated_price_sll_low)) + ' to ' + fmt(Math.round(c.estimated_price_sll_high)) + '</div>';
+   if (c.common_parts && c.common_parts.length) h += '<p style="font-weight:700;margin-bottom:4px">Parts often replaced</p><div style="margin-bottom:14px">' + c.common_parts.map(function (p) { return '<span class="pill">' + esc(p) + '</span>'; }).join('') + '</div>';
+   if (c.description) h += '<p class="muted" style="margin-bottom:14px">' + esc(c.description) + '</p>';
+   var d = ' data-make="' + esc(c.make) + '" data-model="' + esc(c.model) + '"';
+   h += '<div class="row2" style="gap:8px"><button type="button" class="btn btn-primary btn-lg" data-act="findParts"' + d + '>Find parts</button><button type="button" class="btn btn-ghost btn-lg" data-act="listCar">Sell this car</button></div><button type="button" class="btn btn-ghost btn-block" style="margin-top:8px" data-act="idAgain">Try another photo</button>';
+  }
+  $('id-res').innerHTML = h; $('id-up').hidden = true; $('id-res').hidden = false;
  }
 
  // ---------- actions ----------
  var A = {
- market: function (t) { switchMarket(t.dataset.v); },
- search: doSearch,
- cat: function (t) { $('s-cat').value = t.dataset.v; doSearch(); },
- open: function (t) { if (t.dataset.v === 'id-modal') { if (!token()) { toast('Log in to identify a car', 'error'); setTimeout(goLogin, 1000); return; } idReset(); } openM(t.dataset.v); },
- close: function (t) { closeM(t.closest('.overlay').id); },
- list: function (t) { openListing(t.dataset.v); },
- share: share, save: save, saveFit: saveFit, clearFit: clearFit,
- sug: function (t) { if (t.dataset.url) location.href = t.dataset.url; },
- showall: function () { $('f-filter').checked = false; ls.del('fitmentFilterOn'); renderParts(); },
- idAgain: idReset,
- findParts: function (t) { closeM('id-modal'); $('s-q').value = t.dataset.make + ' ' + t.dataset.model; switchMarket('parts'); },
- listCar: function () { closeM('id-modal'); openListing('vehicle'); }
+  market: function (t) { switchMarket(t.dataset.v); },
+  search: function () { hideSug(); doSearch(); },
+  cat: function (t) { $('s-cat').value = t.dataset.v; doSearch(); },
+  open: function (t) {
+   if (t.dataset.v === 'id-modal') { if (!token()) { toast('Sign in to identify a car', 'error'); setTimeout(goLogin, 1000); return; } idReset(); }
+   openM(t.dataset.v);
+  },
+  close: function (t) { closeM(t.closest('.overlay').id); },
+  list: function (t) { openListing(t.dataset.v); },
+  save: save, saveFit: saveFit, clearFit: clearFit,
+  sug: function (t) { if (t.dataset.url) location.href = t.dataset.url; },
+  showall: function () { $('f-filter').checked = false; ls.del('fitmentFilterOn'); renderParts(); },
+  idAgain: idReset,
+  findParts: function (t) { closeM('id-modal'); $('s-q').value = t.dataset.make + ' ' + t.dataset.model; switchMarket('parts'); },
+  listCar: function () { closeM('id-modal'); openListing('vehicle'); }
  };
  document.addEventListener('click', function (e) {
- var t = e.target.closest('[data-act]');
- if (t && A[t.dataset.act]) { e.preventDefault(); e.stopPropagation(); A[t.dataset.act](t, e); return; }
- if (e.target.classList.contains('overlay')) { closeM(e.target.id); return; }
- var c = e.target.closest('.card[data-href]');
- if (c) { location.href = c.dataset.href; return; }
- if (!e.target.closest('.trow')) hideSug();
+  var t = e.target.closest('[data-act]');
+  if (t && A[t.dataset.act]) { e.preventDefault(); e.stopPropagation(); A[t.dataset.act](t, e); return; }
+  if (e.target.classList.contains('overlay') && e.target.id !== 'saz-sell-sheet') { closeM(e.target.id); return; }
+  var c = e.target.closest('.lcard[data-href]');
+  if (c) { location.href = c.dataset.href; return; }
+  if (!e.target.closest('.searchbar')) hideSug();
  });
 
  // ---------- init ----------
  function init() {
- $('s-make').innerHTML = opts(MAKES, 'Any make');
- $('s-model').innerHTML = opts([], 'Any model');
- $('s-year').innerHTML = opts(YEARS, 'Any year');
- $('s-loc').innerHTML = opts(CITIES.slice(0, 5), 'All locations');
- $('imp-city').innerHTML = opts(CITIES.slice(0, 5).concat('Other'), 'Select city');
- $('f-make').innerHTML = opts(MAKES, 'Make');
- $('f-model').innerHTML = opts([], 'Model');
- $('f-year').innerHTML = opts(YEARS, 'Year');
+  $('s-make').innerHTML = opts(MAKES, 'Any make');
+  $('s-model').innerHTML = opts([], 'Any model');
+  $('s-year').innerHTML = opts(YEARS, 'Any year');
+  $('s-loc').innerHTML = opts(CITIES, 'Anywhere');
+  $('imp-city').innerHTML = opts(CITIES.concat('Other'), 'Choose a city');
+  $('f-make').innerHTML = opts(MAKES, 'Make');
+  $('f-model').innerHTML = opts([], 'Model');
+  $('f-year').innerHTML = opts(YEARS, 'Year');
 
- var saved = json('fitmentVehicle');
- if (saved && saved.make) { setFitSelects(saved); fitLabel(saved); }
- var requested = new URLSearchParams(location.search);
- var requestedMake = requested.get('make');
- var requestedModel = requested.get('model');
- var requestedYear = requested.get('year');
- if (requestedMake) {
- if (MAKES.indexOf(requestedMake) < 0) { MAKES.push(requestedMake); MODELS[requestedMake] = []; }
- if (requestedModel && MODELS[requestedMake].indexOf(requestedModel) < 0) MODELS[requestedMake].push(requestedModel);
- if (!Array.from($('s-make').options).some(function (option) { return option.value === requestedMake; })) $('s-make').add(new Option(requestedMake, requestedMake));
- if (!Array.from($('f-make').options).some(function (option) { return option.value === requestedMake; })) $('f-make').add(new Option(requestedMake, requestedMake));
- $('s-make').value = requestedMake;
- fillModels($('s-model'), requestedMake, 'Any model');
- $('s-model').value = requestedModel || '';
- $('s-year').value = requestedYear || '';
- if (requestedModel && requestedYear) {
- var requestedVehicle = {make:requestedMake,model:requestedModel,year:requestedYear};
- setFitSelects(requestedVehicle);
- fitLabel(requestedVehicle);
- ls.set('fitmentVehicle', JSON.stringify(requestedVehicle));
- }
- }
- $('f-filter').checked = ls.get('fitmentFilterOn') === '1';
+  var saved = json('fitmentVehicle');
+  if (saved && saved.make) setFitSelects(saved);
+  fitLabel(saved);
+  var requested = new URLSearchParams(location.search);
+  var requestedMake = requested.get('make');
+  var requestedModel = requested.get('model');
+  var requestedYear = requested.get('year');
+  if (requestedMake) {
+   if (MAKES.indexOf(requestedMake) < 0) { MAKES.push(requestedMake); MODELS[requestedMake] = []; }
+   if (requestedModel && MODELS[requestedMake].indexOf(requestedModel) < 0) MODELS[requestedMake].push(requestedModel);
+   ['s-make', 'f-make'].forEach(function (id) {
+    if (!Array.from($(id).options).some(function (o) { return o.value === requestedMake; })) $(id).add(new Option(requestedMake, requestedMake));
+   });
+   $('s-make').value = requestedMake;
+   fillModels($('s-model'), requestedMake, 'Any model');
+   $('s-model').value = requestedModel || '';
+   $('s-year').value = requestedYear || '';
+   if (requestedModel && requestedYear) {
+    var rv = { make: requestedMake, model: requestedModel, year: requestedYear };
+    setFitSelects(rv); fitLabel(rv);
+    ls.set('fitmentVehicle', JSON.stringify(rv));
+   }
+  }
+  $('f-filter').checked = ls.get('fitmentFilterOn') === '1';
+  if (requested.get('q')) $('s-q').value = requested.get('q');
 
- $('f-make').addEventListener('change', function () { fillModels($('f-model'), this.value, 'Model'); });
- $('s-make').addEventListener('change', function () { fillModels($('s-model'), this.value, 'Any model'); doSearch(); });
- ['s-cat', 's-model', 's-year', 's-loc'].forEach(function (id) { $(id).addEventListener('change', doSearch); });
- $('sort').addEventListener('change', function () { if (tab === 'parts') { if (lastParts) renderParts(); } else renderVehicles(); });
- $('f-filter').addEventListener('change', function () { if (this.checked) ls.set('fitmentFilterOn', '1'); else ls.del('fitmentFilterOn'); if (lastParts) renderParts(); });
- $('s-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') { hideSug(); doSearch(); } });
- $('s-q').addEventListener('input', function () {
- var q = this.value.trim(); clearTimeout(sugTimer);
- if (q.length < 2) { hideSug(); return; }
- sugTimer = setTimeout(function () { getSug(q); }, 250);
- });
- $('list-form').addEventListener('change', function (e) {
- if (e.target.name === 'make' && $('list-form').dataset.type === 'vehicle') fillModels(e.target.form.elements.model, e.target.value, 'Select model');
- });
- $('list-form').addEventListener('submit', function (e) {
- e.preventDefault();
- var type = this.dataset.type;
- post(this, type === 'vehicle' ? '/api/vehicles/' : '/api/parts/', 'list-stat', auth(), {
- ok: 'Listing published.', after: function () { closeM('list-modal'); doSearch(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
- extra: function (p) { var u = json('userInfo'); if (u && u.id) { if (type === 'vehicle') p.seller_id = u.id; else p.vendor_id = u.id; } }
- });
- });
- $('import-form').addEventListener('submit', function (e) {
- e.preventDefault(); var f = this;
- post(f, '/api/import-requests/', 'import-stat', {}, { ok: "Request received. We'll contact you on WhatsApp within 24 hours.", after: function () { closeM('import-modal'); f.reset(); $('import-stat').textContent = ''; } });
- });
- $('id-file').addEventListener('change', function () { if (this.files && this.files[0]) identify(this.files[0]); });
+  $('filter-toggle').addEventListener('click', function () {
+   var open = $('filters').classList.toggle('open');
+   this.setAttribute('aria-expanded', open);
+  });
+  $('f-make').addEventListener('change', function () { fillModels($('f-model'), this.value, 'Model'); });
+  $('s-make').addEventListener('change', function () { fillModels($('s-model'), this.value, 'Any model'); doSearch(); });
+  ['s-cat', 's-model', 's-year', 's-loc'].forEach(function (id) { $(id).addEventListener('change', doSearch); });
+  $('sort').addEventListener('change', function () { if (tab === 'parts') { if (lastParts) renderParts(); } else renderVehicles(); });
+  $('f-filter').addEventListener('change', function () { if (this.checked) ls.set('fitmentFilterOn', '1'); else ls.del('fitmentFilterOn'); if (lastParts) renderParts(); });
+  $('s-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') { hideSug(); doSearch(); } });
+  $('s-q').addEventListener('input', function () {
+   var q = this.value.trim(); clearTimeout(sugTimer);
+   if (q.length < 2) { hideSug(); return; }
+   sugTimer = setTimeout(function () { getSug(q); }, 250);
+  });
+  $('list-form').addEventListener('change', function (e) {
+   if (e.target.name === 'make' && $('list-form').dataset.type === 'vehicle') fillModels(e.target.form.elements.model, e.target.value, 'Model');
+  });
+  $('list-form').addEventListener('submit', function (e) {
+   e.preventDefault();
+   var type = this.dataset.type;
+   post(this, type === 'vehicle' ? '/api/vehicles/' : '/api/parts/', 'list-stat', auth(), {
+    ok: 'Published.', after: function () { closeM('list-modal'); doSearch(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
+    extra: function (p) { var u = json('userInfo'); if (u && u.id) { if (type === 'vehicle') p.seller_id = u.id; else p.vendor_id = u.id; } }
+   });
+  });
+  $('import-form').addEventListener('submit', function (e) {
+   e.preventDefault(); var f = this;
+   post(f, '/api/import-requests/', 'import-stat', {}, { ok: "Request sent. We'll message you on WhatsApp within 24 hours.", after: function () { closeM('import-modal'); f.reset(); $('import-stat').textContent = ''; } });
+  });
+  $('id-file').addEventListener('change', function () { if (this.files && this.files[0]) identify(this.files[0]); });
 
- if (token()) { var l = $('signin'); l.textContent = 'My dashboard'; l.href = '/my-account'; }
- switchMarket('parts');
- syncGarage();
- if (requested.get('action') === 'list-car') {
- switchMarket('vehicles');
- openListing('vehicle');
- }
- var importPart = requested.get('import');
- if (importPart) {
- $('import-form').elements.namedItem('part_name').value = importPart;
- var importNotes = [];
- if (requested.get('part')) importNotes.push('Category: ' + requested.get('part'));
- if (requested.get('vehicle')) importNotes.push('Vehicle: ' + requested.get('vehicle'));
- $('import-form').elements.namedItem('notes').value = importNotes.join('\n');
- openM('import-modal');
- }
+  switchMarket(requested.get('tab') === 'cars' || requested.get('action') === 'list-car' ? 'vehicles' : 'parts');
+  syncGarage();
+  if (requested.get('action') === 'list-car') openListing('vehicle');
+  if (requested.get('action') === 'list-part') openListing('parts');
+  if (requested.get('action') === 'import') openM('import-modal');
+  var importPart = requested.get('import');
+  if (importPart) {
+   $('import-form').elements.namedItem('part_name').value = importPart;
+   var notes = [];
+   if (requested.get('part')) notes.push('Category: ' + requested.get('part'));
+   if (requested.get('vehicle')) notes.push('Vehicle: ' + requested.get('vehicle'));
+   $('import-form').elements.namedItem('notes').value = notes.join('\n');
+   openM('import-modal');
+  }
  }
  init();
 })();
 </script>
-<script src="/static/header-tabs.js"></script></body>
+</body>
 </html>
-
-
-
-
-
-
-
-
-<script src="/static/auth-header.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

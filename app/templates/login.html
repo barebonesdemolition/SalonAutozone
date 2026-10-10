@@ -1,204 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sign in – {{ app_name or 'SalonAutoZone' }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Sign in · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=2">
 <style>
-:root{--primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;--navy:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--text:#1e293b;--danger:#b91c1c;--sh:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.08)}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
-a{color:var(--primary);font-weight:600;text-decoration:none}
-button,input{font:inherit}
-button{border:0;cursor:pointer}
-.top{background:var(--navy);color:#94a3b8;padding:10px 20px;font-size:12px;text-align:center}
-.top strong{color:#fff}
-.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px}
-.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;box-shadow:var(--sh)}
-.logo{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px;color:var(--navy)}
-.logo span{color:var(--primary)}
-.sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:22px}
-.tabs{display:flex;background:#f1f5f9;padding:4px;border-radius:10px;margin-bottom:18px}
-.tabs button{flex:1;padding:10px;border-radius:8px;font-weight:700;font-size:13px;color:var(--muted);background:none}
-.tabs button.active{background:var(--primary);color:#fff}
-.lbl{display:block;font-size:13px;font-weight:600;color:#475569;margin:12px 0 6px}
-.inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;min-height:48px}
-.inp:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
-.btn{width:100%;margin-top:18px;background:var(--primary);color:#fff;padding:14px;border-radius:10px;font-weight:700;min-height:52px}
-.btn:hover{background:var(--primary-hover)}
-.btn:disabled{opacity:.6}
-.msg{margin-top:12px;text-align:center;font-size:14px;font-weight:600}
-.msg.err{color:var(--danger)}.msg.ok{color:var(--primary)}
-.foot{text-align:center;margin-top:18px;font-size:13px;color:var(--muted)}
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
+.auth { display: grid; min-height: calc(100vh - var(--header-h)); }
+.auth .side { display: none; background: var(--ink); color: #b9cbc9; padding: 56px 48px; }
+.auth .side h2 { color: #fff; font-size: 40px; font-variation-settings: "wdth" 75; max-width: 12ch; }
+.auth .side ul { margin: 22px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; font-size: 17px; }
+.auth .side li { padding-left: 28px; position: relative; }
+.auth .side li::before { content: ""; position: absolute; left: 0; top: 7px; width: 14px; height: 14px; border-radius: 4px; background: var(--gold); }
+.auth .main { display: flex; align-items: flex-start; justify-content: center; padding: 28px 16px 40px; }
+.card { width: 100%; max-width: 420px; }
+.card h1 { font-size: 32px; font-variation-settings: "wdth" 78; }
+.card .sub { color: var(--muted); margin-top: 6px; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; background: #e7eceb; border-radius: 12px; padding: 4px; margin: 22px 0 6px; }
+.tabs button { min-height: 42px; border: 0; border-radius: 9px; background: none; font-weight: 700; color: var(--muted); }
+.tabs button.active { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(14, 42, 43, .15); }
+.types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.types label { position: relative; }
+.types input { position: absolute; opacity: 0; }
+.types span { display: block; text-align: center; padding: 10px 6px; border: 1.5px solid var(--line); border-radius: var(--r-sm); font-weight: 700; font-size: 14px; background: var(--card); cursor: pointer; }
+.types input:checked + span { border-color: var(--teal); background: var(--teal-50); color: var(--teal-600); }
+.types input:focus-visible + span { outline: 3px solid var(--gold); outline-offset: 2px; }
+.msg { margin-top: 12px; text-align: center; font-weight: 600; }
+.msg.err { color: var(--bad); }
+.msg.ok { color: var(--ok); }
+@media (min-width: 900px) { .auth { grid-template-columns: 1fr 1fr; } .auth .side { display: block; } .auth .main { align-items: center; } }
 </style>
-<link rel="stylesheet" href="/static/base.css?v=1">
 </head>
-<body>
-<div class="top"><strong>Salon AutoZone</strong> · Sierra Leone <a href="/vin-tool" style="float:right">VIN Lookup</a></div>
-<div class="wrap">
- <div class="card">
- <div class="logo">Salon<span>AutoZone</span></div>
- <p class="sub">Sign in to save listings, manage your garage, and sell.</p>
- <div class="tabs">
- <button type="button" class="active" data-mode="login">Sign in</button>
- <button type="button" data-mode="register">Register</button>
- </div>
- <form id="form">
- <div id="name-wrap" hidden>
- <label class="lbl">Full name</label>
- <input class="inp" name="full_name" autocomplete="name" placeholder="Your name">
- </div>
- <div id="account-type-wrap" hidden>
- <label class="lbl" for="account-type">Account type</label>
- <select class="inp" id="account-type" name="account_type">
- <option value="buyer">Buyer</option>
- <option value="seller">Seller</option>
- <option value="business">Business</option>
- </select>
- </div>
- <label class="lbl">Phone *</label>
- <input class="inp" name="phone" type="tel" required autocomplete="tel" placeholder="+232 76 123456">
- <label class="lbl">Email</label>
- <input class="inp" name="email" type="email" autocomplete="email" placeholder="Email for registration">
- <label class="lbl">Password *</label>
- <input class="inp" name="password" type="password" required autocomplete="current-password" placeholder="••••••••">
- <button class="btn" type="submit" id="submit">Sign in</button>
- <div class="msg" id="msg" aria-live="polite"></div>
- </form>
- <p class="foot"><a href="/">Back to marketplace</a></p>
+<body data-footer="off">
+<div id="site-header"></div>
+<div class="auth">
+ <aside class="side">
+  <h2>Your car, your parts, one account</h2>
+  <ul>
+   <li>Save your car and see parts that fit</li>
+   <li>Message sellers and track your orders</li>
+   <li>Sell parts and cars across Sierra Leone</li>
+  </ul>
+ </aside>
+ <div class="main">
+  <div class="card">
+   <h1 id="heading">Welcome back</h1>
+   <p class="sub" id="subheading">Sign in with your phone number or email.</p>
+   <div class="tabs" role="tablist">
+    <button type="button" class="active" data-mode="login" role="tab">Sign in</button>
+    <button type="button" data-mode="register" role="tab">Create account</button>
+   </div>
+   <form id="form" novalidate>
+    <div id="name-wrap" hidden>
+     <label class="field"><span>Full name</span><input class="input" name="full_name" autocomplete="name" placeholder="Aminata Kamara"></label>
+    </div>
+    <div id="account-type-wrap" hidden>
+     <div class="field"><span>I want to</span>
+      <div class="types" role="radiogroup">
+       <label><input type="radio" name="account_type" value="buyer" checked><span>Buy</span></label>
+       <label><input type="radio" name="account_type" value="seller"><span>Sell</span></label>
+       <label><input type="radio" name="account_type" value="business"><span>Run a business</span></label>
+      </div>
+     </div>
+    </div>
+    <label class="field"><span id="phone-label">Phone or email</span><input class="input" name="phone" type="text" required autocomplete="username" inputmode="tel" placeholder="+232 76 123456"></label>
+    <div id="email-wrap" hidden>
+     <label class="field"><span>Email</span><input class="input" name="email" type="email" autocomplete="email" placeholder="you@example.com"></label>
+    </div>
+    <label class="field"><span>Password</span><input class="input" name="password" type="password" required autocomplete="current-password" minlength="1"></label>
+    <p class="hint" id="pw-hint" hidden>At least 8 characters.</p>
+    <button class="btn btn-primary btn-lg btn-block" style="margin-top:20px" type="submit" id="submit">Sign in</button>
+    <div class="msg" id="msg" aria-live="polite"></div>
+   </form>
+  </div>
  </div>
 </div>
+<script src="/static/site.js?v=2"></script>
 <script>
 (function () {
  var mode = 'login';
  var form = document.getElementById('form');
  var msg = document.getElementById('msg');
  var submit = document.getElementById('submit');
- var nameWrap = document.getElementById('name-wrap');
- var accountTypeWrap = document.getElementById('account-type-wrap');
- var accountType = form.elements.namedItem('account_type');
  var params = new URLSearchParams(location.search);
  var requestedNext = params.get('next') || '';
  var next = requestedNext.charAt(0) === '/' && requestedNext.charAt(1) !== '/' ? requestedNext : '';
- var emailInput = form.elements.namedItem('email');
- var nameInput = form.elements.namedItem('full_name');
- emailInput.required = false;
- nameInput.required = false;
 
+ function setMode(m) {
+  mode = m;
+  var reg = m === 'register';
+  document.querySelectorAll('.tabs button').forEach(function (x) {
+   x.classList.toggle('active', x.dataset.mode === m);
+   x.setAttribute('aria-selected', x.dataset.mode === m);
+  });
+  document.getElementById('name-wrap').hidden = !reg;
+  document.getElementById('account-type-wrap').hidden = !reg;
+  document.getElementById('email-wrap').hidden = !reg;
+  document.getElementById('pw-hint').hidden = !reg;
+  document.getElementById('phone-label').textContent = reg ? 'Phone number' : 'Phone or email';
+  document.getElementById('heading').textContent = reg ? 'Create your account' : 'Welcome back';
+  document.getElementById('subheading').textContent = reg ? 'It takes a minute. We use your phone number for WhatsApp messages from buyers and sellers.' : 'Sign in with your phone number or email.';
+  form.phone.setAttribute('inputmode', reg ? 'tel' : 'text');
+  form.password.autocomplete = reg ? 'new-password' : 'current-password';
+  submit.textContent = reg ? 'Create account' : 'Sign in';
+  msg.textContent = '';
+ }
  document.querySelectorAll('.tabs button').forEach(function (b) {
- b.addEventListener('click', function () {
- document.querySelectorAll('.tabs button').forEach(function (x) { x.classList.remove('active'); });
- b.classList.add('active');
- mode = b.dataset.mode;
- nameWrap.hidden = mode !== 'register';
- accountTypeWrap.hidden = mode !== 'register';
- nameInput.required = mode === 'register';
- emailInput.required = mode === 'register';
- accountType.required = mode === 'register';
- submit.textContent = mode === 'login' ? 'Sign in' : 'Create account';
- form.password.autocomplete = mode === 'login' ? 'current-password' : 'new-password';
- msg.textContent = '';
+  b.addEventListener('click', function () { setMode(b.dataset.mode); });
  });
- });
-
- form.addEventListener('submit', function (e) {
- e.preventDefault();
- msg.className = 'msg';
- msg.textContent = mode === 'login' ? 'Signing in…' : 'Creating account…';
- submit.disabled = true;
- var body = {
- phone: form.phone.value.trim(),
- password: form.password.value
- };
- if (form.email.value.trim()) body.email = form.email.value.trim();
- if (mode === 'register') body.full_name = form.full_name.value.trim() || body.phone;
-
- var url = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
- // fallback paths some apps use
- var alt = mode === 'login' ? '/api/auth/token' : '/api/auth/signup';
-
- function ok(data) {
- var token = data.access_token || data.token || data.accessToken;
- if (token) {
- try {
- localStorage.setItem('token', token);
- localStorage.setItem('access_token', token);
- if (data.user) localStorage.setItem('userInfo', JSON.stringify(data.user));
- } catch (err) {}
- msg.className = 'msg ok';
- msg.textContent = 'Success — redirecting…';
- var HOME = { admin: '/admin/dashboard', business: '/become-a-seller', seller: '/dashboard', buyer: '/my-account' };
- var GENERIC = ['/my-account', '/dashboard', '/admin', '/admin/dashboard', '/become-a-seller'];
- var go = function (user) {
- var l = String(user.account_type || user.role || user.roles || '').toLowerCase().split(',').map(function (x) { return x.trim(); });
- var role = 'buyer';
- if (user.is_admin || l.indexOf('admin') > -1 || l.indexOf('superadmin') > -1) role = 'admin';
- else if (l.indexOf('business') > -1) role = 'business';
- else if (l.indexOf('seller') > -1 || user.is_vendor) role = 'seller';
- if (mode === 'register') role = accountType.value;
- console.warn('LOGIN ROLE:', role, user);
- var useNext = mode === 'login' && next && GENERIC.indexOf(next) === -1;
- location.href = useNext ? next : "/my-account";
- };
- fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } })
- .then(function (r) { return r.ok ? r.json() : (data.user || {}); })
- .catch(function () { return data.user || {}; })
- .then(function (u) {
- try { localStorage.setItem('userInfo', JSON.stringify(u)); } catch (e) {}
- go(u);
- });
- return;
- }
- msg.className = 'msg err';
- msg.textContent = 'Signed in but no token returned. Check auth API.';
- }
+ if (params.get('mode') === 'register') setMode('register');
 
  function fail(text) {
- msg.className = 'msg err';
- msg.textContent = text || 'Could not sign in. Check phone and password.';
- submit.disabled = false;
+  msg.className = 'msg err';
+  msg.textContent = text;
+  submit.disabled = false;
  }
 
- fetch(url, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(body)
- }).then(function (r) {
- return r.json().catch(function () { return {}; }).then(function (d) {
- if (r.ok) { ok(d); return; }
- // try alternate path once
- return fetch(alt, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(body)
- }).then(function (r2) {
- return r2.json().catch(function () { return {}; }).then(function (d2) {
- if (r2.ok) ok(d2);
- else fail(typeof d.detail === 'string' ? d.detail : (typeof d2.detail === 'string' ? d2.detail : 'Login failed'));
- });
- });
- });
- }).catch(function () { fail('Network error'); });
+ form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  var body = { phone: form.phone.value.trim(), password: form.password.value };
+  if (!body.phone || !body.password) return fail(mode === 'login' ? 'Enter your phone or email and your password.' : 'Enter your phone number and a password.');
+  if (mode === 'register') {
+   body.full_name = form.full_name.value.trim();
+   body.email = form.email.value.trim();
+   body.account_type = (form.querySelector('input[name=account_type]:checked') || {}).value || 'buyer';
+   if (body.full_name.length < 2) return fail('Enter your full name.');
+   if (!body.email) return fail('Enter your email address.');
+   if (body.password.length < 8) return fail('Your password needs at least 8 characters.');
+  }
+  msg.className = 'msg';
+  msg.textContent = mode === 'login' ? 'Signing in…' : 'Creating your account…';
+  submit.disabled = true;
+
+  fetch(mode === 'login' ? '/api/auth/login' : '/api/auth/register', {
+   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  }).then(function (r) {
+   return r.json().catch(function () { return {}; }).then(function (d) {
+    if (!r.ok) {
+     var detail = typeof d.detail === 'string' ? d.detail : (Array.isArray(d.detail) ? 'Please check the details you entered.' : '');
+     return fail(detail || (mode === 'login' ? 'That phone, email or password is not right.' : 'We couldn\'t create your account.'));
+    }
+    var token = d.access_token;
+    try {
+     localStorage.setItem('token', token);
+     localStorage.setItem('access_token', token);
+     if (d.user) localStorage.setItem('userInfo', JSON.stringify(d.user));
+    } catch (err) {}
+    msg.className = 'msg ok';
+    msg.textContent = mode === 'login' ? 'Signed in.' : 'Account created.';
+    return fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } })
+     .then(function (res) { return res.ok ? res.json() : (d.user || {}); })
+     .catch(function () { return d.user || {}; })
+     .then(function (u) {
+      try { localStorage.setItem('userInfo', JSON.stringify(u)); } catch (err) {}
+      var GENERIC = ['/my-account', '/dashboard', '/admin', '/admin/dashboard', '/become-a-seller'];
+      var dest = '/my-account';
+      if (mode === 'register' && body.account_type === 'business') dest = '/become-a-seller';
+      if (next && GENERIC.indexOf(next) === -1) dest = next;
+      location.href = dest;
+     });
+   });
+  }).catch(function () { fail('No connection. Check your internet and try again.'); });
  });
 })();
 </script>

@@ -33,3 +33,4 @@ app/static/uploads/*
 # Database dumps and editor backups
 *.backup-*
 *.db.backup*
+dev.db
