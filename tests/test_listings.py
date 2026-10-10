@@ -59,3 +59,16 @@ def test_part_listing_can_be_created(client):
     assert r.status_code == 201, r.text
     part = client.get(f"/api/parts/{r.json()['id']}").json()
     assert part["name"] == "Front brake pads" and part["stock_quantity"] == 3
+
+
+def test_garage_add_list_primary_delete(client):
+    from app import models as m
+    m.Garage.__table__.create(bind=sync_engine, checkfirst=True)
+    auth = {"Authorization": "Bearer " + _token(client)}
+    a = client.post("/api/garage/", headers=auth, json={"make": "Toyota", "model": "Corolla", "year": 2007})
+    assert a.status_code == 200, a.text
+    b = client.post("/api/garage/", headers=auth, json={"make": "Honda", "model": "CR-V", "year": 2015, "vin": "1HGCM82633A004352"}).json()
+    assert len(client.get("/api/garage/", headers=auth).json()) == 2
+    assert client.put(f"/api/garage/{b['id']}/primary", headers=auth).json()["is_primary"] is True
+    assert client.delete(f"/api/garage/{a.json()['id']}", headers=auth).status_code == 200
+    assert [c["model"] for c in client.get("/api/garage/", headers=auth).json()] == ["CR-V"]
