@@ -116,7 +116,10 @@
   t.className = 'toast ' + (type || ''); t.textContent = msg; void t.offsetWidth; t.classList.add('show');
   clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
  }
- function titleCase(s) { return String(s || '').toLowerCase().replace(/(^|[\s-])\S/g, function (m) { return m.toUpperCase(); }); }
+ function titleCase(s) {
+  return String(s || '').toLowerCase().replace(/(^|[\s-])\S/g, function (m) { return m.toUpperCase(); })
+   .replace(/\(([a-z]{2,4})\)/g, function (m, a) { return '(' + a.toUpperCase() + ')'; });
+ }
 
  function counter() {
   var v = clean(input.value).replace(/-/g, '');
