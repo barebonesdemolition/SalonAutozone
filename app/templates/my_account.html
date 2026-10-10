@@ -60,6 +60,7 @@
  <div class="tabs" role="tablist" id="tabs">
   <button role="tab" data-tab="orders" aria-selected="true">Orders</button>
   <button role="tab" data-tab="listings" aria-selected="false">My listings</button>
+  <button role="tab" data-tab="sales" aria-selected="false">Sales</button>
   <button role="tab" data-tab="enquiries" aria-selected="false">Enquiries</button>
   <button role="tab" data-tab="saved" aria-selected="false">Saved</button>
   <button role="tab" data-tab="requests" aria-selected="false">Import requests</button>
@@ -128,7 +129,7 @@
    return api('/api/shop/orders').then(function (d) {
     var list = d.orders || [];
     if (!list.length) return empty('No orders yet', 'Parts you buy will show up here.', '<a class="btn btn-primary" href="/">Browse parts</a>');
-    var L = { awaiting_payment: ['Waiting for payment', 'gold'], confirmed: ['Paid', ''], ready_for_pickup: ['Ready for pickup', ''], driver_assigned: ['Driver assigned', ''], picked_up: ['On the way', ''], delivered: ['Delivered', ''], cancelled: ['Cancelled', 'off'] };
+    var L = { awaiting_payment: ['Waiting for payment', 'gold'], confirmed: ['Paid', ''], ready_for_pickup: ['Ready for pickup', ''], driver_assigned: ['Driver assigned', ''], out_for_delivery: ['On the way', ''], delivered: ['Delivered', ''], cancelled: ['Cancelled', 'off'] };
     return '<div class="list">' + list.map(function (o) {
      var s = L[o.status] || [o.status, ''];
      return item({ noimg: true, href: '/orders?id=' + o.id, title: 'Order ' + o.code, meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> SLL ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + ', ' + esc(when(o.created_at)) });
@@ -151,6 +152,21 @@
       ops: '<a class="btn btn-ghost" href="/vehicle/' + v.id + '">View</a>' + (v.is_sold ? '' : '<button class="btn btn-ghost" data-sold="' + v.id + '">Mark as sold</button>') + '<button class="btn btn-ghost" data-del="vehicle" data-id="' + v.id + '">Delete</button>' });
     }).join('');
     return h + '</div>';
+   });
+  },
+  sales: function () {
+   return api('/api/shop/seller/orders').then(function (d) {
+    var list = d.orders || [];
+    if (!list.length) return empty('No sales yet', 'When a buyer orders one of your parts it shows up here. You\'ll get the parts ready once we confirm their payment.', '');
+    var S = { awaiting_payment: ['Waiting for the buyer to pay', 'gold'], confirmed: ['Paid: get the parts ready', ''], ready_for_pickup: ['Ready: waiting for a driver', ''], driver_assigned: ['Driver on the way to you', ''], out_for_delivery: ['With the driver', ''], delivered: ['Delivered', ''], cancelled: ['Cancelled', 'off'] };
+    return '<div class="list">' + list.map(function (o) {
+     var s = S[o.status] || [o.status, ''];
+     var items = (o.items || []).map(function (it) { return esc(it.title) + ' × ' + it.qty; }).join(', ');
+     return item({ noimg: true, title: 'Order ' + o.code, href: '#',
+      meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> SLL ' + fmt(o.parts_total_sll) + ', ' + esc(when(o.created_at)),
+      extra: '<p class="msg">' + items + (o.pickup_area ? '<br><span class="hint">Pickup from ' + esc(o.pickup_area) + '</span>' : '') + '</p>',
+      ops: o.status === 'confirmed' ? '<button class="btn btn-primary" data-ready="' + o.id + '">The parts are ready for pickup</button>' : '' });
+    }).join('') + '</div>';
    });
   },
   enquiries: function () {
@@ -204,6 +220,13 @@
  document.querySelectorAll('#tabs button').forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.tab); }); });
 
  panel.addEventListener('click', function (e) {
+  var ready = e.target.closest('[data-ready]');
+  if (ready) {
+   ready.disabled = true;
+   api('/api/shop/seller/orders/' + ready.dataset.ready + '/ready', { method: 'POST' }).then(function () { toast('Marked ready. A driver will collect the parts.', 'success'); show('sales'); })
+    .catch(function (err) { ready.disabled = false; if (err) toast(err.message, 'error'); });
+   return;
+  }
   var del = e.target.closest('[data-del]'), sold = e.target.closest('[data-sold]'), uns = e.target.closest('[data-unsave]');
   if (del) {
    if (!confirm('Delete this listing? Buyers will no longer see it.')) return;

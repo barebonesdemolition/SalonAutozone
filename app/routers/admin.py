@@ -53,6 +53,17 @@ async def require_admin(
     raise HTTPException(status_code=403, detail="Admin access required")
 
 
+async def admin_actor(access: dict = Depends(require_admin)):
+    """Admin check for endpoints that record who acted.
+
+    Accepts the admin key or an admin's login (like require_admin). The returned
+    object's .id is the admin user's id, or None when the shared key was used.
+    """
+    from types import SimpleNamespace
+    user = access.get("user")
+    return SimpleNamespace(id=getattr(user, "id", None), via=access.get("via"))
+
+
 def _active_featured(model, now):
     return and_(model.is_featured.is_(True), or_(model.featured_until.is_(None), model.featured_until > now))
 

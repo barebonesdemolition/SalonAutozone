@@ -13,7 +13,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models
-from app.auth import get_current_admin, get_current_user
+from app.auth import get_current_user
+from app.routers.admin import admin_actor
 from app.db import engine, get_db
 from app.drivers import drivers as drivers_t
 
@@ -22,8 +23,11 @@ router = APIRouter(prefix="/api/shop", tags=["Orders & delivery"])
 
 MAX_CODE_ATTEMPTS = 5
 SIZE_CLASSES = {"small", "bulky"}
+# Matched against the part's NAME only. Matching the category made every
+# "Engine" or "Transmission" part (spark plugs, filters, oil) go by van.
 BULKY_WORDS = (
-    "engine","gearbox","transmission","bumper","door","bonnet","hood","fender",
+    "engine block","engine assembly","complete engine","whole engine","gearbox","transmission assembly",
+    "bumper","door","bonnet","hood","fender",
     "windscreen","windshield","seat","radiator","axle","tyre","tire","wheel",
     "rim","exhaust","muffler","dashboard","tailgate","body panel","fuel tank",
     "differential","driveshaft","sunroof",
@@ -123,7 +127,7 @@ async def _setting(db, key):
 
 
 def _default_size(part):
-    t = f"{part.category or ''} {part.name or ''}".lower()
+    t = (part.name or "").lower()
     return "bulky" if any(w in t for w in BULKY_WORDS) else "small"
 
 
@@ -446,7 +450,7 @@ async def driver_earnings(user: models.User = Depends(get_current_user), db: Asy
 
 
 @router.get("/admin/orders")
-async def admin_orders(status: str = Query("awaiting_payment"), admin: models.User = Depends(get_current_admin),
+async def admin_orders(status: str = Query("awaiting_payment"), admin=Depends(admin_actor),
                        db: AsyncSession = Depends(get_db)):
     q = select(orders).order_by(orders.c.id.desc()).limit(200)
     if status != "all":
@@ -456,7 +460,7 @@ async def admin_orders(status: str = Query("awaiting_payment"), admin: models.Us
 
 
 @router.post("/admin/orders/{order_id}/confirm-payment")
-async def confirm_payment(order_id: int, admin: models.User = Depends(get_current_admin),
+async def confirm_payment(order_id: int, admin=Depends(admin_actor),
                           db: AsyncSession = Depends(get_db)):
     await _order_or_404(db, order_id)
     got = await db.execute(update(orders).where(orders.c.id == order_id, orders.c.status == "awaiting_payment")
@@ -470,9 +474,9 @@ async def confirm_payment(order_id: int, admin: models.User = Depends(get_curren
 
 @router.post("/admin/orders/{order_id}/complete")
 async def force_complete(order_id: int, note: str = Query(..., min_length=3, max_length=200),
-                         admin: models.User = Depends(get_current_admin), db: AsyncSession = Depends(get_db)):
+                         admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
     o = await _order_or_404(db, order_id)
-    if o.status not in ("out_for_delivery", "driver_assigned"):
+    if o.status not in ("driver_assigned", "picked_up", "out_for_delivery"):
         raise HTTPException(409, "Only an order that is with a driver can be completed manually")
     await db.execute(update(jobs).where(jobs.c.order_id == order_id)
                      .values(status="delivered", delivered_at=datetime.utcnow()))
@@ -483,14 +487,14 @@ async def force_complete(order_id: int, note: str = Query(..., min_length=3, max
 
 
 @router.get("/admin/settings")
-async def get_settings(admin: models.User = Depends(get_current_admin), db: AsyncSession = Depends(get_db)):
+async def get_settings(admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
     rows = (await db.execute(select(settings_t))).all()
     cur = {r.key: r.value for r in rows}
     return {k: cur.get(k) for k in ("okada_fee_sll", "van_fee_sll", "platform_pct")}
 
 
 @router.put("/admin/settings")
-async def put_settings(body: SettingsIn, admin: models.User = Depends(get_current_admin),
+async def put_settings(body: SettingsIn, admin=Depends(admin_actor),
                        db: AsyncSession = Depends(get_db)):
     for key, value in body.model_dump(exclude_none=True).items():
         if (await db.execute(select(settings_t).where(settings_t.c.key == key))).first():

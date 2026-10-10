@@ -61,7 +61,7 @@
   ['confirmed', 'Payment confirmed', 'The seller is getting your parts ready'],
   ['ready_for_pickup', 'Ready for pickup', 'Waiting for a driver'],
   ['driver_assigned', 'Driver on the way to the seller', ''],
-  ['picked_up', 'On the way to you', 'Have your delivery code ready'],
+  ['out_for_delivery', 'On the way to you', 'Have your delivery code ready'],
   ['delivered', 'Delivered', '']
  ];
  var LABEL = { cancelled: 'Cancelled' };
@@ -109,7 +109,7 @@
     if (!o) { root.innerHTML = '<h1 class="page-title">Order not found</h1><a class="btn btn-primary" href="/orders">My orders</a>'; return; }
     document.title = 'Order ' + o.code + ' · SalonAutoZone';
     var canCancel = o.status === 'awaiting_payment' || o.status === 'confirmed';
-    var showPin = ['confirmed', 'ready_for_pickup', 'driver_assigned', 'picked_up', 'awaiting_payment'].indexOf(o.status) > -1 && o.delivery_code;
+    var showPin = ['confirmed', 'ready_for_pickup', 'driver_assigned', 'out_for_delivery', 'awaiting_payment'].indexOf(o.status) > -1 && o.delivery_code;
     root.innerHTML =
      (q.get('new') ? '<div class="notice notice-ok" style="margin-top:20px"><b>Order placed.</b> We\'ll contact you on ' + esc(o.buyer_phone) + ' to confirm payment.</div>' : '') +
      '<h1 class="page-title">Order <span style="letter-spacing:.06em">' + esc(o.code) + '</span></h1>' +
