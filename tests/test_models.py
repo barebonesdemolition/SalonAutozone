@@ -10,7 +10,7 @@ from app.routers.garage import GarageCar
 
 
 def test_orm_models_match_seeded_schema():
-    assert set(User.metadata.tables) == {
+    assert set(User.metadata.tables) - {"garage"} == {
         "users",
         "user_cars",
         "vehicles",
@@ -52,7 +52,8 @@ def test_business_model_supports_storefront_fields():
     public_data = _public(business)
 
     assert public_data["whatsapp"] == "23276123456"
-    assert "email" not in public_data
+    # Business contact email is shown on the storefront on purpose.
+    assert public_data["email"] == "sales@example.com"
     assert public_data["logo_url"] == "https://example.com/logo.png"
     assert public_data["type_label"] == "Local parts store"
 

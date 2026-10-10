@@ -6,6 +6,7 @@ from typing import List, Optional
 
 from app.db import get_db
 from app import models, schemas
+from app.routers.admin import require_admin
 
 router = APIRouter(prefix="/api/import-requests", tags=["Import Requests"])
 
@@ -29,6 +30,7 @@ async def list_import_requests(
     location: Optional[str] = Query(None),
     limit: int = Query(50, le=200),
     db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_admin),
 ):
     """Admin view — list all import requests. Filter by status/location."""
     query = select(models.ImportRequest)
@@ -42,7 +44,7 @@ async def list_import_requests(
 
 
 @router.get("/stats")
-async def import_stats(db: AsyncSession = Depends(get_db)):
+async def import_stats(db: AsyncSession = Depends(get_db), _: dict = Depends(require_admin)):
     """Get stats for admin dashboard."""
     total = await db.execute(select(func.count(models.ImportRequest.id)))
     pending = await db.execute(
@@ -63,7 +65,7 @@ async def import_stats(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/{request_id}", response_model=schemas.ImportRequestResponse)
-async def get_import_request(request_id: int, db: AsyncSession = Depends(get_db)):
+async def get_import_request(request_id: int, db: AsyncSession = Depends(get_db), _: dict = Depends(require_admin)):
     """Get a single import request."""
     result = await db.execute(
         select(models.ImportRequest).where(models.ImportRequest.id == request_id)
@@ -79,6 +81,7 @@ async def update_import_request(
     request_id: int,
     update: schemas.ImportRequestUpdate,
     db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_admin),
 ):
     """Admin updates a request (quote price, status, notes, etc.)."""
     result = await db.execute(
@@ -98,7 +101,7 @@ async def update_import_request(
 
 
 @router.delete("/{request_id}")
-async def delete_import_request(request_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_import_request(request_id: int, db: AsyncSession = Depends(get_db), _: dict = Depends(require_admin)):
     """Admin deletes a request."""
     result = await db.execute(
         select(models.ImportRequest).where(models.ImportRequest.id == request_id)

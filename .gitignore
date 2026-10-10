@@ -29,3 +29,7 @@ app/static/uploads/*
 *.log
 .env
 *.bak
+
+# Database dumps and editor backups
+*.backup-*
+*.db.backup*

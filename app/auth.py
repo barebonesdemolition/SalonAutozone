@@ -15,7 +15,20 @@ from sqlalchemy.future import select
 from app.db import get_db
 from app import models
 
-SECRET_KEY = os.getenv("SECRET_KEY") or os.getenv("JWT_SECRET_KEY") or "dev-secret-key-for-local-testing"
+from app.db import DATABASE_URL
+
+SECRET_KEY = os.getenv("SECRET_KEY") or os.getenv("JWT_SECRET_KEY") or ""
+if not SECRET_KEY:
+    if DATABASE_URL.startswith("sqlite"):
+        # Local development only. Never used against a real (Postgres) database.
+        SECRET_KEY = "dev-only-secret-not-for-production"
+    else:
+        raise RuntimeError(
+            "SECRET_KEY is not set. Set it to a long random value in your hosting environment "
+            "(e.g. Render > Environment). Without it, anyone could forge login tokens."
+        )
+if len(SECRET_KEY) < 32 and not DATABASE_URL.startswith("sqlite"):
+    raise RuntimeError("SECRET_KEY is too short. Use at least 32 random characters.")
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
