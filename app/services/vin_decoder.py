@@ -158,6 +158,49 @@ BODY_TO_SILHOUETTE = [
 
 _cache: dict[str, tuple[float, dict]] = {}
 
+# ---------------------------------------------------------------------------
+# Free genuine-parts catalogues. Neither site has an API, so we link to the
+# right brand catalogue and the buyer pastes their VIN / frame number there.
+# ---------------------------------------------------------------------------
+AMAYAMA_BRANDS = {
+    "Toyota": "toyota", "Lexus": "lexus", "Nissan": "nissan", "Infiniti": "infiniti",
+    "Honda": "honda", "Mitsubishi": "mitsubishi", "Mazda": "mazda", "Subaru": "subaru",
+    "Suzuki": "suzuki", "Daihatsu": "daihatsu", "Hyundai": "hyundai", "Kia": "kia",
+    "BMW": "bmw", "BMW M": "bmw", "Mercedes-Benz": "mercedes-benz", "Volkswagen": "volkswagen",
+    "Audi": "audi", "Porsche": "porsche", "SEAT": "seat", "Skoda": "skoda",
+}
+MEGAZIP_BRANDS = {
+    "Toyota": "toyota", "Nissan": "nissan", "Honda": "honda", "Hyundai": "hyundai", "Kia": "kia",
+}
+AMAYAMA_INDEX = "https://www.amayama.com/en/genuine-catalogs"
+MEGAZIP_INDEX = "https://www.megazip.net/zapchasti-dlya-avtomobilej"
+MEGAZIP_COVERS = {"Toyota", "Lexus", "Nissan", "Honda", "Mazda", "Mitsubishi", "Subaru", "Suzuki", "Hyundai", "Kia"}
+
+
+def parts_catalog_links(make: Optional[str]) -> list[dict]:
+    """Links to free genuine-parts catalogues for this make (or the catalogue index)."""
+    links = []
+    canonical = None
+    for name in AMAYAMA_BRANDS:
+        if make and name.lower() == make.strip().lower():
+            canonical = name
+            break
+    if make is None or canonical in AMAYAMA_BRANDS:
+        slug = AMAYAMA_BRANDS.get(canonical)
+        links.append({
+            "name": "Amayama",
+            "url": f"{AMAYAMA_INDEX}/{slug}" if slug else AMAYAMA_INDEX,
+            "accepts": "VIN or Japanese frame number",
+        })
+    if make is None or canonical in MEGAZIP_COVERS:
+        slug = MEGAZIP_BRANDS.get(canonical)
+        links.append({
+            "name": "Megazip",
+            "url": f"https://www.megazip.net/parts/{slug}" if slug else MEGAZIP_INDEX,
+            "accepts": "VIN or frame number",
+        })
+    return links
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -392,6 +435,7 @@ async def decode(raw_vin: str, use_online: bool = True) -> dict:
 
     if not result["make"]:
         warnings.append("We don't recognise this manufacturer code yet.")
+    result["parts_catalogs"] = parts_catalog_links(result["make"]) if result["make"] else []
     result["placeholder"] = silhouette_for(result["body_class"])
     result["title"] = " ".join(str(p) for p in (result["year"], result["make"], result["model"]) if p) or "Unknown vehicle"
     return result

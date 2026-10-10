@@ -136,3 +136,33 @@ def test_api_endpoints(offline):
     assert legacy["common_parts_to_check"]
     bad = client.get("/api/nhtsa/decode-vin/NZE121-1234567")
     assert bad.status_code == 400 and "chassis" in bad.json()["detail"]
+
+
+# ---------- genuine parts catalogue links ----------
+
+def test_catalog_links_for_toyota():
+    links = {l["name"]: l["url"] for l in vd.parts_catalog_links("TOYOTA")}
+    assert links == {
+        "Amayama": "https://www.amayama.com/en/genuine-catalogs/toyota",
+        "Megazip": "https://www.megazip.net/parts/toyota",
+    }
+
+
+def test_catalog_links_for_mazda_uses_megazip_index():
+    links = {l["name"]: l["url"] for l in vd.parts_catalog_links("Mazda")}
+    assert links["Amayama"].endswith("/mazda")
+    assert links["Megazip"] == vd.MEGAZIP_INDEX
+
+
+def test_no_catalog_links_for_unsupported_make():
+    assert vd.parts_catalog_links("Ford") == []
+
+
+def test_catalog_index_links_when_make_unknown():
+    names = [l["name"] for l in vd.parts_catalog_links(None)]
+    assert names == ["Amayama", "Megazip"]
+
+
+def test_decode_includes_catalog_links(offline):
+    result = run(vd.decode("JTDBR32E1A0000000"))
+    assert [l["name"] for l in result["parts_catalogs"]] == ["Amayama", "Megazip"]
