@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app import models, schemas
+from app.services import search
 from app.auth import get_current_admin, get_current_user
 from app.db import get_db
 
@@ -93,15 +94,11 @@ async def search_vehicles(
     query = select(models.VehicleListing)
 
     if q:
-        like = f"%{q}%"
-        query = query.where(
-            or_(
-                models.VehicleListing.title.ilike(like),
-                models.VehicleListing.make.ilike(like),
-                models.VehicleListing.model.ilike(like),
-                models.VehicleListing.vin.ilike(like),
-            )
-        )
+        cond = search.condition(q, (models.VehicleListing.title, models.VehicleListing.make,
+                                    models.VehicleListing.model, models.VehicleListing.vin,
+                                    models.VehicleListing.description))
+        if cond is not None:
+            query = query.where(cond)
     if make:
         query = query.where(models.VehicleListing.make.ilike(f"%{make}%"))
     if model:
