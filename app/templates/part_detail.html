@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
-<link rel="stylesheet" href="/static/ui.css?v=4">
+<link rel="stylesheet" href="/static/ui.css?v=5">
 <link rel="stylesheet" href="/static/chrome.css?v=4">
 </head>
 <body>
@@ -60,10 +60,7 @@
   app.innerHTML =
    '<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Parts</a><span>/</span>' + (p.category ? '<a href="/?cat=' + encodeURIComponent(p.category) + '">' + esc(p.category) + '</a><span>/</span>' : '') + '<span>' + esc(title) + '</span></nav>' +
    '<div class="detail">' +
-    '<div>' +
      '<div class="gallery">' + (img ? '<img src="' + esc(img) + '" alt="' + esc(title) + '">' : '<svg aria-hidden="true"><use href="#i-part"/></svg>') + '</div>' +
-     (p.description ? '<section class="box" style="margin-top:16px"><h2>About this part</h2><p style="white-space:pre-line">' + esc(p.description) + '</p></section>' : '') +
-    '</div>' +
     '<aside class="buybox">' +
      '<h1>' + esc(title) + '</h1>' +
      '<div><div class="big-price"><small>SLL</small>' + fmt(p.price_sll) + '</div>' + (p.price_usd ? '<div class="sub-price">About $' + fmt(p.price_usd) + '</div>' : '') + '</div>' +
@@ -77,6 +74,9 @@
      '</div>' +
      '<p class="hint">Pay on delivery or by mobile money at checkout. Always check the part number with the seller before you pay.</p>' +
     '</aside>' +
+    '<div class="more">' +
+     (p.description ? '<section class="box"><h2>About this part</h2><p style="white-space:pre-line">' + esc(p.description) + '</p></section>' : '') +
+    '</div>' +
    '</div>' +
    '<h2 class="section-title" id="similar-title" hidden>More ' + esc(p.category || 'parts') + '</h2><div class="listing-grid" id="similar"></div>';
 

@@ -8,8 +8,13 @@ class VehicleCreate(BaseModel):
     model: str
     year: int
     price_sll: float
+    price_usd: Optional[float] = None
     location: Optional[str] = None
     description: Optional[str] = None
+    contact_phone: Optional[str] = None
+    mileage_km: Optional[float] = None
+    fuel_type: Optional[str] = None
+    transmission: Optional[str] = None
     
     # Dealership / Import Fields
     condition: Optional[str] = "used"          # "new" or "used"
@@ -31,8 +36,14 @@ class VehicleResponse(BaseModel):
     model: str
     year: int
     price_sll: float
+    price_usd: Optional[float] = None
     location: Optional[str] = None
     description: Optional[str] = None
+    image_url: Optional[str] = None
+    contact_phone: Optional[str] = None
+    mileage_km: Optional[float] = None
+    fuel_type: Optional[str] = None
+    transmission: Optional[str] = None
     
     # Dealership / Import Fields
     condition: Optional[str] = "used"

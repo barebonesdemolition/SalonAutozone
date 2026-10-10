@@ -133,7 +133,13 @@ textarea.input, textarea.inp { min-height: 96px; resize: vertical; }
 .crumbs a { color: var(--muted); text-decoration: none; }
 .crumbs a:hover { color: var(--teal); }
 .detail { display: grid; gap: 20px; padding: 14px 0 8px; }
-@media (min-width: 900px) { .detail { grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr); gap: 32px; align-items: start; } }
+@media (min-width: 900px) {
+  .detail { grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr); grid-template-areas: "g b" "m b"; gap: 20px 32px; align-items: start; }
+  .detail > .gallery { grid-area: g; }
+  .detail > .buybox { grid-area: b; }
+  .detail > .more { grid-area: m; }
+}
+.more { display: grid; gap: 16px; }
 .gallery { border-radius: var(--r-lg); overflow: hidden; background: var(--teal-50); aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; color: var(--teal); }
 .gallery img { width: 100%; height: 100%; object-fit: cover; }
 .gallery svg { width: 72px; height: 72px; opacity: .45; }

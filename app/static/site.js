@@ -117,8 +117,8 @@
         '<div class="saz-sheet" id="saz-sell-sheet" role="dialog" aria-modal="true" aria-labelledby="saz-sell-title"><div class="saz-sheet-panel">' +
         '<button class="saz-sheet-x" type="button" aria-label="Close" data-saz-close>&times;</button>' +
         '<h2 id="saz-sell-title">What are you selling?</h2>' +
-        '<a class="saz-sheet-opt" href="/?action=list-part">' + icon('part') + 'A part or accessory</a>' +
-        '<a class="saz-sheet-opt" href="/sell">' + icon('car') + 'A car, truck or bike</a>' +
+        '<a class="saz-sheet-opt" href="/sell?type=part">' + icon('part') + 'A part or accessory</a>' +
+        '<a class="saz-sheet-opt" href="/sell?type=car">' + icon('car') + 'A car, truck or bike</a>' +
         '</div></div>');
       el = document.getElementById('saz-sell-sheet');
       el.addEventListener('click', function (e) {

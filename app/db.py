@@ -32,6 +32,23 @@ SessionLocal = sessionmaker(bind=sync_engine, autoflush=False, autocommit=False,
 Base = declarative_base()
 
 
+async def ensure_vehicle_listing_columns():
+    """Add gearbox/fuel columns to vehicle_listings tables created before they existed."""
+    async with engine.begin() as connection:
+        def get_columns(sync_connection):
+            inspector = inspect(sync_connection)
+            if not inspector.has_table("vehicle_listings"):
+                return None
+            return {column["name"] for column in inspector.get_columns("vehicle_listings")}
+
+        existing = await connection.run_sync(get_columns)
+        if existing is None:
+            return
+        for column in ("fuel_type", "transmission"):
+            if column not in existing:
+                await connection.execute(text(f"ALTER TABLE vehicle_listings ADD COLUMN {column} VARCHAR"))
+
+
 async def ensure_business_contact_columns():
     """Add business storefront fields to databases created by the older ORM model."""
     async with engine.begin() as connection:

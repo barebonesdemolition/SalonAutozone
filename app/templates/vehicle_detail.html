@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
-<link rel="stylesheet" href="/static/ui.css?v=4">
+<link rel="stylesheet" href="/static/ui.css?v=5">
 <link rel="stylesheet" href="/static/chrome.css?v=4">
 <style>
 .check-row { display: flex; gap: 8px; margin-top: 10px; }
@@ -70,11 +70,7 @@
   app.innerHTML =
    '<nav class="crumbs" aria-label="Breadcrumb"><a href="/?tab=cars">Cars</a><span>/</span>' + (v.make ? '<a href="/?tab=cars&make=' + encodeURIComponent(v.make) + '">' + esc(v.make) + '</a><span>/</span>' : '') + '<span>' + esc(title) + '</span></nav>' +
    '<div class="detail">' +
-    '<div>' +
      '<div class="gallery">' + (img ? '<img src="' + esc(img) + '" alt="' + esc(title) + '">' : '<svg aria-hidden="true"><use href="#i-car"/></svg>') + '</div>' +
-     (v.description ? '<section class="box" style="margin-top:16px"><h2>From the seller</h2><p style="white-space:pre-line">' + esc(v.description) + '</p></section>' : '') +
-     '<section class="box" style="margin-top:16px" id="check"><h2>Free VIN and safety check</h2><div id="check-body"></div></section>' +
-    '</div>' +
     '<aside class="buybox">' +
      '<h1>' + esc(title) + '</h1>' +
      '<div><div class="big-price"><small>SLL</small>' + fmt(v.price_sll) + '</div>' + (v.price_usd ? '<div class="sub-price">About $' + fmt(v.price_usd) + '</div>' : '') + '</div>' +
@@ -87,6 +83,10 @@
      '</div>' +
      '<div class="box"><h2>Before you pay</h2><ul class="tips"><li>See the car in person, in daylight.</li><li>Check the VIN on the car matches the papers.</li><li>Take a mechanic you trust for a test drive.</li><li>Never send money before you\'ve seen the car.</li></ul></div>' +
     '</aside>' +
+    '<div class="more">' +
+     (v.description ? '<section class="box"><h2>From the seller</h2><p style="white-space:pre-line">' + esc(v.description) + '</p></section>' : '') +
+     '<section class="box" id="check"><h2>Free VIN and safety check</h2><div id="check-body"></div></section>' +
+    '</div>' +
    '</div>';
 
   if (wa || phone) {

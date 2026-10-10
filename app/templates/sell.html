@@ -1,320 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sell your car · SalonAutoZone</title>
-<style>
-* { box-sizing: border-box; }
-body { margin:0; font-family: Inter, system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
-.top { display:flex; justify-content:space-between; align-items:center; padding:18px clamp(16px,5vw,56px); background:#fff; border-bottom:1px solid #e2e8f0; }
-.brand { font-weight:800; text-decoration:none; color:#0f172a; }
-.brand span { color:#0f766e; }
-.wrap { max-width: 720px; margin: 24px auto; padding: 0 16px; }
-h1 { font-size: 26px; margin: 0 0 8px; }
-.sub { color:#64748b; font-size:14px; margin: 0 0 24px; }
-.card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding: 24px; box-shadow: 0 4px 20px rgba(15,23,42,.04); }
-.row { display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px; }
-.row.full { grid-template-columns: 1fr; }
-label { display:block; font-size:12px; font-weight:700; color:#475569; margin-bottom:5px; text-transform:uppercase; letter-spacing:.04em; }
-input, select, textarea { width:100%; padding:11px 12px; border:1px solid #cbd5e1; border-radius:8px; font: inherit; background:#fff; }
-input:focus, select:focus, textarea:focus { outline: 3px solid rgba(13,148,136,.2); border-color:#0d9488; }
-textarea { resize: vertical; min-height: 80px; }
-.btn { display:inline-flex; align-items:center; justify-content:center; padding: 12px 20px; border:0; border-radius:8px; background:#0f766e; color:#fff; font: inherit; font-weight:700; cursor:pointer; text-decoration:none; }
-.btn:hover { background:#0d9488; }
-.btn:disabled { opacity:.6; cursor:wait; }
-.btn.ghost { background:#fff; color:#0f766e; border:1px solid #0f766e; }
-.btn-row { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
-.vin-row { display:flex; gap:8px; align-items:flex-end; }
-.vin-row input { flex:1; }
-.photos { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-.photo { position:relative; width:90px; height:90px; border-radius:8px; overflow:hidden; background:#e2e8f0; }
-.photo img { width:100%; height:100%; object-fit:cover; }
-.photo .rm { position:absolute; top:2px; right:2px; background:#dc2626; color:#fff; border:0; border-radius:50%; width:20px; height:20px; cursor:pointer; font-size:12px; line-height:1; }
-.status { margin-top:12px; font-size:14px; min-height:20px; }
-.status.ok { color:#0f766e; font-weight:600; }
-.status.err { color:#b91c1c; font-weight:600; }
-@media (max-width:520px) { .row { grid-template-columns: 1fr; } }
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
-</style>
-
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sell · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=5">
 <link rel="stylesheet" href="/static/chrome.css?v=4">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<style>
+.sell { max-width: 760px; margin: 0 auto; padding: 22px 0 40px; }
+.sell h1 { font-size: clamp(30px, 5.4vw, 44px); font-variation-settings: "wdth" 76; }
+.sell .lede { color: var(--muted); margin-top: 6px; }
+.seg { display: inline-grid; grid-template-columns: 1fr 1fr; background: #e7eceb; border-radius: 12px; padding: 4px; margin: 18px 0 4px; }
+.seg button { min-height: 44px; padding: 0 22px; border: 0; border-radius: 9px; background: none; font-weight: 700; color: var(--muted); }
+.seg button[aria-selected="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(14, 42, 43, .15); }
+fieldset { border: 0; margin: 0; padding: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); margin-top: 14px; }
+legend { float: left; width: 100%; padding: 0; font-size: 20px; font-weight: 800; color: var(--ink); font-variation-settings: "wdth" 82; margin-bottom: 2px; }
+legend + * { clear: both; }
+.grid2 { display: grid; gap: 0 12px; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+.vin-row { display: flex; gap: 8px; }
+.vin-row .input { text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.photo-drop { display: flex; align-items: center; gap: 14px; margin-top: 10px; padding: 14px; border: 2px dashed var(--line); border-radius: var(--r-md); cursor: pointer; background: var(--paper); }
+.photo-drop:hover { border-color: var(--teal); }
+.photo-drop .pv { width: 96px; height: 72px; border-radius: var(--r-sm); background: var(--teal-50) center / cover no-repeat; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--teal); font-size: 28px; }
+.photo-drop b { display: block; color: var(--ink); }
+.submit-bar { margin-top: 18px; display: grid; gap: 8px; }
+.status { font-weight: 600; text-align: center; min-height: 1.5em; }
+.status.err { color: var(--bad); }
+.status.ok { color: var(--ok); }
+.req::after { content: " *"; color: var(--bad); }
+</style>
 </head>
 <body>
 <div id="site-header"></div>
-<div class="wrap">
- <h1>Sell your car</h1>
- <p class="sub">Fill in the details and add photos. Takes about 2 minutes.</p>
- <div class="card">
- <form id="sell-form">
- <div class="row full">
- <div>
- <label for="vin">VIN (optional — autofills make/model/year)</label>
- <div class="vin-row">
- <input id="vin" name="vin" maxlength="17" placeholder="17-character VIN" autocomplete="off">
- <button type="button" class="btn ghost" id="decode-btn">Decode</button>
- </div>
- </div>
- </div>
+<main class="wrap">
+ <div class="sell">
+  <h1 id="h1">Sell a part</h1>
+  <p class="lede" id="lede">Listing is free. Buyers contact you on WhatsApp.</p>
+  <div class="seg" role="tablist" aria-label="What are you selling?">
+   <button type="button" role="tab" data-type="part" aria-selected="true">A part</button>
+   <button type="button" role="tab" data-type="car" aria-selected="false">A car</button>
+  </div>
 
- <div class="row">
- <div>
- <label for="title">Listing title *</label>
- <input id="title" name="title" required placeholder="e.g. 2015 Toyota Camry SE">
- </div>
- <div>
- <label for="price_sll">Price (SLL) *</label>
- <input id="price_sll" name="price_sll" type="number" min="0" step="1000" required placeholder="150000">
- </div>
- </div>
+  <form id="sell-form" novalidate>
+   <!-- CAR ONLY -->
+   <fieldset data-for="car">
+    <legend>Start with the VIN</legend>
+    <p class="hint" style="margin-top:0">Optional. We'll fill in the make, model and year for you, and buyers trust listings with a VIN.</p>
+    <div class="vin-row" style="margin-top:8px">
+     <label class="sr-only" for="vin">VIN</label>
+     <input class="input" id="vin" name="vin" maxlength="17" placeholder="17-character VIN" autocomplete="off">
+     <button type="button" class="btn btn-ghost" id="decode-btn">Fill in</button>
+    </div>
+   </fieldset>
 
- <div class="row">
- <div>
- <label for="make">Make *</label>
- <input id="make" name="make" required placeholder="Toyota">
- </div>
- <div>
- <label for="model">Model *</label>
- <input id="model" name="model" required placeholder="Camry">
- </div>
- </div>
+   <fieldset>
+    <legend id="what-legend">What are you selling?</legend>
+    <div data-for="part">
+     <label class="field"><span class="req">Part name</span><input class="input" name="name" maxlength="120" placeholder="Front brake pads, Toyota Corolla"></label>
+     <div class="grid2">
+      <label class="field"><span class="req">Category</span><select class="select" name="category" id="category"></select></label>
+      <label class="field"><span class="req">Condition</span><select class="select" name="part_condition"><option value="new">New</option><option value="used">Used</option><option value="refurbished">Refurbished</option></select></label>
+     </div>
+     <div class="grid2">
+      <label class="field"><span>Fits make</span><select class="select" name="compatible_make" id="p-make"></select></label>
+      <label class="field"><span>Fits model</span><input class="input" name="compatible_model" placeholder="Corolla" list="p-models"></label>
+     </div>
+     <datalist id="p-models"></datalist>
+     <p class="hint">Saying which car it fits helps buyers find it. Leave blank if it fits many cars.</p>
+    </div>
+    <div data-for="car">
+     <div class="grid2">
+      <label class="field"><span class="req">Make</span><select class="select" name="make" id="c-make"></select></label>
+      <label class="field"><span class="req">Model</span><input class="input" name="model" id="c-model" placeholder="RAV4" list="c-models"></label>
+     </div>
+     <datalist id="c-models"></datalist>
+     <div class="grid2">
+      <label class="field"><span class="req">Year</span><select class="select" name="year" id="c-year"></select></label>
+      <label class="field"><span>Mileage (km)</span><input class="input" name="mileage_km" type="number" min="0" inputmode="numeric" placeholder="120000"></label>
+      <label class="field"><span>Fuel</span><select class="select" name="fuel_type"><option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option></select></label>
+      <label class="field"><span>Gearbox</span><select class="select" name="transmission"><option>Automatic</option><option>Manual</option></select></label>
+      <label class="field"><span>Condition</span><select class="select" name="car_condition"><option value="used">Used</option><option value="new">New</option></select></label>
+      <label class="field"><span>Duty</span><select class="select" name="duty_paid"><option value="false">Not paid</option><option value="true">Paid</option></select></label>
+     </div>
+     <label class="field"><span>Listing title</span><input class="input" name="title" id="c-title" maxlength="120" placeholder="Filled in from make, model and year"></label>
+    </div>
+    <label class="field"><span>Description</span><textarea class="input" name="description" rows="4" maxlength="2000" placeholder="Condition, history, anything a buyer should know"></textarea></label>
+   </fieldset>
 
- <div class="row">
- <div>
- <label for="year">Year *</label>
- <input id="year" name="year" type="number" min="1900" max="2100" required placeholder="2015">
- </div>
- <div>
- <label for="condition">Condition</label>
- <select id="condition" name="condition">
- <option value="used">Used</option>
- <option value="new">New</option>
- </select>
- </div>
- </div>
+   <fieldset>
+    <legend>Photo</legend>
+    <label class="photo-drop" for="photo"><span class="pv" id="pv">+</span><span><b id="photo-label">Add a photo</b><span class="hint" style="display:block;margin:0">A clear photo in daylight sells faster. JPG, PNG or WEBP up to 5 MB.</span></span></label>
+    <input type="file" id="photo" accept="image/jpeg,image/png,image/webp" class="sr-only">
+   </fieldset>
 
- <div class="row">
- <div>
- <label for="location">Location</label>
- <input id="location" name="location" placeholder="Freetown">
- </div>
- <div>
- <label for="country_of_origin">Country of origin</label>
- <input id="country_of_origin" name="country_of_origin" placeholder="Japan">
- </div>
- </div>
+   <fieldset>
+    <legend>Price and contact</legend>
+    <div class="grid2">
+     <label class="field"><span class="req">Price (SLL)</span><input class="input" name="price_sll" type="number" min="1" inputmode="numeric" placeholder="185000"></label>
+     <label class="field" data-for="part"><span>How many do you have?</span><input class="input" name="stock_quantity" type="number" min="1" value="1"></label>
+     <label class="field" data-for="car"><span>Price in USD (optional)</span><input class="input" name="price_usd" type="number" min="0"></label>
+     <label class="field"><span class="req">Location</span><select class="select" name="location" id="location"></select></label>
+     <label class="field"><span class="req">WhatsApp number</span><input class="input" name="contact_phone" id="phone" type="tel" placeholder="+232 76 123456" autocomplete="tel"></label>
+    </div>
+   </fieldset>
 
- <div class="row">
- <div>
- <label for="availability">Availability</label>
- <select id="availability" name="availability">
- <option value="in_stock">In stock</option>
- <option value="on_order">On order</option>
- <option value="in_transit">In transit</option>
- </select>
+   <div class="submit-bar">
+    <button class="btn btn-primary btn-lg btn-block" type="submit" id="submit">Publish listing</button>
+    <div class="status" id="status" aria-live="polite"></div>
+   </div>
+  </form>
  </div>
- <div>
- <label for="duty_paid">Duty paid</label>
- <select id="duty_paid" name="duty_paid">
- <option value="false">No</option>
- <option value="true">Yes</option>
- </select>
- </div>
- </div>
-
- <div class="row full">
- <div>
- <label for="description">Description</label>
- <textarea id="description" name="description" placeholder="Condition details, extras, service history..."></textarea>
- </div>
- </div>
-
- <div class="row full">
- <div>
- <label for="photos">Photos (up to 6, max 5 MB each)</label>
- <input id="photos" type="file" accept="image/*" multiple>
- <div class="photos" id="previews"></div>
- </div>
- </div>
-
- <div class="btn-row">
- <button type="submit" class="btn" id="submit">Post listing</button>
- <a href="/" class="btn ghost">Cancel</a>
- </div>
- <p class="status" id="status"></p>
- </form>
- </div>
-</div>
-
+</main>
+<script src="/static/site.js?v=4"></script>
 <script>
-(function() {
- var token = null;
- try { token = localStorage.getItem('token') || localStorage.getItem('access_token'); } catch(e) {}
- if (!token) {
- location.replace('/login?next=' + encodeURIComponent('/sell'));
- return;
+(function () {
+ 'use strict';
+ var token = '';
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
+ if (!token) { location.replace('/login?next=' + encodeURIComponent(location.pathname + location.search)); return; }
+ var $ = function (id) { return document.getElementById(id); };
+ var form = $('sell-form'), status = $('status'), submit = $('submit');
+ var CITIES = ['Freetown', 'Bo', 'Kenema', 'Makeni', 'Koidu', 'Lunsar', 'Port Loko', 'Kabala', 'Waterloo'];
+ var CATS = ['Fluids', 'Filters', 'Batteries', 'Brakes', 'Engine', 'Suspension', 'Electrical', 'Tires & Wheels', 'Transmission', 'Body', 'Interior', 'Exhaust', 'Lighting', 'Audio', 'Accessories'];
+ var RAW = 'Toyota:Corolla,Camry,Hilux,RAV4,Land Cruiser,Prado,Vitz,Yaris,Avensis,Prius,Highlander,Hiace;Nissan:X-Trail,Altima,Sunny,Patrol,Navara,Qashqai,Juke,Note,Murano;Honda:Civic,Accord,CR-V,Fit,Jazz,Pilot;Mitsubishi:Pajero,Lancer,Outlander,L200;Mazda:CX-5,Mazda3,Mazda6,BT-50;Suzuki:Swift,Vitara,Jimny,Alto;Subaru:Forester,Outback,Impreza;Isuzu:D-Max,MU-X,Trooper;Lexus:RX,NX,ES,GX,LX;Hyundai:Tucson,Santa Fe,Elantra,Sonata,i10,Accent,Creta;Kia:Sportage,Sorento,Rio,Cerato,Picanto;Mercedes-Benz:C-Class,E-Class,S-Class,GLC,GLE,ML,G-Class,Sprinter;BMW:3 Series,5 Series,X3,X5,X6;Volkswagen:Golf,Passat,Tiguan,Polo,Jetta;Audi:A3,A4,A6,Q5,Q7;Ford:Focus,Fiesta,Ranger,Explorer,Escape;Chevrolet:Cruze,Malibu,Equinox,Tahoe;Jeep:Wrangler,Grand Cherokee;Peugeot:208,308,3008,Partner;Renault:Clio,Duster,Logan;Land Rover:Defender,Discovery,Range Rover,Evoque;Volvo:XC60,XC90;Chery:Tiggo 4,Tiggo 7;Geely:Coolray,Emgrand;BYD:Atto 3,Han,Seal';
+ var MAKES = [], MODELS = {};
+ RAW.split(';').forEach(function (p) { var a = p.split(':'); MAKES.push(a[0]); MODELS[a[0]] = a[1].split(','); });
+ MAKES.push('Other');
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function opts(list, first) { return (first != null ? '<option value="">' + esc(first) + '</option>' : '') + list.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + '</option>'; }).join(''); }
+ function setStatus(msg, kind) { status.textContent = msg; status.className = 'status' + (kind ? ' ' + kind : ''); }
+ function auth(json) { var h = { Authorization: 'Bearer ' + token }; if (json) h['Content-Type'] = 'application/json'; return h; }
+
+ // ---- fill selects ----
+ $('category').innerHTML = opts(CATS, 'Choose a category');
+ $('p-make').innerHTML = opts(MAKES, 'Many cars');
+ $('c-make').innerHTML = opts(MAKES, 'Choose a make');
+ var years = []; for (var y = new Date().getFullYear() + 1; y >= 1975; y--) years.push(y);
+ $('c-year').innerHTML = opts(years, 'Choose a year');
+ $('location').innerHTML = opts(CITIES, 'Choose a city');
+ function models(listId, make) { $(listId).innerHTML = (MODELS[make] || []).map(function (m) { return '<option value="' + esc(m) + '">'; }).join(''); }
+ $('p-make').addEventListener('change', function () { models('p-models', this.value); });
+ $('c-make').addEventListener('change', function () { models('c-models', this.value); autoTitle(); });
+ ['c-model', 'c-year'].forEach(function (id) { $(id).addEventListener('change', autoTitle); });
+ var titleTouched = false;
+ $('c-title').addEventListener('input', function () { titleTouched = !!this.value; });
+ function autoTitle() {
+  if (titleTouched) return;
+  $('c-title').value = [$('c-year').value, $('c-make').value, $('c-model').value].filter(Boolean).join(' ');
  }
+ try { var u = JSON.parse(localStorage.getItem('userInfo') || '{}'); if (u.phone) $('phone').value = u.phone; } catch (e) {}
 
- var form = document.getElementById('sell-form');
- var status = document.getElementById('status');
- var submit = document.getElementById('submit');
- var photosInput = document.getElementById('photos');
- var previews = document.getElementById('previews');
- var decodeBtn = document.getElementById('decode-btn');
- var selectedFiles = [];
-
- function setStatus(msg, kind) {
- status.textContent = msg;
- status.className = 'status' + (kind ? ' ' + kind : '');
+ // ---- part / car switch ----
+ var type = new URLSearchParams(location.search).get('type') === 'car' ? 'car' : 'part';
+ function setType(t) {
+  type = t;
+  document.querySelectorAll('.seg button').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.type === t); });
+  document.querySelectorAll('[data-for]').forEach(function (el) { el.hidden = el.dataset.for !== t; });
+  $('h1').textContent = t === 'car' ? 'Sell your car' : 'Sell a part';
+  $('what-legend').textContent = t === 'car' ? 'About the car' : 'About the part';
+  try { history.replaceState(null, '', '/sell?type=' + t); } catch (e) {}
+  setStatus('');
  }
+ document.querySelectorAll('.seg button').forEach(function (b) { b.addEventListener('click', function () { setType(b.dataset.type); }); });
+ setType(type);
 
- function authHeaders() {
- return token ? { 'Authorization': 'Bearer ' + token } : {};
- }
-
- decodeBtn.addEventListener('click', async function() {
- var vin = document.getElementById('vin').value.trim().toUpperCase();
- if (vin.length !== 17) { setStatus('VIN must be 17 characters', 'err'); return; }
- setStatus('Decoding VIN...');
- try {
- var r = await fetch('/api/nhtsa/decode-vin/' + encodeURIComponent(vin));
- var d = await r.json();
- if (!r.ok) throw new Error(d.detail || 'Decode failed');
- if (d.make) document.getElementById('make').value = d.make;
- if (d.model) document.getElementById('model').value = d.model;
- if (d.year) document.getElementById('year').value = d.year;
- if (d.plant_country) document.getElementById('country_of_origin').value = d.plant_country;
- if (!document.getElementById('title').value && d.year && d.make && d.model) {
- document.getElementById('title').value = d.year + ' ' + d.make + ' ' + d.model;
- }
- setStatus('VIN decoded — check the fields above', 'ok');
- } catch (e) {
- setStatus('Could not decode: ' + e.message, 'err');
- }
+ // ---- VIN autofill ----
+ $('decode-btn').addEventListener('click', function () {
+  var vin = $('vin').value.replace(/\s+/g, '').toUpperCase();
+  if (vin.length !== 17) { setStatus('A VIN has 17 characters.', 'err'); return; }
+  setStatus('Reading the VIN…');
+  fetch('/api/vin/decode/' + encodeURIComponent(vin)).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'We couldn\'t read this VIN.'); return d; }); })
+   .then(function (d) {
+    var make = d.make ? d.make.charAt(0) + d.make.slice(1).toLowerCase() : '';
+    var match = MAKES.find(function (m) { return m.toLowerCase() === String(d.make || '').toLowerCase(); });
+    if (match) { $('c-make').value = match; models('c-models', match); }
+    else if (make) { $('c-make').add(new Option(make, make)); $('c-make').value = make; }
+    if (d.model) $('c-model').value = d.model;
+    if (d.year) $('c-year').value = d.year;
+    titleTouched = false; autoTitle();
+    setStatus(d.model ? 'Filled in from the VIN. Check it\'s right.' : 'We found the make and year. Please add the model.', 'ok');
+   }).catch(function (e) { setStatus(e.message, 'err'); });
  });
 
- photosInput.addEventListener('change', function() {
- var files = Array.from(photosInput.files || []).slice(0, 6);
- selectedFiles = files;
- previews.innerHTML = '';
- files.forEach(function(f, i) {
- var url = URL.createObjectURL(f);
- var div = document.createElement('div');
- div.className = 'photo';
- div.innerHTML = '<img src="' + url + '"><button type="button" class="rm" data-i="' + i + '">×</button>';
- previews.appendChild(div);
- });
- previews.querySelectorAll('.rm').forEach(function(btn) {
- btn.addEventListener('click', function() {
- var i = parseInt(btn.dataset.i, 10);
- selectedFiles.splice(i, 1);
- photosInput.value = '';
- previews.innerHTML = '';
- selectedFiles.forEach(function(f, j) {
- var url = URL.createObjectURL(f);
- var div = document.createElement('div');
- div.className = 'photo';
- div.innerHTML = '<img src="' + url + '"><button type="button" class="rm" data-i="' + j + '">×</button>';
- previews.appendChild(div);
- });
- Array.from(previews.querySelectorAll('.rm')).forEach(function(b2, k) {
- b2.addEventListener('click', function(){ selectedFiles.splice(k,1); b2.parentElement.remove(); });
- });
- });
- });
+ // ---- photo ----
+ var photo = null;
+ $('photo').addEventListener('change', function () {
+  var f = this.files && this.files[0];
+  if (!f) return;
+  if (f.size > 5 * 1024 * 1024) { setStatus('That photo is over 5 MB. Choose a smaller one.', 'err'); this.value = ''; return; }
+  photo = f;
+  $('pv').style.backgroundImage = 'url(' + URL.createObjectURL(f) + ')';
+  $('pv').textContent = '';
+  $('photo-label').textContent = 'Change photo';
+  setStatus('');
  });
 
- form.addEventListener('submit', async function(ev) {
- ev.preventDefault();
- submit.disabled = true;
- setStatus('Creating listing...');
+ // ---- submit ----
+ form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  var f = form.elements;
+  function val(n) { return (f.namedItem(n) && f.namedItem(n).value || '').trim(); }
+  var body, url, errs = [];
+  var price = parseFloat(val('price_sll'));
+  if (!(price > 0)) errs.push('a price');
+  if (!val('location')) errs.push('a location');
+  if (val('contact_phone').replace(/\D/g, '').length < 6) errs.push('a WhatsApp number');
+  if (type === 'part') {
+   if (!val('name')) errs.unshift('the part name');
+   if (!val('category')) errs.unshift('a category');
+   body = {
+    name: val('name'), category: val('category'), condition: val('part_condition') || 'used',
+    compatible_make: val('compatible_make') || null, compatible_model: val('compatible_model') || null,
+    price_sll: price, stock_quantity: Math.max(1, parseInt(val('stock_quantity'), 10) || 1),
+    location: val('location'), contact_phone: val('contact_phone'), description: val('description') || null
+   };
+   url = '/api/parts/';
+  } else {
+   if (!val('make')) errs.unshift('the make');
+   if (!val('model')) errs.unshift('the model');
+   if (!val('year')) errs.unshift('the year');
+   body = {
+    title: val('title') || [val('year'), val('make'), val('model')].join(' '),
+    make: val('make'), model: val('model'), year: parseInt(val('year'), 10),
+    price_sll: price, price_usd: parseFloat(val('price_usd')) || null,
+    mileage_km: parseFloat(val('mileage_km')) || null, fuel_type: val('fuel_type'), transmission: val('transmission'),
+    condition: val('car_condition') || 'used', duty_paid: val('duty_paid') === 'true',
+    vin: val('vin').replace(/\s+/g, '').toUpperCase() || null,
+    location: val('location'), contact_phone: val('contact_phone'), description: val('description') || null
+   };
+   url = '/api/vehicles/';
+  }
+  if (errs.length) { setStatus('Please add ' + errs.join(', ') + '.', 'err'); return; }
 
- var fd = new FormData(form);
- var body = {
- title: fd.get('title'),
- make: fd.get('make'),
- model: fd.get('model'),
- year: parseInt(fd.get('year'), 10),
- price_sll: parseFloat(fd.get('price_sll')),
- location: fd.get('location') || null,
- description: fd.get('description') || null,
- condition: fd.get('condition') || 'used',
- availability: fd.get('availability') || 'in_stock',
- country_of_origin: fd.get('country_of_origin') || null,
- vin: fd.get('vin') || null,
- duty_paid: fd.get('duty_paid') === 'true'
- };
-
- try {
- var r = await fetch('/api/vehicles/', {
- method: 'POST',
- headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
- body: JSON.stringify(body)
- });
- var d = await r.json();
- if (!r.ok) throw new Error(d.detail || ('Create failed (' + r.status + ')'));
- var vehicleId = d.id;
-
-      if (selectedFiles.length > 0) {
-        setStatus('Uploading ' + selectedFiles.length + ' photo(s)...');
-        var uploadErrors = [];
-        for (var i = 0; i < selectedFiles.length; i++) {
-          var f = selectedFiles[i];
-          var upFd = new FormData();
-          upFd.append('file', f);
-          try {
-            var upRes = await fetch('/api/upload/vehicle/' + vehicleId, {
-              method: 'POST',
-              headers: authHeaders(),
-              body: upFd
-            });
-            var upBody = await upRes.text();
-            if (!upRes.ok) {
-              uploadErrors.push('Photo ' + (i+1) + ' (' + upRes.status + '): ' + upBody.substring(0, 150));
-            }
-          } catch (e) {
-            uploadErrors.push('Photo ' + (i+1) + ' network error: ' + e.message);
-          }
-        }
-        if (uploadErrors.length > 0) {
-          console.error('Upload failures:', uploadErrors);
-          setStatus('Listing created, but photo upload failed: ' + uploadErrors.join(' | '), 'err');
-          submit.disabled = false;
-          return;
-        }
-      }
-
- setStatus('Listing created! Redirecting...', 'ok');
- setTimeout(function() { location.href = '/vehicle/' + vehicleId; }, 800);
- } catch (e) {
- setStatus(e.message, 'err');
- submit.disabled = false;
- }
+  submit.disabled = true; setStatus('Publishing…');
+  fetch(url, { method: 'POST', headers: auth(true), body: JSON.stringify(body) })
+   .then(function (r) {
+    if (r.status === 401) { location.href = '/login?next=' + encodeURIComponent('/sell?type=' + type); throw null; }
+    return r.json().then(function (d) { if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : 'Please check the form and try again.'); return d; });
+   })
+   .then(function (d) {
+    var dest = (type === 'part' ? '/part/' : '/vehicle/') + d.id;
+    if (!photo) { location.href = dest; return; }
+    setStatus('Uploading your photo…');
+    var fd = new FormData(); fd.append('file', photo);
+    return fetch('/api/upload/' + (type === 'part' ? 'part/' : 'vehicle/') + d.id, { method: 'POST', headers: auth(), body: fd })
+     .then(function (r) {
+      if (!r.ok) { setStatus('Published, but the photo didn\'t upload. You can add it later from your dashboard.', 'err'); setTimeout(function () { location.href = dest; }, 2500); return; }
+      location.href = dest;
+     });
+   })
+   .catch(function (err) { if (err) { setStatus(err.message || 'No connection. Try again.', 'err'); submit.disabled = false; } });
  });
 })();
 </script>
-<script src="/static/site.js?v=4"></script>
 </body>
 </html>
