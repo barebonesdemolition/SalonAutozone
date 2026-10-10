@@ -1,10 +1,13 @@
 import os
 import re
+import time
 import traceback
+from collections import defaultdict, deque
 from google import genai
 from google.genai import types
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi.concurrency import run_in_threadpool
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List
@@ -21,8 +24,31 @@ GEMINI_API_KEY = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")
 
 
 class ChatRequest(BaseModel):
-    message: str
-    history: List[dict] = []
+    message: str = Field(min_length=1, max_length=1000)
+    history: List[dict] = Field(default_factory=list, max_length=20)
+
+
+# Simple per-visitor limit so nobody can run up the Gemini bill.
+# (In memory: fine for one server. Move to Redis if you run several.)
+CHAT_LIMIT_PER_HOUR = int(os.getenv("AI_CHAT_LIMIT_PER_HOUR", "30"))
+_chat_hits = defaultdict(deque)
+
+
+def _client_ip(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _check_rate_limit(request: Request):
+    now = time.time()
+    hits = _chat_hits[_client_ip(request)]
+    while hits and now - hits[0] > 3600:
+        hits.popleft()
+    if len(hits) >= CHAT_LIMIT_PER_HOUR:
+        raise HTTPException(status_code=429, detail="You've sent a lot of messages. Please try again in a little while.")
+    hits.append(now)
 
 
 def get_client():
@@ -33,7 +59,8 @@ def get_client():
 
 
 @router.post("/chat")
-async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)):
+async def chat(request: ChatRequest, http_request: Request, db: AsyncSession = Depends(get_db)):
+    _check_rate_limit(http_request)
     client = get_client()
 
     vehicles_result = await db.execute(
@@ -95,7 +122,7 @@ Guidelines:
 
         for h in request.history[-10:]:
             role = "user" if h.get("role") == "user" else "model"
-            text = h.get("content", "")
+            text = str(h.get("content", ""))[:1000]
             if not text:
                 continue
             contents.append(
@@ -112,7 +139,8 @@ Guidelines:
             )
         )
 
-        response = client.models.generate_content(
+        response = await run_in_threadpool(
+            client.models.generate_content,
             model=settings.GEMINI_MODEL,
             contents=contents,
             config=types.GenerateContentConfig(
@@ -134,14 +162,9 @@ Guidelines:
         print("AI CHAT ERROR:", error_detail)
         print(traceback.format_exc())
         print("=" * 60)
-        raise HTTPException(status_code=500, detail=error_detail)
+        raise HTTPException(status_code=502, detail="The assistant is unavailable right now. Please try again.")
 
 
 @router.get("/status")
 async def ai_status():
-    return {
-        "configured": bool(GEMINI_API_KEY),
-        "model": settings.GEMINI_MODEL,
-        "key_prefix": GEMINI_API_KEY[:5] if GEMINI_API_KEY else "none",
-        "key_length": len(GEMINI_API_KEY) if GEMINI_API_KEY else 0,
-    }
+    return {"configured": bool(GEMINI_API_KEY), "model": settings.GEMINI_MODEL}

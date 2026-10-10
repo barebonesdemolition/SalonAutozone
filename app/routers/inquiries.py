@@ -8,6 +8,8 @@ from datetime import datetime
 
 from app.db import get_db
 from app import models
+from app.auth import get_current_user
+from app.routers.admin import require_admin
 
 router = APIRouter(prefix="/api/inquiries", tags=["Inquiries"])
 
@@ -101,6 +103,7 @@ async def list_all_inquiries(
     listing_type: Optional[str] = Query(None),
     limit: int = Query(100, le=500),
     db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_admin),
 ):
     """Admin: list all inquiries."""
     query = select(models.Inquiry)
@@ -114,7 +117,7 @@ async def list_all_inquiries(
 
 
 @router.get("/stats")
-async def inquiry_stats(db: AsyncSession = Depends(get_db)):
+async def inquiry_stats(db: AsyncSession = Depends(get_db), _: dict = Depends(require_admin)):
     """Admin: quick stats."""
     total = await db.execute(select(func.count(models.Inquiry.id)))
     new = await db.execute(
@@ -139,6 +142,7 @@ async def list_inquiries_for_listing(
     listing_type: str,
     listing_id: int,
     db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_admin),
 ):
     """Get all inquiries for a specific listing."""
     result = await db.execute(
@@ -154,8 +158,12 @@ async def list_inquiries_for_listing(
 async def list_inquiries_for_seller(
     seller_id: int,
     db: AsyncSession = Depends(get_db),
+    user: models.User = Depends(get_current_user),
 ):
-    """Get all inquiries on a seller's listings."""
+    """Get all inquiries on a seller's listings. Only that seller (or an admin) may see them."""
+    roles = {r.strip().lower() for r in (user.roles or "").split(",")}
+    if user.id != seller_id and not (user.is_admin or roles & {"admin", "superadmin"}):
+        raise HTTPException(status_code=403, detail="You can only see inquiries on your own listings")
     result = await db.execute(
         select(models.Inquiry)
         .where(models.Inquiry.seller_id == seller_id)
@@ -169,6 +177,7 @@ async def update_inquiry(
     inquiry_id: int,
     update: InquiryUpdate,
     db: AsyncSession = Depends(get_db),
+    _: dict = Depends(require_admin),
 ):
     """Update inquiry status (new → contacted → negotiating → sold → lost)."""
     result = await db.execute(
@@ -188,7 +197,7 @@ async def update_inquiry(
 
 
 @router.delete("/{inquiry_id}")
-async def delete_inquiry(inquiry_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_inquiry(inquiry_id: int, db: AsyncSession = Depends(get_db), _: dict = Depends(require_admin)):
     result = await db.execute(
         select(models.Inquiry).where(models.Inquiry.id == inquiry_id)
     )

@@ -63,6 +63,8 @@ def _seed_legacy_schema():
     module = sys.modules.get("app.models")
     if module is None or not hasattr(module, "User"):
         return
+    if os.getenv("SEED_DEMO_DATA", "false").lower() != "true":
+        return
 
     from app.models import User, Vehicle, Part, Supplier, SupplierPart, PartFitment, Listing, ListingPhoto, Order, OrderItem
 

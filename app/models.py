@@ -405,6 +405,11 @@ def seed_legacy_data():
     if __import__("os").getenv("AUTO_CREATE_TABLES", "false").lower() == "true":
                 Base.metadata.create_all(bind=SessionLocal.kw["bind"])
 
+    # Demo data is for local development and tests only. It used to run on every start-up,
+    # against whatever database was configured (including production).
+    if __import__("os").getenv("SEED_DEMO_DATA", "false").lower() != "true":
+        return
+
     with SessionLocal() as session:
         user_count = session.execute(select(func.count()).select_from(User)).scalar() or 0
         if user_count > 0:
