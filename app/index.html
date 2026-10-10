@@ -438,6 +438,7 @@
   $('feat').innerHTML = feat.map(function (p) { return partCard(p, true, fits(p)); }).join('');
   if (only) reg = reg.filter(fits);
   var h = '';
+  if (data.did_you_mean && (reg.length || feat.length)) h += '<p class="group-title" style="font-size:16px;font-variation-settings:normal;font-weight:600;color:var(--muted)">Showing results for <b style="color:var(--ink)">' + esc(data.did_you_mean) + '</b></p>';
   if (reg.length) h += reg.map(function (p) { return partCard(p, false, fits(p)); }).join('');
   if (cat.length) h += '<h3 class="group-title">Order from abroad<small>Usually arrives in 7–14 days</small></h3>' + cat.map(catalogCard).join('');
   if (!h && !feat.length) {
