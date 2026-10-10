@@ -20,6 +20,7 @@ from app.routers.admin import require_admin
 # --- drivers (must exist as app/drivers.py or the app will not boot) ---
 from app.drivers import ensure_driver_tables, router as drivers_router
 from app.shop import ensure_delivery_tables, router as shop_router
+from app.photos import ensure_photo_tables, router as photos_router
 # ---------------------------------------------------------------------
 from app.routers import (
     admin,
@@ -122,6 +123,7 @@ async def lifespan(_: FastAPI):
     await ensure_subscription_tables()
     await ensure_driver_tables()
     await ensure_delivery_tables()
+    await ensure_photo_tables()
     yield
 
 
@@ -141,6 +143,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.include_router(businesses.router)
 app.include_router(drivers_router)
 app.include_router(shop_router)
+app.include_router(photos_router)
 
 
 @app.exception_handler(HTTPException)

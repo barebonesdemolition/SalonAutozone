@@ -34,3 +34,6 @@ app/static/uploads/*
 *.backup-*
 *.db.backup*
 dev.db
+
+# Local photo uploads
+uploads/

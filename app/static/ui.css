@@ -135,7 +135,7 @@ textarea.input, textarea.inp { min-height: 96px; resize: vertical; }
 .detail { display: grid; gap: 20px; padding: 14px 0 8px; }
 @media (min-width: 900px) {
   .detail { grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr); grid-template-areas: "g b" "m b"; gap: 20px 32px; align-items: start; }
-  .detail > .gallery { grid-area: g; }
+  .detail > .gallery, .detail > .gal-wrap { grid-area: g; }
   .detail > .buybox { grid-area: b; }
   .detail > .more { grid-area: m; }
 }
@@ -168,3 +168,15 @@ textarea.input, textarea.inp { min-height: 96px; resize: vertical; }
 body.has-sticky-cta { padding-bottom: calc(136px + env(safe-area-inset-bottom)); }
 @media (min-width: 900px) { .sticky-cta { display: none; } body.has-sticky-cta { padding-bottom: 0; } }
 .section-title { font-size: 22px; margin: 32px 0 12px; }
+
+/* ---------- Photo gallery (detail pages) ---------- */
+.gal { display: grid; gap: 8px; }
+.gal-main { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: var(--r-lg); background: var(--teal-50); aspect-ratio: 4 / 3; scrollbar-width: none; }
+.gal-main::-webkit-scrollbar { display: none; }
+.gal-main img { width: 100%; height: 100%; object-fit: cover; scroll-snap-align: start; }
+.gal-count { justify-self: end; align-self: start; line-height: 1.3; margin-top: -38px; margin-right: 10px; position: relative; font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: rgba(14, 42, 43, .75); color: #fff; }
+.gal-thumbs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.gal-thumbs button { position: relative; flex-shrink: 0; width: 68px; height: 52px; border-radius: var(--r-sm); border: 2px solid transparent; padding: 0; background: var(--teal-50) center / cover no-repeat; }
+.gal-thumbs button[aria-current="true"] { border-color: var(--teal); }
+.gal-owner { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 14px; }
+.gal-owner .btn { min-height: 36px; padding: 6px 12px; font-size: 14px; }

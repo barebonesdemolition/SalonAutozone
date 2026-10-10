@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
-<link rel="stylesheet" href="/static/ui.css?v=5">
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
 </head>
 <body>
@@ -21,6 +21,7 @@
  <div class="detail"><div class="gallery lcard skeleton" style="border-radius:20px"></div><div class="lcard skeleton"></div></div>
 </main>
 <script src="/static/site.js?v=4"></script>
+<script src="/static/gallery.js?v=1"></script>
 <script>
 (function () {
  'use strict';
@@ -60,7 +61,7 @@
   app.innerHTML =
    '<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Parts</a><span>/</span>' + (p.category ? '<a href="/?cat=' + encodeURIComponent(p.category) + '">' + esc(p.category) + '</a><span>/</span>' : '') + '<span>' + esc(title) + '</span></nav>' +
    '<div class="detail">' +
-     '<div class="gallery">' + (img ? '<img src="' + esc(img) + '" alt="' + esc(title) + '">' : '<svg aria-hidden="true"><use href="#i-part"/></svg>') + '</div>' +
+     '<div id="gal" class="gal-wrap"></div>' +
     '<aside class="buybox">' +
      '<h1>' + esc(title) + '</h1>' +
      '<div><div class="big-price"><small>SLL</small>' + fmt(p.price_sll) + '</div>' + (p.price_usd ? '<div class="sub-price">About $' + fmt(p.price_usd) + '</div>' : '') + '</div>' +
@@ -79,6 +80,8 @@
     '</div>' +
    '</div>' +
    '<h2 class="section-title" id="similar-title" hidden>More ' + esc(p.category || 'parts') + '</h2><div class="listing-grid" id="similar"></div>';
+
+  SAZGallery.mount(document.getElementById('gal'), { type: 'part', id: id, cover: img, title: title, ownerId: p.vendor_id, icon: 'i-part' });
 
   document.body.insertAdjacentHTML('beforeend',
    '<div class="sticky-cta"><span class="price-mini">SLL ' + fmt(p.price_sll) + '</span>' +
