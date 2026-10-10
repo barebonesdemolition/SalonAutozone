@@ -33,6 +33,7 @@
 </main>
 <script src="/static/site.js?v=5"></script>
 <script src="/static/gallery.js?v=2"></script>
+<script src="/static/enquiry.js?v=1"></script>
 <script>
 (function () {
  'use strict';
@@ -85,12 +86,17 @@
      '<div class="box"><h2>Before you pay</h2><ul class="tips"><li>See the car in person, in daylight.</li><li>Check the VIN on the car matches the papers.</li><li>Take a mechanic you trust for a test drive.</li><li>Never send money before you\'ve seen the car.</li></ul></div>' +
     '</aside>' +
     '<div class="more">' +
+     '<div id="enq"></div>' +
      (v.description ? '<section class="box"><h2>From the seller</h2><p style="white-space:pre-line">' + esc(v.description) + '</p></section>' : '') +
      '<section class="box" id="check"><h2>Free VIN and safety check</h2><div id="check-body"></div></section>' +
     '</div>' +
    '</div>';
 
   SAZGallery.mount(document.getElementById('gal'), { type: 'vehicle', id: id, cover: img, title: title, ownerId: v.seller_id, icon: 'i-car' });
+  (function () {
+   var mine = false; try { mine = String((JSON.parse(localStorage.getItem('userInfo') || '{}') || {}).id) === String(v.seller_id); } catch (e) {}
+   if (!mine) SAZEnquiry.mount(document.getElementById('enq'), { type: 'vehicle', id: id, title: title, whatsapp: wa });
+  })();
 
   if (wa || phone) {
    document.body.insertAdjacentHTML('beforeend',

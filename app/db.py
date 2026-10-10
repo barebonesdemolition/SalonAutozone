@@ -17,7 +17,12 @@ elif DATABASE_URL.startswith("postgresql://") and "+asyncpg" not in DATABASE_URL
 
 print(f"[db.py] Using database: {DATABASE_URL.split('@')[-1] if '@' in DATABASE_URL else DATABASE_URL}")
 
-engine = create_async_engine(DATABASE_URL, echo=False)
+# Tests open several event loops; pooled asyncpg connections can't cross them.
+_engine_kwargs = {}
+if os.getenv("DB_NULLPOOL", "false").lower() == "true":
+    from sqlalchemy.pool import NullPool
+    _engine_kwargs["poolclass"] = NullPool
+engine = create_async_engine(DATABASE_URL, echo=False, **_engine_kwargs)
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 sync_database_url = DATABASE_URL
@@ -47,6 +52,39 @@ async def ensure_vehicle_listing_columns():
         for column in ("fuel_type", "transmission"):
             if column not in existing:
                 await connection.execute(text(f"ALTER TABLE vehicle_listings ADD COLUMN {column} VARCHAR"))
+
+
+CORE_TABLES = ("users", "businesses", "vehicle_listings", "part_listings", "supplier_catalog",
+               "inquiries", "import_requests", "saved_listings", "garage")
+
+
+async def ensure_core_tables():
+    """Create the marketplace tables that are missing (existing tables are left alone).
+
+    A brand-new database used to start with none of them, and the delivery,
+    driver and photo tables (which point at users) then failed to create too.
+    """
+    from sqlalchemy.sql.ddl import sort_tables
+    from app import models  # noqa: F401  (registers the model classes)
+
+    tables = {}
+    for mapper in Base.registry.mappers:
+        table = mapper.class_.__table__
+        if table.name in CORE_TABLES:
+            tables[table.name] = table
+    ordered = sort_tables(tables.values())
+    async with engine.begin() as connection:
+        await connection.run_sync(lambda c: [t.create(c, checkfirst=True) for t in ordered])
+
+
+async def drop_wrong_listing_foreign_keys():
+    """Enquiries and saved items can point at a part or a car, but older tables had a
+    foreign key to vehicle_listings only, so saving or asking about a PART failed."""
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as connection:
+        for table in ("inquiries", "saved_listings"):
+            await connection.execute(text(f"ALTER TABLE IF EXISTS {table} DROP CONSTRAINT IF EXISTS {table}_listing_id_fkey"))
 
 
 async def ensure_business_contact_columns():

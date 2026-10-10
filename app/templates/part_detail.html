@@ -22,6 +22,7 @@
 </main>
 <script src="/static/site.js?v=5"></script>
 <script src="/static/gallery.js?v=2"></script>
+<script src="/static/enquiry.js?v=1"></script>
 <script>
 (function () {
  'use strict';
@@ -76,12 +77,17 @@
      '<p class="hint">Pay on delivery or by mobile money at checkout. Always check the part number with the seller before you pay.</p>' +
     '</aside>' +
     '<div class="more">' +
+     '<div id="enq"></div>' +
      (p.description ? '<section class="box"><h2>About this part</h2><p style="white-space:pre-line">' + esc(p.description) + '</p></section>' : '') +
     '</div>' +
    '</div>' +
    '<h2 class="section-title" id="similar-title" hidden>More ' + esc(p.category || 'parts') + '</h2><div class="listing-grid" id="similar"></div>';
 
   SAZGallery.mount(document.getElementById('gal'), { type: 'part', id: id, cover: img, title: title, ownerId: p.vendor_id, icon: 'i-part' });
+  (function () {
+   var mine = false; try { mine = String((JSON.parse(localStorage.getItem('userInfo') || '{}') || {}).id) === String(p.vendor_id); } catch (e) {}
+   if (!mine) SAZEnquiry.mount(document.getElementById('enq'), { type: 'part', id: id, title: title, whatsapp: wa });
+  })();
 
   document.body.insertAdjacentHTML('beforeend',
    '<div class="sticky-cta"><span class="price-mini">SLL ' + fmt(p.price_sll) + '</span>' +

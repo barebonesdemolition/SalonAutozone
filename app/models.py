@@ -187,7 +187,8 @@ class Inquiry(Base):
     __tablename__ = "inquiries"
 
     id = Column(Integer, primary_key=True)
-    listing_id = Column(Integer, ForeignKey("vehicle_listings.id", ondelete="CASCADE"), nullable=True, index=True)
+    # A part OR a car (see listing_type), so no foreign key to one table.
+    listing_id = Column(Integer, nullable=True, index=True)
     listing_type = Column(String, nullable=True)
     listing_title = Column(String, nullable=True)
     seller_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
@@ -239,7 +240,7 @@ class SavedListing(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     listing_type = Column(String, nullable=False, default="vehicle", index=True)
-    listing_id = Column(Integer, ForeignKey("vehicle_listings.id", ondelete="CASCADE"), nullable=False)
+    listing_id = Column(Integer, nullable=False)  # a part or a car (listing_type); no FK to one table
     listing_title = Column(String, nullable=True)
     listing_price_sll = Column(Float, nullable=True)
     listing_image_url = Column(String, nullable=True)
@@ -386,7 +387,7 @@ class OrderItem(Base):
     __tablename__ = "order_items"
 
     id = Column(String, primary_key=True)
-    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
+    order_id = Column(String, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)  # orders.id is a string
     item_type = Column(String, nullable=False)
     supplier_part_id = Column(String, ForeignKey("supplier_parts.id", ondelete="RESTRICT"), nullable=True)
     listing_id = Column(String, ForeignKey("listings.id", ondelete="RESTRICT"), nullable=True)
@@ -417,8 +418,9 @@ def seed_legacy_data():
         if user_count > 0:
             return
 
+        # No explicit id: on Postgres that leaves the id sequence behind, and the
+        # next real sign-up fails with a duplicate key.
         user = User(
-            id=1,
             full_name="Demo Seller",
             phone="+23276123001",
             email="seller@example.com",
@@ -427,6 +429,7 @@ def seed_legacy_data():
             is_active=True,
         )
         session.add(user)
+        session.flush()
 
         vehicle = Vehicle(
             id="veh-1",
@@ -485,9 +488,10 @@ def seed_legacy_data():
             stock=6,
             lead_time_days=0,
         ))
+        session.flush()  # Postgres checks foreign keys row by row; insert parents first
         session.add(Listing(
             id="listing-1",
-            seller_id=1,
+            seller_id=user.id,
             vehicle_id="veh-1",
             vin="JTDBR32E173000001",
             title="2007 Toyota Corolla",
@@ -506,9 +510,10 @@ def seed_legacy_data():
             position=0,
             is_hero=True,
         ))
+        session.flush()
         session.add(Order(
             id="order-1",
-            buyer_id=1,
+            buyer_id=user.id,
             status="completed",
             payment_method="mobile_money",
             payment_status="paid",
@@ -516,6 +521,7 @@ def seed_legacy_data():
             total_amount=480.00,
             currency_code="NLE",
         ))
+        session.flush()
         session.add(OrderItem(
             id="order-item-1",
             order_id="order-1",
