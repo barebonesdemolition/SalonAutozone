@@ -25,6 +25,7 @@ from app.routers.admin import require_admin
 from app.drivers import ensure_driver_tables, router as drivers_router
 from app.shop import ensure_delivery_tables, router as shop_router
 from app.photos import ensure_photo_tables, router as photos_router
+from app.sellers import ensure_review_tables, router as sellers_router
 # ---------------------------------------------------------------------
 from app.routers import (
     admin,
@@ -130,6 +131,7 @@ async def lifespan(_: FastAPI):
     await ensure_driver_tables()
     await ensure_delivery_tables()
     await ensure_photo_tables()
+    await ensure_review_tables()
     yield
 
 
@@ -150,6 +152,7 @@ app.include_router(businesses.router)
 app.include_router(drivers_router)
 app.include_router(shop_router)
 app.include_router(photos_router)
+app.include_router(sellers_router)
 
 
 @app.exception_handler(HTTPException)
@@ -289,6 +292,11 @@ async def part_detail_page(part_id: str, request: Request, db: AsyncSession = De
         return FileResponse("app/templates/part_detail.html")  # the page shows "not found" itself
     base = _public_base(request)
     return HTMLResponse(share_meta.part_page(part, base, f"{base}/part/{part.id}"))
+
+
+@app.get("/seller/{seller_id}")
+async def seller_page(seller_id: str):
+    return FileResponse("app/templates/seller.html")
 
 
 @app.get("/vehicle/{vehicle_id}")

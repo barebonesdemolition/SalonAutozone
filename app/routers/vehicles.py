@@ -84,6 +84,7 @@ async def search_vehicles(
     condition: Optional[str] = Query(None, description="'new' or 'used'"),
     availability: Optional[str] = Query(None, description="'in_stock', 'in_transit', or 'on_order'"),
     business_id: Optional[int] = Query(None),
+    seller_id: Optional[int] = Query(None),
     q: Optional[str] = Query(None),
     sold: Optional[bool] = Query(False, description="False (default) hides sold cars; true shows only sold"),
     page: int = Query(1, ge=1),
@@ -93,6 +94,8 @@ async def search_vehicles(
     await _expire_featured(db)
     query = select(models.VehicleListing)
 
+    if seller_id:
+        query = query.where(models.VehicleListing.seller_id == seller_id)
     if q:
         cond = search.condition(q, (models.VehicleListing.title, models.VehicleListing.make,
                                     models.VehicleListing.model, models.VehicleListing.vin,

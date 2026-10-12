@@ -68,6 +68,8 @@
 .active-filters .af { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 4px 6px 4px 12px; border-radius: 999px; background: var(--ink); color: #fff; border: 0; font-weight: 600; font-size: 14px; }
 .active-filters .af span { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.18); display: inline-flex; align-items: center; justify-content: center; font-size: 15px; line-height: 1; }
 .active-filters .clear { border: 0; background: none; color: var(--teal); font-weight: 700; text-decoration: underline; padding: 6px; }
+.lcard .sb { font-weight: 700; color: #7a4b00; }
+.lcard .sb.ver { color: var(--ok); }
 .count { font-size: 14px; color: var(--muted); font-weight: 600; }
 .only-fit { display: none; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink); }
 .only-fit input { width: 20px; height: 20px; accent-color: var(--teal); }
@@ -340,7 +342,7 @@
   return '<div class="ph"><svg aria-hidden="true"><use href="#' + icon + '"/></svg></div>';
  }
  function card(o) {
-  var h = '<article class="lcard" tabindex="0" role="link" data-href="' + esc(o.href) + '">' + o.img;
+  var h = '<article class="lcard" tabindex="0" role="link" data-href="' + esc(o.href) + '"' + (o.seller ? ' data-seller="' + esc(o.seller) + '"' : '') + '>' + o.img;
   if (o.flags) h += '<div class="flags">' + o.flags + '</div>';
   if (o.type) h += '<button type="button" class="save-btn" aria-label="Save ' + esc(o.title) + '" data-act="save" data-type="' + o.type + '" data-id="' + esc(o.id) + '"><svg><use href="#i-heart"/></svg></button>';
   return h + '<div class="bd">' + o.body + '</div></article>';
@@ -350,7 +352,7 @@
   var flags = (featured ? '<span class="flag gold">Featured</span>' : '') + (fits ? '<span class="flag fit">Fits your car</span>' : '');
   var cond = p.condition ? String(p.condition).charAt(0).toUpperCase() + String(p.condition).slice(1) : '';
   return card({
-   href: '/part/' + encodeURIComponent(p.id), id: p.id, type: 'part', title: p.name, flags: flags,
+   href: '/part/' + encodeURIComponent(p.id), id: p.id, type: 'part', title: p.name, flags: flags, seller: p.vendor_id,
    img: media(p.image_url, 'i-part'),
    body: price(p.price_sll) + '<div class="ttl">' + esc(p.name) + '</div><div class="meta">' + (cond ? '<span>' + esc(cond) + '</span>' : '') + (p.location ? '<span class="loc">' + esc(p.location) + '</span>' : '') + '</div>'
   });
@@ -358,7 +360,7 @@
  function vehicleCard(v) {
   var km = v.mileage_km ? fmt(Math.round(v.mileage_km)) + ' km' : '';
   return card({
-   href: '/vehicle/' + encodeURIComponent(v.id), id: v.id, type: 'vehicle', title: v.title,
+   href: '/vehicle/' + encodeURIComponent(v.id), id: v.id, type: 'vehicle', title: v.title, seller: v.seller_id,
    flags: (v.is_featured ? '<span class="flag gold">Featured</span>' : '') + (v.business_verified ? '<span class="flag fit">Verified dealer</span>' : ''),
    img: media(v.image_url, 'i-car'),
    body: price(v.price_sll) + '<div class="ttl">' + esc(v.title) + '</div><div class="meta">' + [v.year, v.transmission, km].filter(Boolean).map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + (v.location ? '<span class="loc">' + esc(v.location) + '</span>' : '') + '</div>'
@@ -417,6 +419,7 @@
   $('feat-sec').hidden = !feat.length;
   $('feat-title').textContent = 'Featured cars';
   $('feat').innerHTML = feat.map(vehicleCard).join('');
+  setTimeout(decorateSellers, 0);
   $('results').innerHTML = reg.length ? reg.map(vehicleCard).join('') : (feat.length ? '' : '<div class="empty-state"><h3>' + (filterText() ? 'No ' + esc(filterText()) + ' for sale right now' : 'No cars match') + '</h3><p>Try fewer filters or a different search.</p>' + (hasFilters() ? '<button type="button" class="btn btn-primary" data-act="clearfilters">Show all cars</button>' : '') + '</div>');
   markSaved();
  }
@@ -448,6 +451,7 @@
   }
   $('results').innerHTML = h;
   markSaved();
+  decorateSellers();
  }
  var FILTERS = [['s-cat', ''], ['s-make', ''], ['s-model', ''], ['s-year', ''], ['s-loc', 'in ']];
  function hasFilters() { return !!($('s-q').value.trim() || FILTERS.some(function (f) { return $(f[0]).value && !$(f[0]).hidden; })); }
@@ -472,6 +476,26 @@
   renderActive();
   var v = $('s-cat').value;
   document.querySelectorAll('#cats .chip').forEach(function (c) { c.setAttribute('aria-pressed', c.dataset.v === v); });
+ }
+
+ // ---------- seller badges (rating, verified) on cards ----------
+ var badgeCache = {};
+ function decorateSellers() {
+  var cards = Array.from(document.querySelectorAll('.lcard[data-seller]'));
+  var ids = cards.map(function (c) { return c.dataset.seller; }).filter(function (x, i, a) { return x && a.indexOf(x) === i && !(x in badgeCache); });
+  var apply = function () {
+   cards.forEach(function (c) {
+    var b = badgeCache[c.dataset.seller];
+    if (!b || c.querySelector('.sb')) return;
+    var bits = (b.verified ? '<span class="sb ver">✓ Verified</span>' : '') + (b.reviews ? '<span class="sb">★ ' + b.rating + '</span>' : '');
+    if (bits) { var m = c.querySelector('.meta'); if (m) m.insertAdjacentHTML('afterbegin', bits); }
+   });
+  };
+  if (!ids.length) { apply(); return; }
+  fetch('/api/sellers/badges?ids=' + ids.join(',')).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+   ids.forEach(function (i) { badgeCache[i] = (d && d.sellers && d.sellers[i]) || null; });
+   apply();
+  }).catch(function () {});
  }
 
  // ---------- save ----------

@@ -34,6 +34,7 @@
 <script src="/static/site.js?v=5"></script>
 <script src="/static/gallery.js?v=2"></script>
 <script src="/static/enquiry.js?v=1"></script>
+<script src="/static/sellerbox.js?v=1"></script>
 <script>
 (function () {
  'use strict';
@@ -83,6 +84,7 @@
       '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
       '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
      '</div>' +
+     '<div id="seller-box"></div>' +
      '<div class="box"><h2>Before you pay</h2><ul class="tips"><li>See the car in person, in daylight.</li><li>Check the VIN on the car matches the papers.</li><li>Take a mechanic you trust for a test drive.</li><li>Never send money before you\'ve seen the car.</li></ul></div>' +
     '</aside>' +
     '<div class="more">' +
@@ -92,6 +94,7 @@
     '</div>' +
    '</div>';
 
+  SAZSellerBox.mount(document.getElementById('seller-box'), v.seller_id);
   SAZGallery.mount(document.getElementById('gal'), { type: 'vehicle', id: id, cover: img, title: title, ownerId: v.seller_id, icon: 'i-car' });
   (function () {
    var mine = false; try { mine = String((JSON.parse(localStorage.getItem('userInfo') || '{}') || {}).id) === String(v.seller_id); } catch (e) {}
