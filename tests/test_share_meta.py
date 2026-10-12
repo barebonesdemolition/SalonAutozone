@@ -57,3 +57,32 @@ def test_unknown_listing_still_serves_the_page(client):
 def test_home_page_has_preview_tags(client):
     page = client.get("/").text
     assert 'property="og:title"' in page and 'property="og:image"' in page
+
+
+def test_business_page_preview_and_storefront_data(client):
+    auth = _auth(client)
+    n = uuid.uuid4().hex[:6]
+    r = client.post("/api/businesses/apply", headers=auth, json={
+        "business_type": "store", "name": f"Kissy Road Parts {n}", "city": "Freetown", "whatsapp": "076 123456",
+        "description": "Toyota and Nissan parts since 2010"})
+    assert r.status_code == 201, r.text
+    slug = r.json()["slug"]
+    # Not verified yet: no public page, no preview tags.
+    assert client.get(f"/api/businesses/{slug}").status_code == 404
+    assert 'og:title' not in client.get(f"/store/{slug}").text
+
+    mine = client.get("/api/businesses/mine", headers=auth).json()["business"]
+    ok = client.post(f"/api/businesses/admin/{mine['id']}/status?status=verified", headers={"X-Admin-Key": "test-admin-secret"})
+    assert ok.status_code == 200
+    data = client.get(f"/api/businesses/{slug}").json()
+    assert data["owner_id"] and data["verified"] is True
+    page = client.get(f"/store/{slug}").text
+    assert f'<meta property="og:title" content="Kissy Road Parts {n}">' in page
+    assert "Verified, Parts store, Freetown. Toyota and Nissan parts since 2010" in page
+
+
+def test_site_contact_has_no_made_up_payment_number(client, monkeypatch):
+    from app.config import get_settings
+    d = client.get("/api/site/contact").json()
+    assert d["whatsapp"] and d["whatsapp"].isdigit()
+    assert d["orange_money"] == (get_settings().ORANGE_MONEY_NUMBER or None)

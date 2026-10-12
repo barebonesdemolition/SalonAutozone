@@ -53,6 +53,7 @@ async def _unique_slug(db: AsyncSession, name: str) -> str:
 def _public(b: Business) -> dict:
     return {
         "id": b.id,
+        "owner_id": b.owner_id,
         "slug": b.slug,
         "business_type": b.business_type,
         "type_label": BUSINESS_TYPES.get(b.business_type, b.business_type),
