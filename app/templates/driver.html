@@ -1,327 +1,274 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Drive with SalonAutoZone</title>
-<style>
-:root{--primary:#0f766e;--navy:#0f172a;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--card:#fff;--ok:#15803d;--warn:#b45309;--bad:#b91c1c}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--text:#e2e8f0;--muted:#94a3b8;--border:#334155;--bg:#0f172a;--card:#1e293b}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border)}
-header img{width:40px;height:40px;border-radius:50%;object-fit:cover}
-header a{color:var(--text);font-weight:800;text-decoration:none;font-size:18px}
-main{max-width:520px;margin:0 auto;padding:20px 16px 40px}
-h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:20px 0 10px}
-.sub{color:var(--muted);margin:0 0 20px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px}
-label{display:block;font-weight:600;margin:14px 0 6px}
-input[type=text],input[type=tel],input[type=file],input[type=password]{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font:inherit}
-.types{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.types label{margin:0;border:2px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;display:block}
-.types input{position:absolute;opacity:0}
-.types label.on{border-color:var(--primary);background:rgba(15,118,110,.08)}
-.types small{display:block;color:var(--muted);font-weight:400}
-button{width:100%;margin-top:18px;padding:14px;border:0;border-radius:12px;background:var(--primary);color:#fff;font:inherit;font-weight:700;cursor:pointer}
-button:disabled{opacity:.6}
-button.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
-button.small{margin-top:8px;padding:10px;font-size:14px}
-.pill{display:inline-block;padding:3px 12px;border-radius:999px;font-weight:700;font-size:14px;color:#fff}
-.pill.pending{background:var(--warn)}.pill.verified{background:var(--ok)}.pill.rejected,.pill.suspended{background:var(--bad)}
-.pill.open{background:var(--ok)}.pill.accepted{background:var(--warn)}.pill.picked_up{background:var(--primary)}
-.msg{margin-top:12px;color:var(--bad);min-height:1.2em}
-.note{background:rgba(185,28,28,.08);border-radius:10px;padding:10px 12px;margin-top:12px}
-dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px}dt{color:var(--muted)}dd{margin:0;font-weight:600}
-.job{border:1px solid var(--border);border-radius:12px;padding:14px;margin:10px 0}
-.job .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.job .pay{font-weight:800;color:var(--ok);font-size:18px}
-.job .route{font-size:14px;color:var(--muted);margin:6px 0}
-.job .route b{color:var(--text)}
-.empty{text-align:center;color:var(--muted);padding:20px 0;font-size:14px}
-.stat{display:inline-block;margin-right:20px}.stat b{display:block;font-size:22px;color:var(--primary)}
-.contact { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 6px 0 10px; }
-.contact span { flex: 1 1 100%; }
-.cbtn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 14px; border-radius: 8px; border: 1.5px solid #dde4e2; color: #0e2a2b; font-weight: 700; text-decoration: none; background: #fff; }
-.cbtn.wa { background: #1f9d55; border-color: #1f9d55; color: #fff; }
-.cbtn.dir { width: 100%; margin: 4px 0 10px; background: #0e7c7b; border-color: #0e7c7b; color: #fff; }
-.leg small { display: block; color: #5d6f6e; font-weight: 600; }
-.pin { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: #fdf3dc; color: #7a4b00; }
-</style>
+<title>Deliver with SalonAutoZone</title>
+<meta name="description" content="Deliver car parts across Sierra Leone with your okada or van and get paid for every delivery.">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<style>
+.page { max-width: 560px; padding: 22px 16px 56px; }
+.page h1 { font-size: clamp(28px, 7vw, 38px); }
+.lead { color: var(--muted); font-size: 16px; margin: 4px 0 18px; }
+.stack { display: grid; gap: 14px; }
+.perks { display: grid; gap: 10px; grid-template-columns: repeat(3, 1fr); margin-bottom: 18px; }
+.perks div { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px; }
+.perks b { display: block; color: var(--ink); font-size: 15px; }
+.perks span { font-size: 13px; color: var(--muted); }
+@media (max-width: 460px) { .perks { grid-template-columns: 1fr; } }
+.vt { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vt button { text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; font: inherit; color: inherit; cursor: pointer; }
+.vt button b { display: block; color: var(--ink); }
+.vt button small { color: var(--muted); font-size: 13px; }
+.vt button[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-50); box-shadow: 0 0 0 3px var(--teal-50); }
+.st { display: inline-flex; font-size: 13px; font-weight: 800; padding: 3px 9px; border-radius: 6px; }
+.st.ok { background: var(--ok-50); color: var(--ok); }
+.st.wait { background: var(--gold-50); color: #8a5a00; }
+.st.bad { background: var(--bad-50); color: var(--bad); }
+.facts-list { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin-top: 12px; font-size: 15px; }
+.facts-list dt { color: var(--muted); }
+.facts-list dd { margin: 0; font-weight: 600; color: var(--ink); }
+.online { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: var(--r-md); background: var(--ink); color: #fff; margin-top: 14px; }
+.online b { display: block; font-size: 17px; }
+.online small { color: #a9c4c2; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #6b7f7e; margin-right: 6px; }
+.on .dot { background: #3ddc84; box-shadow: 0 0 0 4px rgba(61, 220, 132, .25); }
+.switch { position: relative; width: 56px; height: 32px; border-radius: 999px; border: 0; background: #3b5556; cursor: pointer; flex-shrink: 0; }
+.switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: left .15s; }
+.switch[aria-checked="true"] { background: #1f9d55; }
+.switch[aria-checked="true"]::after { left: 28px; }
+.nums { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.nums div { background: var(--card); padding: 12px; text-align: center; }
+.nums b { display: block; font-size: 22px; color: var(--ink); font-variation-settings: "wdth" 85; }
+.nums span { font-size: 13px; color: var(--muted); }
+.job { border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px; background: var(--card); }
+.job + .job { margin-top: 10px; }
+.job .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.job .code { font-family: ui-monospace, Menlo, monospace; font-weight: 700; color: var(--ink); }
+.job .pay { font-weight: 800; font-size: 20px; color: var(--ok); font-variation-settings: "wdth" 85; }
+.route { display: grid; gap: 4px; margin: 10px 0 12px; font-size: 15px; }
+.route small { color: var(--muted); font-weight: 600; font-size: 13px; }
+.leg { border-left: 3px solid var(--line); padding: 2px 0 2px 12px; margin-top: 10px; }
+.leg.go { border-color: var(--teal); }
+.leg small { display: block; color: var(--muted); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.leg b { color: var(--ink); }
+.who { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.who span { flex: 1 1 100%; font-size: 14px; color: var(--muted); }
+.who .btn { min-height: 40px; padding: 8px 14px; }
+.items { margin: 6px 0 0; padding-left: 18px; font-size: 14px; }
+.pin { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: var(--gold-50); color: #7a4b00; }
+.code-in { font-size: 24px; letter-spacing: .3em; text-align: center; font-family: ui-monospace, Menlo, monospace; }
+.acts { display: grid; gap: 8px; margin-top: 12px; }
+.empty { text-align: center; color: var(--muted); padding: 14px 0; font-size: 15px; }
+</style>
 </head>
 <body>
 <div id="site-header"></div>
-<main>
-<h1>Drive with us</h1>
-<p class="sub">Deliver car parts across Freetown with your okada or van.</p>
-
-<div id="root" class="card">Loading…</div>
-
-<div id="jobs-section" style="display:none">
-  <h2>Available jobs</h2>
-  <div id="jobs-list" class="card"><div class="empty">Loading…</div></div>
-
-  <h2>My current delivery</h2>
-  <div id="my-job" class="card"><div class="empty">No active delivery</div></div>
-
-  <div class="card">
-    <div class="stat"><b id="earned">0</b>Le earned</div>
-    <div class="stat"><b id="count">0</b>deliveries</div>
-  </div>
-</div>
-
+<main class="wrap page">
+ <h1>Deliver with us</h1>
+ <p class="lead">Deliver car parts with your okada or van and get paid for every drop.</p>
+ <div id="app" class="stack"><div class="lcard skeleton" style="min-height:200px"></div></div>
 </main>
-<script src="/static/auth.js"></script>
+<script src="/static/site.js?v=5"></script>
 <script>
 (function () {
-  var root = document.getElementById('root');
-  var jobsSection = document.getElementById('jobs-section');
-  var jobsList = document.getElementById('jobs-list');
-  var myJobEl = document.getElementById('my-job');
-  var LABEL = { bike: 'Okada', van: 'Van' };
+ 'use strict';
+ var app = document.getElementById('app');
+ var LABEL = { bike: 'Okada', van: 'Van' };
+ var token = '', me = null, timer = null, flash = '';
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
 
-  function hdr(json) {
-    var h = { Authorization: 'Bearer ' + Auth.getToken() };
-    if (json) h['Content-Type'] = 'application/json';
-    return h;
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+ function toLogin() { try { localStorage.removeItem('token'); localStorage.removeItem('access_token'); } catch (e) {} location.href = '/login?next=' + encodeURIComponent(location.pathname); }
+ function api(url, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign(opts.body && !(opts.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}, { 'Authorization': 'Bearer ' + token });
+  return fetch(url, opts).then(function (r) {
+   return r.json().catch(function () { return {}; }).then(function (d) {
+    if (r.status === 401) { toLogin(); throw new Error('Please log in again.'); }
+    if (!r.ok) { var m = d.detail; if (Array.isArray(m)) m = m.map(function (x) { return String(x.msg || '').replace(/^Value error, /, ''); }).join('. '); var e = new Error(typeof m === 'string' ? m : 'Something went wrong. Please try again.'); e.status = r.status; throw e; }
+    return d;
+   });
+  });
+ }
+ function say(el, text, kind) { if (el) el.innerHTML = text ? '<div class="notice notice-' + (kind || 'bad') + '" style="margin-top:10px">' + esc(text) + '</div>' : ''; }
+
+ var perks = '<div class="perks"><div><b>Paid per drop</b><span>You see the pay before you accept.</span></div><div><b>Your hours</b><span>Go online when you want jobs.</span></div><div><b>Near you</b><span>Jobs match your okada or van.</span></div></div>';
+
+ if (!token) {
+  app.innerHTML = perks + '<div class="box"><h2>Log in to apply</h2><p>You need a SalonAutoZone account. It\'s free.</p>' +
+   '<div class="acts" style="grid-template-columns:1fr 1fr"><a class="btn btn-primary" href="/login?next=/drive">Log in</a><a class="btn btn-ghost" href="/login?mode=register&next=/drive">Create account</a></div></div>';
+  return;
+ }
+
+ api('/api/drivers/me').then(showStatus).catch(function (e) {
+  if (e.status === 404) { showForm(null); return; }
+  app.innerHTML = '<div class="notice notice-bad">' + esc(e.message) + '</div>';
+ });
+
+ function showStatus(d) {
+  me = d;
+  var st = { verified: ['ok', 'Approved'], pending: ['wait', 'Being checked'], rejected: ['bad', 'Not approved'], suspended: ['bad', 'Suspended'] }[d.status] || ['wait', d.status];
+  var msg = {
+   pending: 'We\'re checking your details and will message you on WhatsApp.',
+   rejected: 'Your application wasn\'t approved. You can fix the details and apply again.',
+   suspended: 'Your account is paused. Please message us on WhatsApp.'
+  }[d.status] || '';
+  var h = '<div class="box"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 style="margin:0">' + esc(LABEL[d.vehicle_type] || d.vehicle_type) + ' driver</h2><span class="st ' + st[0] + '">' + esc(st[1]) + '</span></div>' +
+   (msg ? '<p style="margin-top:8px">' + esc(msg) + '</p>' : '') +
+   (d.rejection_note ? '<div class="notice notice-bad" style="margin-top:10px">Reason: ' + esc(d.rejection_note) + '</div>' : '') +
+   '<dl class="facts-list"><dt>Registration</dt><dd>' + esc(d.plate_number || '-') + '</dd><dt>City</dt><dd>' + esc(d.city || '-') + '</dd><dt>Phone</dt><dd>' + esc(d.phone || '-') + '</dd></dl>';
+  if (d.status === 'verified') {
+   h += '<div class="online' + (d.is_online ? ' on' : '') + '"><div><b><span class="dot"></span>' + (d.is_online ? 'You\'re online' : 'You\'re offline') + '</b><small>' + (d.is_online ? 'New jobs show below.' : 'Go online to see jobs.') + '</small></div>' +
+    '<button class="switch" id="sw" role="switch" aria-checked="' + !!d.is_online + '" aria-label="Online"></button></div><div id="swmsg"></div>';
   }
-  function el(tag, text, cls) { var e = document.createElement(tag); if (text != null) e.textContent = text; if (cls) e.className = cls; return e; }
-  function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  if (!Auth.requireLogin()) return;
-
-  fetch('/api/drivers/me', { headers: hdr() }).then(function (r) {
-    if (r.status === 401) { Auth.goLogin('401 from drivers/me'); throw null; }
-    if (r.status === 404) return null;
-    if (!r.ok) throw new Error('Could not load your application');
-    return r.json();
-  }).then(function (d) { if (d) showStatus(d); else showForm(null); })
-    .catch(function (e) { if (e) root.textContent = e.message; });
-
-  function showStatus(d) {
-    root.innerHTML = '';
-    var top = el('div'); top.appendChild(el('span', d.status[0].toUpperCase() + d.status.slice(1), 'pill ' + d.status));
-    root.appendChild(top);
-    var msg = {
-      pending: 'We are checking your details. We will contact you on WhatsApp.',
-      verified: 'You are approved. Go online to receive delivery jobs.',
-      rejected: 'Your application was not approved. You can fix the details and apply again.',
-      suspended: 'Your account is suspended. Please contact us on WhatsApp.'
-    }[d.status] || '';
-    root.appendChild(el('p', msg));
-    if (d.rejection_note) root.appendChild(el('div', 'Reason: ' + d.rejection_note, 'note'));
-    var dl = el('dl');
-    [['Vehicle', LABEL[d.vehicle_type] || d.vehicle_type], ['Registration', d.plate_number], ['City', d.city], ['Phone', d.phone]].forEach(function (p) {
-      dl.appendChild(el('dt', p[0])); dl.appendChild(el('dd', p[1] || '-'));
-    });
-    root.appendChild(dl);
-
-    if (d.status === 'verified') {
-      var b = el('button', d.is_online ? 'You are online. Tap to go offline' : 'Go online');
-      b.addEventListener('click', function () {
-        b.disabled = true;
-        fetch('/api/drivers/me/online?online=' + (!d.is_online), { method: 'POST', headers: hdr() })
-          .then(function (r) { if (!r.ok) throw new Error(); d.is_online = !d.is_online; showStatus(d); })
-          .catch(function () { b.disabled = false; alert('Could not change your status'); });
-      });
-      root.appendChild(b);
-      jobsSection.style.display = 'block';
-      loadJobs();
-      loadMyJob();
-      loadEarnings();
-    }
-    if (d.status === 'rejected') {
-      var again = el('button', 'Fix details and apply again', 'ghost');
-      again.addEventListener('click', function () { showForm(d); });
-      root.appendChild(again);
-    }
+  if (d.status === 'rejected') h += '<button class="btn btn-ghost btn-block" style="margin-top:14px" id="again" type="button">Fix details and apply again</button>';
+  h += '</div>';
+  if (d.status === 'verified') {
+   h += '<section><h2 class="section-title" style="margin-top:6px">Your delivery</h2><div id="mine"><div class="lcard skeleton" style="min-height:120px"></div></div></section>' +
+    '<section><h2 class="section-title" style="margin-top:6px">Jobs near you</h2><div id="open"></div></section>' +
+    '<div class="nums"><div><b id="earned">0</b><span>SLL earned</span></div><div><b id="count">0</b><span>deliveries</span></div></div>';
   }
+  app.innerHTML = h;
+  var again = document.getElementById('again');
+  if (again) again.addEventListener('click', function () { showForm(d); });
+  if (d.status !== 'verified') return;
+  document.getElementById('sw').addEventListener('click', function () {
+   var sw = this; sw.disabled = true;
+   api('/api/drivers/me/online?online=' + (!d.is_online), { method: 'POST' })
+    .then(function () { d.is_online = !d.is_online; showStatus(d); })
+    .catch(function (e) { sw.disabled = false; say(document.getElementById('swmsg'), e.message); });
+  });
+  refresh();
+  clearInterval(timer);
+  timer = setInterval(function () { if (!document.hidden) refresh(); }, 15000);
+ }
 
-  function showForm(prev) {
-    prev = prev || {};
-    jobsSection.style.display = 'none';
-    root.innerHTML =
-      '<form id="f" novalidate>' +
-      '<div class="types">' +
-      '<label><input type="radio" name="vt" value="bike"><b>Okada</b><small>Small and medium parts</small></label>' +
-      '<label><input type="radio" name="vt" value="van"><b>Van</b><small>Bulky parts</small></label></div>' +
-      '<label for="plate">Registration number</label><input id="plate" type="text" maxlength="20" autocomplete="off">' +
-      '<label for="city">City</label><input id="city" type="text" maxlength="60" value="Freetown">' +
-      '<label for="phone">WhatsApp / phone</label><input id="phone" type="tel" maxlength="25" placeholder="+232 76 123456">' +
-      '<label for="photo">Photo of your ID</label><input id="photo" type="file" accept="image/*">' +
-      '<button type="submit" id="go">Send application</button><div class="msg" id="msg" role="alert"></div></form>';
-    var f = document.getElementById('f'), msg = document.getElementById('msg');
-    document.getElementById('plate').value = prev.plate_number || '';
-    document.getElementById('city').value = prev.city || 'Freetown';
-    document.getElementById('phone').value = prev.phone || '';
-    f.querySelectorAll('.types label').forEach(function (l) {
-      l.addEventListener('click', function () {
-        f.querySelectorAll('.types label').forEach(function (x) { x.classList.remove('on'); });
-        l.classList.add('on'); l.querySelector('input').checked = true;
-      });
-    });
-    if (prev.vehicle_type) { var pre = f.querySelector('input[value="' + prev.vehicle_type + '"]'); if (pre) pre.parentNode.click(); }
+ function refresh() { loadMine(); loadOpen(); loadEarnings(); }
 
-    f.addEventListener('submit', function (ev) {
-      ev.preventDefault(); msg.textContent = '';
-      var vt = f.querySelector('input[name="vt"]:checked');
-      var plate = document.getElementById('plate').value.trim();
-      var city = document.getElementById('city').value.trim();
-      var phone = document.getElementById('phone').value.trim();
-      var file = document.getElementById('photo').files[0];
-      if (!vt) { msg.textContent = 'Choose Okada or Van.'; return; }
-      if (!plate) { msg.textContent = 'Enter your registration number.'; return; }
-      if (city.length < 2 || phone.length < 6) { msg.textContent = 'Enter your city and phone number.'; return; }
-      if (!file) { msg.textContent = 'Add a photo of your ID.'; return; }
-      var go = document.getElementById('go'); go.disabled = true; go.textContent = 'Sending…';
-      var fd = new FormData(); fd.append('file', file);
-      fetch('/api/upload/', { method: 'POST', headers: hdr(), body: fd })
-        .then(function (r) { if (!r.ok) throw new Error('Photo upload failed. Try a smaller photo.'); return r.json(); })
-        .then(function (u) {
-          return fetch('/api/drivers/apply', { method: 'POST', headers: hdr(true),
-            body: JSON.stringify({ vehicle_type: vt.value, plate_number: plate, city: city, phone: phone, id_photo_url: u.url }) });
-        })
-        .then(function (r) {
-          if (r.status === 401) { Auth.goLogin('401 from drivers/apply'); throw null; }
-          if (r.status === 409) throw new Error('You already have an application.');
-          if (!r.ok) throw new Error('Check your details and try again.');
-          return r.json();
-        })
-        .then(showStatus)
-        .catch(function (e) { if (e) { msg.textContent = e.message; go.disabled = false; go.textContent = 'Send application'; } });
-    });
-  }
+ function loadOpen() {
+  var el = document.getElementById('open'); if (!el) return;
+  if (!me.is_online) { el.innerHTML = '<div class="box empty">Go online to see jobs.</div>'; return; }
+  api('/api/shop/driver/jobs?scope=open').then(function (d) {
+   if (!d.jobs || !d.jobs.length) { el.innerHTML = '<div class="box empty">No jobs right now. This page checks again every 15 seconds.</div>'; return; }
+   el.innerHTML = d.jobs.map(function (j) {
+    return '<div class="job"><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">SLL ' + fmt(j.payout_sll) + '</span></div>' +
+     '<div class="route"><div><small>Collect in</small> <b>' + esc(j.pickup_area || '-') + '</b></div><div><small>Deliver to</small> <b>' + esc(j.delivery_area || '-') + '</b></div></div>' +
+     '<button class="btn btn-primary btn-block" data-accept="' + j.id + '" type="button">Accept job</button><div data-msg="' + j.id + '"></div></div>';
+   }).join('');
+  }).catch(function (e) { el.innerHTML = '<div class="box empty">' + esc(e.status === 403 ? 'Go online to see jobs.' : 'We couldn\'t load jobs.') + '</div>'; });
+ }
 
-  function loadJobs() {
-    fetch('/api/shop/driver/jobs?scope=open', { headers: hdr() }).then(function (r) {
-      if (r.status === 403) { jobsList.innerHTML = '<div class="empty">Go online to see jobs.</div>'; return null; }
-      if (!r.ok) throw new Error(); return r.json();
-    }).then(function (d) {
-      if (!d) return;
-      if (!d.jobs || !d.jobs.length) { jobsList.innerHTML = '<div class="empty">No open jobs right now. Check back soon.</div>'; return; }
-      jobsList.innerHTML = '';
-      d.jobs.forEach(function (j) {
-        var wrap = el('div', null, 'job');
-        var row = el('div', null, 'row');
-        row.appendChild(el('span', j.code, 'pill open'));
-        row.appendChild(el('span', Number(j.payout_sll).toLocaleString() + 'Le', 'pay'));
-        wrap.appendChild(row);
-        var route = el('div', null, 'route');
-        route.innerHTML = 'Pickup: <b>' + esc(j.pickup_area || '—') + '</b><br>Drop: <b>' + esc(j.delivery_area || '—') + '</b>';
-        wrap.appendChild(route);
-        var b = el('button', 'Accept job', 'small');
-        b.addEventListener('click', function () {
-          b.disabled = true; b.textContent = 'Accepting…';
-          fetch('/api/shop/driver/jobs/' + j.id + '/accept', { method: 'POST', headers: hdr() })
-            .then(function (r) { if (!r.ok) return r.json().then(function(e){throw new Error(e.detail||'Could not accept');}); return r.json(); })
-            .then(function () { loadJobs(); loadMyJob(); })
-            .catch(function (e) { b.disabled = false; b.textContent = 'Accept job'; alert(e.message); });
-        });
-        wrap.appendChild(b);
-        jobsList.appendChild(wrap);
-      });
-    }).catch(function () { jobsList.innerHTML = '<div class="empty">Could not load jobs.</div>'; });
-  }
+ app.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-accept]'); if (!b) return;
+  var id = b.dataset.accept; b.disabled = true; b.textContent = 'Accepting…';
+  api('/api/shop/driver/jobs/' + id + '/accept', { method: 'POST' }).then(refresh).then(function () { window.scrollTo({ top: 0, behavior: 'smooth' }); })
+   .catch(function (err) { b.disabled = false; b.textContent = 'Accept job'; say(app.querySelector('[data-msg="' + id + '"]'), err.message); });
+ });
 
-  function loadMyJob() {
-    fetch('/api/shop/driver/jobs?scope=mine', { headers: hdr() }).then(function (r) {
-      if (!r.ok) throw new Error(); return r.json();
-    }).then(function (d) {
-      if (!d.jobs || !d.jobs.length) { myJobEl.innerHTML = '<div class="empty">No active delivery</div>'; return; }
-      var j = d.jobs[0];
-      myJobEl.innerHTML = '';
-      var row = el('div', null, 'row');
-      row.appendChild(el('span', j.code, 'pill ' + j.status));
-      row.appendChild(el('span', Number(j.payout_sll).toLocaleString() + 'Le', 'pay'));
-      myJobEl.appendChild(row);
-      var route = el('div', null, 'route');
-      function digits(p) { return String(p || '').replace(/[^\d+]/g, ''); }
-      function contact(label, name, phone) {
-        var d = digits(phone);
-        if (!d) return '';
-        return '<div class="contact"><span>' + label + ': <b>' + esc(name || '—') + '</b></span>' +
-          '<a class="cbtn" href="tel:' + esc(d) + '">Call</a>' +
-          '<a class="cbtn wa" href="https://wa.me/' + esc(d.replace(/^\+/, '')) + '" target="_blank" rel="noopener">WhatsApp</a></div>';
-      }
-      var hasPin = j.delivery_lat != null && j.delivery_lng != null;
-      var dest = hasPin ? (j.delivery_lat + ',' + j.delivery_lng) : (j.delivery_address + ', ' + j.delivery_area + ', Sierra Leone');
-      var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(dest);
-      route.innerHTML =
-        '<div class="leg"><small>1. Collect from</small><b>' + esc(j.pickup_area || '—') + '</b></div>' +
-        contact('Seller', j.seller_name, j.seller_phone) +
-        '<div class="leg"><small>2. Deliver to</small><b>' + esc(j.delivery_address || '—') + '</b>, ' + esc(j.delivery_area || '') +
-        (hasPin ? ' <span class="pin">Pin on map</span>' : '') + '</div>' +
-        '<a class="cbtn dir" href="' + esc(mapsUrl) + '" target="_blank" rel="noopener">' + (hasPin ? 'Directions to the buyer\'s pin' : 'Search the address in Maps') + '</a>' +
-        contact('Buyer', j.buyer_name, j.buyer_phone);
-      myJobEl.appendChild(route);
+ function person(label, name, phone) {
+  var d = String(phone || '').replace(/[^\d+]/g, '');
+  if (!d) return '';
+  return '<div class="who"><span>' + label + ': <b style="color:var(--ink)">' + esc(name || '-') + '</b></span>' +
+   '<a class="btn btn-ghost" href="tel:' + esc(d) + '">Call</a><a class="btn btn-wa" href="https://wa.me/' + esc(d.replace(/^\+/, '')) + '" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>';
+ }
 
-      if (j.status === 'accepted') {
-        var pickB = el('button', 'Mark as picked up', 'small');
-        pickB.addEventListener('click', function () {
-          pickB.disabled = true;
-          fetch('/api/shop/driver/jobs/' + j.id + '/pickup', { method: 'POST', headers: hdr() })
-            .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
-            .then(function () { loadMyJob(); loadJobs(); })
-            .catch(function () { pickB.disabled = false; alert('Could not update'); });
-        });
-        myJobEl.appendChild(pickB);
+ function loadMine() {
+  var el = document.getElementById('mine'); if (!el) return;
+  api('/api/shop/driver/jobs?scope=mine').then(function (d) {
+   if (!d.jobs || !d.jobs.length) {
+    el.innerHTML = (flash ? '<div class="notice notice-ok" style="margin-bottom:10px">' + esc(flash) + '</div>' : '') + '<div class="box empty">No delivery yet. Accept a job below.</div>';
+    flash = '';
+    return;
+   }
+   var j = d.jobs[0], picked = j.status === 'picked_up';
+   var hasPin = j.delivery_lat != null && j.delivery_lng != null;
+   var dest = hasPin ? j.delivery_lat + ',' + j.delivery_lng : [j.delivery_address, j.delivery_area, 'Sierra Leone'].filter(Boolean).join(', ');
+   var items = (j.items || []).map(function (i) { return '<li>' + esc(i.qty > 1 ? i.qty + ' × ' + i.title : i.title) + '</li>'; }).join('');
+   el.innerHTML = '<div class="job"><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">SLL ' + fmt(j.payout_sll) + '</span></div>' +
+    '<div class="leg' + (picked ? '' : ' go') + '"><small>1. Collect' + (picked ? 'ed' : '') + '</small><b>' + esc(j.pickup_area || '-') + '</b>' + (items ? '<ul class="items">' + items + '</ul>' : '') + (picked ? '' : person('Seller', j.seller_name, j.seller_phone)) + '</div>' +
+    '<div class="leg' + (picked ? ' go' : '') + '"><small>2. Deliver to</small><b>' + esc(j.delivery_address || '-') + '</b>' + (j.delivery_area ? ', ' + esc(j.delivery_area) : '') + (hasPin ? ' <span class="pin">Pin on map</span>' : '') +
+     person('Buyer', j.buyer_name, j.buyer_phone) +
+     '<a class="btn btn-dark btn-block" style="margin-top:10px" href="https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(dest) + '" target="_blank" rel="noopener noreferrer">' + (hasPin ? 'Directions to the buyer\'s pin' : 'Find the address in Maps') + '</a></div>' +
+    (picked
+     ? '<label class="field"><span>Delivery code from the buyer</span><input class="input code-in" id="code" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="••••••"></label><div class="acts"><button class="btn btn-primary btn-lg" id="deliver" type="button">Mark as delivered</button></div>'
+     : '<div class="acts"><button class="btn btn-primary btn-lg" id="pickup" type="button">I\'ve collected the parts</button><button class="btn btn-ghost" id="release" type="button">I can\'t do this job</button></div>') +
+    '<div id="jobmsg"></div></div>';
+   var msg = document.getElementById('jobmsg');
+   function step(path, body) {
+    return api('/api/shop/driver/jobs/' + j.id + '/' + path, { method: 'POST', body: body ? JSON.stringify(body) : undefined }).then(refresh).catch(function (e) { say(msg, e.message); throw e; });
+   }
+   var pu = document.getElementById('pickup');
+   if (pu) pu.addEventListener('click', function () { pu.disabled = true; step('pickup').catch(function () { pu.disabled = false; }); });
+   var rel = document.getElementById('release');
+   if (rel) rel.addEventListener('click', function () {
+    if (rel.dataset.sure !== '1') { rel.dataset.sure = '1'; rel.textContent = 'Tap again to give the job back'; rel.classList.add('btn-dark'); return; }
+    rel.disabled = true; step('release').catch(function () { rel.disabled = false; });
+   });
+   var del = document.getElementById('deliver');
+   if (del) del.addEventListener('click', function () {
+    var code = document.getElementById('code').value.replace(/\D/g, '');
+    if (code.length !== 6) { say(msg, 'Ask the buyer for their 6-digit code.'); return; }
+    del.disabled = true;
+    flash = 'Delivered. Well done! SLL ' + fmt(j.payout_sll) + ' added to your earnings.';
+    step('deliver', { code: code }).catch(function () { flash = ''; del.disabled = false; });
+   });
+  }).catch(function () { el.innerHTML = '<div class="box empty">We couldn\'t load your delivery.</div>'; });
+ }
 
-        var relB = el('button', 'Release job (before pickup)', 'ghost small');
-        relB.addEventListener('click', function () {
-          if (!confirm('Release this job back to the pool?')) return;
-          relB.disabled = true;
-          fetch('/api/shop/driver/jobs/' + j.id + '/release', { method: 'POST', headers: hdr() })
-            .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
-            .then(function () { loadMyJob(); loadJobs(); })
-            .catch(function () { relB.disabled = false; alert('Could not release'); });
-        });
-        myJobEl.appendChild(relB);
-      }
+ function loadEarnings() {
+  api('/api/shop/driver/earnings').then(function (d) {
+   var a = document.getElementById('earned'), b = document.getElementById('count');
+   if (a) a.textContent = fmt(d.earned_sll); if (b) b.textContent = d.deliveries || 0;
+  }).catch(function () {});
+ }
 
-      if (j.status === 'picked_up') {
-        var codeInput = document.createElement('input');
-        codeInput.type = 'password';
-        codeInput.inputMode = 'numeric';
-        codeInput.pattern = '\\d{6}';
-        codeInput.maxLength = 6;
-        codeInput.placeholder = '6-digit code from buyer';
-        myJobEl.appendChild(codeInput);
-
-        var delB = el('button', 'Mark as delivered', 'small');
-        delB.addEventListener('click', function () {
-          var code = codeInput.value.trim();
-          if (!/^\d{6}$/.test(code)) { alert('Enter the 6-digit code the buyer gives you.'); return; }
-          delB.disabled = true;
-          fetch('/api/shop/driver/jobs/' + j.id + '/deliver', {
-            method: 'POST', headers: hdr(true), body: JSON.stringify({ code: code })
-          })
-            .then(function (r) { if (!r.ok) return r.json().then(function(e){throw new Error(e.detail||'Wrong code');}); return r.json(); })
-            .then(function () { loadMyJob(); loadJobs(); loadEarnings(); })
-            .catch(function (e) { delB.disabled = false; alert(e.message); });
-        });
-        myJobEl.appendChild(delB);
-      }
-    }).catch(function () { myJobEl.innerHTML = '<div class="empty">Could not load current job.</div>'; });
-  }
-
-  function loadEarnings() {
-    fetch('/api/shop/driver/earnings', { headers: hdr() }).then(function (r) {
-      if (!r.ok) throw new Error(); return r.json();
-    }).then(function (d) {
-      document.getElementById('earned').textContent = Number(d.earned_sll || 0).toLocaleString();
-      document.getElementById('count').textContent = d.deliveries || 0;
-    }).catch(function () {});
-  }
-
-  setInterval(function () { if (jobsSection.style.display !== 'none') { loadJobs(); loadMyJob(); } }, 15000);
+ function showForm(prev) {
+  prev = prev || {};
+  clearInterval(timer);
+  var vt = prev.vehicle_type || '';
+  app.innerHTML = perks + '<form class="box" id="f" novalidate><h2>Apply to deliver</h2>' +
+   '<span class="lbl" style="margin-top:12px">What do you ride?</span><div class="vt" id="vt">' +
+   '<button type="button" data-v="bike" aria-pressed="false"><b>Okada</b><small>Small and medium parts</small></button>' +
+   '<button type="button" data-v="van" aria-pressed="false"><b>Van</b><small>Bulky parts like engines and doors</small></button></div>' +
+   '<label class="field"><span>Registration number</span><input class="input" id="plate" maxlength="20" autocomplete="off" style="text-transform:uppercase"></label>' +
+   '<label class="field"><span>City</span><input class="input" id="city" maxlength="60" value="Freetown"></label>' +
+   '<label class="field"><span>WhatsApp number</span><input class="input" id="phone" type="tel" maxlength="25" placeholder="076 123456"></label>' +
+   '<label class="field"><span>Photo of your ID or licence</span><input class="input" id="photo" type="file" accept="image/*"></label>' +
+   '<p class="hint">Only our team sees this photo.</p>' +
+   '<button class="btn btn-primary btn-block btn-lg" style="margin-top:16px" type="submit" id="go">Send application</button><div id="msg"></div></form>';
+  var f = document.getElementById('f'), msg = document.getElementById('msg'), vtBox = document.getElementById('vt');
+  function pick(v) { vt = v; vtBox.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.v === v)); }); }
+  if (vt) pick(vt);
+  vtBox.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pick(b.dataset.v); });
+  document.getElementById('plate').value = prev.plate_number || '';
+  document.getElementById('city').value = prev.city || 'Freetown';
+  document.getElementById('phone').value = prev.phone || '';
+  f.addEventListener('submit', function (ev) {
+   ev.preventDefault(); say(msg, '');
+   var plate = document.getElementById('plate').value.trim(), city = document.getElementById('city').value.trim(),
+    phone = document.getElementById('phone').value.trim(), file = document.getElementById('photo').files[0];
+   if (!vt) return say(msg, 'Choose Okada or Van.');
+   if (!plate) return say(msg, 'Enter your registration number.');
+   if (city.length < 2) return say(msg, 'Enter your city.');
+   if (phone.replace(/\D/g, '').length < 8) return say(msg, 'Enter your WhatsApp number.');
+   if (!file && !prev.id_photo_url) return say(msg, 'Add a photo of your ID or licence.');
+   var go = document.getElementById('go'); go.disabled = true; go.textContent = 'Sending…';
+   var photo = file ? (function () { var fd = new FormData(); fd.append('file', file); return api('/api/upload/', { method: 'POST', body: fd }).then(function (u) { return u.url; }); })() : Promise.resolve(prev.id_photo_url);
+   photo.then(function (url) {
+    return api('/api/drivers/apply', { method: 'POST', body: JSON.stringify({ vehicle_type: vt, plate_number: plate, city: city, phone: phone, id_photo_url: url }) });
+   }).then(function () { return api('/api/drivers/me'); }).then(function (d) { window.scrollTo(0, 0); showStatus(d); })
+    .catch(function (e) { say(msg, e.status === 409 ? 'You already have an application.' : e.message); go.disabled = false; go.textContent = 'Send application'; });
+  });
+ }
 })();
 </script>
-<script src="/static/site.js?v=5"></script>
 </body>
 </html>

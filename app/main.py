@@ -558,6 +558,11 @@ async def orders_page():
 async def track_page():
     return FileResponse("app/templates/orders.html")
 
+@app.get("/driver")
+async def driver_redirect():
+    return RedirectResponse("/drive", status_code=301)
+
+
 @app.get("/drive")
 async def drive_page():
     return FileResponse("app/templates/driver.html")
