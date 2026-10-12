@@ -40,6 +40,11 @@
 .status.done { background: var(--ok-50); color: var(--ok); }
 .track-form { display: flex; gap: 8px; max-width: 460px; }
 .track-form .input { text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+.star-pick { display: flex; gap: 4px; margin-top: 8px; }
+.star-pick button { width: 48px; height: 48px; border: 0; background: none; font-size: 34px; line-height: 1; color: var(--line); cursor: pointer; }
+.star-pick button.on { color: var(--gold); }
+.stars-big { font-size: 28px; color: var(--gold); letter-spacing: 2px; }
+.stars-big .off { color: var(--line); }
 </style>
 </head>
 <body>
@@ -111,6 +116,38 @@
    '</section>';
  }
 
+ function rateBox(id) {
+  var box = document.getElementById('rate');
+  var auth = { Authorization: 'Bearer ' + token() };
+  fetch('/api/shop/orders/' + encodeURIComponent(id) + '/review', { headers: auth }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+   if (!d) { box.remove(); return; }
+   if (d.review) {
+    box.innerHTML = '<h2>Your rating</h2><p class="stars-big" aria-label="' + d.review.rating + ' out of 5">' + '★★★★★'.slice(0, d.review.rating) + '<span class="off">' + '★★★★★'.slice(d.review.rating) + '</span></p>' + (d.review.comment ? '<p>' + esc(d.review.comment) + '</p>' : '') + '<p class="hint">Thanks. Ratings help other buyers choose good sellers.</p>';
+    return;
+   }
+   var pick = 0;
+   box.innerHTML = '<h2>How was the seller?</h2><p class="hint" style="margin-top:0">Your rating shows on their profile and helps other buyers.</p>' +
+    '<div class="star-pick" role="radiogroup" aria-label="Rating">' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" role="radio" aria-checked="false" data-star="' + n + '" aria-label="' + n + ' star' + (n > 1 ? 's' : '') + '">★</button>'; }).join('') + '</div>' +
+    '<label class="field"><span>Comment (optional)</span><textarea class="input" id="rate-c" rows="2" maxlength="500" placeholder="Genuine part, well packed, quick to reply…"></textarea></label>' +
+    '<button class="btn btn-primary btn-block" style="margin-top:12px" id="rate-go" disabled>Send rating</button><p class="hint" id="rate-msg" aria-live="polite"></p>';
+   box.querySelectorAll('[data-star]').forEach(function (b) {
+    b.addEventListener('click', function () {
+     pick = Number(b.dataset.star);
+     box.querySelectorAll('[data-star]').forEach(function (x) { var on = Number(x.dataset.star) <= pick; x.classList.toggle('on', on); x.setAttribute('aria-checked', String(Number(x.dataset.star) === pick)); });
+     document.getElementById('rate-go').disabled = false;
+    });
+   });
+   document.getElementById('rate-go').addEventListener('click', function () {
+    var btn = this; btn.disabled = true;
+    fetch('/api/shop/orders/' + encodeURIComponent(id) + '/review', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth),
+     body: JSON.stringify({ rating: pick, comment: document.getElementById('rate-c').value.trim() || null }) })
+     .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not send'); }); })
+     .then(function () { rateBox(id); })
+     .catch(function (e) { btn.disabled = false; document.getElementById('rate-msg').textContent = e.message; });
+   });
+  }).catch(function () { box.remove(); });
+ }
+
  // ---------- one order (buyer) ----------
  function orderPage(id) {
   root.innerHTML = '<div class="lcard skeleton" style="margin-top:22px"></div>';
@@ -126,6 +163,7 @@
      '<h1 class="page-title">Order <span style="letter-spacing:.06em">' + esc(o.code) + '</span></h1>' +
      '<div class="two"><div style="display:grid;gap:16px">' +
       driverBox(o.driver, o.status) +
+      (o.status === 'delivered' ? '<section class="box" id="rate"></section>' : '') +
       '<section class="box"><h2>Progress</h2>' + timeline(o.status, o.events) + '</section>' +
       '<section class="box"><h2>Items</h2>' + (o.items || []).map(function (it) {
         return '<div class="row"><span>' + esc(it.title) + ' <span style="color:var(--muted)">× ' + it.qty + '</span></span><b>SLL ' + fmt(it.unit_price_sll * it.qty) + '</b></div>';
@@ -140,6 +178,7 @@
       (canCancel ? '<button class="btn btn-ghost btn-block" id="cancel">Cancel order</button>' : '') +
       '<a class="btn btn-ghost btn-block" href="/orders">All my orders</a>' +
      '</aside></div>';
+    if (o.status === 'delivered') rateBox(id);
     var c = document.getElementById('cancel');
     if (c) c.addEventListener('click', function () {
      if (!confirm('Cancel this order?')) return;

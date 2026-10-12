@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Seller · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
+<link rel="stylesheet" href="/static/chrome.css?v=5">
+<style>
+.prof { display: grid; gap: 16px; padding: 22px 0 8px; }
+@media (min-width: 900px) { .prof { grid-template-columns: 340px minmax(0, 1fr); align-items: start; } .prof aside { position: sticky; top: calc(var(--header-h) + 16px); } }
+.who { display: flex; gap: 14px; align-items: center; }
+.av { width: 64px; height: 64px; border-radius: 50%; background: var(--ink); color: var(--gold); font-weight: 800; font-size: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-variation-settings: "wdth" 80; }
+.who h1 { font-size: 28px; font-variation-settings: "wdth" 80; }
+.verified { display: inline-flex; gap: 6px; align-items: center; margin-top: 4px; font-size: 13px; font-weight: 800; padding: 3px 9px; border-radius: 6px; background: var(--ok-50); color: var(--ok); }
+.stars { color: var(--gold); letter-spacing: 1px; font-size: 18px; }
+.stars .off { color: var(--line); }
+.nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; margin-top: 14px; }
+.nums div { background: var(--card); padding: 10px; text-align: center; }
+.nums b { display: block; font-size: 22px; color: var(--ink); font-variation-settings: "wdth" 85; }
+.nums span { font-size: 13px; color: var(--muted); }
+.rev { padding: 12px 0; border-top: 1px solid var(--line); }
+.rev:first-of-type { border-top: 0; }
+.rev p { margin-top: 4px; }
+.rev small { color: var(--muted); }
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+ <symbol id="i-part" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+ <symbol id="i-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><path d="M5 12h14"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/></symbol>
+</svg>
+<div id="site-header"></div>
+<main class="wrap" id="app"><div class="lcard skeleton" style="margin-top:22px;min-height:200px"></div></main>
+<script src="/static/site.js?v=5"></script>
+<script>
+(function () {
+ 'use strict';
+ var id = location.pathname.split('/').pop();
+ var app = document.getElementById('app');
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+ function safeUrl(u) { u = String(u || '').trim(); return (/^https?:\/\//i.test(u) || /^\/(?!\/)/.test(u)) ? u : ''; }
+ function stars(r) { var n = Math.round(r || 0), h = ''; for (var i = 1; i <= 5; i++) h += i <= n ? '★' : '<span class="off">★</span>'; return '<span class="stars" aria-label="' + (r || 0) + ' out of 5">' + h + '</span>'; }
+ function since(iso) { var d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }); }
+ function card(href, img, icon, price, title, meta) {
+  var u = safeUrl(window.SAZImg ? SAZImg(img, 480) : img);
+  return '<a class="lcard" href="' + href + '">' + (u ? '<div class="ph" style="background-image:url(\'' + esc(u) + '\')"></div>' : '<div class="ph"><svg aria-hidden="true"><use href="#' + icon + '"/></svg></div>') +
+   '<div class="bd"><div class="price"><small>SLL</small>' + fmt(price) + '</div><div class="ttl">' + esc(title) + '</div><div class="meta">' + (meta ? '<span class="loc">' + esc(meta) + '</span>' : '') + '</div></div></a>';
+ }
+
+ fetch('/api/sellers/' + encodeURIComponent(id)).then(function (r) { return r.ok ? r.json() : null; }).then(function (s) {
+  if (!s) { app.innerHTML = '<div style="padding:64px 0;text-align:center"><h1 style="font-size:28px">Seller not found</h1><a class="btn btn-primary" style="margin-top:14px" href="/">Browse parts</a></div>'; return; }
+  document.title = s.name + ' · SalonAutoZone';
+  var b = s.business;
+  app.innerHTML = '<div class="prof"><aside class="box">' +
+   '<div class="who"><div class="av" aria-hidden="true">' + esc((s.name || '?').charAt(0).toUpperCase()) + '</div><div><h1>' + esc(s.name) + '</h1>' +
+    (b && b.verified ? '<span class="verified">✓ Verified business</span>' : '') + '</div></div>' +
+   (b ? '<p class="hint" style="margin-top:10px">' + esc([b.type_label, b.city].filter(Boolean).join(', ')) + (b.slug ? ', <a href="/store/' + encodeURIComponent(b.slug) + '">Business page</a>' : '') + '</p>' : '') +
+   '<p style="margin-top:10px">' + (s.reviews_count ? stars(s.rating) + ' <b>' + s.rating + '</b> <span class="hint" style="display:inline">from ' + s.reviews_count + ' rating' + (s.reviews_count > 1 ? 's' : '') + '</span>' : '<span class="hint" style="display:inline">No ratings yet</span>') + '</p>' +
+   '<div class="nums"><div><b>' + fmt(s.delivered_sales) + '</b><span>delivered</span></div><div><b>' + fmt(s.listings.parts) + '</b><span>parts</span></div><div><b>' + fmt(s.listings.cars) + '</b><span>cars</span></div></div>' +
+   (s.member_since ? '<p class="hint" style="margin-top:12px">On SalonAutoZone since ' + esc(since(s.member_since)) + '</p>' : '') +
+   (s.reviews.length ? '<h2 style="font-size:20px;margin-top:18px">What buyers say</h2>' + s.reviews.map(function (r) {
+     return '<div class="rev">' + stars(r.rating) + (r.comment ? '<p>' + esc(r.comment) + '</p>' : '') + '<small>' + esc(r.by) + ', ' + esc(since(r.date)) + '</small></div>';
+    }).join('') : '') +
+   '</aside><section><h2 class="section-title" style="margin-top:0">For sale</h2><div class="listing-grid" id="items"><div class="lcard skeleton"></div><div class="lcard skeleton"></div></div></section></div>';
+
+  Promise.all([
+   fetch('/api/unified/parts?seller=' + encodeURIComponent(id) + '&limit=48').then(function (r) { return r.ok ? r.json() : {}; }),
+   fetch('/api/vehicles/?seller_id=' + encodeURIComponent(id)).then(function (r) { return r.ok ? r.json() : []; })
+  ]).then(function (res) {
+   var parts = (res[0] && res[0].local_parts) || [], cars = Array.isArray(res[1]) ? res[1] : [];
+   var h = parts.map(function (p) { return card('/part/' + p.id, p.image_url, 'i-part', p.price_sll, p.name, p.location); }).join('') +
+    cars.map(function (v) { return card('/vehicle/' + v.id, v.image_url, 'i-car', v.price_sll, v.title, v.location); }).join('');
+   document.getElementById('items').innerHTML = h || '<p class="hint" style="grid-column:1/-1">Nothing for sale right now.</p>';
+  });
+ }).catch(function () { app.innerHTML = '<div class="notice notice-bad" style="margin-top:22px">We couldn\'t load this seller.</div>'; });
+})();
+</script>
+</body>
+</html>

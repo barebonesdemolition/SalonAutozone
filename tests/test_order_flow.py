@@ -75,6 +75,22 @@ def test_order_from_checkout_to_delivery(client):
     assert client.post(f"/api/shop/driver/jobs/{job['id']}/deliver", headers=driver, json={"code": order["delivery_code"]}).status_code == 200
     assert client.get(f"/api/shop/orders/{order['id']}", headers=buyer).json()["status"] == "delivered"
 
+    # The buyer rates the seller once; the rating shows on the seller's profile and badge.
+    seller_id = client.get("/api/auth/me", headers=seller).json()["id"]
+    assert client.get(f"/api/shop/orders/{order['id']}/review", headers=buyer).json()["review"] is None
+    r = client.post(f"/api/shop/orders/{order['id']}/review", headers=buyer, json={"rating": 4, "comment": "Fast and genuine"})
+    assert r.status_code == 201, r.text
+    assert client.post(f"/api/shop/orders/{order['id']}/review", headers=buyer, json={"rating": 1}).status_code == 409
+    assert client.post(f"/api/shop/orders/{order['id']}/review", headers=seller, json={"rating": 5}).status_code == 404
+    profile = client.get(f"/api/sellers/{seller_id}").json()
+    assert profile["rating"] == 4.0 and profile["reviews_count"] == 1 and profile["delivered_sales"] == 1
+    assert profile["reviews"][0]["comment"] == "Fast and genuine" and profile["reviews"][0]["by"] == "Buyer"
+    assert profile["name"] == "Seller"  # first name only, unless it's a verified business
+    badge = client.get(f"/api/sellers/badges?ids={seller_id}").json()["sellers"][str(seller_id)]
+    assert badge == {"verified": False, "rating": 4.0, "reviews": 1}
+    mine = client.get("/api/unified/parts", params={"seller": seller_id}).json()["local_parts"]
+    assert {p["id"] for p in mine} == {part["id"]}
+
 
 def test_admin_endpoints_reject_strangers(client):
     buyer = _user(client)

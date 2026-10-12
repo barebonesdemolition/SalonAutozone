@@ -37,6 +37,7 @@ async def unified_parts_search(
     model: Optional[str] = Query(None),
     year: Optional[str] = Query(None),
     location: Optional[str] = Query(None),
+    seller: Optional[int] = Query(None, description="Only this seller's parts"),
     page: int = Query(1, ge=1),
     limit: int = Query(24, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
@@ -69,6 +70,8 @@ async def unified_parts_search(
         local_q = local_q.where(models.PartListing.compatible_model.ilike(f"%{model}%"))
     if location:
         local_q = local_q.where(models.PartListing.location.ilike(f"%{location}%"))
+    if seller:
+        local_q = local_q.where(models.PartListing.vendor_id == seller)
 
     local_count = (await db.execute(
         select(func.count()).select_from(local_q.subquery())

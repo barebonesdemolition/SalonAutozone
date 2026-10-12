@@ -23,6 +23,7 @@
 <script src="/static/site.js?v=5"></script>
 <script src="/static/gallery.js?v=2"></script>
 <script src="/static/enquiry.js?v=1"></script>
+<script src="/static/sellerbox.js?v=1"></script>
 <script>
 (function () {
  'use strict';
@@ -74,6 +75,7 @@
       '<button type="button" class="btn btn-ghost" id="btn-save">Save</button>' +
       '<button type="button" class="btn btn-ghost" id="btn-share">Share</button>' +
      '</div>' +
+     '<div id="seller-box"></div>' +
      '<p class="hint">Pay on delivery or by mobile money at checkout. Always check the part number with the seller before you pay.</p>' +
     '</aside>' +
     '<div class="more">' +
@@ -83,6 +85,7 @@
    '</div>' +
    '<h2 class="section-title" id="similar-title" hidden>More ' + esc(p.category || 'parts') + '</h2><div class="listing-grid" id="similar"></div>';
 
+  SAZSellerBox.mount(document.getElementById('seller-box'), p.vendor_id);
   SAZGallery.mount(document.getElementById('gal'), { type: 'part', id: id, cover: img, title: title, ownerId: p.vendor_id, icon: 'i-part' });
   (function () {
    var mine = false; try { mine = String((JSON.parse(localStorage.getItem('userInfo') || '{}') || {}).id) === String(p.vendor_id); } catch (e) {}
