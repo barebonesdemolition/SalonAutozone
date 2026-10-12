@@ -1,0 +1,14 @@
+{
+  "name": "SalonAutoZone",
+  "short_name": "SalonAutoZone",
+  "description": "Car parts and cars across Sierra Leone",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f7f6",
+  "theme_color": "#0e2a2b",
+  "icons": [
+    { "src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
