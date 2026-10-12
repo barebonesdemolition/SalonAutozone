@@ -114,10 +114,42 @@ async def admin_stats(_: dict = Depends(require_admin), db: AsyncSession = Depen
         "total_inquiries": await count(models.Inquiry.id),
         "total_imports": await count(models.ImportRequest.id),
         "total_saved": await count(models.SavedListing.id),
-        "total_garages": await count(models.UserCar.id),
+        "total_garages": await count(models.Garage.id),  # user_cars (UserCar) isn't created in production
         "featured_parts": featured_parts,
         "featured_vehicles": featured_vehicles,
         "featured_revenue_sll": (featured_parts + featured_vehicles) * FEATURE_PRICE_SLL,
+    }
+
+
+# ============================================================
+# TO-DO: things waiting for an admin
+# ============================================================
+@router.get("/todo")
+async def admin_todo(_: dict = Depends(require_admin), db: AsyncSession = Depends(get_db)):
+    """Counts of everything that needs an admin's action, for the dashboard's first screen."""
+    from sqlalchemy import text
+    from app.drivers import drivers as drivers_t
+    from app.shop import jobs as jobs_t, orders as orders_t, settings_t
+
+    async def scalar(query, default=0):
+        try:
+            async with db.begin_nested():
+                return (await db.execute(query)).scalar() or 0
+        except Exception:  # a table that doesn't exist on this database yet
+            return default
+
+    fees = await scalar(select(func.count()).select_from(settings_t).where(
+        settings_t.c.key.in_(["okada_fee_sll", "van_fee_sll", "platform_pct"])))
+    return {
+        "delivery_fees_missing": fees < 3,
+        "orders_awaiting_payment": await scalar(select(func.count(orders_t.c.id)).where(orders_t.c.status == "awaiting_payment")),
+        "jobs_without_driver": await scalar(select(func.count(jobs_t.c.id)).where(jobs_t.c.status == "open")),
+        "drivers_pending": await scalar(select(func.count(drivers_t.c.id)).where(drivers_t.c.status == "pending")),
+        "businesses_pending": await scalar(select(func.count(models.Business.id)).where(models.Business.status == "pending")),
+        "payments_pending": await scalar(text("SELECT COUNT(*) FROM payments WHERE status = 'pending'")),
+        "imports_open": await scalar(select(func.count(models.ImportRequest.id)).where(
+            models.ImportRequest.status.in_(["open", "pending", "new"]))),
+        "inquiries_new": await scalar(select(func.count(models.Inquiry.id)).where(models.Inquiry.status == "new")),
     }
 
 

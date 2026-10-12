@@ -7,8 +7,8 @@
 <title>Admin dashboard · SalonAutoZone</title>
 <style>
 :root{
- --primary:#0f766e;--primary-hover:#0d9488;--primary-light:#ccfbf1;
- --navy:#0f172a;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f1f5f9;--surface:#fff;
+ --primary:#0e7c7b;--primary-hover:#0a6665;--primary-light:#e3f3f1;
+ --navy:#0e2a2b;--text:#1c2b2b;--muted:#5d6f6e;--border:#dde4e2;--bg:#f5f7f6;--surface:#fff;
  --success:#15803d;--danger:#b91c1c;--warn:#b45309;
  --sh:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,23,42,.06);
 }
@@ -59,6 +59,13 @@ td{font-size:13px}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--navy);color:#fff;padding:12px 16px;border-radius:10px;font-weight:600;transform:translateY(120px);transition:transform .25s;z-index:99}
 .toast.show{transform:translateY(0)}.toast.ok{background:var(--success)}.toast.err{background:var(--danger)}
 .hidden{display:none!important}
+.todo { display: grid; gap: 8px; padding: 0 16px 16px; }
+.todo a, .todo button { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; font-weight: 600; text-align: left; cursor: pointer; text-decoration: none; }
+.todo a:hover, .todo button:hover { border-color: var(--primary); }
+.todo .n { min-width: 30px; padding: 2px 9px; border-radius: 999px; background: #fdf3dc; color: #7a4b00; font-weight: 800; text-align: center; }
+.todo .urgent { border-color: #f6c7c3; background: #fdeceb; }
+.todo .urgent .n { background: var(--danger); color: #fff; }
+.todo .clear { padding: 12px 14px; color: var(--success); font-weight: 700; }
 </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -95,6 +102,10 @@ td{font-size:13px}
  </div>
 
  <div id="view-overview">
+ <div class="panel" id="todo-panel" style="margin-bottom:16px">
+ <div class="bar"><h2>Needs your attention</h2></div>
+ <div id="todo" class="todo"><p class="empty">Checking…</p></div>
+ </div>
  <div class="stats" id="stats">
  <div class="stat"><div class="k">Vehicles</div><div class="v" id="s-vehicles">—</div></div>
  <div class="stat"><div class="k">Parts</div><div class="v" id="s-parts">—</div></div>
@@ -319,7 +330,34 @@ td{font-size:13px}
  });
  });
 
+ function loadTodo() {
+ fetch('/api/admin/todo', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (t) {
+ var box = $('todo');
+ if (!t) { box.innerHTML = '<p class="empty">Could not load the to-do list.</p>'; return; }
+ var items = [];
+ if (t.delivery_fees_missing) items.push(['delivery', 'Set delivery fees. Buyers can\'t check out until you do.', '!', true]);
+ if (t.orders_awaiting_payment) items.push(['orders', 'Parts orders waiting for payment', t.orders_awaiting_payment]);
+ if (t.drivers_pending) items.push(['drivers', 'Drivers waiting for approval', t.drivers_pending]);
+ if (t.jobs_without_driver) items.push(['orders', 'Orders ready but no driver has taken them yet', t.jobs_without_driver, false, 'ready_for_pickup']);
+ if (t.businesses_pending) items.push(['businesses', 'Business applications to review', t.businesses_pending]);
+ if (t.payments_pending) items.push(['payments', 'Seller plan payments to confirm', t.payments_pending]);
+ if (t.imports_open) items.push(['imports', 'Import requests waiting for a quote', t.imports_open]);
+ if (t.inquiries_new) items.push(['inquiries', 'New enquiries from buyers', t.inquiries_new]);
+ box.innerHTML = items.length ? items.map(function (it) {
+ return '<button type="button" class="' + (it[3] ? 'urgent' : '') + '" data-todo="' + it[0] + '"' + (it[4] ? ' data-todo-filter="' + it[4] + '"' : '') + '><span>' + esc(it[1]) + '</span><span class="n">' + esc(it[2]) + '</span></button>';
+ }).join('') : '<p class="clear">✓ All clear. Nothing is waiting for you.</p>';
+ }).catch(function () {});
+ }
+ $('todo').addEventListener('click', function (e) {
+ var b = e.target.closest('[data-todo]');
+ if (!b) return;
+ if (b.dataset.todoFilter && $('q-orders')) $('q-orders').value = b.dataset.todoFilter;
+ var target = document.querySelector('.side [data-view="' + b.dataset.todo + '"]');
+ if (target) target.click();
+ });
+
  function loadOverview() {
+ loadTodo();
  fetch('/api/admin/stats', { headers: auth() })
  .then(function (r) { if (r.status === 403) throw new Error('Admin session expired'); return r.json(); })
  .then(function (data) {
