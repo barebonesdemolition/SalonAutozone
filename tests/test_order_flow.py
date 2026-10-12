@@ -110,3 +110,11 @@ def test_delivery_size_from_part_name(name, category, size):
     from types import SimpleNamespace
     from app.shop import _default_size
     assert _default_size(SimpleNamespace(name=name, category=category)) == size
+
+
+def test_admin_todo_and_stats(client):
+    todo = client.get("/api/admin/todo", headers=ADMIN)
+    assert todo.status_code == 200, todo.text
+    assert set(todo.json()) >= {"delivery_fees_missing", "orders_awaiting_payment", "drivers_pending", "payments_pending"}
+    assert client.get("/api/admin/stats", headers=ADMIN).status_code == 200
+    assert client.get("/api/admin/todo").status_code == 403
