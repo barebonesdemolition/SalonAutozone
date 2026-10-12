@@ -1,199 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Business · SalonAutoZone</title>
-<style>
-:root{--t:#0f766e;--t2:#0b5f58;--n:#0a1729;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s500:#64748b;--s600:#475569;--r:#dc2626;--g:#16a34a;--am:#b45309}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;color:#1e293b;background:var(--s50)}
-a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
-:focus-visible{outline:3px solid #5eead4;outline-offset:2px}
-header{background:#fff;border-bottom:1px solid var(--s200);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
-.logo{font-weight:800;font-size:18px;color:var(--n)}.logo span{color:var(--t)}
-header a.back{font-size:14px;font-weight:600;color:var(--t)}
-main{max-width:680px;margin:24px auto;padding:0 16px 48px}
-.card{background:#fff;border:1px solid var(--s200);border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(15,23,42,.06)}
-h1{font-size:24px;font-weight:800;color:var(--n);letter-spacing:-.02em;margin-bottom:6px}
-.sub{color:var(--s500);margin-bottom:18px}
-label{display:block;font-size:13px;font-weight:600;color:var(--s600);margin-top:14px}
-input,select,textarea{display:block;width:100%;margin-top:6px;padding:12px;border:1.5px solid var(--s200);border-radius:10px;font-size:16px;background:#fff}
-input:focus,select:focus,textarea:focus{outline:0;border-color:var(--t);box-shadow:0 0 0 4px rgba(15,118,110,.15)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.types{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
-.type{border:1.5px solid var(--s200);border-radius:12px;padding:12px;cursor:pointer;background:#fff;text-align:left}
-.type b{display:block;font-size:14px;color:var(--n)}.type small{color:var(--s500);font-size:12px}
-.type[aria-pressed=true]{border-color:var(--t);background:#f0fdfa}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--t);color:#fff;font-weight:700;padding:13px 20px;border-radius:10px;min-height:48px;border:0;cursor:pointer}
-.btn:hover{background:var(--t2)}.btn:disabled{opacity:.6;cursor:wait}.btn.full{width:100%;margin-top:20px}
-.btn.wa{background:#16a34a}
-a.btn.public-link{display:inline-flex;justify-content:center;align-items:center;border-radius:8px;font-weight:600;text-decoration:none;background-color:rgb(15,118,110);color:rgb(255,255,255)}
-.pill{display:inline-block;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700}
-.pill.ok{background:#dcfce7;color:#166534}.pill.wait{background:#fef3c7;color:var(--am)}.pill.bad{background:#fee2e2;color:var(--r)}.pill.t{background:#ccfbf1;color:var(--t2)}
-.msg{margin-top:14px;font-weight:600;text-align:center}
-.hero{display:flex;gap:16px;align-items:center;margin-bottom:16px}
-.logo-box{width:72px;height:72px;border-radius:16px;background:var(--t);color:#fff;font-weight:800;font-size:28px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
-.logo-box img{width:100%;height:100%;object-fit:cover}
-.meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-.note{background:#f0fdfa;border:1px solid #99f6e4;color:var(--t2);padding:12px 14px;border-radius:10px;font-size:14px;margin-top:16px}
-@media (max-width:560px){.row,.types{grid-template-columns:1fr}}
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
-
-/* business-logo-fix */
-.brand img, .logo img, img.logo-img {
-}
-
-/* logo-hard-fix */
-header img, .top img, .brand img, .logo img, img.logo-img, img[alt*="Salon"] {
-}
-</style>
-
+<title>Sell as a business · SalonAutoZone</title>
+<meta name="description" content="Parts stores, dealerships, shippers and wholesalers: get a Verified badge and your own page on SalonAutoZone.">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<style>
+.page { max-width: 760px; padding: 26px 16px 56px; }
+.page h1 { font-size: clamp(28px, 6vw, 40px); }
+.page .lead { color: var(--muted); font-size: 17px; margin: 6px 0 20px; }
+.stack { display: grid; gap: 14px; }
+.perks { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px; }
+.perks div { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px; }
+.perks b { display: block; color: var(--ink); }
+.perks span { font-size: 14px; color: var(--muted); }
+.types { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.type { text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; cursor: pointer; font: inherit; color: inherit; }
+.type b { display: block; color: var(--ink); }
+.type small { color: var(--muted); font-size: 13px; }
+.type[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-50); box-shadow: 0 0 0 3px var(--teal-50); }
+.row2 { display: grid; gap: 0 12px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 520px) { .row2 { grid-template-columns: 1fr; } }
+.logo-pick { display: flex; gap: 14px; align-items: center; }
+.logo { width: 72px; height: 72px; border-radius: 16px; flex-shrink: 0; background: var(--ink) center / cover no-repeat; color: var(--gold); font-weight: 800; font-size: 30px; display: flex; align-items: center; justify-content: center; font-variation-settings: "wdth" 80; }
+.head { display: flex; gap: 14px; align-items: center; }
+.head h2 { font-size: 24px; margin: 0; }
+.st { display: inline-flex; font-size: 13px; font-weight: 800; padding: 3px 9px; border-radius: 6px; margin-top: 4px; }
+.st.ok { background: var(--ok-50); color: var(--ok); }
+.st.wait { background: var(--gold-50); color: #8a5a00; }
+.st.bad { background: var(--bad-50); color: var(--bad); }
+.acts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+details.box summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+</style>
 </head>
 <body>
 <div id="site-header"></div>
-<main><div class="card" id="root"><p>Loading...</p></div></main>
-
+<main class="wrap page" id="app"><div class="lcard skeleton" style="min-height:240px"></div></main>
+<script src="/static/site.js?v=5"></script>
 <script>
 (function () {
  'use strict';
- var root = document.getElementById('root');
+ var app = document.getElementById('app');
  var TYPES = [
- ['store', 'Local parts store', 'You stock parts in Sierra Leone'],
- ['dealership', 'Car dealership', 'You sell new or used cars'],
- ['shipper', 'Shipper / importer', 'You bring cars in from abroad'],
- ['wholesaler', 'Wholesaler (abroad)', 'You supply parts from outside Sierra Leone']
+  ['store', 'Local parts store', 'You stock parts in Sierra Leone'],
+  ['dealership', 'Car dealership', 'You sell new or used cars'],
+  ['shipper', 'Shipper / importer', 'You bring cars in from abroad'],
+  ['wholesaler', 'Wholesaler (abroad)', 'You supply parts from outside Sierra Leone']
  ];
- var token = '';
+ var token = '', contact = {};
  try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
 
- function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
- function safeUrl(u) { u = String(u || '').trim(); return (u.indexOf('https://') === 0 || (u.charAt(0) === '/' && u.charAt(1) !== '/')) ? u : ''; }
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function safeUrl(u) { u = String(u || '').trim(); return (/^https:\/\//i.test(u) || /^\/(?!\/)/.test(u)) ? u : ''; }
+ function toLogin() { try { localStorage.removeItem('token'); localStorage.removeItem('access_token'); } catch (e) {} location.href = '/login?next=' + encodeURIComponent(location.pathname); }
  function api(url, opts) {
- opts = opts || {};
- opts.headers = Object.assign({ 'Content-Type': 'application/json' }, token ? { 'Authorization': 'Bearer ' + token } : {}, opts.headers || {});
- return fetch(url, opts).then(function (r) {
- return r.json().catch(function () { return {}; }).then(function (d) {
- if (!r.ok) {
- var detail = d.detail;
- if (Array.isArray(detail)) detail = detail.map(function (x) { return x.msg; }).join('. ');
- var error = new Error(typeof detail === 'string' ? detail : 'Something went wrong');
- error.status = r.status;
- throw error;
+  opts = opts || {};
+  opts.headers = Object.assign(opts.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }, token ? { 'Authorization': 'Bearer ' + token } : {}, opts.headers || {});
+  return fetch(url, opts).then(function (r) {
+   return r.json().catch(function () { return {}; }).then(function (d) {
+    if (r.status === 401) { toLogin(); throw new Error('Please log in again.'); }
+    if (!r.ok) { var m = d.detail; if (Array.isArray(m)) m = m.map(function (x) { return String(x.msg || '').replace(/^Value error, /, ''); }).join('. '); throw new Error(typeof m === 'string' ? m : 'Something went wrong. Please try again.'); }
+    return d;
+   });
+  });
  }
- return d;
+ function logo(b) { var u = safeUrl(b.logo_url); return '<div class="logo"' + (u ? ' style="background-image:url(\'' + esc(window.SAZImg ? SAZImg(u, 160) : u) + '\')"' : '') + '>' + (u ? '' : esc((b.name || '?').charAt(0).toUpperCase())) + '</div>'; }
+ var STATUS = { verified: ['ok', '✓ Verified'], pending: ['wait', 'Being checked'], rejected: ['bad', 'Not approved'], suspended: ['bad', 'Suspended'] };
+
+ var perks = '<div class="perks"><div><b>Verified badge</b><span>Shown on your listings so buyers trust you.</span></div>' +
+  '<div><b>Your own page</b><span>One link with everything you sell, to share on WhatsApp.</span></div>' +
+  '<div><b>More listings</b><span>Plans for stores and dealers with lots of stock.</span></div></div>';
+
+ fetch('/api/site/contact').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (c) {
+  contact = c || {};
+  if (!token) {
+   app.innerHTML = '<h1>Sell as a business</h1><p class="lead">For parts stores, car dealerships, shippers and wholesalers.</p>' + perks +
+    '<div class="box"><h2>Log in to apply</h2><p>Use your SalonAutoZone account, or create one first. It\'s free.</p><div class="acts"><a class="btn btn-primary" href="/login?next=/become-a-seller">Log in</a><a class="btn btn-ghost" href="/login?mode=register&next=/become-a-seller">Create account</a></div></div>';
+   return;
+  }
+  load();
  });
- });
- }
- function returnToLogin() {
- try {
- localStorage.removeItem('token');
- localStorage.removeItem('access_token');
- } catch (e) {}
- window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
- }
- function pill(st) {
- var map = { verified: ['ok', 'Verified'], pending: ['wait', 'Waiting for approval'], rejected: ['bad', 'Not approved'], suspended: ['bad', 'Suspended'] };
- var p = map[st] || ['wait', st];
- return '<span class="pill ' + p[0] + '">' + p[1] + '</span>';
- }
- function logoBox(b) {
- var u = safeUrl(b.logo_url);
- return '<div class="logo-box">' + (u ? '<img src="' + esc(u) + '" alt="">' : esc((b.name || '?').charAt(0).toUpperCase())) + '</div>';
+
+ function load() {
+  api('/api/businesses/mine').then(function (d) { if (d.business) showMine(d.business); else showForm(null); })
+   .catch(function (e) { app.innerHTML = '<div class="notice notice-bad">' + esc(e.message) + '</div>'; });
  }
 
- // ---------- storefront ----------
- function showStore(slug) {
- api('/api/businesses/' + encodeURIComponent(slug)).then(function (b) {
- document.title = b.name + ' · SalonAutoZone';
- var contact = b.whatsapp
- ? '<a class="btn wa full" href="https://wa.me/' + encodeURIComponent(b.whatsapp) + '?text=' + encodeURIComponent('Hello ' + b.name + ', I found you on SalonAutoZone.') + '" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>'
- : '<div class="note">This business has not added a WhatsApp contact yet.</div>';
- root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta"><span class="pill ok">Verified</span><span class="pill t">' + esc(b.type_label) + '</span><span class="pill t">' + esc(b.city) + ', ' + esc(b.country) + '</span></div></div></div>' +
- (b.description ? '<p>' + esc(b.description) + '</p>' : '') +
- contact +
- '<div class="note">Listings from this business will appear here soon. Never pay a deposit before you have checked the seller and seen the item.</div>';
- }).catch(function () {
- root.innerHTML = '<h1>Business not found</h1><p class="sub">This page does not exist or has not been approved yet.</p><a class="btn" href="/">Back to marketplace</a>';
- });
+ function showMine(b) {
+  var st = STATUS[b.status] || ['wait', b.status];
+  var wa = contact.whatsapp ? 'https://wa.me/' + encodeURIComponent(contact.whatsapp) + '?text=' + encodeURIComponent('Hello, this is ' + b.name + ' on SalonAutoZone.') : '';
+  var h = '<h1>Your business</h1><p class="lead">' + esc(b.type_label) + ', ' + esc(b.city) + '</p><div class="stack">' +
+   '<div class="box"><div class="head">' + logo(b) + '<div><h2>' + esc(b.name) + '</h2><span class="st ' + st[0] + '">' + esc(st[1]) + '</span></div></div>';
+  if (b.status === 'pending') h += '<p style="margin-top:12px">We\'re checking your details and will message you on WhatsApp at +' + esc(b.whatsapp) + '. This usually takes a day or two.</p>';
+  if (b.status === 'verified') h += '<p style="margin-top:12px">Your Verified badge is on. Everything you list shows on your business page.</p>';
+  if (b.status === 'rejected' || b.status === 'suspended') h += '<p style="margin-top:12px">Message us on WhatsApp to find out why and what to change.</p>';
+  h += '<div class="acts">' +
+   (b.status === 'verified' ? '<a class="btn btn-primary" href="/store/' + encodeURIComponent(b.slug) + '">See your page</a>' : '') +
+   '<a class="btn btn-ghost" href="/sell">List an item</a><a class="btn btn-ghost" href="/my-subscription">Your plan</a>' +
+   (wa ? '<a class="btn btn-wa" href="' + esc(wa) + '" target="_blank" rel="noopener noreferrer">Message us</a>' : '') + '</div></div>' +
+   '<details class="box" id="edit"><summary>Edit business details</summary><div id="editform"></div></details></div>';
+  app.innerHTML = h;
+  document.getElementById('edit').addEventListener('toggle', function (e) {
+   if (e.target.open && !document.getElementById('f')) form(document.getElementById('editform'), b);
+  }, { once: false });
  }
 
- // ---------- apply ----------
- function showApply() {
- if (!token) { window.location.href = '/login?next=/become-a-seller'; return; }
- api('/api/businesses/mine').then(function (d) {
- if (d.business) { showStatus(d.business); } else { showForm(); }
- }).catch(function (e) {
- if (e.status === 401) { returnToLogin(); return; }
- root.innerHTML = '<p class="msg" style="color:var(--r)">' + esc(e.message) + '</p>';
- });
- }
- function showStatus(b) {
- root.innerHTML = '<div class="hero">' + logoBox(b) + '<div><h1>' + esc(b.name) + '</h1><div class="meta">' + pill(b.status) + '<span class="pill t">' + esc(b.type_label) + '</span></div></div></div>' +
- (b.status === 'pending' ? '<div class="note">We received your application. We will check your details and contact you on WhatsApp (+' + esc(b.whatsapp) + ').</div>' : '') +
- (b.status === 'verified' ? '<a class="btn full public-link" href="/store/' + encodeURIComponent(b.slug) + '">View your public page</a>' : '') +
- ((b.status === 'rejected' || b.status === 'suspended') ? '<div class="note">Please contact us on WhatsApp to find out why and what to fix.</div>' : '');
- }
  function showForm() {
- var chosen = '';
- root.innerHTML = '<h1>Sell on SalonAutoZone as a business</h1><p class="sub">Stores, dealerships, shippers and wholesalers get a public page with a Verified badge once we have checked the details.</p>' +
- '<form id="f"><label>What kind of business are you?</label><div class="types" id="types">' +
- TYPES.map(function (t) { return '<button type="button" class="type" data-t="' + t[0] + '" aria-pressed="false"><b>' + t[1] + '</b><small>' + t[2] + '</small></button>'; }).join('') + '</div>' +
- '<label>Business name<input name="name" required minlength="2" maxlength="80" placeholder="e.g. Freetown Auto Parts"></label>' +
- '<div class="row"><label>Country<input name="country" required value="Sierra Leone"></label><label>City<input name="city" required placeholder="Freetown"></label></div>' +
- '<label>WhatsApp number<input name="whatsapp" type="tel" required placeholder="+232 76 123456"></label>' +
- '<label>Email (optional)<input name="email" type="email"></label>' +
- '<label>About your business<textarea name="description" rows="4" maxlength="1000" placeholder="What you sell, how long you have traded, where to find you"></textarea></label>' +
- '<button class="btn full" type="submit">Send application</button><div class="msg" id="msg" aria-live="polite"></div></form>';
- document.getElementById('types').addEventListener('click', function (e) {
- var b = e.target.closest('.type'); if (!b) return;
- chosen = b.dataset.t;
- document.querySelectorAll('.type').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
- });
- document.getElementById('f').addEventListener('submit', function (e) {
- e.preventDefault();
- var msg = document.getElementById('msg'), btn = e.target.querySelector('.btn');
- if (!chosen) { msg.style.color = 'var(--r)'; msg.textContent = 'Choose what kind of business you are.'; return; }
- var p = { business_type: chosen };
- new FormData(e.target).forEach(function (v, k) { if (v !== '') p[k] = v; });
- btn.disabled = true; msg.style.color = 'var(--t)'; msg.textContent = 'Sending...';
- api('/api/businesses/apply', { method: 'POST', body: JSON.stringify(p) })
- .then(function () { showApply(); })
- .catch(function (err) {
- if (err.status === 401) { returnToLogin(); return; }
- msg.style.color = 'var(--r)'; msg.textContent = err.message; btn.disabled = false;
- });
- });
+  app.innerHTML = '<h1>Sell as a business</h1><p class="lead">Fill this in and we\'ll check your details, then switch on your Verified badge.</p>' + perks + '<div class="box" id="formbox"></div>';
+  form(document.getElementById('formbox'), null);
  }
 
- var path = window.location.pathname;
- if (path.indexOf('/store/') === 0) showStore(decodeURIComponent(path.slice('/store/'.length)));
- else showApply();
+ function form(el, b) {
+  var editing = !!b, chosen = b ? b.business_type : '', logoUrl = b ? (b.logo_url || '') : '';
+  el.innerHTML = '<form id="f" novalidate>' +
+   (editing ? '<p class="hint">Changing the name or WhatsApp number means we check your business again.</p>' :
+    '<span class="lbl">What kind of business are you?</span><div class="types" id="types">' + TYPES.map(function (t) {
+     return '<button type="button" class="type" data-t="' + t[0] + '" aria-pressed="false"><b>' + t[1] + '</b><small>' + t[2] + '</small></button>';
+    }).join('') + '</div>') +
+   '<label class="field"><span>Business name</span><input class="input" name="name" required minlength="2" maxlength="80" placeholder="e.g. Freetown Auto Parts"></label>' +
+   '<div class="row2"><label class="field"><span>City</span><input class="input" name="city" required maxlength="80" placeholder="Freetown"></label>' +
+   '<label class="field"><span>Country</span><input class="input" name="country" required maxlength="80" value="Sierra Leone"></label></div>' +
+   '<label class="field"><span>WhatsApp number</span><input class="input" name="whatsapp" type="tel" required placeholder="076 123456"></label>' +
+   '<label class="field"><span>Email (optional)</span><input class="input" name="email" type="email" maxlength="120"></label>' +
+   '<label class="field"><span>About your business</span><textarea class="input" name="description" rows="4" maxlength="1000" placeholder="What you sell, how long you have traded, where to find you"></textarea></label>' +
+   '<div class="field"><span class="lbl">Logo (optional)</span><div class="logo-pick"><div id="lp"></div><label class="btn btn-ghost">Choose picture<input type="file" accept="image/*" id="logofile" hidden></label></div></div>' +
+   '<button class="btn btn-primary btn-block" style="margin-top:18px" type="submit">' + (editing ? 'Save changes' : 'Send application') + '</button>' +
+   '<div id="msg" aria-live="polite" style="margin-top:10px"></div></form>';
+  var f = document.getElementById('f'), msg = document.getElementById('msg');
+  if (b) ['name', 'city', 'country', 'whatsapp', 'email', 'description'].forEach(function (k) { if (b[k] != null) f.elements[k].value = k === 'whatsapp' ? '+' + b[k] : b[k]; });
+  function paintLogo() { document.getElementById('lp').innerHTML = logo({ name: f.elements.name.value || '?', logo_url: logoUrl }); }
+  paintLogo();
+  f.elements.name.addEventListener('input', function () { if (!logoUrl) paintLogo(); });
+  var types = document.getElementById('types');
+  if (types) types.addEventListener('click', function (e) {
+   var t = e.target.closest('.type'); if (!t) return;
+   chosen = t.dataset.t;
+   types.querySelectorAll('.type').forEach(function (x) { x.setAttribute('aria-pressed', String(x === t)); });
+  });
+  document.getElementById('logofile').addEventListener('change', function (e) {
+   var file = e.target.files[0]; if (!file) return;
+   var fd = new FormData(); fd.append('file', file);
+   msg.innerHTML = '<p class="hint">Uploading logo…</p>';
+   api('/api/upload/', { method: 'POST', body: fd }).then(function (d) { logoUrl = d.url || ''; paintLogo(); msg.innerHTML = ''; })
+    .catch(function (err) { msg.innerHTML = '<div class="notice notice-bad">' + esc(err.message) + '</div>'; });
+  });
+  f.addEventListener('submit', function (e) {
+   e.preventDefault();
+   if (!chosen) { msg.innerHTML = '<div class="notice notice-bad">Choose what kind of business you are.</div>'; return; }
+   if (!f.reportValidity()) return;
+   var p = { business_type: chosen, logo_url: logoUrl || null };
+   ['name', 'city', 'country', 'whatsapp', 'email', 'description'].forEach(function (k) { var v = f.elements[k].value.trim(); p[k] = v || null; });
+   var btn = f.querySelector('button[type=submit]'); btn.disabled = true;
+   msg.innerHTML = '<p class="hint">Sending…</p>';
+   api('/api/businesses/' + (editing ? 'mine' : 'apply'), { method: editing ? 'PUT' : 'POST', body: JSON.stringify(p) })
+    .then(function () { window.scrollTo(0, 0); load(); })
+    .catch(function (err) { msg.innerHTML = '<div class="notice notice-bad">' + esc(err.message) + '</div>'; btn.disabled = false; });
+  });
+ }
 })();
 </script>
-<script src="/static/site.js?v=5"></script>
 </body>
 </html>

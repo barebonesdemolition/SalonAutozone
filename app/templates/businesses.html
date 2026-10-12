@@ -2,104 +2,80 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Businesses · SalonAutoZone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Verified businesses · SalonAutoZone</title>
+<meta name="description" content="Verified parts stores, car dealerships, shippers and wholesalers selling in Sierra Leone.">
+<meta name="theme-color" content="#0e2a2b">
 <link rel="icon" type="image/png" href="/static/logo.png">
-<style>
-* { box-sizing: border-box; }
-body { margin:0; font-family: Inter, system-ui, sans-serif; background:#f8fafc; color:#0f172a; }
-.top { display:flex; align-items:center; gap:12px; padding:14px clamp(16px,5vw,56px); background:#fff; border-bottom:1px solid #e2e8f0; }
-.brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:#0f172a; font-weight:800; font-size:17px; }
-.brand img { height:44px; width:44px; border-radius:50%; }
-.brand span { color:#0f766e; }
-.wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
-h1 { font-size: 26px; margin: 0 0 6px; }
-.sub { color:#64748b; font-size:14px; margin: 0 0 24px; }
-.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px; }
-.card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:18px; text-decoration:none; color:inherit; display:flex; gap:14px; align-items:flex-start; transition: box-shadow .15s; }
-.card:hover { box-shadow: 0 8px 24px rgba(15,23,42,.08); }
-.card .logo { width:60px; height:60px; border-radius:50%; object-fit:cover; background:#e2e8f0; flex-shrink:0; }
-.card .body { flex:1; min-width: 0; }
-.card h3 { margin:0 0 4px; font-size:16px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.badge { display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; }
-.badge.verified { background:#d1fae5; color:#065f46; }
-.badge.pending { background:#fef3c7; color:#92400e; }
-.badge.rejected { background:#fee2e2; color:#991b1b; }
-.card .meta { font-size:13px; color:#64748b; margin: 4px 0 0; }
-.card .desc { font-size:13px; color:#475569; margin-top:6px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.empty { color:#94a3b8; font-style:italic; padding: 40px; text-align:center; background:#fff; border:1px dashed #cbd5e1; border-radius: 12px; }
-.loading { padding: 40px; text-align:center; color:#64748b; }
-.counters { display:flex; gap:16px; margin-bottom: 24px; flex-wrap:wrap; }
-.stat { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding: 12px 18px; }
-.stat .n { font-size: 22px; font-weight:800; color:#0f766e; }
-.stat .l { font-size: 12px; color:#64748b; text-transform:uppercase; letter-spacing:.05em; }
-</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<style>
+.lead { padding: 26px 0 4px; }
+.lead h1 { font-size: clamp(28px, 6vw, 40px); }
+.lead p { color: var(--muted); margin-top: 6px; font-size: 16px; }
+.bar { display: grid; gap: 10px; margin: 18px 0 14px; }
+.chips .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.biz-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); padding-bottom: 20px; }
+.biz { display: flex; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px; text-decoration: none; color: inherit; }
+.biz:hover { border-color: var(--teal); }
+.logo { width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0; background: var(--ink) center / cover no-repeat; color: var(--gold); font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; font-variation-settings: "wdth" 80; }
+.biz h2 { font-size: 18px; margin: 0; }
+.biz .ok { color: var(--ok); font-size: 13px; font-weight: 800; }
+.biz .meta { font-size: 14px; color: var(--muted); }
+.biz p { font-size: 14px; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cta { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--ink); color: #fff; border-radius: var(--r-lg); padding: 20px; margin: 10px 0 48px; }
+.cta h2 { color: #fff; font-size: 22px; }
+.cta p { color: #a9c4c2; margin-top: 4px; }
+</style>
 </head>
 <body>
-
 <div id="site-header"></div>
-
-<div class="wrap" id="content">
-  <div class="loading">Loading businesses...</div>
-</div>
-
+<main class="wrap">
+ <div class="lead"><h1>Verified businesses</h1><p>Parts stores, dealers and importers we have checked.</p></div>
+ <div class="bar">
+  <input class="input" id="q" type="search" placeholder="Search by name or town" aria-label="Search businesses">
+  <div class="chips" id="types">
+   <button class="chip" type="button" data-t="" aria-pressed="true">All</button>
+   <button class="chip" type="button" data-t="store" aria-pressed="false">Parts stores</button>
+   <button class="chip" type="button" data-t="dealership" aria-pressed="false">Car dealers</button>
+   <button class="chip" type="button" data-t="shipper" aria-pressed="false">Shippers</button>
+   <button class="chip" type="button" data-t="wholesaler" aria-pressed="false">Wholesalers</button>
+  </div>
+ </div>
+ <div class="biz-grid" id="list"><div class="lcard skeleton" style="min-height:90px"></div><div class="lcard skeleton" style="min-height:90px"></div></div>
+ <div class="cta"><div><h2>Run a parts store or dealership?</h2><p>Get a Verified badge and your own page.</p></div><a class="btn btn-gold" href="/become-a-seller">Apply as a business</a></div>
+</main>
+<script src="/static/site.js?v=5"></script>
 <script>
-(function() {
-  var wrap = document.getElementById('content');
-
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-
-  function badge(status) {
-    if (status === 'verified') return '<span class="badge verified">&#10003; Verified</span>';
-    if (status === 'pending') return '<span class="badge pending">Pending</span>';
-    if (status === 'rejected') return '<span class="badge rejected">Rejected</span>';
-    return '';
-  }
-
-  fetch('/api/businesses/')
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      var list = d.businesses || [];
-      var html = '';
-      html += '<h1>Verified businesses in Sierra Leone</h1>';
-      html += '<p class="sub">Browse dealers, parts stores, and importers. Only verified businesses show a green badge.</p>';
-      html += '<div class="counters">';
-      html += '  <div class="stat"><div class="n">' + (d.count || list.length || 0) + '</div><div class="l">Total</div></div>';
-      html += '  <div class="stat"><div class="n">' + list.filter(function(b){return b.verified}).length + '</div><div class="l">Verified</div></div>';
-      html += '</div>';
-
-      if (list.length === 0) {
-        html += '<div class="empty">No businesses yet.</div>';
-      } else {
-        html += '<div class="grid">';
-        list.forEach(function(b) {
-          var logo = b.logo_url || '/static/logo.png';
-          var loc = [b.city, b.country].filter(Boolean).join(', ');
-          html += '<a class="card" href="/store/' + esc(b.slug) + '">';
-          html += '  <img class="logo" src="' + esc(logo) + '" alt="' + esc(b.name) + '">';
-          html += '  <div class="body">';
-          html += '    <h3>' + esc(b.name) + badge(b.status) + '</h3>';
-          if (b.type_label) html += '    <div class="meta">' + esc(b.type_label) + '</div>';
-          if (loc) html += '    <div class="meta">' + esc(loc) + '</div>';
-          if (b.description) html += '    <div class="desc">' + esc(b.description) + '</div>';
-          html += '  </div>';
-          html += '</a>';
-        });
-        html += '</div>';
-      }
-
-      wrap.innerHTML = html;
-    })
-    .catch(function(e) {
-      wrap.innerHTML = '<div class="empty">Could not load businesses.</div>';
-    });
+(function () {
+ 'use strict';
+ var list = document.getElementById('list'), q = document.getElementById('q'), all = [], type = '';
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function safeUrl(u) { u = String(u || '').trim(); return (/^https?:\/\//i.test(u) || /^\/(?!\/)/.test(u)) ? u : ''; }
+ function paint() {
+  var term = q.value.trim().toLowerCase();
+  var rows = all.filter(function (b) {
+   return (!type || b.business_type === type) && (!term || [b.name, b.city, b.country, b.description].join(' ').toLowerCase().indexOf(term) !== -1);
+  });
+  list.innerHTML = rows.length ? rows.map(function (b) {
+   var u = safeUrl(b.logo_url);
+   return '<a class="biz" href="/store/' + encodeURIComponent(b.slug) + '"><div class="logo"' + (u ? ' style="background-image:url(\'' + esc(window.SAZImg ? SAZImg(u, 120) : u) + '\')"' : '') + '>' + (u ? '' : esc((b.name || '?').charAt(0).toUpperCase())) + '</div>' +
+    '<div><h2>' + esc(b.name) + '</h2><div class="meta"><span class="ok">✓ Verified</span> · ' + esc([b.type_label, b.city].filter(Boolean).join(', ')) + '</div>' + (b.description ? '<p>' + esc(b.description) + '</p>' : '') + '</div></a>';
+  }).join('') : '<p class="hint" style="grid-column:1/-1">' + (all.length ? 'No businesses match that.' : 'No verified businesses yet.') + '</p>';
+ }
+ fetch('/api/businesses/').then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) { all = d.businesses || []; paint(); })
+  .catch(function () { list.innerHTML = '<div class="notice notice-bad" style="grid-column:1/-1">We couldn\'t load businesses. Please refresh.</div>'; });
+ q.addEventListener('input', paint);
+ document.getElementById('types').addEventListener('click', function (e) {
+  var c = e.target.closest('.chip'); if (!c) return;
+  type = c.dataset.t;
+  this.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', String(x === c)); });
+  paint();
+ });
 })();
 </script>
-<script src="/static/site.js?v=5"></script>
 </body>
 </html>

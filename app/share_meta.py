@@ -98,6 +98,16 @@ def vehicle_page(car, base_url: str, page_url: str) -> str:
                   url=page_url, image=image, kind="product")
 
 
+def business_page(biz, base_url: str, page_url: str) -> str:
+    label = {"store": "Parts store", "dealership": "Car dealership", "shipper": "Shipper / importer",
+             "wholesaler": "Wholesaler"}.get(biz.business_type, "")
+    lead = ", ".join(b for b in ("Verified" if biz.status == "verified" else "", label, biz.city or "") if b)
+    description = _clip(f"{lead}. {biz.description}") if biz.description else lead
+    image = absolute(cloudinary_variant(biz.logo_url, "w_600,h_600,c_fill,f_jpg,q_auto"), base_url) or absolute("/static/logo.png", base_url)
+    return render("app/templates/storefront.html", title=biz.name, description=description or DEFAULT_DESCRIPTION,
+                  url=page_url, image=image, kind="business.business")
+
+
 def home_page(base_url: str, page_url: str) -> str:
     return render("app/index.html", title="Car parts and cars in Sierra Leone", description=DEFAULT_DESCRIPTION,
                   url=page_url, image=absolute("/static/logo.png", base_url))

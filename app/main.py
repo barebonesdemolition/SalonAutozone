@@ -279,8 +279,12 @@ async def my_subscription_page():
 
 
 @app.get("/store/{slug}")
-async def verified_business_page(slug: str):
-    return FileResponse("app/templates/storefront.html")
+async def verified_business_page(slug: str, request: Request, db: AsyncSession = Depends(get_db)):
+    biz = (await db.execute(_orm_select(models.Business).where(models.Business.slug == slug))).scalars().first()
+    if not biz or biz.status != "verified":
+        return FileResponse("app/templates/storefront.html")  # the page shows "not found" itself
+    base = _public_base(request)
+    return HTMLResponse(share_meta.business_page(biz, base, f"{base}/store/{slug}"))
 
 
 @app.get("/part/{part_id}")
@@ -347,6 +351,15 @@ app.include_router(unified_search.router)
 # ============================================================
 # SUBSCRIPTIONS - API endpoints
 # ============================================================
+
+
+@app.get("/api/site/contact")
+async def site_contact():
+    """Public contact details for the platform (support WhatsApp, payment number)."""
+    from app.config import get_settings
+    cfg = get_settings()
+    digits = lambda v: "".join(ch for ch in (v or "") if ch.isdigit())  # noqa: E731
+    return {"whatsapp": digits(cfg.ADMIN_WHATSAPP) or None, "orange_money": (cfg.ORANGE_MONEY_NUMBER or None)}
 
 
 @app.get("/api/plans")

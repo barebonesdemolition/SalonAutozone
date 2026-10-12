@@ -2,87 +2,80 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Plans · SalonAutoZone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plans for businesses · SalonAutoZone</title>
+<meta name="description" content="Plans for parts stores, dealerships and importers selling on SalonAutoZone.">
+<meta name="theme-color" content="#0e2a2b">
 <link rel="icon" type="image/png" href="/static/logo.png">
-<style>
-* { box-sizing: border-box; }
-body { margin:0; font-family: Inter, system-ui, sans-serif; background:#f8fafc; color:#0f172a; }
-.top { display:flex; align-items:center; gap:12px; padding:14px clamp(16px,5vw,56px); background:#fff; border-bottom:1px solid #e2e8f0; }
-.brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:#0f172a; font-weight:800; font-size:17px; }
-.brand img { height:44px; width:44px; border-radius:50%; }
-.brand span { color:#0f766e; }
-.wrap { max-width: 1100px; margin: 0 auto; padding: 32px 16px 60px; text-align: center; }
-h1 { font-size: 30px; margin: 0 0 10px; }
-.sub { color:#64748b; font-size:15px; margin: 0 0 34px; }
-.grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:18px; text-align:left; }
-.plan { background:#fff; border:2px solid #e2e8f0; border-radius:14px; padding:24px; display:flex; flex-direction:column; transition: all .15s; }
-.plan:hover { border-color:#0f766e; transform: translateY(-2px); }
-.plan.featured { border-color:#0f766e; box-shadow: 0 8px 30px rgba(15,118,110,.12); }
-.plan h3 { margin: 0 0 4px; font-size: 19px; }
-.plan .price { font-size: 26px; font-weight:800; color:#0f766e; margin: 8px 0; }
-.plan .price small { font-size: 13px; font-weight:600; color:#64748b; }
-.plan ul { list-style:none; padding: 0; margin: 12px 0 20px; flex:1; }
-.plan ul li { font-size: 14px; padding: 6px 0; color:#334155; }
-.plan ul li::before { content:"✓ "; color:#0f766e; font-weight:800; margin-right: 6px; }
-.btn { display:inline-flex; justify-content:center; align-items:center; padding: 12px; border: 0; border-radius: 8px; background:#0f766e; color:#fff; font-weight:700; text-decoration:none; cursor:pointer; }
-.btn.ghost { background:#fff; color:#0f766e; border:1px solid #0f766e; }
-.btn:hover { opacity: .9; }
-.loading { padding: 40px; color:#64748b; text-align:center; }
-</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<style>
+.lead { padding: 28px 0 6px; max-width: 640px; }
+.lead h1 { font-size: clamp(30px, 6vw, 44px); }
+.lead p { color: var(--muted); margin-top: 8px; font-size: 17px; }
+.plans { display: grid; gap: 14px; margin-top: 22px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.plan { position: relative; display: flex; flex-direction: column; background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg); padding: 22px 20px 20px; }
+.plan.top { border-color: var(--ink); box-shadow: var(--shadow); }
+.plan .tag { position: absolute; top: -12px; left: 18px; background: var(--gold); color: var(--ink); font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+.plan h2 { font-size: 22px; }
+.plan .amt { margin: 10px 0 2px; font-size: 32px; font-weight: 800; color: var(--ink); font-variation-settings: "wdth" 80; letter-spacing: -.02em; }
+.plan .amt small { font-size: 14px; font-weight: 700; color: var(--muted); letter-spacing: 0; }
+.plan .desc { color: var(--muted); font-size: 14px; min-height: 1.5em; }
+.plan ul { list-style: none; padding: 0; margin: 16px 0 20px; flex: 1; display: grid; gap: 8px; }
+.plan li { display: flex; gap: 10px; font-size: 15px; }
+.plan li::before { content: ""; flex-shrink: 0; width: 18px; height: 18px; margin-top: 2px; border-radius: 50%; background: var(--teal-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230e7c7b' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center / 11px no-repeat; }
+.how { display: grid; gap: 12px; margin: 34px 0 48px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); counter-reset: s; }
+.how div { counter-increment: s; }
+.how div::before { content: counter(s); display: inline-flex; width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--gold); font-weight: 800; align-items: center; justify-content: center; margin-bottom: 8px; }
+.how b { display: block; color: var(--ink); }
+.how p { color: var(--muted); font-size: 14px; margin-top: 2px; }
+</style>
 </head>
 <body>
-
 <div id="site-header"></div>
+<main class="wrap">
+ <div class="lead">
+  <h1>Grow your business on SalonAutoZone</h1>
+  <p>Get a Verified badge, a public business page and more listings in front of buyers across Sierra Leone.</p>
+ </div>
+ <div class="plans" id="plans"><div class="lcard skeleton"></div><div class="lcard skeleton"></div><div class="lcard skeleton"></div></div>
 
-<div class="wrap">
-  <h1>Choose your plan</h1>
-  <p class="sub">Sell more, get verified, and reach thousands of buyers in Sierra Leone.</p>
-  <div class="grid" id="plans-grid">
-    <div class="loading">Loading plans...</div>
-  </div>
-</div>
-
+ <h2 class="section-title">How it works</h2>
+ <div class="how">
+  <div><b>Apply as a business</b><p>Tell us what you sell and where. It takes two minutes.</p></div>
+  <div><b>We check your details</b><p>We contact you on WhatsApp, then switch on your Verified badge.</p></div>
+  <div><b>Choose a plan and pay</b><p>Pay with Orange Money and send us the reference. We activate the plan.</p></div>
+ </div>
+</main>
+<script src="/static/site.js?v=5"></script>
 <script>
-(function() {
-  var grid = document.getElementById('plans-grid');
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function fmtPrice(sll) {
-    if (sll === 0) return 'Free';
-    return 'SLL ' + Number(sll).toLocaleString('en-US', { maximumFractionDigits: 0 });
-  }
-  fetch('/api/plans')
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      var plans = d.plans || [];
-      if (plans.length === 0) { grid.innerHTML = '<div class="loading">No plans configured yet.</div>'; return; }
-      var html = '';
-      plans.forEach(function(p) {
-        var featured = p.code === 'pro';
-        html += '<div class="plan' + (featured ? ' featured' : '') + '">';
-        html += '  <h3>' + esc(p.name) + (featured ? ' ⭐' : '') + '</h3>';
-        html += '  <div class="price">' + fmtPrice(p.price_sll) + (p.price_sll > 0 ? ' <small>/month</small>' : '') + '</div>';
-        html += '  <ul>';
-        if (p.listing_limit == null) html += '    <li>Unlimited listings</li>';
-        else html += '    <li>' + p.listing_limit + ' active listings</li>';
-        if (p.featured_slots > 0) html += '    <li>' + p.featured_slots + ' featured slots</li>';
-        if (p.verified_badge) html += '    <li>Verified business badge</li>';
-        html += '    <li>Public storefront</li>';
-        html += '    <li>WhatsApp + phone contact</li>';
-        html += '  </ul>';
-        html += '  <a class="btn' + (featured ? '' : ' ghost') + '" href="/my-subscription?plan=' + p.id + '">' + (p.price_sll === 0 ? 'Start free' : 'Choose ' + esc(p.name)) + '</a>';
-        html += '</div>';
-      });
-      grid.innerHTML = html;
-    })
-    .catch(function() { grid.innerHTML = '<div class="loading">Could not load plans.</div>'; });
+(function () {
+ 'use strict';
+ var box = document.getElementById('plans');
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+
+ fetch('/api/plans').then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
+  var plans = d.plans || [];
+  if (!plans.length) { box.innerHTML = '<div class="notice notice-warn" style="grid-column:1/-1">Plans are not available yet. Message us on WhatsApp to get set up.</div>'; return; }
+  box.innerHTML = plans.map(function (p) {
+   var top = p.code === 'pro', free = !p.price_sll;
+   var perks = [p.listing_limit == null ? 'Unlimited listings' : p.listing_limit + ' active listings'];
+   if (p.featured_slots > 0) perks.push(p.featured_slots + ' featured listing' + (p.featured_slots > 1 ? 's' : '') + ' at the top of search');
+   if (p.verified_badge) perks.push('Verified business badge');
+   perks.push('Your own business page', 'Buyers contact you on WhatsApp and phone');
+   return '<div class="plan' + (top ? ' top' : '') + '">' + (top ? '<span class="tag">Most popular</span>' : '') +
+    '<h2>' + esc(p.name) + '</h2>' +
+    '<div class="amt">' + (free ? 'Free' : '<small>SLL </small>' + fmt(p.price_sll) + '<small> / month</small>') + '</div>' +
+    '<div class="desc">' + esc(p.description || '') + '</div>' +
+    '<ul>' + perks.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
+    '<a class="btn btn-block ' + (top ? 'btn-primary' : 'btn-ghost') + '" href="/my-subscription?plan=' + encodeURIComponent(p.id) + '">' + (free ? 'Start free' : 'Choose ' + esc(p.name)) + '</a></div>';
+  }).join('');
+ }).catch(function () { box.innerHTML = '<div class="notice notice-bad" style="grid-column:1/-1">We couldn\'t load the plans. Please refresh the page.</div>'; });
 })();
 </script>
-<script src="/static/site.js?v=5"></script>
 </body>
 </html>

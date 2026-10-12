@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-3.6-flash"
     AUTODEV_API_KEY: str = ""
     ADMIN_WHATSAPP: str = "23276570104"
+    # Orange Money number sellers pay plan fees to. Leave empty until there is a real one:
+    # the pages then tell sellers to ask on WhatsApp instead of showing a number.
+    ORANGE_MONEY_NUMBER: str = ""
 
     @field_validator("*", mode="before")
     @classmethod

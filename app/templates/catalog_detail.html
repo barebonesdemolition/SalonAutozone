@@ -1,113 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
-<title>{{ app_name }} - Import Quote</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8}
-.navbar{background:#0b1e3a;color:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:20px;font-weight:900;color:#00a8e8;text-decoration:none}
-.logo span{color:#ffb800}
-.navbar a{color:white;text-decoration:none;font-size:14px;margin-left:20px}
-.container{max-width:800px;margin:40px auto;padding:0 20px}
-.card{background:white;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.08)}
-.import-badge{display:inline-block;background:#ff6b00;color:white;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:bold;margin-bottom:15px}
-h1{color:#0b1e3a;font-size:26px;margin-bottom:12px}
-.part-number{font-family:monospace;background:#f0f4f8;color:#475569;padding:8px 14px;border-radius:8px;display:inline-block;font-size:14px;margin-bottom:20px}
-.info-row{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px}
-.info-box{background:#f8fafc;padding:15px;border-radius:10px}
-.info-label{font-size:12px;color:#888;text-transform:uppercase;font-weight:600;margin-bottom:6px}
-.info-value{font-size:16px;font-weight:bold;color:#0b1e3a}
-.timeline{background:#fff7ed;padding:20px;border-radius:10px;border-left:4px solid #ff6b00;margin-top:25px}
-.timeline h3{color:#c2410c;margin-bottom:12px;font-size:15px}
-.timeline ol{margin-left:20px;line-height:1.8;color:#666}
-.btn-primary{background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;border:none;padding:16px 30px;border-radius:10px;font-weight:bold;font-size:16px;cursor:pointer;width:100%;margin-top:20px;box-shadow:0 6px 20px rgba(255,107,0,0.35)}
-.btn-whatsapp{background:#25D366;margin-top:10px;box-shadow:0 6px 20px rgba(37,211,102,0.35)}
-.back-link{color:#00a8e8;text-decoration:none;font-weight:bold;margin-bottom:20px;display:inline-block}
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
-</style>
-
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Import a part · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<style>
+.page { max-width: 760px; padding-bottom: 56px; }
+.tag { display: inline-flex; font-size: 13px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: var(--gold-50); color: #8a5a00; margin-top: 18px; }
+.page h1 { font-size: clamp(28px, 6vw, 38px); margin-top: 8px; }
+.pn { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 18px; color: var(--teal); margin-top: 4px; word-break: break-all; }
+.grid2 { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; grid-template-columns: 1fr 1fr; margin: 18px 0; }
+.grid2 div { background: var(--card); padding: 12px 14px; }
+.grid2 span { display: block; font-size: 13px; color: var(--muted); }
+.grid2 b { color: var(--ink); }
+.steps { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.acts { display: grid; gap: 10px; margin-top: 18px; }
+@media (min-width: 560px) { .acts { grid-template-columns: 1fr 1fr; } }
+</style>
 </head>
 <body>
 <div id="site-header"></div>
-<div class="container">
-<a href="/" class="back-link">← Back to Search</a>
-<div class="card" id="content">Loading...</div>
-</div>
-<script>
-var partId = window.location.pathname.split('/').pop();
-async function loadPart(){
-  try{
-    var res = await fetch('/api/unified/catalog/' + partId);
-    if(!res.ok) throw new Error('Not found');
-    var p = await res.json();
-    render(p);
-  }catch(err){
-    document.getElementById('content').innerHTML = '<div style="text-align:center;padding:40px;color:#888;">Part not found</div>';
-  }
-}
-function render(p){
-  var vehicle = p.vehicle_compatibility || 'Universal';
-  var category = p.category || 'Part';
-  document.getElementById('content').innerHTML = `
-    <div class="import-badge">🌍 Import Available</div>
-    <h1>${category}</h1>
-    <div class="part-number">${p.part_number}</div>
-    <div class="info-row">
-      <div class="info-box"><div class="info-label">Fits Vehicle</div><div class="info-value">${vehicle}</div></div>
-      <div class="info-box"><div class="info-label">Category</div><div class="info-value">${category}</div></div>
-      <div class="info-box"><div class="info-label">Ships From</div><div class="info-value">🌏 International Supplier</div></div>
-      <div class="info-box"><div class="info-label">Delivery Time</div><div class="info-value">7-14 days</div></div>
-    </div>
-    <div class="timeline">
-      <h3>How Importing Works</h3>
-      <ol>
-        <li>You submit a request with your details</li>
-        <li>We confirm price & availability with our supplier</li>
-        <li>We send you a quote on WhatsApp within 24 hours</li>
-        <li>You approve and pay (Orange Money / Afrimoney / Bank)</li>
-        <li>We order and deliver to your doorstep in Sierra Leone</li>
-      </ol>
-    </div>
-    <button class="btn-primary" onclick="requestQuote('${p.part_number}','${category}','${vehicle}')">📩 Request Import Quote</button>
-    <button class="btn-primary btn-whatsapp" onclick="whatsappUs('${p.part_number}')">💬 Chat on WhatsApp</button>
-  `;
-}
-function requestQuote(pn, cat, vehicle){
-  // Pre-fill and open the import modal on the homepage
-  var url = '/?import=' + encodeURIComponent(pn) + '&part=' + encodeURIComponent(cat) + '&vehicle=' + encodeURIComponent(vehicle);
-  window.location.href = url;
-}
-function whatsappUs(pn){
-  var msg = encodeURIComponent('Hi, I want to import: ' + pn + '. Can you send me a quote?');
-  window.open('https://wa.me/23276123456?text=' + msg, '_blank');
-}
-loadPart();
-</script>
+<main class="wrap page" id="app"><div class="lcard skeleton" style="margin-top:22px;min-height:220px"></div></main>
 <script src="/static/site.js?v=5"></script>
+<script>
+(function () {
+ 'use strict';
+ var app = document.getElementById('app');
+ var id = location.pathname.split('/').pop();
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+ Promise.all([
+  fetch('/api/unified/catalog/' + encodeURIComponent(id)).then(function (r) { return r.ok ? r.json() : null; }),
+  fetch('/api/site/contact').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
+ ]).then(function (res) {
+  var p = res[0], contact = res[1] || {};
+  if (!p) { app.innerHTML = '<div style="padding:64px 0;text-align:center"><h1 style="font-size:28px">Part not found</h1><a class="btn btn-primary" style="margin-top:14px" href="/">Search parts</a></div>'; return; }
+  var cat = p.category || 'Car part', fits = p.vehicle_compatibility || 'Ask us to check';
+  document.title = cat + ' ' + (p.part_number || '') + ' · SalonAutoZone';
+  var quote = '/?import=' + encodeURIComponent(p.part_number || '') + '&part=' + encodeURIComponent(cat) + '&vehicle=' + encodeURIComponent(p.vehicle_compatibility || '');
+  var wa = contact.whatsapp ? 'https://wa.me/' + encodeURIComponent(contact.whatsapp) + '?text=' + encodeURIComponent('Hello, I want to import part ' + (p.part_number || '') + ' (' + cat + '). Can you send me a price?') : '';
+  app.innerHTML = '<div class="crumbs"><a href="/">Home</a><span>›</span><span>Import a part</span></div>' +
+   '<span class="tag">Ordered from abroad</span><h1>' + esc(cat) + '</h1><div class="pn">' + esc(p.part_number) + '</div>' +
+   '<div class="grid2"><div><span>Fits</span><b>' + esc(fits) + '</b></div><div><span>Usual delivery time</span><b>7 to 14 days</b></div></div>' +
+   '<div class="box"><h2>How importing works</h2><ol class="steps"><li>Ask for a price with your car details.</li><li>We check price and stock with the supplier and reply on WhatsApp, usually within a day.</li><li>You agree the price and pay.</li><li>We order the part and deliver it in Sierra Leone.</li></ol></div>' +
+   '<div class="acts"><a class="btn btn-primary btn-lg" href="' + esc(quote) + '">Ask for a price</a>' +
+   (wa ? '<a class="btn btn-wa btn-lg" href="' + esc(wa) + '" target="_blank" rel="noopener noreferrer">Ask on WhatsApp</a>' : '') + '</div>';
+ }).catch(function () { app.innerHTML = '<div class="notice notice-bad" style="margin-top:22px">We couldn\'t load this part. Please refresh.</div>'; });
+})();
+</script>
 </body>
 </html>

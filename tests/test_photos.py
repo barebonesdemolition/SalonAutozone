@@ -72,3 +72,16 @@ def test_photo_limit(client, monkeypatch):
     for _ in range(2):
         assert client.post(f"/api/photos/part/{pid}", headers=auth, files={"file": _jpeg("red")}).status_code == 201
     assert client.post(f"/api/photos/part/{pid}", headers=auth, files={"file": _jpeg("red")}).status_code == 400
+
+
+def test_upload_rejects_non_image_with_plain_message():
+    import uuid
+    from fastapi.testclient import TestClient
+    from app.main import app
+    with TestClient(app) as c:
+        n = uuid.uuid4().hex[:8]
+        tok = c.post("/api/auth/register", json={"full_name": "Up", "phone": "+2327" + str(int(n, 16))[:7],
+                                                  "email": f"u{n}@example.com", "password": "password123"}).json()["access_token"]
+        r = c.post("/api/upload/", headers={"Authorization": "Bearer " + tok}, files={"file": ("x.jpg", b"not an image", "image/jpeg")})
+        assert r.status_code == 400
+        assert "PIL" not in r.json()["detail"] and "JPG or PNG" in r.json()["detail"]

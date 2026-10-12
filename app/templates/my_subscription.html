@@ -2,196 +2,144 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My subscription · SalonAutoZone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My plan · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
 <link rel="icon" type="image/png" href="/static/logo.png">
-<style>
-* { box-sizing: border-box; }
-body { margin:0; font-family: Inter, system-ui, sans-serif; background:#f8fafc; color:#0f172a; }
-.top { display:flex; align-items:center; gap:12px; padding:14px clamp(16px,5vw,56px); background:#fff; border-bottom:1px solid #e2e8f0; }
-.brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:#0f172a; font-weight:800; font-size:17px; }
-.brand img { height:44px; width:44px; border-radius:50%; }
-.brand span { color:#0f766e; }
-.wrap { max-width: 720px; margin: 0 auto; padding: 28px 16px 60px; }
-h1 { font-size: 26px; margin: 0 0 6px; }
-.sub { color:#64748b; font-size:14px; margin: 0 0 24px; }
-.card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding: 24px; margin-bottom: 20px; }
-.current-plan { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
-.current-plan h2 { margin: 0 0 4px; font-size: 20px; }
-.badge { display:inline-flex; align-items:center; gap:4px; background:#d1fae5; color:#065f46; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; }
-.badge.pending { background:#fef3c7; color:#92400e; }
-.badge.rejected { background:#fee2e2; color:#991b1b; }
-.field { margin-bottom: 14px; }
-label { display:block; font-size:12px; font-weight:700; color:#475569; margin-bottom:5px; text-transform:uppercase; letter-spacing:.04em; }
-input, select, textarea { width:100%; padding: 11px 12px; border:1px solid #cbd5e1; border-radius:8px; font: inherit; }
-input:focus, select:focus, textarea:focus { outline: 3px solid rgba(13,148,136,.2); border-color:#0d9488; }
-textarea { resize: vertical; min-height: 70px; }
-.btn { display:inline-flex; align-items:center; justify-content:center; padding: 12px 20px; border-radius:8px; background:#0f766e; color:#fff; font-weight:700; border: 0; cursor: pointer; font: inherit; }
-.btn:hover { opacity: .9; }
-.btn:disabled { opacity: .6; cursor: wait; }
-.status { margin-top: 12px; font-size: 14px; min-height: 20px; }
-.status.ok { color:#0f766e; font-weight:600; }
-.status.err { color:#b91c1c; font-weight:600; }
-.pmt-row { display:flex; justify-content:space-between; padding: 10px 0; border-bottom:1px solid #e2e8f0; font-size: 14px; }
-.pmt-row:last-child { border-bottom: 0; }
-.pmt-row .st { font-weight: 700; }
-.st.pending { color:#92400e; }
-.st.confirmed { color:#065f46; }
-.st.rejected { color:#991b1b; }
-.empty { color:#94a3b8; font-style:italic; padding: 12px 0; }
-.note { background:#fffbeb; border:1px solid #fde68a; padding: 14px 16px; border-radius: 10px; color:#78350f; font-size: 14px; margin-bottom: 20px; }
-</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<style>
+.page { max-width: 720px; padding: 26px 16px 56px; }
+.page h1 { font-size: clamp(28px, 6vw, 38px); }
+.page > .hint { font-size: 15px; margin: 4px 0 18px; }
+.stack { display: grid; gap: 14px; }
+.cur { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.cur h2 { margin: 0; }
+.st { display: inline-flex; align-items: center; font-size: 13px; font-weight: 800; padding: 3px 9px; border-radius: 6px; vertical-align: 3px; margin-left: 6px; }
+.st.ok { background: var(--ok-50); color: var(--ok); }
+.st.wait { background: var(--gold-50); color: #8a5a00; }
+.st.bad { background: var(--bad-50); color: var(--bad); }
+.steps { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.payto { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--ink); color: #fff; border-radius: var(--r-md); padding: 14px 16px; margin-top: 12px; }
+.payto small { display: block; color: #a9c4c2; font-size: 13px; }
+.payto b { font-size: 22px; letter-spacing: .02em; font-variation-settings: "wdth" 85; }
+.amount { font-size: 26px; font-weight: 800; color: var(--ink); font-variation-settings: "wdth" 82; }
+.pay-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.pay-row:first-of-type { border-top: 0; }
+.pay-row small { color: var(--muted); display: block; }
+</style>
 </head>
 <body>
-
 <div id="site-header"></div>
-
-<div class="wrap" id="content">
-  <div class="loading">Loading your subscription...</div>
-</div>
-
+<main class="wrap page" id="app"><div class="lcard skeleton" style="min-height:220px"></div></main>
+<script src="/static/site.js?v=5"></script>
 <script>
-(function() {
-  var wrap = document.getElementById('content');
-  var token = null;
-  try { token = localStorage.getItem('token') || localStorage.getItem('access_token'); } catch(e) {}
-  if (!token) { location.replace('/login?next=' + encodeURIComponent('/my-subscription')); return; }
+(function () {
+ 'use strict';
+ var app = document.getElementById('app');
+ var token = '';
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
+ if (!token) { location.replace('/login?next=' + encodeURIComponent(location.pathname + location.search)); return; }
 
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function fmtPrice(sll) { if (sll === 0) return 'Free'; return 'SLL ' + Number(sll).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
-  function authHeaders() { return { 'Authorization': 'Bearer ' + token }; }
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+ function day(iso) { var d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+ function auth() { return { 'Authorization': 'Bearer ' + token }; }
+ function json(r) {
+  return r.json().catch(function () { return {}; }).then(function (d) {
+   if (r.status === 401) { try { localStorage.removeItem('token'); localStorage.removeItem('access_token'); } catch (e) {} location.replace('/login?next=' + encodeURIComponent(location.pathname + location.search)); throw new Error('Please log in again.'); }
+   if (!r.ok) { var m = d.detail; if (Array.isArray(m)) m = m.map(function (x) { return x.msg; }).join('. '); throw new Error(typeof m === 'string' ? m : 'Something went wrong. Please try again.'); }
+   return d;
+  });
+ }
+ var PAY_ST = { pending: ['wait', 'Being checked'], approved: ['ok', 'Approved'], confirmed: ['ok', 'Approved'], rejected: ['bad', 'Not approved'] };
+ function pill(map, s) { var p = map[s] || ['wait', s]; return '<span class="st ' + p[0] + '">' + esc(p[1]) + '</span>'; }
 
-  var plansCache = [];
+ Promise.all([
+  fetch('/api/plans').then(function (r) { return r.ok ? r.json() : { plans: [] }; }).catch(function () { return { plans: [] }; }),
+  fetch('/api/subscriptions/my', { headers: auth() }).then(json),
+  fetch('/api/site/contact').then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
+ ]).then(function (res) { render(res[0].plans || [], res[1], res[2] || {}); })
+  .catch(function (e) { app.innerHTML = '<h1>My plan</h1><div class="notice notice-bad" style="margin-top:16px">' + esc(e.message) + '</div>'; });
 
-  Promise.all([
-    fetch('/api/plans').then(function(r){ return r.json(); }),
-    fetch('/api/subscriptions/my', { headers: authHeaders() }).then(function(r){ return r.json(); }),
-  ])
-    .then(function(results) {
-      plansCache = results[0].plans || [];
-      render(results[1]);
-    })
-    .catch(function(e) {
-      wrap.innerHTML = '<div class="card"><p>Could not load. <a href="/">Home</a></div>';
-    });
+ function render(plans, d, contact) {
+  var wa = contact.whatsapp ? 'https://wa.me/' + encodeURIComponent(contact.whatsapp) : '';
+  if (!d.business) {
+   app.innerHTML = '<h1>My plan</h1><p class="hint">Plans are for businesses: parts stores, dealerships, shippers and wholesalers.</p>' +
+    '<div class="box"><h2>Apply as a business first</h2><p>Once we have checked your details you can choose a plan here.</p><a class="btn btn-primary" style="margin-top:12px" href="/become-a-seller">Apply as a business</a></div>';
+   return;
+  }
+  var sub = d.subscription, paid = plans.filter(function (p) { return p.price_sll > 0; });
+  var want = parseInt(new URLSearchParams(location.search).get('plan') || '0', 10);
+  var wantPlan = plans.filter(function (p) { return p.id === want; })[0];
 
-  function render(d) {
-    if (!d.business) {
-      wrap.innerHTML = '<div class="card"><h1>Subscription</h1><p>You need a business account to subscribe. <a href="/become-a-seller">Apply as a business</a>.</p></div>';
-      return;
-    }
+  var h = '<h1>My plan</h1><p class="hint">' + esc(d.business.name) + '</p><div class="stack">';
 
-    var html = '<h1>My subscription</h1>';
-    html += '<p class="sub">Business: <strong>' + esc(d.business.name) + '</strong> · ' + esc(d.business.status) + '</p>';
+  h += '<div class="box"><div class="cur"><div>';
+  if (sub && sub.status === 'active') h += '<h2>' + esc(sub.plan_name) + pill({ a: ['ok', 'Active'] }, 'a') + '</h2><p class="hint">Renews or ends on ' + esc(day(sub.expires_at)) + '</p>';
+  else if (sub && sub.status === 'pending') h += '<h2>' + esc(sub.plan_name) + pill({ p: ['wait', 'Checking payment'] }, 'p') + '</h2><p class="hint">We\'re checking your payment. Your plan starts as soon as it\'s confirmed.</p>';
+  else h += '<h2>Free plan</h2><p class="hint">Choose a paid plan for more listings and a Verified badge.</p>';
+  h += '</div><a class="btn btn-ghost" href="/plans">Compare plans</a></div></div>';
 
-    // Current subscription
-    var sub = d.subscription;
-    html += '<div class="card">';
-    html += '  <div class="current-plan">';
-    if (sub && sub.status === 'active') {
-      html += '    <div><h2>' + esc(sub.plan_name) + ' <span class="badge">✓ Active</span></h2>';
-      html += '      <p class="sub" style="margin:6px 0 0;">Expires ' + esc(String(sub.expires_at || '').slice(0,10)) + '</p></div>';
-    } else if (sub && sub.status === 'pending') {
-      html += '    <div><h2>' + esc(sub.plan_name) + ' <span class="badge pending">Pending approval</span></h2>';
-      html += '      <p class="sub" style="margin:6px 0 0;">Waiting for admin to confirm your payment.</p></div>';
-    } else {
-      html += '    <div><h2>No active plan</h2>';
-      html += '      <p class="sub" style="margin:6px 0 0;">Choose a plan below to get verified and increase your listings.</p></div>';
-    }
-    html += '    <a class="btn" href="/plans" style="text-decoration:none;">' + (sub && sub.status === 'active' ? 'Upgrade' : 'Choose a plan') + '</a>';
-    html += '  </div>';
-    html += '</div>';
-
-    // Payment form (if a plan was selected via ?plan=ID or user picks below)
-    var params = new URLSearchParams(location.search);
-    var preselectedPlanId = parseInt(params.get('plan') || '0', 10);
-
-    html += '<div class="card">';
-    html += '  <h2 style="margin-top:0;">Submit an Orange Money payment</h2>';
-    html += '  <p class="sub">Send the plan amount to our Orange Money number, then enter the reference number below. We&rsquo;ll verify and activate your plan.</p>';
-    html += '  <div class="note">Orange Money number: <strong>+232 76 123 456</strong> (SalonAutoZone). Use the payment reference below when you send.</div>';
-    html += '  <div class="field"><label for="plan">Plan</label><select id="plan">';
-    plansCache.forEach(function(p) {
-      html += '<option value="' + p.id + '" data-price="' + p.price_sll + '"' + (p.id === preselectedPlanId ? ' selected' : '') + '>' + esc(p.name) + ' — ' + fmtPrice(p.price_sll) + (p.price_sll > 0 ? '/month' : '') + '</option>';
-    });
-    html += '  </select></div>';
-    html += '  <div class="field"><label for="amount">Amount (SLL)</label><input id="amount" type="number" min="0" step="1000"></div>';
-    html += '  <div class="field"><label for="reference">Orange Money reference *</label><input id="reference" placeholder="e.g. 2026100712345678" required></div>';
-    html += '  <div class="field"><label for="note">Note (optional)</label><textarea id="note" placeholder="Anything we should know?"></textarea></div>';
-    html += '  <button class="btn" id="submit-btn">Submit payment</button>';
-    html += '  <p class="status" id="status"></p>';
-    html += '</div>';
-
-    // Payment history
-    html += '<div class="card"><h2 style="margin-top:0;">Recent payments</h2>';
-    if (!d.pending_payments || d.pending_payments.length === 0) {
-      html += '<div class="empty">No payments submitted yet.</div>';
-    } else {
-      d.pending_payments.forEach(function(p) {
-        html += '<div class="pmt-row">';
-        html += '  <div>Ref: <strong>' + esc(p.reference) + '</strong><br><span style="color:#64748b;font-size:12px;">' + esc(String(p.created_at).slice(0,10)) + '</span></div>';
-        html += '  <div style="text-align:right;">' + fmtPrice(p.amount_sll) + '<br><span class="st ' + esc(p.status) + '">' + esc(p.status) + '</span></div>';
-        html += '</div>';
-      });
-    }
-    html += '</div>';
-
-    wrap.innerHTML = html;
-    wireEvents();
+  if (d.business.status !== 'verified') {
+   h += '<div class="notice notice-warn">Your business is still being checked. You can pay now and we\'ll switch everything on together.</div>';
   }
 
-  function wireEvents() {
-    var planSel = document.getElementById('plan');
-    var amtInp = document.getElementById('amount');
-    function syncAmount() {
-      var opt = planSel.options[planSel.selectedIndex];
-      var price = parseInt(opt.getAttribute('data-price') || '0', 10);
-      if (price > 0 && (!amtInp.value || amtInp.dataset.lastPlan !== planSel.value)) {
-        amtInp.value = price;
-        amtInp.dataset.lastPlan = planSel.value;
-      }
-    }
-    planSel.addEventListener('change', syncAmount);
-    syncAmount();
-
-    var btn = document.getElementById('submit-btn');
-    var status = document.getElementById('status');
-    btn.addEventListener('click', async function() {
-      var planId = parseInt(planSel.value, 10);
-      var amount = parseInt(amtInp.value, 10);
-      var reference = document.getElementById('reference').value.trim();
-      var note = document.getElementById('note').value.trim() || null;
-
-      if (!reference) { status.textContent = 'Reference is required'; status.className = 'status err'; return; }
-
-      btn.disabled = true;
-      status.textContent = 'Submitting...'; status.className = 'status';
-
-      try {
-        var r = await fetch('/api/subscriptions/pay', {
-          method: 'POST',
-          headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
-          body: JSON.stringify({ plan_id: planId, amount_sll: amount, reference: reference, note: note }),
-        });
-        var d = await r.json();
-        if (!r.ok) throw new Error(d.detail || 'Could not submit');
-        status.textContent = 'Payment submitted. Admin will confirm shortly.';
-        status.className = 'status ok';
-        setTimeout(function() { location.reload(); }, 1200);
-      } catch (e) {
-        status.textContent = e.message;
-        status.className = 'status err';
-        btn.disabled = false;
-      }
-    });
+  if (wantPlan && !wantPlan.price_sll) {
+   h += '<div class="notice notice-ok">The free plan is already on. You don\'t need to pay anything.</div>';
   }
+
+  if (paid.length && !(sub && sub.status === 'pending')) {
+   var sel = (wantPlan && wantPlan.price_sll > 0) ? wantPlan : paid[0];
+   h += '<form class="box" id="pay"><h2>Pay for a plan</h2>' +
+    '<label class="field"><span>Plan</span><select class="select" id="plan">' + paid.map(function (p) {
+     return '<option value="' + p.id + '" data-price="' + p.price_sll + '"' + (p.id === sel.id ? ' selected' : '') + '>' + esc(p.name) + ', SLL ' + fmt(p.price_sll) + ' a month</option>';
+    }).join('') + '</select></label>' +
+    '<div class="field"><span class="lbl">Amount to send</span><div class="amount">SLL <span id="amt">' + fmt(sel.price_sll) + '</span></div></div>' +
+    (contact.orange_money
+     ? '<div class="payto"><div><small>Send with Orange Money to</small><b>' + esc(contact.orange_money) + '</b></div><button type="button" class="btn btn-gold" id="copy">Copy number</button></div>'
+     : '<div class="notice notice-warn" style="margin-top:12px">Message us on WhatsApp and we\'ll send you the Orange Money number to pay.' + (wa ? ' <a href="' + esc(wa + '?text=' + encodeURIComponent('Hello, I want to pay for a plan for ' + d.business.name + '.')) + '" target="_blank" rel="noopener noreferrer">Message us</a>' : '') + '</div>') +
+    '<ol class="steps hint"><li>Send the exact amount with Orange Money.</li><li>Copy the transaction reference from the confirmation SMS.</li><li>Enter it below. We check it and start your plan.</li></ol>' +
+    '<label class="field"><span>Transaction reference</span><input class="input" id="ref" required maxlength="64" autocomplete="off" placeholder="From your Orange Money SMS"></label>' +
+    '<label class="field"><span>Note (optional)</span><textarea class="input" id="note" rows="2" maxlength="500"></textarea></label>' +
+    '<button class="btn btn-primary btn-block" style="margin-top:16px" type="submit">I\'ve paid, send reference</button>' +
+    '<div id="msg" aria-live="polite" style="margin-top:10px"></div></form>';
+  }
+
+  var pays = d.pending_payments || [];
+  h += '<div class="box"><h2>Payments</h2>' + (pays.length ? pays.map(function (p) {
+   return '<div class="pay-row"><div>Ref <b>' + esc(p.reference) + '</b><small>' + esc(day(p.created_at)) + '</small></div><div style="text-align:right">SLL ' + fmt(p.amount_sll) + '<br>' + pill(PAY_ST, p.status) + '</div></div>';
+  }).join('') : '<p class="hint">No payments yet.</p>') + '</div>';
+
+  if (wa) h += '<p class="hint">Questions about your plan? <a href="' + esc(wa) + '" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>';
+  app.innerHTML = h + '</div>';
+
+  var form = document.getElementById('pay');
+  if (!form) return;
+  var planSel = document.getElementById('plan');
+  planSel.addEventListener('change', function () { document.getElementById('amt').textContent = fmt(planSel.selectedOptions[0].dataset.price); });
+  var copy = document.getElementById('copy');
+  if (copy) copy.addEventListener('click', function () {
+   try { navigator.clipboard.writeText(contact.orange_money).then(function () { copy.textContent = 'Copied'; }); } catch (e) {}
+  });
+  form.addEventListener('submit', function (e) {
+   e.preventDefault();
+   var msg = document.getElementById('msg'), btn = form.querySelector('button[type=submit]');
+   var opt = planSel.selectedOptions[0];
+   btn.disabled = true; msg.innerHTML = '<p class="hint">Sending…</p>';
+   fetch('/api/subscriptions/pay', {
+    method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()),
+    body: JSON.stringify({ plan_id: parseInt(opt.value, 10), amount_sll: parseInt(opt.dataset.price, 10), reference: document.getElementById('ref').value.trim(), note: document.getElementById('note').value.trim() || null })
+   }).then(json).then(function () {
+    msg.innerHTML = '<div class="notice notice-ok">Thanks. We\'re checking your payment and will start your plan soon.</div>';
+    setTimeout(function () { location.href = '/my-subscription'; }, 1500);
+   }).catch(function (err) { msg.innerHTML = '<div class="notice notice-bad">' + esc(err.message) + '</div>'; btn.disabled = false; });
+  });
+ }
 })();
 </script>
-<script src="/static/site.js?v=5"></script>
 </body>
 </html>

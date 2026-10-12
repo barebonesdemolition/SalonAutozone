@@ -2,135 +2,110 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Storefront · SalonAutoZone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Business · SalonAutoZone</title>
+<meta name="theme-color" content="#0e2a2b">
 <link rel="icon" type="image/png" href="/static/logo.png">
-<style>
-* { box-sizing: border-box; }
-body { margin:0; font-family: Inter, system-ui, sans-serif; background:#f8fafc; color:#0f172a; }
-.top { display:flex; align-items:center; gap:12px; padding:14px clamp(16px,5vw,56px); background:#fff; border-bottom:1px solid #e2e8f0; }
-.brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:#0f172a; font-weight:800; font-size:17px; }
-.brand img { height:44px; width:44px; border-radius:50%; }
-.brand span { color:#0f766e; }
-.wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
-.hero { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:26px; display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
-.hero img.logo { width:96px; height:96px; border-radius:50%; object-fit:cover; background:#e2e8f0; }
-.hero .meta { flex:1; min-width: 240px; }
-.hero h1 { margin:0 0 6px; font-size:26px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.badge { display:inline-flex; align-items:center; gap:4px; background:#d1fae5; color:#065f46; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; }
-.badge.unverified { background:#fef3c7; color:#92400e; }
-.hero .meta p { margin:4px 0; color:#64748b; font-size:14px; }
-.actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
-.btn { display:inline-flex; align-items:center; gap:6px; padding:10px 16px; border-radius:8px; background:#0f766e; color:#fff; text-decoration:none; font-weight:700; font-size:14px; border:0; cursor:pointer; }
-.btn.ghost { background:#fff; color:#0f766e; border:1px solid #0f766e; }
-.btn.wa { background:#25d366; }
-.section { margin-top: 32px; }
-.section h2 { font-size:20px; margin:0 0 14px; }
-.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:16px; }
-.card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; text-decoration:none; color:inherit; display:flex; flex-direction:column; transition: box-shadow .15s; }
-.card:hover { box-shadow: 0 8px 24px rgba(15,23,42,.08); }
-.card .img { width:100%; height:160px; background:#e2e8f0; object-fit:cover; display:block; }
-.card .body { padding:14px; flex:1; display:flex; flex-direction:column; }
-.card .title { font-weight:700; font-size:15px; margin:0 0 4px; }
-.card .sub { color:#64748b; font-size:13px; margin:0 0 8px; }
-.card .price { color:#0f766e; font-weight:800; font-size:16px; margin-top:auto; }
-.about { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px; line-height:1.6; color:#334155; white-space: pre-wrap; }
-.empty { color:#94a3b8; font-style:italic; padding: 20px; text-align:center; background:#fff; border:1px dashed #cbd5e1; border-radius: 12px; }
-.loading { padding: 40px; text-align:center; color:#64748b; }
-</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<style>
+.hero { background: var(--ink); color: #fff; }
+.hero .wrap { display: flex; gap: 18px; align-items: center; padding-top: 26px; padding-bottom: 26px; flex-wrap: wrap; }
+.logo { width: 84px; height: 84px; border-radius: 18px; flex-shrink: 0; background: var(--ink-2) center / cover no-repeat; border: 2px solid rgba(255,255,255,.15); color: var(--gold); font-weight: 800; font-size: 36px; display: flex; align-items: center; justify-content: center; font-variation-settings: "wdth" 80; }
+.hero h1 { color: #fff; font-size: clamp(28px, 6vw, 40px); }
+.hero .sub { color: #a9c4c2; margin-top: 4px; }
+.verified { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 800; padding: 3px 9px; border-radius: 6px; background: var(--gold); color: var(--ink); margin-top: 8px; }
+.hero .grow { flex: 1; min-width: 220px; }
+.hero .acts { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero .btn-ghost { color: #fff; border-color: rgba(255,255,255,.35); background: transparent; }
+.stars { color: var(--gold); letter-spacing: 1px; }
+.stars .off { color: rgba(255,255,255,.25); }
+.cols { display: grid; gap: 16px; padding: 20px 0 48px; }
+@media (min-width: 900px) { .cols { grid-template-columns: 300px minmax(0, 1fr); align-items: start; } .cols aside { position: sticky; top: calc(var(--header-h) + 16px); } }
+.about { white-space: pre-line; }
+.tabs { display: flex; gap: 8px; margin: 0 0 12px; }
+.tabs .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.tabs .chip[aria-pressed="true"] svg { color: var(--gold); }
+.facts-list { display: grid; gap: 8px; margin-top: 10px; font-size: 15px; }
+.facts-list div { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid var(--line); padding-top: 8px; }
+.facts-list span { color: var(--muted); }
+</style>
 </head>
 <body>
-
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+ <symbol id="i-part" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+ <symbol id="i-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><path d="M5 12h14"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/></symbol>
+</svg>
 <div id="site-header"></div>
-
-<div class="wrap" id="content">
-  <div class="loading">Loading storefront...</div>
-</div>
-
+<div id="app"><div class="wrap"><div class="lcard skeleton" style="margin-top:22px;min-height:200px"></div></div></div>
+<script src="/static/site.js?v=5"></script>
 <script>
-(function() {
-  var wrap = document.getElementById('content');
-  var slug = location.pathname.split('/').filter(Boolean).pop();
+(function () {
+ 'use strict';
+ var app = document.getElementById('app');
+ var slug = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() || '');
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+ function safeUrl(u) { u = String(u || '').trim(); return (/^https?:\/\//i.test(u) || /^\/(?!\/)/.test(u)) ? u : ''; }
+ function stars(r) { var n = Math.round(r || 0), h = ''; for (var i = 1; i <= 5; i++) h += i <= n ? '★' : '<span class="off">★</span>'; return '<span class="stars" aria-label="' + r + ' out of 5">' + h + '</span>'; }
+ function card(href, img, icon, price, title, meta) {
+  var u = safeUrl(window.SAZImg ? SAZImg(img, 480) : img);
+  return '<a class="lcard" href="' + href + '">' + (u ? '<div class="ph" style="background-image:url(\'' + esc(u) + '\')"></div>' : '<div class="ph"><svg aria-hidden="true"><use href="#' + icon + '"/></svg></div>') +
+   '<div class="bd"><div class="price"><small>SLL</small>' + fmt(price) + '</div><div class="ttl">' + esc(title) + '</div><div class="meta">' + (meta ? '<span class="loc">' + esc(meta) + '</span>' : '') + '</div></div></a>';
+ }
 
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function fmtPrice(sll) {
-    if (sll == null) return '';
-    return 'SLL ' + Number(sll).toLocaleString('en-US', { maximumFractionDigits: 0 });
+ fetch('/api/businesses/' + encodeURIComponent(slug)).then(function (r) { return r.ok ? r.json() : null; }).then(function (b) {
+  if (!b) {
+   app.innerHTML = '<div class="wrap" style="padding:64px 16px;text-align:center"><h1 style="font-size:28px">Business not found</h1><p class="hint">This page doesn\'t exist or hasn\'t been approved yet.</p><a class="btn btn-primary" style="margin-top:14px" href="/businesses">See all businesses</a></div>';
+   return;
   }
+  document.title = b.name + ' · SalonAutoZone';
+  var parts = (b.listings && b.listings.parts) || [], cars = (b.listings && b.listings.vehicles) || [];
+  var logoU = safeUrl(b.logo_url);
+  var wa = b.whatsapp ? 'https://wa.me/' + encodeURIComponent(String(b.whatsapp).replace(/\D/g, '')) + '?text=' + encodeURIComponent('Hello ' + b.name + ', I found you on SalonAutoZone.') : '';
+  var since = b.created_at ? new Date(b.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : '';
 
-  fetch('/api/businesses/' + encodeURIComponent(slug))
-    .then(function(r) { if (!r.ok) throw new Error('Not found'); return r.json(); })
-    .then(function(b) {
-      // Handle both response shapes:
-      // 1. { business: {...}, vehicles: [...], vehicle_count: N }
-      // 2. { id, slug, name, ..., listings: { vehicles: [...] } }  (app/businesses.py)
-      var biz = b.business || b;
-      var vehicles = (b.vehicles) || (b.listings && b.listings.vehicles) || [];
-      var parts = (b.listings && b.listings.parts) || [];
+  app.innerHTML = '<section class="hero"><div class="wrap">' +
+   '<div class="logo"' + (logoU ? ' style="background-image:url(\'' + esc(window.SAZImg ? SAZImg(logoU, 200) : logoU) + '\')"' : '') + '>' + (logoU ? '' : esc((b.name || '?').charAt(0).toUpperCase())) + '</div>' +
+   '<div class="grow"><h1>' + esc(b.name) + '</h1><div class="sub">' + esc([b.type_label, b.city].filter(Boolean).join(', ')) + '</div>' +
+   (b.verified ? '<span class="verified">✓ Verified business</span>' : '') + '<div id="rating" class="sub"></div></div>' +
+   '<div class="acts">' + (wa ? '<a class="btn btn-wa" href="' + esc(wa) + '" target="_blank" rel="noopener noreferrer">WhatsApp</a>' : '') +
+   '<button class="btn btn-ghost" id="share" type="button">Share</button></div></div></section>' +
+   '<div class="wrap"><div class="cols"><aside class="box"><h2>About</h2>' +
+   (b.description ? '<p class="about">' + esc(b.description) + '</p>' : '<p class="hint">No description yet.</p>') +
+   '<div class="facts-list"><div><span>Type</span><b>' + esc(b.type_label) + '</b></div><div><span>Location</span><b>' + esc([b.city, b.country].filter(Boolean).join(', ')) + '</b></div>' +
+   (since ? '<div><span>On SalonAutoZone since</span><b>' + esc(since) + '</b></div>' : '') + '</div>' +
+   '<p class="hint" style="margin-top:14px">Check the item before you pay. Never send a deposit to someone you haven\'t met.</p></aside>' +
+   '<section><div class="tabs" id="tabs"></div><div class="listing-grid" id="items"></div></section></div></div>';
 
-      var status = biz.status || (biz.verified ? 'verified' : 'pending');
-      var verified = status === 'verified';
-      var logo = biz.logo_url || '/static/logo.png';
-      var wa = biz.whatsapp ? 'https://wa.me/' + biz.whatsapp.replace(/[^0-9]/g,'') : null;
-      var mail = biz.email ? 'mailto:' + biz.email : null;
-      var typeLabel = biz.type_label || biz.business_type || biz.type || '';
+  var tabs = [];
+  if (parts.length) tabs.push(['parts', 'Parts', parts.length, 'i-part']);
+  if (cars.length) tabs.push(['cars', 'Cars', cars.length, 'i-car']);
+  function show(k) {
+   var h = k === 'cars'
+    ? cars.map(function (v) { return card('/vehicle/' + v.id, v.image_url, 'i-car', v.price_sll, v.title, [v.year, v.location].filter(Boolean).join(', ')); }).join('')
+    : parts.map(function (p) { return card('/part/' + p.id, p.image_url, 'i-part', p.price_sll, p.name, p.location); }).join('');
+   document.getElementById('items').innerHTML = h || '<p class="hint" style="grid-column:1/-1">Nothing for sale right now. Message them on WhatsApp to ask what they have.</p>';
+   document.querySelectorAll('#tabs .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.k === k)); });
+  }
+  document.getElementById('tabs').innerHTML = tabs.length > 1 ? tabs.map(function (t) { return '<button type="button" class="chip" data-k="' + t[0] + '"><svg aria-hidden="true"><use href="#' + t[3] + '"/></svg>' + t[1] + ' · ' + t[2] + '</button>'; }).join('') : '';
+  document.getElementById('tabs').addEventListener('click', function (e) { var c = e.target.closest('.chip'); if (c) show(c.dataset.k); });
+  show(tabs.length ? tabs[0][0] : 'parts');
 
-      var html = '';
-      html += '<div class="hero">';
-      html += '  <img class="logo" src="' + esc(logo) + '" alt="' + esc(biz.name) + '">';
-      html += '  <div class="meta">';
-      html += '    <h1>' + esc(biz.name) + (verified
-                ? ' <span class="badge">&#10003; Verified</span>'
-                : ' <span class="badge unverified">Unverified</span>') + '</h1>';
-      html += '    <p>' + esc([biz.city, biz.country].filter(Boolean).join(', ')) + '</p>';
-      if (typeLabel) html += '    <p>' + esc(typeLabel) + (biz.subscription_tier ? ' &middot; ' + esc(biz.subscription_tier) : '') + '</p>';
-      if (biz.created_at) html += '    <p>Member since ' + esc(String(biz.created_at).slice(0, 10)) + '</p>';
-      html += '    <div class="actions">';
-      if (wa) html += '<a class="btn wa" href="' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>';
-      if (mail) html += '<a class="btn" href="' + esc(mail) + '">Email</a>';
-      html += '      <a class="btn ghost" href="/businesses">Browse all businesses</a>';
-      html += '    </div>';
-      html += '  </div>';
-      html += '</div>';
+  document.getElementById('share').addEventListener('click', function () {
+   var url = location.href, btn = this;
+   if (navigator.share) navigator.share({ title: b.name, url: url }).catch(function () {});
+   else { try { navigator.clipboard.writeText(url).then(function () { btn.textContent = 'Link copied'; }); } catch (e) {} }
+  });
 
-      if (biz.description) {
-        html += '<div class="section"><h2>About</h2><div class="about">' + esc(biz.description) + '</div></div>';
-      }
-
-      html += '<div class="section">';
-      html += '  <h2>Listings (' + vehicles.length + (parts.length ? ' vehicles, ' + parts.length + ' parts' : '') + ')</h2>';
-      if (vehicles.length === 0 && parts.length === 0) {
-        html += '  <div class="empty">No listings yet.</div>';
-      } else {
-        html += '  <div class="grid">';
-        vehicles.forEach(function(v) {
-          var img = v.image_url || '/static/silhouettes/generic.svg';
-          html += '<a class="card" href="/vehicle/' + esc(v.id) + '">';
-          html += '  <img class="img" src="' + esc(img) + '" alt="">';
-          html += '  <div class="body">';
-          html += '    <div class="title">' + esc(v.title) + '</div>';
-          html += '    <div class="sub">' + esc([v.year, v.make, v.model].filter(Boolean).join(' ')) + '</div>';
-          if (v.location) html += '    <div class="sub">' + esc(v.location) + '</div>';
-          if (v.price_sll) html += '    <div class="price">' + esc(fmtPrice(v.price_sll)) + '</div>';
-          html += '  </div>';
-          html += '</a>';
-        });
-        html += '  </div>';
-      }
-      html += '</div>';
-
-      wrap.innerHTML = html;
-    })
-    .catch(function(e) {
-      wrap.innerHTML = '<div class="empty">Storefront not found. <a href="/">Back to home</a></div>';
-    });
+  if (b.owner_id) fetch('/api/sellers/' + encodeURIComponent(b.owner_id)).then(function (r) { return r.ok ? r.json() : null; }).then(function (s) {
+   if (s && s.reviews_count) document.getElementById('rating').innerHTML = '<a href="/seller/' + encodeURIComponent(b.owner_id) + '" style="color:inherit;text-decoration:none">' + stars(s.rating) + ' <b style="color:#fff">' + esc(s.rating) + '</b> from ' + s.reviews_count + ' buyer rating' + (s.reviews_count > 1 ? 's' : '') + '</a>';
+  }).catch(function () {});
+ }).catch(function () { app.innerHTML = '<div class="wrap"><div class="notice notice-bad" style="margin-top:22px">We couldn\'t load this page. Please refresh.</div></div>'; });
 })();
 </script>
-<script src="/static/site.js?v=5"></script>
 </body>
 </html>
