@@ -142,6 +142,28 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Most buyers are on slow, metered mobile data: compress text responses and let
+# phones keep static files instead of downloading them on every page.
+from starlette.middleware.gzip import GZipMiddleware  # noqa: E402
+
+app.add_middleware(GZipMiddleware, minimum_size=800)
+
+
+@app.middleware("http")
+async def cache_static_files(request: Request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+    if response.status_code == 200 and "cache-control" not in response.headers:
+        if path.startswith("/uploads/"):
+            # Upload names are random and never reused.
+            response.headers["Cache-Control"] = "public, max-age=2592000, immutable"
+        elif path.startswith("/static/"):
+            # Pages link to CSS/JS with ?v=N, bumped when the file changes.
+            versioned = "v=" in (request.url.query or "")
+            response.headers["Cache-Control"] = "public, max-age=604800" if versioned else "public, max-age=3600"
+    return response
+
+
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 os.makedirs("uploads", exist_ok=True)

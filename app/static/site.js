@@ -13,6 +13,33 @@
     return url.replace('/image/upload/', '/image/upload/f_auto,q_auto,c_limit,w_' + (width || 600) + '/');
   };
 
+  // Listing photos load only when they're about to scroll into view, so a long
+  // list doesn't spend the buyer's data on photos they never see.
+  // Usage: <div class="ph" data-bg="https://..."></div>
+  (function () {
+    function show(el) {
+      var u = el.getAttribute('data-bg');
+      el.removeAttribute('data-bg');
+      if (u) el.style.backgroundImage = 'url("' + u.replace(/["\\\n\r]/g, encodeURIComponent) + '")';
+    }
+    var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); show(e.target); } });
+    }, { rootMargin: '400px 0px' }) : null;
+    function scan(root) {
+      if (!root.querySelectorAll) return;
+      if (root.hasAttribute && root.hasAttribute('data-bg')) { io ? io.observe(root) : show(root); }
+      root.querySelectorAll('[data-bg]').forEach(function (el) { io ? io.observe(el) : show(el); });
+    }
+    window.SAZLazy = scan;
+    function start() {
+      scan(document.body);
+      new MutationObserver(function (list) {
+        list.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1) scan(n); }); });
+      }).observe(document.body, { childList: true, subtree: true });
+    }
+    if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+  })();
+
   var ICONS = {
     part: '<path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',
     car: '<path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><path d="M5 12h14"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/>',
@@ -67,7 +94,7 @@
 
   function header() {
     return '<header class="saz-header"><div class="saz-wrap">' +
-      '<a class="saz-logo" href="/"><img src="/static/logo.png" alt="" width="40" height="40"><b>Salon<span>AutoZone</span></b></a>' +
+      '<a class="saz-logo" href="/"><img src="/static/logo-80.webp" alt="" width="40" height="40"><b>Salon<span>AutoZone</span></b></a>' +
       '<nav class="saz-nav" aria-label="Main">' +
         '<a href="/?tab=parts"' + cur('parts') + '>Parts</a>' +
         '<a href="/?tab=cars"' + cur('cars') + '>Cars</a>' +
