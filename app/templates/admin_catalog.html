@@ -1,266 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="/static/logo.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Supplier Catalog Admin - {{ app_name }}</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6f8;color:#1a1a1a}
-.navbar{background:#0b1e3a;color:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:20px;font-weight:900;color:#00a8e8;text-decoration:none}
-.logo span{color:#ffb800}
-.navbar a{color:white;text-decoration:none;font-size:14px;margin-left:20px}
-.container{max-width:900px;margin:40px auto;padding:0 20px}
-h1{color:#0b1e3a;margin-bottom:8px}
-.subtitle{color:#666;margin-bottom:30px}
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:30px}
-.stat-card{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.06);border-left:4px solid #00a8e8}
-.stat-label{font-size:12px;color:#888;text-transform:uppercase;font-weight:600}
-.stat-value{font-size:28px;color:#0b1e3a;font-weight:bold;margin-top:6px}
-.upload-card{background:white;border-radius:14px;padding:30px;box-shadow:0 2px 10px rgba(0,0,0,0.06)}
-.drop-zone{border:3px dashed #cbd5e0;border-radius:12px;padding:50px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafbfc}
-.drop-zone:hover{border-color:#00a8e8;background:#f0f9ff}
-.drop-zone.dragover{border-color:#00a8e8;background:#e0f2fe;transform:scale(1.01)}
-.drop-icon{font-size:60px;margin-bottom:15px;opacity:0.7}
-.drop-text{color:#475569;font-size:16px;font-weight:600;margin-bottom:8px}
-.drop-sub{color:#94a3b8;font-size:13px}
-.file-name{display:none;margin-top:15px;padding:12px;background:#e0f2fe;border-radius:8px;font-weight:600;color:#0369a1;font-size:14px}
-.file-name.show{display:block}
-.options{margin-top:20px;display:flex;align-items:center;gap:10px}
-.options input[type=checkbox]{width:18px;height:18px}
-.options label{font-size:14px;color:#475569;font-weight:500;cursor:pointer}
-.upload-btn{margin-top:20px;background:linear-gradient(135deg,#ff6b00,#e55a00);color:white;border:none;padding:16px 30px;border-radius:10px;font-weight:bold;font-size:16px;cursor:pointer;width:100%;box-shadow:0 4px 12px rgba(255,107,0,0.3)}
-.upload-btn:disabled{opacity:0.5;cursor:not-allowed}
-.upload-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,107,0,0.4)}
-.result{margin-top:25px;padding:20px;border-radius:10px;font-size:14px}
-.result.success{background:#dcfce7;border-left:4px solid #22c55e;color:#14532d}
-.result.error{background:#fee2e2;border-left:4px solid #dc2626;color:#7f1d1d}
-.result h3{margin-bottom:10px;font-size:16px}
-.result ul{margin:10px 0 0 20px;line-height:1.8}
-.loading{display:none;margin-top:20px;text-align:center;padding:20px;color:#00a8e8;font-weight:bold}
-.loading.show{display:block}
-.spinner{display:inline-block;width:30px;height:30px;border:3px solid #e0e6ed;border-top-color:#00a8e8;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:10px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.recent-list{margin-top:30px;background:white;border-radius:14px;padding:25px;box-shadow:0 2px 10px rgba(0,0,0,0.06)}
-.recent-title{font-size:16px;font-weight:700;color:#0b1e3a;margin-bottom:15px}
-.category-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
-.category-row:last-child{border-bottom:none}
-.category-name{font-weight:600;color:#0b1e3a}
-.category-count{background:#e0f2fe;color:#0369a1;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700}
-/* salon-logo-css */
-.brand img.logo-img { height: 52px; width: 52px; border-radius: 50%; display: block; }
-.brand em { font-style: normal; }
-.brand em span { color: #0f766e; }
-@media (max-width: 640px) {
-  .brand img.logo-img { height: 42px; width: 42px; }
-  .brand { font-size: 17px; }
-}
-/* big-logo */
-.brand img.logo-img,
-.logo img,
-.brand em,
-.logo em { font-style: normal; font-weight: 800; font-size: 26px; vertical-align: middle; }
-@media (max-width: 640px) {
-  .brand img.logo-img,
-  .logo img,
-  .brand em, .logo em { font-size: 20px; }
-}
-</style>
-
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Supplier catalogue · SalonAdmin</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font>
+<link rel="stylesheet" href="/static/ui.css?v=6">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
-<link rel="stylesheet" href="/static/legacy.css?v=4">
+<style>
+.page { max-width: 860px; padding: 22px 16px 56px; }
+.page h1 { font-size: clamp(26px, 6vw, 34px); }
+.back { display: inline-block; font-size: 14px; color: var(--muted); text-decoration: none; margin-bottom: 8px; }
+.back:hover { color: var(--teal); }
+.lead { color: var(--muted); margin: 4px 0 18px; }
+.stack { display: grid; gap: 14px; }
+.nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.nums div { background: var(--card); padding: 14px; }
+.nums b { display: block; font-size: 26px; color: var(--ink); font-variation-settings: "wdth" 85; }
+.nums span { font-size: 13px; color: var(--muted); }
+.drop { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; border: 2px dashed var(--line); border-radius: var(--r-md); padding: 28px 16px; cursor: pointer; background: var(--paper); }
+.drop:hover, .drop.over { border-color: var(--teal); background: var(--teal-50); }
+.drop b { color: var(--ink); font-size: 17px; }
+.drop svg { width: 34px; height: 34px; color: var(--teal); }
+.file { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; font-weight: 600; }
+.mode { display: grid; gap: 8px; margin-top: 14px; }
+.mode label { display: flex; gap: 10px; align-items: flex-start; border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 10px 12px; cursor: pointer; }
+.mode label:has(input:checked) { border-color: var(--teal); background: var(--teal-50); }
+.mode input { margin-top: 4px; accent-color: var(--teal); }
+.mode b { display: block; color: var(--ink); }
+.mode small { color: var(--muted); }
+.fmt { font-family: ui-monospace, Menlo, monospace; font-size: 13px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 12px; overflow-x: auto; white-space: pre; margin-top: 8px; }
+.cats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.cats .chip { min-height: 34px; }
+.cats .chip span { color: var(--muted); font-weight: 600; }
+.cats .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.cats .chip[aria-pressed="true"] span { color: #a9c4c2; }
+.rows { margin-top: 10px; }
+.row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); text-decoration: none; color: inherit; }
+.row:first-child { border-top: 0; }
+.row:hover b { color: var(--teal); }
+.row b { font-family: ui-monospace, Menlo, monospace; color: var(--ink); }
+.row span { color: var(--muted); font-size: 14px; text-align: right; }
+</style>
 </head>
-<body data-tabbar="off" data-footer="off">
+<body data-tabbar="off">
 <div id="site-header"></div>
-
-<div class="container">
-<h1>📦 Supplier Catalog Admin</h1>
-<p class="subtitle">Import your supplier's CSV file to make all parts searchable in the marketplace.</p>
-
-<div class="stats-row">
-<div class="stat-card">
-<div class="stat-label">Total Parts</div>
-<div class="stat-value" id="stat-total">0</div>
-</div>
-<div class="stat-card">
-<div class="stat-label">Categories</div>
-<div class="stat-value" id="stat-categories">0</div>
-</div>
-<div class="stat-card">
-<div class="stat-label">Vehicles Covered</div>
-<div class="stat-value" id="stat-vehicles">0</div>
-</div>
-</div>
-
-<div class="upload-card">
-<div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-<div class="drop-icon">📄</div>
-<div class="drop-text">Drop your CSV here or click to browse</div>
-<div class="drop-sub">Accepts .csv files from Excel or Google Sheets</div>
-</div>
-<input type="file" id="file-input" accept=".csv" style="display:none">
-<div class="file-name" id="file-name"></div>
-
-<div class="options">
-<input type="checkbox" id="replace" checked>
-<label for="replace">Replace existing catalog (recommended)</label>
-</div>
-
-<button class="upload-btn" id="upload-btn" onclick="uploadFile()" disabled>Upload & Import</button>
-
-<div class="loading" id="loading">
-<div class="spinner"></div>
-<div>Parsing and importing your catalog...</div>
-</div>
-
-<div id="result"></div>
-</div>
-
-<div class="recent-list" id="category-list" style="display:none">
-<div class="recent-title">📊 Current Catalog by Category</div>
-<div id="categories-content"></div>
-</div>
-</div>
-
-<script>
-var selectedFile = null;
-
-var dropZone = document.getElementById('drop-zone');
-var fileInput = document.getElementById('file-input');
-
-['dragenter','dragover'].forEach(function(evt){
- dropZone.addEventListener(evt,function(e){
- e.preventDefault();
- dropZone.classList.add('dragover');
- });
-});
-
-['dragleave','drop'].forEach(function(evt){
- dropZone.addEventListener(evt,function(e){
- e.preventDefault();
- dropZone.classList.remove('dragover');
- });
-});
-
-dropZone.addEventListener('drop',function(e){
- var files = e.dataTransfer.files;
- if(files.length > 0) handleFile(files[0]);
-});
-
-fileInput.addEventListener('change',function(e){
- if(e.target.files.length > 0) handleFile(e.target.files[0]);
-});
-
-function handleFile(file){
- if(!file.name.toLowerCase().endsWith('.csv')){
- showResult('error','Please upload a .csv file, not a '+file.name.split('.').pop());
- return;
- }
- selectedFile = file;
- var nameEl = document.getElementById('file-name');
- nameEl.innerText = '📄 ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
- nameEl.classList.add('show');
- document.getElementById('upload-btn').disabled = false;
- document.getElementById('result').innerHTML = '';
-}
-
-function showResult(type, message, details){
- var el = document.getElementById('result');
- el.innerHTML = '<div class="result '+type+'"><h3>'+(type==='success'?'✅ ':'❌ ')+message+'</h3>'+(details||'')+'</div>';
-}
-
-async function uploadFile(){
- if(!selectedFile) return;
-
- var btn = document.getElementById('upload-btn');
- var loading = document.getElementById('loading');
- btn.disabled = true;
- loading.classList.add('show');
- document.getElementById('result').innerHTML = '';
-
- var fd = new FormData();
- fd.append('file', selectedFile);
- var headers = {};
- try {
- var adminKey = sessionStorage.getItem('adminKey');
- if (adminKey) headers['X-Admin-Key'] = adminKey;
- } catch(e){}
-
- var replace = document.getElementById('replace').checked;
- var url = '/api/catalog/upload?replace=' + replace;
-
- try {
- var res = await fetch(url, { method:'POST', headers:headers, body: fd });
- var data = await res.json();
- loading.classList.remove('show');
-
- if(!res.ok){
- showResult('error', data.detail || 'Upload failed');
- btn.disabled = false;
- return;
- }
-
- showResult('success',
- 'Catalog imported!',
- '<ul>' +
- '<li><strong>' + data.imported + '</strong> parts imported</li>' +
- '<li><strong>' + data.skipped + '</strong> skipped (duplicates)</li>' +
- '<li><strong>' + data.total_parts + '</strong> total parts in file</li>' +
- '</ul>'
- );
-
- // Refresh stats and categories
- loadStats();
- loadCategories();
-
- // Reset
- selectedFile = null;
- fileInput.value = '';
- document.getElementById('file-name').classList.remove('show');
-
- } catch(err){
- loading.classList.remove('show');
- showResult('error', 'Network error: ' + err.message);
- }
- btn.disabled = false;
-}
-
-async function loadStats(){
- try {
- var res = await fetch('/api/catalog/stats');
- var data = await res.json();
- document.getElementById('stat-total').innerText = data.total_parts;
- document.getElementById('stat-categories').innerText = data.categories;
- document.getElementById('stat-vehicles').innerText = data.vehicles;
- } catch(e){}
-}
-
-async function loadCategories(){
- try {
- var res = await fetch('/api/catalog/categories');
- var data = await res.json();
- if(!data.categories || data.categories.length === 0){
- document.getElementById('category-list').style.display = 'none';
- return;
- }
- document.getElementById('category-list').style.display = 'block';
- var html = '';
- data.categories.forEach(function(c){
- html += '<div class="category-row"><div class="category-name">'+c.name+'</div><div class="category-count">'+c.count+' parts</div></div>';
- });
- document.getElementById('categories-content').innerHTML = html;
- } catch(e){}
-}
-
-// Load on startup
-loadStats();
-loadCategories();
-</script>
+<main class="wrap page">
+ <a class="back" href="/admin/dashboard">← Admin dashboard</a>
+ <h1>Supplier catalogue</h1>
+ <p class="lead">Parts your suppliers can send from abroad. Buyers find them in search and ask you for a price.</p>
+ <div id="app" class="stack"></div>
+</main>
 <script src="/static/site.js?v=5"></script>
+<script>
+(function () {
+ 'use strict';
+ var app = document.getElementById('app');
+ var key = '', token = '';
+ try { key = sessionStorage.getItem('adminKey') || ''; token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB'); }
+ function headers() { var h = {}; if (key) h['X-Admin-Key'] = key; if (token) h['Authorization'] = 'Bearer ' + token; return h; }
+ function getJSON(u) { return fetch(u).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); }
+
+ if (!key && !token) {
+  app.innerHTML = '<div class="box"><h2>Admins only</h2><p>Log in to the admin dashboard first.</p><a class="btn btn-primary" style="margin-top:12px" href="/admin/login">Admin log in</a></div>';
+  return;
+ }
+
+ app.innerHTML =
+  '<div class="nums"><div><b id="s-total">–</b><span>parts</span></div><div><b id="s-cats">–</b><span>categories</span></div><div><b id="s-veh">–</b><span>vehicles</span></div></div>' +
+  '<div class="box"><h2>Import a file</h2>' +
+  '<label class="drop" id="drop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>' +
+  '<b>Choose a CSV file</b><span class="hint" style="margin:0">or drop it here. Save from Excel or Google Sheets as .csv</span><input type="file" id="file" accept=".csv,text/csv" hidden></label>' +
+  '<div class="file" id="fname" hidden></div>' +
+  '<div class="mode"><label><input type="radio" name="mode" value="add" checked><span><b>Add new parts</b><small>Keeps what\'s there. Part numbers already in the catalogue are skipped.</small></span></label>' +
+  '<label><input type="radio" name="mode" value="replace"><span><b>Replace the whole catalogue</b><small>Deletes every part first. Use when the supplier sends a full new list.</small></span></label></div>' +
+  '<button class="btn btn-primary btn-block" style="margin-top:14px" id="go" type="button" disabled>Import</button><div id="res"></div>' +
+  '<details style="margin-top:14px"><summary class="hint" style="cursor:pointer">What should the file look like?</summary>' +
+  '<p class="hint">A category name on its own line, then one part per line: part number, vehicle, brand, price in SLL. Up to three brand and price pairs per line.</p>' +
+  '<div class="fmt">Brake pads\nPart Number,Vehicle,Brand,Price SLL,Price CAD\n04465-02220,Toyota Corolla 2007-2013,Akebono,450000,25</div></details></div>' +
+  '<div class="box"><h2>In the catalogue</h2><input class="input" id="q" type="search" placeholder="Search part number, car or brand" style="margin-top:6px"><div class="cats" id="cats"></div><div class="rows" id="rows"></div></div>';
+
+ var file = null, drop = document.getElementById('drop'), go = document.getElementById('go'), res = document.getElementById('res');
+ function pick(f) {
+  res.innerHTML = '';
+  if (!f) return;
+  if (!/\.csv$/i.test(f.name)) { file = null; go.disabled = true; res.innerHTML = '<div class="notice notice-bad" style="margin-top:12px">That\'s not a .csv file. In Excel use File, Save as, CSV.</div>'; return; }
+  file = f; go.disabled = false;
+  var el = document.getElementById('fname'); el.hidden = false;
+  el.innerHTML = '<span>' + esc(f.name) + '</span><span class="hint" style="margin:0">' + (f.size / 1024).toFixed(1) + ' KB</span>';
+ }
+ document.getElementById('file').addEventListener('change', function (e) { pick(e.target.files[0]); });
+ ['dragenter', 'dragover'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+ ['dragleave', 'drop'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+ drop.addEventListener('drop', function (e) { pick(e.dataTransfer.files[0]); });
+
+ go.addEventListener('click', function () {
+  if (!file) return;
+  var replace = document.querySelector('input[name=mode]:checked').value === 'replace';
+  if (replace && go.dataset.sure !== '1') { go.dataset.sure = '1'; go.textContent = 'Tap again to delete the old catalogue and import'; go.classList.add('btn-dark'); return; }
+  go.disabled = true; go.textContent = 'Importing…';
+  var fd = new FormData(); fd.append('file', file);
+  fetch('/api/catalog/upload?replace=' + replace, { method: 'POST', headers: headers(), body: fd })
+   .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (r.status === 401 || r.status === 403) throw new Error('Your admin login has ended. Log in again from the admin dashboard.'); if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : 'The import failed.'); return d; }); })
+   .then(function (d) {
+    res.innerHTML = '<div class="notice notice-ok" style="margin-top:12px"><b>' + fmt(d.imported) + ' part' + (d.imported === 1 ? '' : 's') + ' added.</b>' + (d.skipped ? ' ' + fmt(d.skipped) + ' already in the catalogue were skipped.' : '') + '</div>';
+    file = null; document.getElementById('file').value = ''; document.getElementById('fname').hidden = true;
+    load();
+   })
+   .catch(function (e) { res.innerHTML = '<div class="notice notice-bad" style="margin-top:12px">' + esc(e.message) + '</div>'; })
+   .then(function () { go.textContent = 'Import'; go.dataset.sure = ''; go.classList.remove('btn-dark'); go.disabled = !file; });
+ });
+
+ var cat = '', rows = document.getElementById('rows'), q = document.getElementById('q'), t = null;
+ function show(items) {
+  rows.innerHTML = items && items.length ? items.map(function (i) {
+   return '<a class="row" href="/catalog/' + i.id + '" target="_blank" rel="noopener"><b>' + esc(i.part_number) + '</b><span>' + esc([i.category, i.vehicle_compatibility].filter(Boolean).join(' · ')) + '</span></a>';
+  }).join('') : '<p class="hint">Nothing here yet.</p>';
+ }
+ function list() {
+  var term = q.value.trim();
+  if (term) getJSON('/api/catalog/search?limit=50&q=' + encodeURIComponent(term)).then(function (d) { show(d && d.items); });
+  else getJSON('/api/catalog/all?limit=50' + (cat ? '&category=' + encodeURIComponent(cat) : '')).then(function (d) { show(d && d.items); });
+ }
+ q.addEventListener('input', function () { clearTimeout(t); t = setTimeout(list, 250); });
+ document.getElementById('cats').addEventListener('click', function (e) {
+  var c = e.target.closest('.chip'); if (!c) return;
+  cat = cat === c.dataset.c ? '' : c.dataset.c; q.value = '';
+  this.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.c === cat)); });
+  list();
+ });
+ function load() {
+  getJSON('/api/catalog/stats').then(function (s) {
+   if (!s) return;
+   document.getElementById('s-total').textContent = fmt(s.total_parts);
+   document.getElementById('s-cats').textContent = fmt(s.categories);
+   document.getElementById('s-veh').textContent = fmt(s.vehicles);
+  });
+  getJSON('/api/catalog/categories').then(function (d) {
+   var cs = (d && d.categories) || [];
+   document.getElementById('cats').innerHTML = cs.map(function (c) { return '<button class="chip" type="button" data-c="' + esc(c.name) + '" aria-pressed="' + (c.name === cat) + '">' + esc(c.name) + ' <span>' + fmt(c.count) + '</span></button>'; }).join('');
+  });
+  list();
+ }
+ load();
+})();
+</script>
 </body>
 </html>

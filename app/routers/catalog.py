@@ -3,7 +3,7 @@ import io
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import func, desc, or_
+from sqlalchemy import delete, func, desc, or_
 from typing import List, Optional
 from pydantic import BaseModel
 
@@ -21,9 +21,7 @@ class CatalogItem(BaseModel):
     category: Optional[str] = None
     vehicle_compatibility: Optional[str] = None
     brand_1: Optional[str] = None
-    price_1_sll: Optional[float] = None
-    price_1_cad: Optional[float] = None
-    in_stock: bool
+    price_sll: Optional[float] = None
 
     class Config:
         from_attributes = True
@@ -161,30 +159,36 @@ async def upload_catalog(
     parts = parse_csv(text)
 
     if not parts:
-        raise HTTPException(status_code=400, detail="No parts found in CSV. Check the format.")
+        raise HTTPException(status_code=400, detail="No parts found in this file. Check that the first column has part numbers.")
 
-    # Optionally wipe existing catalog
     if replace:
-        existing = await db.execute(select(models.SupplierCatalog))
-        for row in existing.scalars().all():
-            await db.delete(row)
-        await db.commit()
+        await db.execute(delete(models.SupplierCatalog))
 
-    imported = 0
-    skipped = 0
+    existing = set()
+    if not replace:
+        existing = {r for (r,) in (await db.execute(select(models.SupplierCatalog.part_number))).all()}
+
+    imported = skipped = 0
     for p in parts:
-        # Skip duplicates in same import
-        result = await db.execute(
-            select(models.SupplierCatalog).where(
-                models.SupplierCatalog.part_number == p["part_number"]
-            )
-        )
-        if result.scalars().first() and not replace:
+        key = p["part_number"]
+        if key in existing:
             skipped += 1
             continue
-
-        item = models.SupplierCatalog(**p)
-        db.add(item)
+        existing.add(key)
+        # The file can list up to three brands with a price each; keep the first one that has a price.
+        brand, price = p["brand_1"], p["price_1_sll"]
+        for b, pr in ((p["brand_2"], p["price_2_sll"]), (p["brand_3"], p["price_3_sll"])):
+            if price is None and pr is not None:
+                brand, price = b or brand, pr
+        db.add(models.SupplierCatalog(
+            part_number=key[:120],
+            category=p["category"],
+            vehicle_compatibility=p["vehicle_compatibility"] or None,
+            brand_1=brand,
+            name=" ".join(x for x in (p["category"], key) if x)[:200],
+            price_sll=price,
+            condition="new",
+        ))
         imported += 1
 
     await db.commit()
@@ -245,9 +249,6 @@ async def catalog_search(
                 "category": i.category,
                 "vehicle_compatibility": i.vehicle_compatibility,
                 "brand_1": i.brand_1,
-                "price_1_sll": i.price_1_sll,
-                "price_1_cad": i.price_1_cad,
-                "in_stock": i.in_stock,
             }
             for i in items
         ],
