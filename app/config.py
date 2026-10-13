@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     # Orange Money number sellers pay plan fees to. Set it to empty to hide it:
     # the pages then tell sellers to ask on WhatsApp instead.
     ORANGE_MONEY_NUMBER: str = "+232 76 570104"
+    # Emails (password reset codes) go out through Brevo's API. Both must be set:
+    # BREVO_API_KEY from Brevo > SMTP & API > API keys, and EMAIL_FROM an address
+    # verified in Brevo > Senders. Leave empty and resets use the WhatsApp link instead.
+    BREVO_API_KEY: str = ""
+    EMAIL_FROM: str = ""
+    EMAIL_FROM_NAME: str = "SalonAutoZone"
 
     @field_validator("*", mode="before")
     @classmethod

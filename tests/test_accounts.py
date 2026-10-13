@@ -145,3 +145,141 @@ def test_pages_exist(client):
     for path in ("/forgot-password", "/reset-password", "/account/password"):
         assert client.get(path).status_code == 200
     assert "Forgot password?" in client.get("/login").text
+
+
+# ---------------------------------------------------------------- emailed codes
+
+@pytest.fixture
+def email_on(monkeypatch):
+    """Turn email on and catch what would be sent, instead of calling Brevo."""
+    from app import emailer
+    from app.config import get_settings
+    sent = []
+    cfg = get_settings()
+    monkeypatch.setattr(cfg, "BREVO_API_KEY", "test-key")
+    monkeypatch.setattr(cfg, "EMAIL_FROM", "noreply@example.com")
+
+    async def fake_send(to_email, to_name, subject, text, html_body):
+        sent.append({"to": to_email, "subject": subject, "text": text})
+        return True
+
+    monkeypatch.setattr(emailer, "send_email", fake_send)
+    return sent
+
+
+def _code_from(mail):
+    import re
+    return re.search(r"\b(\d{6})\b", mail["subject"]).group(1)
+
+
+def test_email_code_reset(client, email_on):
+    phone, n, reg = _new_user(client)
+    old_token = reg["access_token"]
+    r = client.post("/api/auth/forgot", json={"identity": f"077{n}"})
+    assert r.status_code == 200 and r.json()["method"] == "email"
+    assert len(email_on) == 1 and email_on[0]["to"] == reg["user"]["email"]
+    code = _code_from(email_on[0])
+    assert code in email_on[0]["text"]
+
+    # Asking again straight away is refused (no email spam).
+    assert client.post("/api/auth/forgot", json={"identity": f"077{n}"}).status_code == 429
+
+    wrong = "000000" if code != "000000" else "111111"
+    bad = client.post("/api/auth/reset-with-code", json={"identity": phone, "code": wrong, "password": "brand-new-1"})
+    assert bad.status_code == 400 and "4 tries left" in bad.json()["detail"]
+
+    ok = client.post("/api/auth/reset-with-code", json={"identity": reg["user"]["email"], "code": code, "password": "brand-new-1"})
+    assert ok.status_code == 200
+    assert client.get("/api/auth/me", headers=_auth(ok.json()["access_token"])).status_code == 200
+    assert client.get("/api/auth/me", headers=_auth(old_token)).status_code == 401
+    # A code works once.
+    assert client.post("/api/auth/reset-with-code", json={"identity": phone, "code": code, "password": "again-again"}).status_code == 400
+    assert _login(client, phone, "brand-new-1").status_code == 200
+    events = {e["outcome"] for e in client.get(f"/api/admin/users/{reg['user']['id']}", headers=ADMIN).json()["events"]}
+    assert {"reset_code_sent", "reset_code_wrong", "password_reset_code"} <= events
+
+
+def test_code_locks_after_five_wrong_tries(client, email_on):
+    phone, n, reg = _new_user(client)
+    client.post("/api/auth/forgot", json={"identity": phone})
+    code = _code_from(email_on[-1])
+    wrong = "000000" if code != "000000" else "111111"
+    for _ in range(5):
+        client.post("/api/auth/reset-with-code", json={"identity": phone, "code": wrong, "password": "brand-new-1"})
+    # Even the right code no longer works.
+    assert client.post("/api/auth/reset-with-code", json={"identity": phone, "code": code, "password": "brand-new-1"}).status_code == 400
+
+
+def test_unknown_account_looks_the_same_and_sends_nothing(client, email_on):
+    r = client.post("/api/auth/forgot", json={"identity": "nobody-here@example.com"})
+    assert r.status_code == 200 and r.json()["method"] == "email"
+    assert email_on == []
+
+
+def test_ask_team_instead_of_email(client, email_on):
+    phone, n, reg = _new_user(client)
+    r = client.post("/api/auth/forgot?team=true", json={"identity": phone})
+    assert r.json()["method"] == "team" and email_on == []
+    reqs = client.get("/api/admin/login-problems", headers=ADMIN).json()["requests"]
+    assert any(q["user_id"] == reg["user"]["id"] for q in reqs)
+
+
+def test_failed_email_goes_to_the_team(client, monkeypatch, email_on):
+    from app import emailer
+
+    async def broken(*a, **k):
+        return False
+
+    monkeypatch.setattr(emailer, "send_email", broken)
+    phone, n, reg = _new_user(client)
+    assert client.post("/api/auth/forgot", json={"identity": phone}).json()["method"] == "team"
+    problems = client.get("/api/admin/login-problems", headers=ADMIN).json()
+    assert any(e["outcome"] == "reset_code_failed" and e["user_id"] == reg["user"]["id"] for e in problems["failed"])
+
+
+def test_email_status_and_test_email(client, email_on):
+    st = client.get("/api/admin/email-status", headers=ADMIN).json()
+    assert st["enabled"] is True and st["from"] == "noreply@example.com"
+    assert client.post("/api/admin/email-test", headers=ADMIN, json={"to": "me@example.com"}).status_code == 200
+    assert email_on[-1]["to"] == "me@example.com"
+    assert client.post("/api/admin/email-test", json={"to": "me@example.com"}).status_code == 403
+
+
+def test_without_email_it_uses_the_team(client):
+    phone, n, reg = _new_user(client)
+    assert client.post("/api/auth/forgot", json={"identity": phone}).json()["method"] == "team"
+    assert client.get("/api/admin/email-status", headers=ADMIN).json()["enabled"] is False
+
+
+def test_brevo_request_shape(monkeypatch):
+    """The call to Brevo has the right address, key header and body."""
+    import asyncio
+
+    import httpx
+
+    from app import emailer
+    from app.config import get_settings
+    cfg = get_settings()
+    monkeypatch.setattr(cfg, "BREVO_API_KEY", "xkeysib-test")
+    monkeypatch.setattr(cfg, "EMAIL_FROM", "noreply@example.com")
+    seen = {}
+
+    def handler(request: httpx.Request):
+        import json
+        seen["url"] = str(request.url)
+        seen["key"] = request.headers.get("api-key")
+        seen["body"] = json.loads(request.content)
+        return httpx.Response(201, json={"messageId": "<1@brevo>"})
+
+    real = httpx.AsyncClient
+    monkeypatch.setattr(emailer.httpx, "AsyncClient", lambda **kw: real(transport=httpx.MockTransport(handler), **kw))
+    subject, text, body = emailer.code_email("Hawa", "123456", 15)
+    assert asyncio.run(emailer.send_email("hawa@example.com", "Hawa Sesay", subject, text, body)) is True
+    assert seen["url"] == "https://api.brevo.com/v3/smtp/email" and seen["key"] == "xkeysib-test"
+    assert seen["body"]["sender"] == {"name": "SalonAutoZone", "email": "noreply@example.com"}
+    assert seen["body"]["to"] == [{"email": "hawa@example.com", "name": "Hawa Sesay"}]
+    assert "123456" in seen["body"]["subject"] and "123456" in seen["body"]["htmlContent"]
+
+    monkeypatch.setattr(emailer.httpx, "AsyncClient",
+                        lambda **kw: real(transport=httpx.MockTransport(lambda r: httpx.Response(401, json={})), **kw))
+    assert asyncio.run(emailer.send_email("hawa@example.com", "Hawa", subject, text, body)) is False
