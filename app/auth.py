@@ -103,6 +103,9 @@ async def get_current_user(
     user = result.scalars().first()
     if user is None:
         raise credentials_exception
+    # A password reset or "sign out everywhere" bumps token_version, which ends older logins.
+    if int(payload.get("ver", 0) or 0) != int(getattr(user, "token_version", 0) or 0):
+        raise credentials_exception
     return user
 
 

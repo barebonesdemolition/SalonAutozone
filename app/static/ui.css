@@ -180,3 +180,11 @@ body.has-sticky-cta { padding-bottom: calc(136px + env(safe-area-inset-bottom));
 .gal-thumbs button[aria-current="true"] { border-color: var(--teal); }
 .gal-owner { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 14px; }
 .gal-owner .btn { min-height: 36px; padding: 6px 12px; font-size: 14px; }
+
+/* Show/hide password button (added to every password box by site.js) */
+.pw-wrap { position: relative; display: block; }
+.pw-wrap > input { width: 100%; padding-right: 52px; }
+.pw-eye { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); width: 44px; height: 40px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: var(--r-sm); background: none; color: var(--muted); cursor: pointer; }
+.pw-eye:hover { color: var(--ink); }
+.pw-eye:focus-visible { outline: 3px solid var(--gold); outline-offset: 0; }
+.pw-eye svg { width: 22px; height: 22px; }

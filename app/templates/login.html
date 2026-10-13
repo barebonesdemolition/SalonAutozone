@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
-<link rel="stylesheet" href="/static/ui.css?v=6">
+<link rel="stylesheet" href="/static/ui.css?v=7">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
 <style>
 .auth { display: grid; min-height: calc(100vh - var(--header-h)); }
@@ -35,6 +35,9 @@
 .types input:checked + span { border-color: var(--teal); background: var(--teal-50); color: var(--teal-600); }
 .types input:focus-visible + span { outline: 3px solid var(--gold); outline-offset: 2px; }
 .msg { margin-top: 12px; text-align: center; font-weight: 600; }
+.forgot { margin-top: 8px; text-align: right; font-size: 15px; }
+.forgot a { font-weight: 700; text-decoration: none; }
+.forgot a:hover { text-decoration: underline; }
 .msg.err { color: var(--bad); }
 .msg.ok { color: var(--ok); }
 @media (min-width: 900px) { .auth { grid-template-columns: 1fr 1fr; } .auth .side { display: block; } .auth .main { align-items: center; } }
@@ -78,13 +81,14 @@
     </div>
     <label class="field"><span>Password</span><input class="input" name="password" type="password" required autocomplete="current-password" minlength="1"></label>
     <p class="hint" id="pw-hint" hidden>At least 8 characters.</p>
+    <p class="forgot" id="forgot"><a href="/forgot-password">Forgot password?</a></p>
     <button class="btn btn-primary btn-lg btn-block" style="margin-top:20px" type="submit" id="submit">Sign in</button>
     <div class="msg" id="msg" aria-live="polite"></div>
    </form>
   </div>
  </div>
 </div>
-<script src="/static/site.js?v=6"></script>
+<script src="/static/site.js?v=7"></script>
 <script>
 (function () {
  var mode = 'login';
@@ -106,6 +110,7 @@
   document.getElementById('account-type-wrap').hidden = !reg;
   document.getElementById('email-wrap').hidden = !reg;
   document.getElementById('pw-hint').hidden = !reg;
+  document.getElementById('forgot').hidden = reg;
   document.getElementById('phone-label').textContent = reg ? 'Phone number' : 'Phone or email';
   document.getElementById('heading').textContent = reg ? 'Create your account' : 'Welcome back';
   document.getElementById('subheading').textContent = reg ? 'It takes a minute. We use your phone number for WhatsApp messages from buyers and sellers.' : 'Sign in with your phone number or email.';
@@ -118,6 +123,11 @@
   b.addEventListener('click', function () { setMode(b.dataset.mode); });
  });
  if (params.get('mode') === 'register') setMode('register');
+ document.querySelector('#forgot a').addEventListener('click', function (e) {
+  var v = form.phone.value.trim();
+  // Carry what they typed over to the next page (kept out of the address bar).
+  try { if (v) sessionStorage.setItem('forgotWho', v); } catch (err) {}
+ });
 
  function fail(text) {
   msg.className = 'msg err';

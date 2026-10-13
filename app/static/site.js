@@ -40,6 +40,51 @@
     if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
   })();
 
+  // Every password box gets an eye button to show or hide what's typed.
+  (function () {
+    var EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+    var EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+    function add(input) {
+      if (input.dataset.pwReveal || input.type !== 'password') return;
+      input.dataset.pwReveal = '1';
+      var wrap = document.createElement('span');
+      wrap.className = 'pw-wrap';
+      input.parentNode.insertBefore(wrap, input);
+      wrap.appendChild(input);
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'pw-eye';
+      b.setAttribute('aria-label', 'Show password');
+      b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = EYE;
+      b.addEventListener('click', function () {
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        b.innerHTML = show ? EYE_OFF : EYE;
+        b.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        b.setAttribute('aria-pressed', String(show));
+        input.focus();
+      });
+      // Hide it again before the form is sent, so the browser saves it as a password.
+      if (input.form) input.form.addEventListener('submit', function () {
+        if (input.type === 'text') { input.type = 'password'; b.innerHTML = EYE; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Show password'); }
+      });
+      wrap.appendChild(b);
+    }
+    function scan(root) {
+      if (!root || !root.querySelectorAll) return;
+      if (root.matches && root.matches('input[type=password]')) add(root);
+      root.querySelectorAll('input[type=password]').forEach(add);
+    }
+    function start() {
+      scan(document.body);
+      new MutationObserver(function (list) {
+        list.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1) scan(n); }); });
+      }).observe(document.body, { childList: true, subtree: true });
+    }
+    if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+  })();
+
   var ICONS = {
     part: '<path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',
     car: '<path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><path d="M5 12h14"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/>',

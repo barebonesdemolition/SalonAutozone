@@ -53,7 +53,10 @@ async def get_optional_user(
         payload = decode_access_token(token)
         user_id = int(payload.get("sub"))
         result = await db.execute(select(models.User).where(models.User.id == user_id))
-        return result.scalars().first()
+        user = result.scalars().first()
+        if user and int(payload.get("ver", 0) or 0) != int(getattr(user, "token_version", 0) or 0):
+            return None
+        return user
     except (JWTError, TypeError, ValueError):
         return None
 

@@ -60,6 +60,18 @@ td{font-size:13px}
 .toast{position:fixed;bottom:20px;right:20px;visibility:hidden;background:var(--navy);color:#fff;padding:12px 16px;border-radius:10px;font-weight:600;transform:translateY(120px);transition:transform .25s;z-index:99}
 .toast.show{transform:translateY(0);visibility:visible}.toast.ok{background:var(--success)}.toast.err{background:var(--danger)}
 .hidden{display:none!important}
+.ud-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px}
+.ud-head h3{font-size:18px;color:var(--navy)}
+.ud-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--border);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ud-facts div{background:#fff;padding:10px 16px}.ud-facts span{display:block;font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.ud-acts{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px}
+.ud-link{margin:0 16px 14px;padding:12px;border-radius:10px;background:var(--primary-light)}
+.ud-link input{width:100%;margin-top:6px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.ud-events{padding:0 16px 16px}.ud-events li{padding:6px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:12px}
+.ud-events ul{list-style:none}
+.req{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--border)}
+.req:first-child{border-top:0}
+
 [hidden]{display:none!important}
 h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
 .who b{display:block}.who small{color:var(--muted)}
@@ -108,6 +120,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <button type="button" data-view="orders">Parts orders</button>
  <button type="button" data-view="drivers">Drivers</button>
  <button type="button" data-view="delivery">Delivery fees</button>
+ <button type="button" data-view="users">Users &amp; logins</button>
  <a href="/admin/catalog">Supplier catalog</a>
  <a href="/vin-tool">VIN lookup</a>
  <a href="/">← Back to site</a>
@@ -260,6 +273,26 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  </div>
  </div>
 
+<div id="view-users" class="hidden">
+ <div class="panel" style="margin-bottom:16px">
+  <div class="bar"><h2>Forgot-password requests</h2></div>
+  <div id="u-requests" style="padding:4px 16px 14px"><p class="empty">Loading…</p></div>
+ </div>
+ <div class="panel" id="u-detail" style="margin-bottom:16px" hidden></div>
+ <div class="panel" style="margin-bottom:16px">
+  <div class="bar"><h2>Find a user</h2><input class="inp" id="u-q" type="search" placeholder="Name, phone or email" style="min-width:240px"></div>
+  <div class="table-wrap"><table><thead><tr>
+  <th>User</th><th>Type</th><th>Last sign-in</th><th>Status</th><th></th>
+  </tr></thead><tbody id="tb-users"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ <div class="panel">
+  <div class="bar"><h2>Failed sign-ins (last 7 days)</h2></div>
+  <div class="table-wrap"><table><thead><tr>
+  <th>When</th><th>Typed</th><th>Account</th><th>What happened</th>
+  </tr></thead><tbody id="tb-failed"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+</div>
+
  <div id="view-delivery" class="hidden">
  <div class="panel" style="max-width:560px">
  <div class="bar"><h2>Delivery fees</h2></div>
@@ -308,7 +341,8 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  payments: 'Payments',
  orders: 'Parts orders',
  drivers: 'Drivers',
- delivery: 'Delivery fees'
+ delivery: 'Delivery fees',
+ users: 'Users & logins'
  };
 
  document.querySelectorAll('.side [data-view]').forEach(function (btn) {
@@ -317,7 +351,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  btn.classList.add('active');
  var v = btn.dataset.view;
  $('page-title').textContent = titles[v] || v;
- ['overview','vehicles','parts','imports','inquiries','businesses','payments','orders','drivers','delivery'].forEach(function (name) {
+ ['overview','vehicles','parts','imports','inquiries','businesses','payments','orders','drivers','delivery','users'].forEach(function (name) {
  var el = $('view-' + name);
  if (el) el.classList.toggle('hidden', name !== v);
  });
@@ -341,6 +375,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  if (v === 'orders') loadOrders();
  if (v === 'drivers') loadDrivers();
  if (v === 'delivery') loadFees();
+ if (v === 'users') loadUsersView();
  }
 
  document.querySelectorAll('[data-view-link]').forEach(function (button) {
@@ -363,6 +398,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  if (t.payments_pending) items.push(['payments', 'Seller plan payments to confirm', t.payments_pending]);
  if (t.imports_open) items.push(['imports', 'Import requests waiting for a quote', t.imports_open]);
  if (t.inquiries_new) items.push(['inquiries', 'New enquiries from buyers', t.inquiries_new]);
+ if (t.password_requests) items.push(['users', 'People who forgot their password', t.password_requests]);
  box.innerHTML = items.length ? items.map(function (it) {
  return '<button type="button" class="' + (it[3] ? 'urgent' : '') + '" data-todo="' + it[0] + '"' + (it[4] ? ' data-todo-filter="' + it[4] + '"' : '') + '><span>' + esc(it[1]) + '</span><span class="n">' + esc(it[2]) + '</span></button>';
  }).join('') : '<p class="clear">✓ All clear. Nothing is waiting for you.</p>';
@@ -507,6 +543,104 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
    .catch(function () { tb.innerHTML = '<tr><td colspan="6" class="empty">Could not load enquiries.</td></tr>'; });
  }
 
+
+ // ---------- users & logins ----------
+ var OUTCOME = {
+  ok: ['ok', 'Signed in'], wrong_password: ['bad', 'Wrong password'], no_account: ['warn', 'No account with this phone or email'],
+  inactive: ['bad', 'Account is switched off'], locked: ['bad', 'Paused after too many wrong passwords'],
+  reset_requested: ['warn', 'Asked for a password reset'], password_reset: ['ok', 'Set a new password with a reset link'],
+  password_changed: ['ok', 'Changed their password'], admin_reset_link: ['off', 'Admin made a reset link'],
+  admin_unlock: ['off', 'Admin unlocked the account'], admin_sign_out: ['off', 'Admin signed them out everywhere'],
+  admin_disable: ['bad', 'Admin switched the account off'], admin_enable: ['ok', 'Admin switched the account on']
+ };
+ function outcome(o) { var x = OUTCOME[o] || ['off', o]; return '<span class="badge ' + x[0] + '">' + esc(x[1]) + '</span>'; }
+ function when(iso) { if (!iso) return '—'; var d = new Date(iso + (/[zZ]|[+-]\d\d:?\d\d$/.test(iso) ? '' : 'Z')); return isNaN(d) ? '—' : d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
+ function jsonOrThrow(r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : 'Something went wrong'); return d; }); }
+ function userStatus(u) {
+  var b = [];
+  b.push(u.is_active ? '<span class="badge ok">Active</span>' : '<span class="badge bad">Switched off</span>');
+  if (u.locked) b.push('<span class="badge bad">Paused</span>');
+  else if (u.failed_logins) b.push('<span class="badge warn">' + u.failed_logins + ' wrong</span>');
+  if (u.reset_requested) b.push('<span class="badge warn">Forgot password</span>');
+  if (u.is_admin) b.push('<span class="badge off">Admin</span>');
+  return b.join(' ');
+ }
+ var uTimer = null;
+ function loadUsersView() { loadUsers(); loadLoginProblems(); }
+ function loadUsers() {
+  var tb = $('tb-users');
+  fetch('/api/admin/users?limit=50&q=' + encodeURIComponent($('u-q').value.trim()), { headers: auth() }).then(jsonOrThrow).then(function (d) {
+   var us = d.users || [];
+   tb.innerHTML = us.length ? us.map(function (u) {
+    return '<tr><td class="who"><b>' + esc(u.full_name) + '</b><small>' + esc(u.phone) + ' · ' + esc(u.email) + '</small></td>' +
+     '<td>' + esc(u.roles || 'buyer') + '</td><td>' + when(u.last_login_at) + '</td><td>' + userStatus(u) + '</td>' +
+     '<td><button class="btn btn-ghost" data-user-open="' + u.id + '">Manage</button></td></tr>';
+   }).join('') : '<tr><td colspan="5" class="empty">No users match that.</td></tr>';
+  }).catch(function (e) { tb.innerHTML = '<tr><td colspan="5" class="empty">' + esc(e.message) + '</td></tr>'; });
+ }
+ function loadLoginProblems() {
+  fetch('/api/admin/login-problems', { headers: auth() }).then(jsonOrThrow).then(function (d) {
+   $('u-requests').innerHTML = d.requests.length ? d.requests.map(function (q) {
+    return '<div class="req"><div><b>' + esc(q.user_name || 'No matching account') + '</b><br><small style="color:var(--muted)">Typed ' + esc(q.identity) + ' · ' + when(q.at) + '</small></div><div class="acts">' +
+     (q.user_id ? '<button class="btn btn-primary" data-user-open="' + q.user_id + '">Help them</button>' : '<button class="btn btn-ghost" data-user-search="' + esc(q.identity) + '">Search</button>') +
+     '<button class="btn btn-ghost" data-request-done="' + q.id + '">Done</button></div></div>';
+   }).join('') : '<p class="clear" style="color:var(--success);font-weight:700;padding:8px 0">✓ No one is waiting for a reset link.</p>';
+   $('tb-failed').innerHTML = d.failed.length ? d.failed.map(function (e) {
+    return '<tr><td>' + when(e.at) + '</td><td>' + esc(e.identity || '—') + '</td><td>' + (e.user_id ? '<a href="#" data-user-open="' + e.user_id + '" style="color:var(--primary);font-weight:600">' + esc(e.user_name || 'User #' + e.user_id) + '</a>' : '—') + '</td><td>' + outcome(e.outcome) + '</td></tr>';
+   }).join('') : '<tr><td colspan="4" class="empty">No failed sign-ins in the last 7 days.</td></tr>';
+  }).catch(function (e) { $('u-requests').innerHTML = '<p class="empty">' + esc(e.message) + '</p>'; });
+ }
+ function openUser(id) {
+  var box = $('u-detail');
+  box.hidden = false; box.innerHTML = '<p class="empty">Loading…</p>';
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  fetch('/api/admin/users/' + encodeURIComponent(id), { headers: auth() }).then(jsonOrThrow).then(function (d) {
+   var u = d.user;
+   box.innerHTML = '<div class="ud-head"><div><h3>' + esc(u.full_name) + '</h3><div>' + userStatus(u) + '</div></div><button class="btn btn-ghost" data-user-close>Close</button></div>' +
+    '<div class="ud-facts"><div><span>Phone</span>' + esc(u.phone) + '</div><div><span>Email</span>' + esc(u.email) + '</div><div><span>Joined</span>' + when(u.created_at) + '</div><div><span>Last sign-in</span>' + when(u.last_login_at) + '</div><div><span>Wrong passwords in a row</span>' + (u.failed_logins || 0) + '</div></div>' +
+    '<div class="ud-acts"><button class="btn btn-primary" data-ua="reset" data-id="' + u.id + '">Make a reset link</button>' +
+    (u.failed_logins ? '<button class="btn btn-ghost" data-ua="unlock" data-id="' + u.id + '">Unlock</button>' : '') +
+    '<button class="btn btn-ghost" data-ua="signout" data-id="' + u.id + '">Sign out everywhere</button>' +
+    (u.is_admin ? '' : (u.is_active ? '<button class="btn btn-danger" data-ua="off" data-id="' + u.id + '">Switch account off</button>' : '<button class="btn btn-primary" data-ua="on" data-id="' + u.id + '">Switch account on</button>')) + '</div>' +
+    '<div id="ud-link"></div>' +
+    '<div class="ud-events"><h2 style="margin:4px 0 4px">Recent activity</h2>' + (d.events.length ? '<ul>' + d.events.map(function (e) { return '<li><span>' + outcome(e.outcome) + (e.identity ? ' <small style="color:var(--muted)">typed ' + esc(e.identity) + '</small>' : '') + '</span><small style="color:var(--muted);white-space:nowrap">' + when(e.at) + '</small></li>'; }).join('') + '</ul>' : '<p style="color:var(--muted)">No sign-in activity recorded yet.</p>') + '</div>';
+  }).catch(function (e) { box.innerHTML = '<p class="empty">' + esc(e.message) + '</p>'; });
+ }
+ function userAction(btn) {
+  var id = btn.dataset.id, a = btn.dataset.ua;
+  if ((a === 'off' || a === 'signout') && btn.dataset.sure !== '1') { btn.dataset.sure = '1'; btn.textContent = 'Tap again to confirm'; return; }
+  var url = { reset: 'reset-link', unlock: 'unlock', signout: 'sign-out', off: 'active?active=false', on: 'active?active=true' }[a];
+  btn.disabled = true;
+  fetch('/api/admin/users/' + encodeURIComponent(id) + '/' + url, { method: 'POST', headers: auth() }).then(jsonOrThrow).then(function (d) {
+   if (a === 'reset') {
+    $('ud-link').innerHTML = '<div class="ud-link"><b>Reset link ready.</b> It works once and expires in 24 hours. Making a new one cancels this one.' +
+     '<input class="inp" readonly id="ud-url"><div class="acts" style="margin-top:8px">' +
+     (d.whatsapp_url ? '<a class="btn btn-wa" target="_blank" rel="noopener noreferrer" id="ud-wa">Send on WhatsApp</a>' : '') +
+     '<button class="btn btn-ghost" id="ud-copy">Copy message</button></div></div>';
+    $('ud-url').value = d.url;
+    if (d.whatsapp_url) $('ud-wa').href = d.whatsapp_url;
+    $('ud-copy').addEventListener('click', function () { try { navigator.clipboard.writeText(d.message).then(function () { toast('Message copied', true); }); } catch (e) { $('ud-url').select(); } });
+    btn.disabled = false;
+    loadLoginProblems();
+    return;
+   }
+   toast({ unlock: 'Unlocked', signout: 'Signed out on every device', off: 'Account switched off', on: 'Account switched on' }[a], true);
+   openUser(id); loadUsers(); loadLoginProblems();
+  }).catch(function (e) { btn.disabled = false; toast(e.message, false); });
+ }
+ $('u-q').addEventListener('input', function () { clearTimeout(uTimer); uTimer = setTimeout(loadUsers, 300); });
+ document.addEventListener('click', function (e) {
+  var o = e.target.closest('[data-user-open]'); if (o) { e.preventDefault(); openUser(o.dataset.userOpen); return; }
+  var s = e.target.closest('[data-user-search]'); if (s) { $('u-q').value = s.dataset.userSearch; loadUsers(); return; }
+  if (e.target.closest('[data-user-close]')) { $('u-detail').hidden = true; return; }
+  var ua = e.target.closest('[data-ua]'); if (ua) { userAction(ua); return; }
+  var dn = e.target.closest('[data-request-done]');
+  if (dn) {
+   dn.disabled = true;
+   fetch('/api/admin/reset-requests/' + encodeURIComponent(dn.dataset.requestDone) + '/done', { method: 'POST', headers: auth() }).then(jsonOrThrow)
+    .then(function () { loadLoginProblems(); loadTodo(); }).catch(function (err) { dn.disabled = false; toast(err.message, false); });
+  }
+ });
  document.addEventListener('change', function (e) {
   var sel = e.target.closest('[data-status-kind]'); if (!sel) return;
   var url = (sel.dataset.statusKind === 'import' ? '/api/import-requests/' : '/api/inquiries/') + encodeURIComponent(sel.dataset.statusId);

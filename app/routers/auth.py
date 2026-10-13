@@ -6,7 +6,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel, EmailStr, Field
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -68,9 +68,12 @@ def _user_payload(user: models.User) -> dict:
 async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db)):
     phone = request.phone.strip()
     email = str(request.email).strip().lower()
-    existing = await db.execute(
-        select(models.User.id).where(or_(models.User.phone == phone, models.User.email == email))
-    )
+    from app.accounts import phone_key
+    key = phone_key(phone)
+    conds = [models.User.phone == phone, func.lower(models.User.email) == email]
+    if key:
+        conds.append(models.User.phone_key == key)
+    existing = await db.execute(select(models.User.id).where(or_(*conds)))
     if existing.first():
         raise HTTPException(status_code=409, detail="An account with that phone or email already exists.")
 
@@ -83,6 +86,9 @@ async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db))
         is_vendor=request.account_type == "seller",
         is_active=True,
         is_admin=False,
+        phone_key=key,
+        token_version=0,
+        failed_logins=0,
     )
     db.add(user)
     try:
@@ -92,27 +98,62 @@ async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db))
         await db.rollback()
         raise HTTPException(status_code=409, detail="Could not create account. Check whether the phone or email is already registered.")
 
-    access_token = create_access_token({"sub": user.id})
-    return {"access_token": access_token, "token_type": "bearer", "user": _user_payload(user)}
+    from app.accounts import token_for
+    return {"access_token": token_for(user), "token_type": "bearer", "user": _user_payload(user)}
 
 
 @router.post("/login")
 async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
+    from app.accounts import LOCK_MINUTES, find_users, is_locked, record, token_for
+    from datetime import datetime
+
     identity = request.phone.strip()
-    result = await db.execute(
-        select(models.User).where(or_(models.User.phone == identity, models.User.email == identity.lower()))
+    users = await find_users(db, identity)
+    wrong = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="That phone, email or password isn't right.",
+        headers={"WWW-Authenticate": "Bearer"},
     )
-    user = result.scalars().first()
-    valid_password = user and await run_in_threadpool(verify_password, request.password, user.hashed_password)
-    if not valid_password or user.is_active is False:
+    if not users:
+        await record(db, "no_account", identity=identity)
+        await db.commit()
+        raise wrong
+
+    if all(is_locked(u) for u in users):
+        await record(db, "locked", user_id=users[0].id, identity=identity)
+        await db.commit()
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid phone/email or password.",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=429,
+            detail=f"Too many wrong passwords. Wait {LOCK_MINUTES} minutes, or tap \"Forgot password\".",
         )
 
-    access_token = create_access_token({"sub": user.id})
-    return {"access_token": access_token, "token_type": "bearer", "user": _user_payload(user)}
+    match = None
+    for user in users:
+        if not is_locked(user) and await run_in_threadpool(verify_password, request.password, user.hashed_password):
+            match = user
+            break
+
+    now = datetime.utcnow()
+    if match is None:
+        for user in users:
+            user.failed_logins = (user.failed_logins or 0) + 1
+            user.last_failed_at = now
+        await record(db, "wrong_password", user_id=users[0].id, identity=identity)
+        await db.commit()
+        raise wrong
+
+    if match.is_active is False:
+        await record(db, "inactive", user_id=match.id, identity=identity)
+        await db.commit()
+        raise HTTPException(status_code=403, detail="This account is switched off. Please message us on WhatsApp.")
+
+    match.failed_logins = 0
+    match.last_failed_at = None
+    match.last_login_at = now
+    await record(db, "ok", user_id=match.id, identity=identity)
+    await db.commit()
+    await db.refresh(match)
+    return {"access_token": token_for(match), "token_type": "bearer", "user": _user_payload(match)}
 
 
 @router.get("/me")

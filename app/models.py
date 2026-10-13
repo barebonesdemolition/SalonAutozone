@@ -23,6 +23,12 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    # Login help (added later; app/accounts.py adds these columns to older databases).
+    phone_key = Column(String, nullable=True, index=True)   # last 8 digits, so any phone format matches
+    last_login_at = Column(DateTime, nullable=True)
+    failed_logins = Column(Integer, nullable=True, default=0)
+    last_failed_at = Column(DateTime, nullable=True)
+    token_version = Column(Integer, nullable=True, default=0)  # bump to sign the user out everywhere
 
     # Relationships
     vehicles = relationship(
