@@ -45,6 +45,8 @@ async def require_admin(
             user_id = int(payload.get("sub"))
             result = await db.execute(select(models.User).where(models.User.id == user_id))
             user = result.scalars().first()
+            if user and int(payload.get("ver", 0) or 0) != int(getattr(user, "token_version", 0) or 0):
+                user = None  # signed out everywhere / password changed
             if user and (user.is_admin or ({r.strip().lower() for r in (getattr(user, "roles", "") or "").split(",")} & {"admin", "superadmin"})) and user.is_active is not False:
                 return {"via": "user", "user": user}
         except (JWTError, TypeError, ValueError):
@@ -150,6 +152,7 @@ async def admin_todo(_: dict = Depends(require_admin), db: AsyncSession = Depend
         "imports_open": await scalar(select(func.count(models.ImportRequest.id)).where(
             models.ImportRequest.status.in_(["open", "pending", "new"]))),
         "inquiries_new": await scalar(select(func.count(models.Inquiry.id)).where(models.Inquiry.status == "new")),
+        "password_requests": await scalar(text("SELECT COUNT(*) FROM password_reset_requests WHERE status = 'open'")),
     }
 
 

@@ -19,6 +19,7 @@ from app import share_meta
 from app import businesses
 from app import models
 from app.auth import get_current_user
+from app.accounts import admin_router as accounts_admin_router, ensure_account_tables, router as accounts_router
 from app.db import drop_wrong_listing_foreign_keys, engine, ensure_core_tables, ensure_business_contact_columns, ensure_vehicle_listing_columns, get_db
 from app.routers.admin import require_admin
 # --- drivers (must exist as app/drivers.py or the app will not boot) ---
@@ -124,6 +125,7 @@ async def ensure_subscription_tables():
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await ensure_core_tables()
+    await ensure_account_tables()
     await ensure_business_contact_columns()
     await ensure_vehicle_listing_columns()
     await drop_wrong_listing_foreign_keys()
@@ -354,6 +356,8 @@ async def marketplace_page():
 # ---------- Include Routers ----------
 
 app.include_router(auth.router)
+app.include_router(accounts_router)
+app.include_router(accounts_admin_router())
 app.include_router(admin.router)
 app.include_router(my_account.router)
 app.include_router(parts.router)
@@ -579,6 +583,21 @@ async def orders_page():
 @app.get("/track")
 async def track_page():
     return FileResponse("app/templates/orders.html")
+
+@app.get("/forgot-password")
+async def forgot_password_page():
+    return FileResponse("app/templates/forgot_password.html")
+
+
+@app.get("/reset-password")
+async def reset_password_page():
+    return FileResponse("app/templates/reset_password.html")
+
+
+@app.get("/account/password")
+async def change_password_page():
+    return FileResponse("app/templates/change_password.html")
+
 
 @app.get("/driver")
 async def driver_redirect():

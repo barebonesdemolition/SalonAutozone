@@ -17,7 +17,7 @@ def test_pages_and_assets_are_compressed_and_cached():
         assert home.headers.get("content-encoding") == "gzip"
         assert "cache-control" not in home.headers  # pages always fresh
 
-        css = c.get("/static/ui.css?v=6", headers={"Accept-Encoding": "gzip"})
+        css = c.get("/static/ui.css?v=7", headers={"Accept-Encoding": "gzip"})
         assert css.headers.get("content-encoding") == "gzip"
         assert "max-age=604800" in css.headers["cache-control"]
 
