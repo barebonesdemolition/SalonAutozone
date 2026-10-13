@@ -67,6 +67,21 @@ reset_requests = Table(
     Column("done_at", DateTime, nullable=True),
 )
 
+reset_codes = Table(
+    "password_reset_codes", _md,
+    Column("id", Integer, primary_key=True),
+    Column("user_id", Integer, nullable=False, index=True),
+    Column("code_hash", String, nullable=False),
+    Column("created_at", DateTime, nullable=False, default=datetime.utcnow, index=True),
+    Column("expires_at", DateTime, nullable=False),
+    Column("attempts", Integer, nullable=False, default=0),
+    Column("used_at", DateTime, nullable=True),
+)
+
+CODE_MINUTES = 15
+CODE_TRIES = 5
+CODES_PER_HOUR = 5
+
 USER_COLUMNS = {
     "phone_key": "VARCHAR",
     "last_login_at": "TIMESTAMP",
@@ -114,6 +129,12 @@ def _now() -> datetime:
 
 def _hash_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _hash_code(user_id: int, code: str) -> str:
+    # Tied to the user and the server secret, so a leaked table can't be reversed with a lookup.
+    from app.auth import SECRET_KEY
+    return hashlib.sha256(f"{user_id}:{code}:{SECRET_KEY}".encode()).hexdigest()
 
 
 def _public_base(request: Request) -> str:
@@ -186,23 +207,114 @@ class ChangeIn(BaseModel):
     new_password: str = Field(min_length=8, max_length=128)
 
 
+async def _email_code(db: AsyncSession, user) -> str:
+    """Make a new code for this user and email it. Returns 'sent', 'wait' or 'failed'."""
+    from app.emailer import code_email, send_email
+    now = _now()
+    recent = (await db.execute(select(reset_codes.c.created_at).where(
+        reset_codes.c.user_id == user.id, reset_codes.c.created_at > now - timedelta(hours=1))
+        .order_by(desc(reset_codes.c.created_at)))).all()
+    if recent and (len(recent) >= CODES_PER_HOUR or recent[0][0] > now - timedelta(seconds=60)):
+        return "wait"
+    code = f"{secrets.randbelow(1_000_000):06d}"
+    # Only the newest code works.
+    await db.execute(update(reset_codes).where(
+        reset_codes.c.user_id == user.id, reset_codes.c.used_at.is_(None)).values(used_at=now))
+    await db.execute(insert(reset_codes).values(
+        user_id=user.id, code_hash=_hash_code(user.id, code), created_at=now,
+        expires_at=now + timedelta(minutes=CODE_MINUTES), attempts=0))
+    await db.commit()
+    subject, text_body, html_body = code_email((user.full_name or "").split(" ")[0], code, CODE_MINUTES)
+    ok = await send_email(user.email, user.full_name, subject, text_body, html_body)
+    await record(db, "reset_code_sent" if ok else "reset_code_failed", user_id=user.id)
+    await db.commit()
+    return "sent" if ok else "failed"
+
+
 @router.post("/api/auth/forgot")
-async def forgot_password(body: ForgotIn, db: AsyncSession = Depends(get_db)):
-    """Ask the team for a reset link. The answer is the same whether or not the account exists."""
+async def forgot_password(body: ForgotIn, team: bool = False, db: AsyncSession = Depends(get_db)):
+    """Start a password reset.
+
+    With email set up, the account's email gets a 6-digit code. Otherwise (or when the
+    user asks for the team with ?team=true) the request goes to the admin, who sends a
+    WhatsApp link. The answer never says whether an account exists.
+    """
     from app.config import get_settings
+    from app.emailer import email_enabled
     identity = body.identity.strip()
     users = await find_users(db, identity)
-    user_id = users[0].id if len(users) == 1 else None
+    user = users[0] if len(users) == 1 else None
+    wa = re.sub(r"\D", "", get_settings().ADMIN_WHATSAPP or "") or None
+
+    if email_enabled() and not team:
+        if user and user.email and user.is_active is not False:
+            outcome = await _email_code(db, user)
+            if outcome == "wait":
+                raise HTTPException(429, "We just sent a code. Check your email (and the spam folder), or wait a minute and try again.")
+            if outcome == "sent":
+                return {"ok": True, "method": "email", "whatsapp": wa}
+            # Email failed: fall through so the team can help instead.
+        else:
+            # No such account: behave the same as when a code was sent.
+            return {"ok": True, "method": "email", "whatsapp": wa}
+
     recent = (await db.execute(select(reset_requests.c.id).where(
         reset_requests.c.identity == identity, reset_requests.c.status == "open",
         reset_requests.c.created_at > _now() - timedelta(minutes=10)))).first()
     if not recent:
         await db.execute(insert(reset_requests).values(
-            user_id=user_id, identity=identity[:120], status="open", created_at=_now()))
-        await record(db, "reset_requested", user_id=user_id, identity=identity)
+            user_id=user.id if user else None, identity=identity[:120], status="open", created_at=_now()))
+        await record(db, "reset_requested", user_id=user.id if user else None, identity=identity)
         await db.commit()
-    wa = re.sub(r"\D", "", get_settings().ADMIN_WHATSAPP or "") or None
-    return {"ok": True, "whatsapp": wa}
+    return {"ok": True, "method": "team", "whatsapp": wa}
+
+
+class TestEmailIn(BaseModel):
+    to: str = Field(min_length=5, max_length=120, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+class CodeResetIn(BaseModel):
+    identity: str = Field(min_length=3, max_length=120)
+    code: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
+    password: str = Field(min_length=8, max_length=128)
+
+
+@router.post("/api/auth/reset-with-code")
+async def reset_with_code(body: CodeResetIn, db: AsyncSession = Depends(get_db)):
+    bad = HTTPException(400, "That code isn't right or has expired. Ask for a new code.")
+    users = await find_users(db, body.identity)
+    if not users:
+        raise bad
+    ids = [u.id for u in users]
+    row = (await db.execute(select(reset_codes).where(
+        reset_codes.c.user_id.in_(ids), reset_codes.c.used_at.is_(None), reset_codes.c.expires_at > _now())
+        .order_by(desc(reset_codes.c.id)))).first()
+    if not row or row.attempts >= CODE_TRIES:
+        raise bad
+    if not secrets.compare_digest(row.code_hash, _hash_code(row.user_id, body.code)):
+        await db.execute(update(reset_codes).where(reset_codes.c.id == row.id).values(attempts=row.attempts + 1))
+        await record(db, "reset_code_wrong", user_id=row.user_id, identity=body.identity)
+        await db.commit()
+        left = CODE_TRIES - row.attempts - 1
+        if left <= 0:
+            raise HTTPException(400, "Too many wrong codes. Ask for a new code.")
+        raise HTTPException(400, f"That code isn't right. {left} {'try' if left == 1 else 'tries'} left.")
+    used = await db.execute(update(reset_codes).where(
+        reset_codes.c.id == row.id, reset_codes.c.used_at.is_(None)).values(used_at=_now()))
+    if used.rowcount != 1:
+        raise bad
+    user = next(u for u in users if u.id == row.user_id)
+    if user.is_active is False:
+        raise HTTPException(403, "This account is switched off. Message us on WhatsApp.")
+    await set_password(db, user, body.password)
+    user.last_login_at = _now()
+    await db.execute(update(reset_requests).where(
+        reset_requests.c.user_id == user.id, reset_requests.c.status == "open").values(status="done", done_at=_now()))
+    await record(db, "password_reset_code", user_id=user.id)
+    await db.commit()
+    await db.refresh(user)
+    from app.routers.auth import _user_payload
+    return {"access_token": token_for(user), "token_type": "bearer", "user": _user_payload(user)}
 
 
 @router.get("/api/auth/reset/{token}")
@@ -384,7 +496,7 @@ def admin_router():
     async def login_problems(admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
         since = _now() - timedelta(days=7)
         failed = (await db.execute(select(login_events).where(
-            login_events.c.outcome.in_(["wrong_password", "no_account", "inactive", "locked"]),
+            login_events.c.outcome.in_(["wrong_password", "no_account", "inactive", "locked", "reset_code_failed"]),
             login_events.c.created_at > since).order_by(desc(login_events.c.id)).limit(60))).all()
         requests = (await db.execute(select(reset_requests).where(reset_requests.c.status == "open")
                                      .order_by(desc(reset_requests.c.id)).limit(60))).all()
@@ -398,6 +510,24 @@ def admin_router():
                           "at": q.created_at.isoformat() if q.created_at else None} for q in requests],
             "failed": [_event(e, names) for e in failed],
         }
+
+    @r.get("/email-status")
+    async def email_status(admin=Depends(admin_actor)):
+        from app.config import get_settings
+        from app.emailer import email_enabled
+        cfg = get_settings()
+        return {"enabled": email_enabled(), "has_key": bool(cfg.BREVO_API_KEY), "from": cfg.EMAIL_FROM or None}
+
+    @r.post("/email-test")
+    async def email_test(body: TestEmailIn, admin=Depends(admin_actor)):
+        from app.emailer import code_email, email_enabled, send_email
+        if not email_enabled():
+            raise HTTPException(400, "Email isn't set up yet. Add BREVO_API_KEY and EMAIL_FROM in Render.")
+        subject, text_body, html_body = code_email("there", "123456", CODE_MINUTES)
+        ok = await send_email(body.to, "", "Test: " + subject, "This is a test from SalonAutoZone.\n\n" + text_body, html_body)
+        if not ok:
+            raise HTTPException(502, "Brevo didn't accept the email. Check the API key and that EMAIL_FROM is a verified sender in Brevo.")
+        return {"ok": True}
 
     @r.post("/reset-requests/{request_id}/done")
     async def close_request(request_id: int, admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
