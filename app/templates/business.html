@@ -41,6 +41,14 @@
 .st.bad { background: var(--bad-50); color: var(--bad); }
 .acts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
 details.box summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+.tools { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.tool { display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: var(--r-lg); background: var(--ink); color: #fff; text-decoration: none; }
+.tool:nth-child(2) { background: var(--card); color: var(--ink); border: 1.5px solid var(--line); }
+.tool .ic { color: var(--gold); display: flex; }
+.tool:nth-child(2) .ic { color: var(--teal); }
+.tool b { font-size: 18px; color: inherit; }
+.tool small { color: #a9c4c2; font-size: 14px; }
+.tool:nth-child(2) small { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -106,8 +114,10 @@ details.box summary { cursor: pointer; font-weight: 700; color: var(--ink); }
   if (b.status === 'rejected' || b.status === 'suspended') h += '<p style="margin-top:12px">Message us on WhatsApp to find out why and what to change.</p>';
   h += '<div class="acts">' +
    (b.status === 'verified' ? '<a class="btn btn-primary" href="/store/' + encodeURIComponent(b.slug) + '">See your page</a>' : '') +
-   '<a class="btn btn-ghost" href="/sell">List an item</a><a class="btn btn-ghost" href="/my-subscription">Your plan</a>' +
+   '<a class="btn btn-ghost" href="/sell">List one item</a><a class="btn btn-ghost" href="/my-subscription">Your plan</a>' +
    (wa ? '<a class="btn btn-wa" href="' + esc(wa) + '" target="_blank" rel="noopener noreferrer">Message us</a>' : '') + '</div></div>' +
+   '<div class="tools"><a class="tool" href="/business/stock"><span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="4"/></svg></span><b>Add stock with your camera</b><small>Photograph a shelf. We fill in each part for you.</small></a>' +
+   '<a class="tool" href="/business/page"><span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="16" cy="10" r="1.3"/><path d="M12 21a2.5 2.5 0 0 1 0-5h2a3 3 0 0 0 3-3"/></svg></span><b>Personalise your page</b><small>Cover photo, colour, opening hours, address.</small></a></div>' +
    '<details class="box" id="edit"><summary>Edit business details</summary><div id="editform"></div></details></div>';
   app.innerHTML = h;
   document.getElementById('edit').addEventListener('toggle', function (e) {

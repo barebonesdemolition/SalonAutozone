@@ -84,6 +84,17 @@ class Business(Base):
     logo_url = Column(String, nullable=True)
     subscription_tier = Column(String, default="free", nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    # Page personalisation (app/stores.py adds these columns to older databases)
+    tagline = Column(String, nullable=True)
+    cover_url = Column(String, nullable=True)
+    accent = Column(String, nullable=True)          # one of stores.ACCENTS
+    address = Column(String, nullable=True)
+    hours = Column(Text, nullable=True)             # JSON: {"mon": "08:00-18:00" | "closed", ...}
+    call_phone = Column(String, nullable=True)
+    facebook = Column(String, nullable=True)
+    instagram = Column(String, nullable=True)
+    tiktok = Column(String, nullable=True)
+    specialties = Column(String, nullable=True)     # comma-separated makes, e.g. "Toyota,Nissan"
 
     # Relationships
     owner = relationship("User", back_populates="businesses")

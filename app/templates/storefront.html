@@ -15,8 +15,25 @@
 <link rel="stylesheet" href="/static/ui.css?v=7">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
 <style>
-.hero { background: var(--ink); color: #fff; }
-.hero .wrap { display: flex; gap: 18px; align-items: center; padding-top: 26px; padding-bottom: 26px; flex-wrap: wrap; }
+.hero { position: relative; background: var(--ink) center / cover no-repeat; color: #fff; }
+.hero.has-cover::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,42,43,.25) 0%, rgba(14,42,43,.92) 100%); }
+.hero .wrap { position: relative; display: flex; gap: 18px; align-items: center; padding-top: 26px; padding-bottom: 26px; flex-wrap: wrap; }
+.hero.has-cover .wrap { padding-top: clamp(90px, 22vw, 170px); }
+.tagline { color: #e2ecea; margin-top: 4px; font-size: 17px; }
+.openb { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 800; padding: 3px 9px; border-radius: 6px; margin: 8px 0 0 6px; }
+.openb.on { background: #d6f5e3; color: #116b3a; }
+.openb.off { background: rgba(255,255,255,.14); color: #fff; }
+.hours-t { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 15px; }
+.hours-t td { padding: 5px 0; border-top: 1px solid var(--line); }
+.hours-t td:last-child { text-align: right; font-weight: 600; }
+.hours-t tr.today td { color: var(--accent, var(--teal)); font-weight: 800; }
+.social { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.social a { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line); font-weight: 700; font-size: 14px; text-decoration: none; color: var(--ink); }
+.find { display: grid; gap: 10px; margin-bottom: 12px; }
+.mk .chip[aria-pressed="true"] { background: var(--accent, var(--ink)); color: #fff; border-color: var(--accent, var(--ink)); }
+body.accented .btn-primary { background: var(--accent); border-color: var(--accent); }
+body.accented .tabs .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
+body.accented .listing-grid .lcard:hover { border-color: var(--accent); }
 .logo { width: 84px; height: 84px; border-radius: 18px; flex-shrink: 0; background: var(--ink-2) center / cover no-repeat; border: 2px solid rgba(255,255,255,.15); color: var(--gold); font-weight: 800; font-size: 36px; display: flex; align-items: center; justify-content: center; font-variation-settings: "wdth" 80; }
 .hero h1 { color: #fff; font-size: clamp(28px, 6vw, 40px); }
 .hero .sub { color: #a9c4c2; margin-top: 4px; }
@@ -71,31 +88,76 @@
   var wa = b.whatsapp ? 'https://wa.me/' + encodeURIComponent(String(b.whatsapp).replace(/\D/g, '')) + '?text=' + encodeURIComponent('Hello ' + b.name + ', I found you on SalonAutoZone.') : '';
   var since = b.created_at ? new Date(b.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : '';
 
-  app.innerHTML = '<section class="hero"><div class="wrap">' +
+  var cover = safeUrl(b.cover_url);
+  if (b.accent_hex) { document.body.style.setProperty('--accent', b.accent_hex); document.body.classList.add('accented'); }
+  var call = b.call_phone ? String(b.call_phone).replace(/[^\d+]/g, '') : '';
+  var DAYN = [['mon', 'Monday'], ['tue', 'Tuesday'], ['wed', 'Wednesday'], ['thu', 'Thursday'], ['fri', 'Friday'], ['sat', 'Saturday'], ['sun', 'Sunday']];
+  // Sierra Leone keeps GMT all year, so UTC is local shop time.
+  var now = new Date(), todayKey = DAYN[(now.getUTCDay() + 6) % 7][0], mins = now.getUTCHours() * 60 + now.getUTCMinutes();
+  function openNow(h) {
+   if (!h || !h[todayKey] || h[todayKey] === 'closed') return h && h[todayKey] === 'closed' ? false : null;
+   var t = h[todayKey].split('-').map(function (x) { var p = x.split(':'); return +p[0] * 60 + +p[1]; });
+   return t[1] > t[0] ? (mins >= t[0] && mins < t[1]) : (mins >= t[0] || mins < t[1]);
+  }
+  var isOpen = openNow(b.hours);
+  var mapUrl = b.address ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent([b.address, b.city, b.country].filter(Boolean).join(', ')) : '';
+  var socials = [['facebook', 'Facebook'], ['instagram', 'Instagram'], ['tiktok', 'TikTok']].filter(function (x) { return safeUrl(b[x[0]]); });
+
+  app.innerHTML = '<section class="hero' + (cover ? ' has-cover' : '') + '"' + (cover ? ' style="background-image:url(\'' + esc(window.SAZImg ? SAZImg(cover, 1600) : cover) + '\')"' : '') + '><div class="wrap">' +
    '<div class="logo"' + (logoU ? ' style="background-image:url(\'' + esc(window.SAZImg ? SAZImg(logoU, 200) : logoU) + '\')"' : '') + '>' + (logoU ? '' : esc((b.name || '?').charAt(0).toUpperCase())) + '</div>' +
-   '<div class="grow"><h1>' + esc(b.name) + '</h1><div class="sub">' + esc([b.type_label, b.city].filter(Boolean).join(', ')) + '</div>' +
-   (b.verified ? '<span class="verified">✓ Verified business</span>' : '') + '<div id="rating" class="sub"></div></div>' +
+   '<div class="grow"><h1>' + esc(b.name) + '</h1>' + (b.tagline ? '<div class="tagline">' + esc(b.tagline) + '</div>' : '') +
+   '<div class="sub">' + esc([b.type_label, b.city].filter(Boolean).join(', ')) + '</div>' +
+   (b.verified ? '<span class="verified">✓ Verified business</span>' : '') +
+   (isOpen === true ? '<span class="openb on">● Open now</span>' : isOpen === false ? '<span class="openb off">Closed now</span>' : '') +
+   '<div id="rating" class="sub"></div></div>' +
    '<div class="acts">' + (wa ? '<a class="btn btn-wa" href="' + esc(wa) + '" target="_blank" rel="noopener noreferrer">WhatsApp</a>' : '') +
+   (call ? '<a class="btn btn-ghost" href="tel:' + esc(call) + '">Call</a>' : '') +
    '<button class="btn btn-ghost" id="share" type="button">Share</button></div></div></section>' +
    '<div class="wrap"><div class="cols"><aside class="box"><h2>About</h2>' +
    (b.description ? '<p class="about">' + esc(b.description) + '</p>' : '<p class="hint">No description yet.</p>') +
    '<div class="facts-list"><div><span>Type</span><b>' + esc(b.type_label) + '</b></div><div><span>Location</span><b>' + esc([b.city, b.country].filter(Boolean).join(', ')) + '</b></div>' +
    (since ? '<div><span>On SalonAutoZone since</span><b>' + esc(since) + '</b></div>' : '') + '</div>' +
+   (b.address ? '<h2 style="margin-top:18px">Find us</h2><p>' + esc(b.address) + '</p><a class="btn btn-ghost btn-block" style="margin-top:8px" target="_blank" rel="noopener noreferrer" href="' + esc(mapUrl) + '">Directions</a>' : '') +
+   (b.hours ? '<h2 style="margin-top:18px">Opening hours</h2><table class="hours-t">' + DAYN.map(function (d) {
+     var v = b.hours[d[0]];
+     return '<tr' + (d[0] === todayKey ? ' class="today"' : '') + '><td>' + d[1] + '</td><td>' + (!v ? '—' : v === 'closed' ? 'Closed' : esc(v.replace('-', ' – '))) + '</td></tr>';
+    }).join('') + '</table>' : '') +
+   (socials.length ? '<div class="social">' + socials.map(function (x) { return '<a href="' + esc(b[x[0]]) + '" target="_blank" rel="noopener noreferrer">' + x[1] + '</a>'; }).join('') + '</div>' : '') +
    '<p class="hint" style="margin-top:14px">Check the item before you pay. Never send a deposit to someone you haven\'t met.</p></aside>' +
-   '<section><div class="tabs" id="tabs"></div><div class="listing-grid" id="items"></div></section></div></div>';
+   '<section><div class="tabs" id="tabs"></div><div class="find" id="find"></div><div class="listing-grid" id="items"></div></section></div></div>';
 
-  var tabs = [];
+  var tabs = [], current = 'parts', make = '', term = '';
   if (parts.length) tabs.push(['parts', 'Parts', parts.length, 'i-part']);
   if (cars.length) tabs.push(['cars', 'Cars', cars.length, 'i-car']);
+  var specs = (b.specialties || []).filter(function (m) {
+   return parts.some(function (p) { return (p.compatible_make || '').toLowerCase() === m.toLowerCase(); }) ||
+    cars.some(function (v) { return (v.make || '').toLowerCase() === m.toLowerCase(); });
+  });
+  var big = parts.length + cars.length > 8;
+  document.getElementById('find').innerHTML = (big ? '<input class="input" id="q" type="search" placeholder="Search this shop">' : '') +
+   (specs.length ? '<div class="chips mk" id="mk"><button type="button" class="chip" data-m="" aria-pressed="true">All makes</button>' + specs.map(function (m) { return '<button type="button" class="chip" data-m="' + esc(m) + '" aria-pressed="false">' + esc(m) + '</button>'; }).join('') + '</div>' : '');
   function show(k) {
+   current = k;
+   var t = term.toLowerCase(), mk = make.toLowerCase();
    var h = k === 'cars'
-    ? cars.map(function (v) { return card('/vehicle/' + v.id, v.image_url, 'i-car', v.price_sll, v.title, [v.year, v.location].filter(Boolean).join(', ')); }).join('')
-    : parts.map(function (p) { return card('/part/' + p.id, p.image_url, 'i-part', p.price_sll, p.name, p.location); }).join('');
-   document.getElementById('items').innerHTML = h || '<p class="hint" style="grid-column:1/-1">Nothing for sale right now. Message them on WhatsApp to ask what they have.</p>';
+    ? cars.filter(function (v) { return (!mk || (v.make || '').toLowerCase() === mk) && (!t || [v.title, v.make, v.model].join(' ').toLowerCase().indexOf(t) !== -1); })
+      .map(function (v) { return card('/vehicle/' + v.id, v.image_url, 'i-car', v.price_sll, v.title, [v.year, v.location].filter(Boolean).join(', ')); }).join('')
+    : parts.filter(function (p) { return (!mk || (p.compatible_make || '').toLowerCase() === mk) && (!t || [p.name, p.category, p.compatible_make, p.compatible_model].join(' ').toLowerCase().indexOf(t) !== -1); })
+      .map(function (p) { return card('/part/' + p.id, p.image_url, 'i-part', p.price_sll, p.name, [p.compatible_make, p.compatible_model].filter(Boolean).join(' ') || p.location); }).join('');
+   document.getElementById('items').innerHTML = h || '<p class="hint" style="grid-column:1/-1">' + ((t || mk) ? 'Nothing matches that. Message them on WhatsApp to ask.' : 'Nothing for sale right now. Message them on WhatsApp to ask what they have.') + '</p>';
    document.querySelectorAll('#tabs .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.k === k)); });
   }
   document.getElementById('tabs').innerHTML = tabs.length > 1 ? tabs.map(function (t) { return '<button type="button" class="chip" data-k="' + t[0] + '"><svg aria-hidden="true"><use href="#' + t[3] + '"/></svg>' + t[1] + ' · ' + t[2] + '</button>'; }).join('') : '';
   document.getElementById('tabs').addEventListener('click', function (e) { var c = e.target.closest('.chip'); if (c) show(c.dataset.k); });
+  var q = document.getElementById('q');
+  if (q) q.addEventListener('input', function () { term = q.value.trim(); show(current); });
+  var mkEl = document.getElementById('mk');
+  if (mkEl) mkEl.addEventListener('click', function (e) {
+   var c = e.target.closest('[data-m]'); if (!c) return;
+   make = c.dataset.m;
+   mkEl.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', String(x === c)); });
+   show(current);
+  });
   show(tabs.length ? tabs[0][0] : 'parts');
 
   document.getElementById('share').addEventListener('click', function () {

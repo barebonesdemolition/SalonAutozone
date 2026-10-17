@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app import models
+from app.stores import profile_fields
 from app.auth import get_current_user
 from app.db import get_db
 from app.routers.admin import require_admin
@@ -68,6 +69,7 @@ def _public(b: Business) -> dict:
         "status": b.status,
         "verified": b.status == "verified",
         "subscription_tier": getattr(b, "subscription_tier", None),
+        **profile_fields(b),
     }
 
 
