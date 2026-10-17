@@ -103,7 +103,13 @@ def business_page(biz, base_url: str, page_url: str) -> str:
              "wholesaler": "Wholesaler"}.get(biz.business_type, "")
     lead = ", ".join(b for b in ("Verified" if biz.status == "verified" else "", label, biz.city or "") if b)
     description = _clip(f"{lead}. {biz.description}") if biz.description else lead
-    image = absolute(cloudinary_variant(biz.logo_url, "w_600,h_600,c_fill,f_jpg,q_auto"), base_url) or absolute("/static/logo-share.jpg", base_url)
+    cover = getattr(biz, "cover_url", None)
+    image = (absolute(cloudinary_variant(cover, "w_1200,h_630,c_fill,f_jpg,q_auto"), base_url)
+             or absolute(cloudinary_variant(biz.logo_url, "w_600,h_600,c_fill,f_jpg,q_auto"), base_url)
+             or absolute("/static/logo-share.jpg", base_url))
+    tagline = getattr(biz, "tagline", None)
+    if tagline:
+        description = _clip(f"{tagline}. {description}")
     return render("app/templates/storefront.html", title=biz.name, description=description or DEFAULT_DESCRIPTION,
                   url=page_url, image=image, kind="business.business")
 

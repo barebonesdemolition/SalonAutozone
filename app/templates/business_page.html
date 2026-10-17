@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Personalise your page · SalonAutoZone</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" sizes="64x64" href="/static/icon-64.png">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
+<link rel="stylesheet" href="/static/ui.css?v=7">
+<link rel="stylesheet" href="/static/chrome.css?v=5">
+<style>
+.page { max-width: 760px; padding: 22px 16px 120px; }
+.page h1 { font-size: clamp(28px, 7vw, 38px); }
+.lead { color: var(--muted); margin: 4px 0 16px; }
+.stack { display: grid; gap: 14px; }
+.prev { position: relative; border-radius: var(--r-lg); overflow: hidden; background: var(--ink) center / cover no-repeat; color: #fff; min-height: 170px; display: flex; align-items: flex-end; }
+.prev::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,42,43,.15), rgba(14,42,43,.88)); }
+.prev .in { position: relative; display: flex; gap: 14px; align-items: center; padding: 16px; width: 100%; }
+.prev .logo { width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0; background: var(--ink-2) center / cover no-repeat; border: 2px solid rgba(255,255,255,.2); color: var(--gold); font-weight: 800; font-size: 28px; display: flex; align-items: center; justify-content: center; }
+.prev h2 { color: #fff; font-size: 24px; margin: 0; }
+.prev p { color: #d5e3e1; margin: 2px 0 0; font-size: 15px; }
+.prev .pill { display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 999px; font-weight: 800; font-size: 13px; color: #fff; }
+.cover-acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.sw { width: 42px; height: 42px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--line); cursor: pointer; }
+.sw[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--ink); }
+.makes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.makes button { min-height: 36px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--ink); }
+.makes button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.hours { display: grid; gap: 8px; margin-top: 6px; }
+.hrow { display: grid; grid-template-columns: 56px auto 1fr; gap: 10px; align-items: center; }
+.hrow b { color: var(--ink); }
+.hrow .times { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.hrow .times input { flex: 1 1 0; min-width: 0; width: 100%; padding: 8px 6px; }
+.hrow .times span { flex-shrink: 0; color: var(--muted); }
+.hrow.closed .times { opacity: .35; pointer-events: none; }
+.toggle { display: flex; gap: 6px; align-items: center; font-size: 14px; font-weight: 600; }
+.toggle input { width: 20px; height: 20px; accent-color: var(--teal); }
+.row2 { display: grid; gap: 0 12px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 520px) {
+ .row2 { grid-template-columns: 1fr; }
+ .hrow { grid-template-columns: 1fr auto; gap: 6px 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+ .hrow .times { grid-column: 1 / -1; }
+}
+.page, .stack, .box { min-width: 0; }
+.prev h2, .prev p { overflow-wrap: anywhere; }
+.save { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--card); border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+.save .in { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+.save .note { flex: 1; font-size: 14px; color: var(--muted); }
+body .saz-tabbar { display: none !important; }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main class="wrap page" id="app"><div class="lcard skeleton" style="min-height:240px"></div></main>
+<div class="save" id="savebar" hidden><div class="in"><div class="note" id="note">Changes show on your page as soon as you save.</div><button class="btn btn-primary btn-lg" id="save" type="button">Save</button></div></div>
+<script src="/static/cars.js?v=1"></script>
+<script src="/static/site.js?v=7"></script>
+<script>
+(function () {
+ 'use strict';
+ var app = document.getElementById('app'), saveBtn = document.getElementById('save'), note = document.getElementById('note');
+ var token = '';
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
+ if (!token) { location.replace('/login?next=' + encodeURIComponent('/business/page')); return; }
+ var DAYS = [['mon', 'Mon'], ['tue', 'Tue'], ['wed', 'Wed'], ['thu', 'Thu'], ['fri', 'Fri'], ['sat', 'Sat'], ['sun', 'Sun']];
+ var ACCENTS = {}, biz = null, st = {}, dirty = false;
+
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function safeUrl(u) { u = String(u || '').trim(); return (/^https:\/\//i.test(u) || /^\/(?!\/)/.test(u)) ? u : ''; }
+ function api(url, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign(opts.body && !(opts.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}, { Authorization: 'Bearer ' + token });
+  return fetch(url, opts).then(function (r) {
+   return r.json().catch(function () { return {}; }).then(function (d) {
+    if (r.status === 401) { location.replace('/login?next=' + encodeURIComponent('/business/page')); throw new Error('Please log in again.'); }
+    if (!r.ok) { var m = d.detail; if (Array.isArray(m)) m = m.map(function (x) { return String(x.msg || '').replace(/^Value error, /, ''); }).join('. '); throw new Error(typeof m === 'string' ? m : 'Something went wrong.'); }
+    return d;
+   });
+  }, function () { throw new Error('No connection. Check your internet and try again.'); });
+ }
+ function touch() { dirty = true; note.textContent = 'You have changes that aren\'t saved yet.'; preview(); }
+
+ function preview() {
+  var el = document.getElementById('prev'); if (!el) return;
+  var cover = safeUrl(st.cover_url), logo = safeUrl(biz.logo_url), col = ACCENTS[st.accent] || ACCENTS.teal;
+  el.style.backgroundImage = cover ? 'url("' + (window.SAZImg ? SAZImg(cover, 900) : cover) + '")' : '';
+  el.innerHTML = '<div class="in"><div class="logo"' + (logo ? ' style="background-image:url(\'' + esc(logo) + '\')"' : '') + '>' + (logo ? '' : esc((biz.name || '?').charAt(0))) + '</div>' +
+   '<div><h2>' + esc(biz.name) + '</h2><p>' + esc(st.tagline || biz.type_label + ', ' + biz.city) + '</p><span class="pill" style="background:' + col + '">WhatsApp</span></div></div>';
+ }
+
+ function render() {
+  var h = st.hours || {};
+  app.innerHTML = '<h1>Personalise your page</h1><p class="lead">Make your page look like your shop, so buyers know they\'re in the right place.</p><div class="stack">' +
+   '<div class="prev" id="prev"></div>' +
+   '<div class="box"><h2>Cover photo</h2><p class="hint" style="margin-top:0">A wide photo of your shop front or shelves. It goes across the top of your page.</p>' +
+   '<div class="cover-acts"><label class="btn btn-primary">' + (st.cover_url ? 'Change photo' : 'Add a cover photo') + '<input type="file" accept="image/*" id="cover" hidden></label>' + (st.cover_url ? '<button class="btn btn-ghost" type="button" id="nocover">Remove</button>' : '') + '</div><div id="covermsg"></div></div>' +
+   '<div class="box"><h2>Your line</h2><label class="field" style="margin-top:4px"><span>One sentence about your shop</span><input class="input" id="tagline" maxlength="90" placeholder="Genuine Toyota parts since 2009" value="' + esc(st.tagline || '') + '"></label>' +
+   '<span class="lbl" style="margin-top:14px">Your colour</span><div class="swatches" id="swatches">' + Object.keys(ACCENTS).map(function (k) { return '<button type="button" class="sw" data-accent="' + k + '" style="background:' + ACCENTS[k] + '" aria-label="' + k + '" aria-pressed="' + ((st.accent || 'teal') === k) + '"></button>'; }).join('') + '</div>' +
+   '<span class="lbl" style="margin-top:14px">Car makes you specialise in</span><p class="hint" style="margin-top:0">Buyers can tap these on your page to see just those parts.</p><div class="makes" id="makes">' + SAZCars.MAKES.filter(function (m) { return m !== 'Other'; }).map(function (m) { return '<button type="button" data-make="' + esc(m) + '" aria-pressed="' + ((st.specialties || []).indexOf(m) !== -1) + '">' + esc(m) + '</button>'; }).join('') + '</div></div>' +
+   '<div class="box"><h2>Opening hours</h2><p class="hint" style="margin-top:0">Your page shows "Open now" or "Closed" using Sierra Leone time.</p><div class="hours" id="hours">' + DAYS.map(function (d) {
+     var v = h[d[0]], closed = v === 'closed', t = (v && v !== 'closed') ? v.split('-') : ['08:00', '18:00'];
+     return '<div class="hrow' + (closed ? ' closed' : '') + '" data-day="' + d[0] + '"><b>' + d[1] + '</b><label class="toggle"><input type="checkbox" data-open ' + (closed ? '' : 'checked') + '>Open</label><div class="times"><input class="input" type="time" data-from value="' + t[0] + '" aria-label="' + d[1] + ' opens"><span>to</span><input class="input" type="time" data-to value="' + t[1] + '" aria-label="' + d[1] + ' closes"></div></div>';
+    }).join('') + '</div><div class="cover-acts"><button class="btn btn-ghost" type="button" id="copyhours">Copy Monday to Tue–Sat</button>' + (st.hours ? '<button class="btn btn-ghost" type="button" id="nohours">Don\'t show hours</button>' : '') + '</div></div>' +
+   '<div class="box"><h2>How to find and reach you</h2>' +
+   '<label class="field" style="margin-top:4px"><span>Address or landmark</span><input class="input" id="address" maxlength="160" placeholder="12 Kissy Road, near the Eastern Police roundabout" value="' + esc(st.address || '') + '"></label>' +
+   '<label class="field"><span>Phone number for calls</span><input class="input" id="call_phone" type="tel" maxlength="30" placeholder="076 123456" value="' + esc(st.call_phone || '') + '"></label>' +
+   '<p class="hint">WhatsApp messages go to +' + esc(biz.whatsapp) + '. Change it under <a href="/become-a-seller">business details</a>.</p>' +
+   '<div class="row2"><label class="field"><span>Facebook</span><input class="input" id="facebook" placeholder="@yourshop or link" value="' + esc(st.facebook || '') + '"></label>' +
+   '<label class="field"><span>Instagram</span><input class="input" id="instagram" placeholder="@yourshop" value="' + esc(st.instagram || '') + '"></label></div>' +
+   '<label class="field"><span>TikTok</span><input class="input" id="tiktok" placeholder="@yourshop" value="' + esc(st.tiktok || '') + '"></label></div>' +
+   '</div>';
+  document.getElementById('savebar').hidden = false;
+  preview();
+
+  ['tagline', 'address', 'call_phone', 'facebook', 'instagram', 'tiktok'].forEach(function (k) {
+   document.getElementById(k).addEventListener('input', function (e) { st[k] = e.target.value; touch(); });
+  });
+  document.getElementById('swatches').addEventListener('click', function (e) {
+   var b = e.target.closest('[data-accent]'); if (!b) return;
+   st.accent = b.dataset.accent;
+   this.querySelectorAll('.sw').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+   touch();
+  });
+  document.getElementById('makes').addEventListener('click', function (e) {
+   var b = e.target.closest('[data-make]'); if (!b) return;
+   var list = st.specialties || [], m = b.dataset.make, i = list.indexOf(m);
+   if (i === -1) { if (list.length >= 12) return; list.push(m); } else list.splice(i, 1);
+   st.specialties = list; b.setAttribute('aria-pressed', String(i === -1)); touch();
+  });
+  var hours = document.getElementById('hours');
+  hours.addEventListener('change', function (e) {
+   var row = e.target.closest('[data-day]'); if (!row) return;
+   if (e.target.hasAttribute('data-open')) row.classList.toggle('closed', !e.target.checked);
+   st.hoursTouched = true; touch();
+  });
+  document.getElementById('copyhours').addEventListener('click', function () {
+   var mon = hours.querySelector('[data-day=mon]');
+   ['tue', 'wed', 'thu', 'fri', 'sat'].forEach(function (d) {
+    var r = hours.querySelector('[data-day=' + d + ']');
+    r.querySelector('[data-from]').value = mon.querySelector('[data-from]').value;
+    r.querySelector('[data-to]').value = mon.querySelector('[data-to]').value;
+    r.querySelector('[data-open]').checked = mon.querySelector('[data-open]').checked;
+    r.classList.toggle('closed', !mon.querySelector('[data-open]').checked);
+   });
+   st.hoursTouched = true; touch();
+  });
+  var nh = document.getElementById('nohours');
+  if (nh) nh.addEventListener('click', function () { st.hours = null; st.hoursTouched = false; st.clearHours = true; touch(); nh.remove(); });
+  document.getElementById('cover').addEventListener('change', function (e) {
+   var f = e.target.files[0]; if (!f) return;
+   var msg = document.getElementById('covermsg');
+   msg.innerHTML = '<p class="hint">Uploading…</p>';
+   var fd = new FormData(); fd.append('file', f);
+   api('/api/upload/', { method: 'POST', body: fd }).then(function (d) { if (st.hoursTouched) st.hours = readHours(); st.cover_url = d.url; touch(); render(); })
+    .catch(function (err) { msg.innerHTML = '<div class="notice notice-bad" style="margin-top:8px">' + esc(err.message) + '</div>'; });
+  });
+  var nc = document.getElementById('nocover');
+  if (nc) nc.addEventListener('click', function () { if (st.hoursTouched) st.hours = readHours(); st.cover_url = null; touch(); render(); });
+ }
+
+ function readHours() {
+  var out = {};
+  document.querySelectorAll('#hours [data-day]').forEach(function (r) {
+   out[r.dataset.day] = r.querySelector('[data-open]').checked ? r.querySelector('[data-from]').value + '-' + r.querySelector('[data-to]').value : 'closed';
+  });
+  return out;
+ }
+
+ saveBtn.addEventListener('click', function () {
+  var body = { tagline: st.tagline || null, cover_url: st.cover_url || null, accent: st.accent || null, address: st.address || null,
+   call_phone: st.call_phone || null, facebook: st.facebook || null, instagram: st.instagram || null, tiktok: st.tiktok || null,
+   specialties: st.specialties || [] };
+  if (st.hoursTouched) body.hours = readHours();
+  else if (st.clearHours) body.hours = null;
+  saveBtn.disabled = true; note.textContent = 'Saving…';
+  api('/api/businesses/mine/profile', { method: 'PUT', body: JSON.stringify(body) }).then(function (d) {
+   Object.keys(d).forEach(function (k) { st[k] = d[k]; });
+   st.hoursTouched = false; st.clearHours = false; dirty = false;
+   note.innerHTML = 'Saved.' + (biz.status === 'verified' ? ' <a href="/store/' + encodeURIComponent(biz.slug) + '">See your page</a>' : ' Your page goes public once we\'ve checked your business.');
+   ['facebook', 'instagram', 'tiktok'].forEach(function (k) { var el = document.getElementById(k); if (el) el.value = st[k] || ''; });
+  }).catch(function (e) { note.innerHTML = '<span style="color:var(--bad);font-weight:700">' + esc(e.message) + '</span>'; })
+   .then(function () { saveBtn.disabled = false; });
+ });
+ window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+ Promise.all([api('/api/businesses/mine'), api('/api/stores/options')]).then(function (res) {
+  biz = res[0].business; ACCENTS = res[1].accents;
+  if (!biz) { app.innerHTML = '<h1>Personalise your page</h1><div class="box" style="margin-top:14px"><h2>For businesses</h2><p>Apply as a business first to get your own page.</p><a class="btn btn-primary" style="margin-top:12px" href="/become-a-seller">Apply as a business</a></div>'; return; }
+  ['tagline', 'cover_url', 'accent', 'address', 'hours', 'call_phone', 'facebook', 'instagram', 'tiktok', 'specialties'].forEach(function (k) { st[k] = biz[k]; });
+  render();
+ }).catch(function (e) { app.innerHTML = '<div class="notice notice-bad">' + esc(e.message) + '</div>'; });
+})();
+</script>
+</body>
+</html>

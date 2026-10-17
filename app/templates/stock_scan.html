@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Add stock with your camera · SalonAutoZone</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" sizes="64x64" href="/static/icon-64.png">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
+<link rel="stylesheet" href="/static/ui.css?v=7">
+<link rel="stylesheet" href="/static/chrome.css?v=5">
+<style>
+.page { max-width: 760px; padding: 22px 16px 140px; }
+.page h1 { font-size: clamp(28px, 7vw, 38px); }
+.lead { color: var(--muted); font-size: 16px; margin: 6px 0 16px; }
+.shoot { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+.shoot label { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 110px; border-radius: var(--r-lg); font-weight: 800; cursor: pointer; text-align: center; padding: 12px; }
+.shoot label svg { width: 34px; height: 34px; }
+.shoot .cam { background: var(--ink); color: #fff; grid-column: 1 / -1; min-height: 130px; font-size: 19px; }
+.shoot .cam svg { color: var(--gold); width: 40px; height: 40px; }
+.shoot .gal { background: var(--card); border: 1.5px solid var(--line); color: var(--ink); }
+.shoot .hand { background: var(--card); border: 1.5px solid var(--line); color: var(--ink); text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: var(--r-lg); font-weight: 800; min-height: 110px; }
+.shoot small { font-weight: 600; color: var(--muted); font-size: 13px; }
+.shoot .cam small { color: #a9c4c2; }
+.tips { margin-top: 12px; font-size: 14px; color: var(--muted); }
+.tips summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+.tips ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+.shots { display: flex; gap: 8px; overflow-x: auto; margin: 16px 0 4px; padding-bottom: 4px; }
+.shot { position: relative; flex-shrink: 0; width: 92px; height: 92px; border-radius: var(--r-md); background: var(--teal-50) center / cover no-repeat; overflow: hidden; }
+.shot span { position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 5px; font-size: 11px; font-weight: 800; color: #fff; background: rgba(14, 42, 43, .82); text-align: center; }
+.shot.busy span { background: rgba(14, 124, 123, .9); }
+.shot.bad span { background: rgba(180, 35, 24, .92); }
+.shot button { position: absolute; inset: 0; background: none; border: 0; cursor: pointer; }
+.items { display: grid; gap: 12px; margin-top: 14px; }
+.item { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r-lg); padding: 12px; }
+.item.off { opacity: .55; }
+.item.off .fields { display: none; }
+.item .top { display: flex; gap: 12px; align-items: flex-start; }
+.item .ph { width: 84px; height: 84px; border-radius: var(--r-md); background: var(--teal-50) center / cover no-repeat; flex-shrink: 0; }
+.item .top .grow { flex: 1; min-width: 0; }
+.item .nm { font-size: 16px; font-weight: 700; padding: 8px 10px; }
+.item .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.tag { font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 6px; background: var(--teal-50); color: var(--teal-600); }
+.tag.low { background: var(--gold-50); color: #8a5a00; }
+.keep { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.keep input { width: 20px; height: 20px; accent-color: var(--teal); }
+.fields { display: grid; gap: 0 10px; grid-template-columns: 1fr 1fr; margin-top: 4px; }
+.fields .field { margin-top: 10px; }
+.fields .wide { grid-column: 1 / -1; }
+.price-in { font-size: 18px; font-weight: 800; }
+.price-in.miss { border-color: var(--gold); background: var(--gold-50); }
+.empty-note { text-align: center; color: var(--muted); padding: 18px; background: var(--card); border: 1.5px dashed var(--line); border-radius: var(--r-lg); }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--card); border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -8px 24px -12px rgba(14, 42, 43, .25); }
+.bar .in { max-width: 760px; margin: 0 auto; display: flex; gap: 12px; align-items: center; }
+.bar .sum { flex: 1; font-size: 14px; color: var(--muted); }
+.bar .sum b { display: block; font-size: 16px; color: var(--ink); }
+body.has-bar .saz-tabbar { display: none !important; }
+.done { text-align: center; padding: 30px 0; }
+.done h1 { margin-top: 10px; }
+.done .big { font-size: 56px; }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main class="wrap page" id="app">
+ <div class="lcard skeleton" style="min-height:240px"></div>
+</main>
+<div class="bar" id="bar" hidden><div class="in"><div class="sum" id="sum"></div><button class="btn btn-primary btn-lg" id="publish" type="button">Add to my store</button></div></div>
+<script src="/static/cars.js?v=1"></script>
+<script src="/static/site.js?v=7"></script>
+<script>
+(function () {
+ 'use strict';
+ var app = document.getElementById('app'), bar = document.getElementById('bar'), sum = document.getElementById('sum'), publishBtn = document.getElementById('publish');
+ var C = window.SAZCars;
+ var token = '';
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) {}
+ if (!token) { location.replace('/login?next=' + encodeURIComponent('/business/stock')); return; }
+
+ var shots = [];   // {id, img (ImageBitmap/HTMLImageElement), thumb, status, error}
+ var items = [];   // {id, shot, keep, data:{...}, crop (dataURL)}
+ var seq = 0, busy = 0, biz = null;
+
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function opts(list, sel, blank) { return (blank ? '<option value="">' + blank + '</option>' : '') + list.map(function (v) { return '<option' + (v === sel ? ' selected' : '') + '>' + esc(v) + '</option>'; }).join(''); }
+ function api(url, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign(opts.body && !(opts.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}, { Authorization: 'Bearer ' + token });
+  return fetch(url, opts).then(function (r) {
+   return r.json().catch(function () { return {}; }).then(function (d) {
+    if (r.status === 401) { location.replace('/login?next=' + encodeURIComponent('/business/stock')); throw new Error('Please log in again.'); }
+    if (!r.ok) { var m = d.detail; if (Array.isArray(m)) m = m.map(function (x) { return String(x.msg || '').replace(/^Value error, /, ''); }).join('. '); var e = new Error(typeof m === 'string' ? m : 'Something went wrong.'); e.status = r.status; throw e; }
+    return d;
+   });
+  }, function () { throw new Error('No connection. Check your internet and try again.'); });
+ }
+
+ // ---------- images ----------
+ function loadImage(file) {
+  return new Promise(function (ok, bad) {
+   var url = URL.createObjectURL(file), img = new Image();
+   img.onload = function () { ok(img); };
+   img.onerror = function () { URL.revokeObjectURL(url); bad(new Error('That file isn\'t a photo we can open.')); };
+   img.src = url;
+  });
+ }
+ function draw(img, sx, sy, sw, sh, max, q) {
+  var scale = Math.min(1, max / Math.max(sw, sh));
+  var c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(sw * scale)); c.height = Math.max(1, Math.round(sh * scale));
+  c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+  return c;
+ }
+ function toBlob(canvas, q) { return new Promise(function (ok) { canvas.toBlob(ok, 'image/jpeg', q); }); }
+ function cropFor(img, box) {
+  var W = img.naturalWidth, H = img.naturalHeight;
+  if (!box) return draw(img, 0, 0, W, H, 900).toDataURL('image/jpeg', .85);
+  var y0 = box[0] / 1000 * H, x0 = box[1] / 1000 * W, y1 = box[2] / 1000 * H, x1 = box[3] / 1000 * W;
+  var padX = (x1 - x0) * .08, padY = (y1 - y0) * .08;
+  x0 = Math.max(0, x0 - padX); y0 = Math.max(0, y0 - padY); x1 = Math.min(W, x1 + padX); y1 = Math.min(H, y1 + padY);
+  return draw(img, x0, y0, x1 - x0, y1 - y0, 900).toDataURL('image/jpeg', .85);
+ }
+ function dataUrlToBlob(u) {
+  var parts = u.split(','), bin = atob(parts[1]), arr = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: 'image/jpeg' });
+ }
+
+ // ---------- scanning ----------
+ function addFiles(files) {
+  Array.prototype.forEach.call(files, function (f) {
+   if (!/^image\//.test(f.type)) return;
+   var shot = { id: ++seq, status: 'Waiting', file: f };
+   shots.push(shot);
+   loadImage(f).then(function (img) {
+    shot.img = img;
+    shot.thumb = draw(img, 0, 0, img.naturalWidth, img.naturalHeight, 200).toDataURL('image/jpeg', .7);
+    renderShots();
+    scan(shot);
+   }).catch(function (e) { shot.status = 'Failed'; shot.error = e.message; renderShots(); });
+  });
+  renderShots();
+ }
+ function scan(shot) {
+  shot.status = 'Looking…'; shot.error = ''; busy++; renderShots(); renderBar();
+  var small = draw(shot.img, 0, 0, shot.img.naturalWidth, shot.img.naturalHeight, 1600);
+  toBlob(small, .82).then(function (blob) {
+   var fd = new FormData(); fd.append('file', blob, 'shelf.jpg');
+   return api('/api/stock/scan', { method: 'POST', body: fd });
+  }).then(function (d) {
+   var found = d.items || [];
+   shot.status = found.length ? found.length + ' found' : 'None found';
+   var fresh = [];
+   found.forEach(function (it) {
+    fresh.push({ id: ++seq, shot: shot.id, keep: it.confidence !== 'low', data: {
+     name: it.name, category: it.category, brand: it.brand || '', part_number: it.part_number || '',
+     compatible_make: it.compatible_make || '', compatible_model: it.compatible_model || '',
+     condition: it.condition || 'new', stock_quantity: it.quantity || 1, price_sll: '', notes: it.notes || '', confidence: it.confidence
+    }, crop: cropFor(shot.img, it.box) });
+   });
+   if (!found.length) shot.error = 'No parts found in this photo. Try closer, with better light.';
+   addCards(fresh);
+  }).catch(function (e) {
+   shot.status = 'Failed'; shot.error = e.message;
+  }).then(function () { busy--; renderShots(); renderBar(); });
+ }
+
+ // ---------- rendering ----------
+ function render() {
+  var store = biz && biz.status === 'verified' ? '<a href="/store/' + encodeURIComponent(biz.slug) + '">your page</a>' : 'your store';
+  app.innerHTML = '<h1>Add stock with your camera</h1>' +
+   '<p class="lead">Take a photo of a shelf or a part. We spot each part and fill in the details. You check them, add prices, and they go on ' + store + '.</p>' +
+   '<div class="shoot">' +
+   '<label class="cam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="4"/></svg>Take a photo<small>Opens your camera</small><input type="file" accept="image/*" capture="environment" id="cam" hidden></label>' +
+   '<label class="gal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/></svg>Choose photos<small>Several at once</small><input type="file" accept="image/*" multiple id="gal" hidden></label>' +
+   '<a class="hand" href="/sell"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add one by hand<small>The usual form</small></a>' +
+   '</div>' +
+   '<details class="tips"><summary>Tips for good results</summary><ul><li>Get close: 3 to 6 parts per photo works best.</li><li>Turn boxes so the label and part number face the camera.</li><li>Use daylight or a bright light, and hold still.</li><li>One part on its own gives the clearest listing photo.</li></ul></details>' +
+   '<div class="shots" id="shots"></div><div class="items" id="items"></div>';
+  document.getElementById('cam').addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+  document.getElementById('gal').addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+  renderShots(); renderItems(); renderBar();
+ }
+ function renderShots() {
+  var el = document.getElementById('shots'); if (!el) return;
+  el.innerHTML = shots.map(function (s) {
+   var cls = s.status === 'Looking…' ? 'busy' : (s.status === 'Failed' || s.status === 'None found' ? 'bad' : '');
+   return '<div class="shot ' + cls + '" style="' + (s.thumb ? 'background-image:url(' + s.thumb + ')' : '') + '" title="' + esc(s.error || '') + '"><span>' + esc(s.status) + '</span>' +
+    (s.status === 'Failed' && s.img ? '<button type="button" data-retry="' + s.id + '" aria-label="Try this photo again"></button>' : '') + '</div>';
+  }).join('');
+  var errs = shots.filter(function (s) { return s.error; });
+  var note = document.getElementById('shot-note');
+  if (!note) { note = document.createElement('div'); note.id = 'shot-note'; el.parentNode.insertBefore(note, el.nextSibling); }
+  note.innerHTML = errs.length ? '<div class="notice notice-warn" style="margin-top:6px">' + esc(errs[errs.length - 1].error) + (errs.some(function (s) { return s.status === 'Failed' && s.img; }) ? ' Tap a red photo to try again.' : '') + '</div>' : '';
+ }
+ function itemHtml(it) {
+  var d = it.data, makes = C.MAKES.slice(), models = (C.MODELS[d.compatible_make] || []).slice();
+  if (d.compatible_make && makes.indexOf(d.compatible_make) === -1) makes.unshift(d.compatible_make);
+  if (d.compatible_model && models.indexOf(d.compatible_model) === -1) models.unshift(d.compatible_model);
+  return '<div class="item' + (it.keep ? '' : ' off') + '" data-item="' + it.id + '">' +
+   '<div class="top"><div class="ph" style="background-image:url(' + it.crop + ')"></div><div class="grow">' +
+   '<input class="input nm" data-f="name" value="' + esc(d.name) + '" maxlength="120" aria-label="Part name">' +
+   '<div class="meta">' + (d.confidence === 'low' ? '<span class="tag low">Check this one</span>' : '') + (d.part_number ? '<span class="tag">' + esc(d.part_number) + '</span>' : '') + (d.notes ? '<span class="hint" style="margin:0">' + esc(d.notes) + '</span>' : '') + '</div>' +
+   '</div><label class="keep"><input type="checkbox" data-keep ' + (it.keep ? 'checked' : '') + '>Add</label></div>' +
+   '<div class="fields">' +
+   '<label class="field wide"><span>Price, SLL</span><input class="input price-in' + (d.price_sll ? '' : ' miss') + '" data-f="price_sll" inputmode="numeric" placeholder="e.g. 150000" value="' + esc(d.price_sll) + '"></label>' +
+   '<label class="field"><span>Quantity</span><input class="input" data-f="stock_quantity" type="number" min="1" max="9999" value="' + esc(d.stock_quantity) + '"></label>' +
+   '<label class="field"><span>Condition</span><select class="select" data-f="condition">' + [['new', 'New'], ['used', 'Used'], ['refurbished', 'Refurbished']].map(function (c) { return '<option value="' + c[0] + '"' + (c[0] === d.condition ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></label>' +
+   '<label class="field"><span>Category</span><select class="select" data-f="category">' + opts(C.CATS, d.category) + '</select></label>' +
+   '<label class="field"><span>Brand</span><input class="input" data-f="brand" maxlength="60" value="' + esc(d.brand) + '"></label>' +
+   '<label class="field"><span>Fits make</span><select class="select" data-f="compatible_make">' + opts(makes, d.compatible_make, 'Any / not sure') + '</select></label>' +
+   '<label class="field"><span>Fits model</span><select class="select" data-f="compatible_model">' + opts(models, d.compatible_model, 'Any') + '</select></label>' +
+   '<label class="field wide"><span>Part number</span><input class="input" data-f="part_number" maxlength="60" value="' + esc(d.part_number) + '" placeholder="From the box, if there is one"></label>' +
+   '</div></div>';
+ }
+ function renderItems() {
+  var el = document.getElementById('items'); if (!el) return;
+  if (!items.length) { el.innerHTML = shots.length ? '' : '<div class="empty-note">Parts you photograph will appear here.</div>'; return; }
+  el.innerHTML = '<h2 class="section-title" style="margin:14px 0 0">Check the details</h2>' + items.map(itemHtml).join('');
+ }
+ // New cards are added below the ones already there, so typing in a price isn't interrupted.
+ function addCards(fresh) {
+  if (!fresh.length) return;
+  var el = document.getElementById('items'); if (!el) return;
+  var first = !items.length;
+  Array.prototype.push.apply(items, fresh);
+  if (first) { renderItems(); return; }
+  el.insertAdjacentHTML('beforeend', fresh.map(itemHtml).join(''));
+ }
+ function chosen() { return items.filter(function (i) { return i.keep; }); }
+ function priceOf(i) { return Number(String(i.data.price_sll || '').replace(/[^\d.]/g, '')); }
+ function renderBar() {
+  var on = chosen(), missing = on.filter(function (i) { return !(priceOf(i) > 0); }).length;
+  bar.hidden = !items.length && !busy;
+  document.body.classList.toggle('has-bar', !bar.hidden);
+  sum.innerHTML = busy ? '<b>Looking at ' + busy + ' photo' + (busy > 1 ? 's' : '') + '…</b>You can keep taking photos.' :
+   '<b>' + on.length + ' part' + (on.length === 1 ? '' : 's') + ' ready</b>' + (missing ? missing + ' still need a price' : 'All have prices');
+  publishBtn.disabled = busy > 0 || !on.length || missing > 0;
+  publishBtn.textContent = on.length ? 'Add ' + on.length + ' to my store' : 'Add to my store';
+ }
+
+ app.addEventListener('input', function (e) {
+  var card = e.target.closest('[data-item]'); if (!card) return;
+  var it = items.filter(function (x) { return String(x.id) === card.dataset.item; })[0]; if (!it) return;
+  var f = e.target.dataset.f;
+  if (f) {
+   it.data[f] = e.target.value;
+   if (f === 'price_sll') e.target.classList.toggle('miss', !(priceOf(it) > 0));
+   renderBar();
+  }
+ });
+ app.addEventListener('change', function (e) {
+  var card = e.target.closest('[data-item]'); if (!card) return;
+  var it = items.filter(function (x) { return String(x.id) === card.dataset.item; })[0]; if (!it) return;
+  if (e.target.hasAttribute('data-keep')) { it.keep = e.target.checked; card.classList.toggle('off', !it.keep); renderBar(); return; }
+  if (e.target.dataset.f === 'compatible_make') {
+   it.data.compatible_make = e.target.value; it.data.compatible_model = '';
+   card.querySelector('[data-f=compatible_model]').innerHTML = opts(C.MODELS[e.target.value] || [], '', 'Any');
+  }
+ });
+ app.addEventListener('click', function (e) {
+  var r = e.target.closest('[data-retry]'); if (!r) return;
+  var s = shots.filter(function (x) { return String(x.id) === r.dataset.retry; })[0];
+  if (s) scan(s);
+ });
+
+ publishBtn.addEventListener('click', function () {
+  var on = chosen();
+  if (!on.length) return;
+  publishBtn.disabled = true; publishBtn.textContent = 'Adding…';
+  var payload = on.map(function (i) {
+   var d = i.data;
+   return { name: d.name.trim(), category: d.category, price_sll: priceOf(i), stock_quantity: Math.max(1, parseInt(d.stock_quantity, 10) || 1),
+    condition: d.condition, brand: d.brand.trim() || null, part_number: d.part_number.trim() || null,
+    compatible_make: d.compatible_make || null, compatible_model: d.compatible_model || null };
+  });
+  api('/api/stock/bulk', { method: 'POST', body: JSON.stringify({ items: payload }) }).then(function (res) {
+   var created = res.created || [], failed = 0, n = 0;
+   function next() {
+    if (n >= created.length) return Promise.resolve();
+    var it = on[n], id = created[n].id; n++;
+    sum.innerHTML = '<b>Uploading photos ' + n + ' of ' + created.length + '…</b>Keep this page open.';
+    var fd = new FormData(); fd.append('file', dataUrlToBlob(it.crop), 'part.jpg');
+    return api('/api/photos/part/' + id, { method: 'POST', body: fd }).catch(function () { failed++; }).then(next);
+   }
+   return next().then(function () {
+    bar.hidden = true; document.body.classList.remove('has-bar');
+    items = items.filter(function (i) { return !i.keep; });
+    shots = [];
+    window.scrollTo(0, 0);
+    app.innerHTML = '<div class="done"><div class="big" aria-hidden="true">✓</div><h1>' + created.length + ' part' + (created.length === 1 ? '' : 's') + ' added</h1>' +
+     '<p class="lead">They\'re live and buyers can find them now.' + (failed ? ' ' + failed + ' photo' + (failed > 1 ? 's' : '') + ' didn\'t upload; you can add them from each listing.' : '') + '</p>' +
+     '<div style="display:grid;gap:10px;max-width:360px;margin:16px auto 0">' +
+     '<button class="btn btn-primary btn-lg" id="again" type="button">Scan more stock</button>' +
+     (res.store && biz && biz.status === 'verified' ? '<a class="btn btn-ghost" href="/store/' + encodeURIComponent(res.store) + '">See your page</a>' : '') +
+     '<a class="btn btn-ghost" href="/my-account?tab=listings">Manage my listings</a></div></div>';
+    document.getElementById('again').addEventListener('click', render);
+   });
+  }).catch(function (e) {
+   publishBtn.disabled = false; renderBar();
+   sum.innerHTML = '<b style="color:var(--bad)">' + esc(e.message) + '</b>';
+  });
+ });
+
+ window.addEventListener('beforeunload', function (e) { if (chosen().length) { e.preventDefault(); e.returnValue = ''; } });
+
+ api('/api/businesses/mine').then(function (d) {
+  biz = d.business;
+  if (!biz) {
+   app.innerHTML = '<h1>Add stock with your camera</h1><div class="box" style="margin-top:14px"><h2>For businesses</h2><p>Apply as a business first. Then you can photograph your shelves and add your stock in minutes.</p><a class="btn btn-primary" style="margin-top:12px" href="/become-a-seller">Apply as a business</a></div>';
+   return;
+  }
+  render();
+ }).catch(function (e) { app.innerHTML = '<div class="notice notice-bad">' + esc(e.message) + '</div>'; });
+})();
+</script>
+</body>
+</html>

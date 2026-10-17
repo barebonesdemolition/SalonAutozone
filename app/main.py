@@ -19,6 +19,7 @@ from app import share_meta
 from app import businesses
 from app import models
 from app.auth import get_current_user
+from app.stores import ensure_store_tables, router as stores_router
 from app.accounts import admin_router as accounts_admin_router, ensure_account_tables, router as accounts_router
 from app.db import drop_wrong_listing_foreign_keys, engine, ensure_core_tables, ensure_business_contact_columns, ensure_vehicle_listing_columns, get_db
 from app.routers.admin import require_admin
@@ -127,6 +128,7 @@ async def lifespan(_: FastAPI):
     await ensure_core_tables()
     await ensure_account_tables()
     await ensure_business_contact_columns()
+    await ensure_store_tables()
     await ensure_vehicle_listing_columns()
     await drop_wrong_listing_foreign_keys()
     await ensure_subscription_tables()
@@ -172,6 +174,7 @@ os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
+app.include_router(stores_router)
 app.include_router(businesses.router)
 app.include_router(drivers_router)
 app.include_router(shop_router)
@@ -583,6 +586,16 @@ async def orders_page():
 @app.get("/track")
 async def track_page():
     return FileResponse("app/templates/orders.html")
+
+@app.get("/business/stock")
+async def stock_scan_page():
+    return FileResponse("app/templates/stock_scan.html")
+
+
+@app.get("/business/page")
+async def business_page_editor():
+    return FileResponse("app/templates/business_page.html")
+
 
 @app.get("/forgot-password")
 async def forgot_password_page():
