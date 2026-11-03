@@ -39,6 +39,41 @@ def split_async_url(url: str):
 
 _ORIGINAL_URL = DATABASE_URL
 DATABASE_URL, _async_connect_args = split_async_url(DATABASE_URL)
+if DATABASE_URL.startswith("postgresql+asyncpg://"):
+    _async_connect_args.setdefault("timeout", 10)  # give up on a dead database quickly instead of after 60s
+
+
+def _db_down_types():
+    import sqlalchemy.exc as sa_exc
+    types = [sa_exc.OperationalError, sa_exc.InterfaceError, ConnectionError, TimeoutError, OSError]
+    try:
+        import asyncpg
+        types += [asyncpg.exceptions.CannotConnectNowError, asyncpg.exceptions.ConnectionDoesNotExistError,
+                  asyncpg.exceptions.InvalidAuthorizationSpecificationError, asyncpg.exceptions.InvalidCatalogNameError,
+                  asyncpg.exceptions.TooManyConnectionsError, asyncpg.exceptions.InvalidPasswordError]
+    except ImportError:
+        pass
+    return tuple(types)
+
+
+DB_DOWN_TYPES = _db_down_types()
+
+
+def is_db_down(exc: BaseException) -> bool:
+    """True when an error means the database can't be reached (not a bug in a query)."""
+    import sqlalchemy.exc as sa_exc
+    seen = set()
+    while exc is not None and id(exc) not in seen:
+        seen.add(id(exc))
+        if isinstance(exc, sa_exc.DBAPIError) and exc.connection_invalidated:
+            return True
+        if isinstance(exc, (sa_exc.OperationalError, sa_exc.InterfaceError)):
+            # SQLite "database is locked" etc. are not outages.
+            return "sqlite" not in type(getattr(exc, "orig", None)).__module__
+        if isinstance(exc, DB_DOWN_TYPES) and not isinstance(exc, (sa_exc.OperationalError, sa_exc.InterfaceError)):
+            return True
+        exc = getattr(exc, "orig", None) or exc.__cause__ or exc.__context__
+    return False
 
 print(f"[db.py] Using database: {DATABASE_URL.split('@')[-1].split('?')[0] if '@' in DATABASE_URL else DATABASE_URL}")
 

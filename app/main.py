@@ -23,6 +23,10 @@ from app.stores import ensure_store_tables, router as stores_router
 from app.accounts import admin_router as accounts_admin_router, ensure_account_tables, router as accounts_router
 from app.db import drop_wrong_listing_foreign_keys, engine, ensure_core_tables, ensure_business_contact_columns, ensure_vehicle_listing_columns, get_db
 from app.routers.admin import require_admin
+from app.db import is_db_down
+import logging as _logging
+
+_log = _logging.getLogger("salonautozone")
 # --- drivers (must exist as app/drivers.py or the app will not boot) ---
 from app.drivers import ensure_driver_tables, router as drivers_router
 from app.shop import ensure_delivery_tables, router as shop_router
@@ -123,8 +127,7 @@ async def ensure_subscription_tables():
             await conn.execute(text(statement))
 
 
-@asynccontextmanager
-async def lifespan(_: FastAPI):
+async def _setup_database():
     await ensure_core_tables()
     await ensure_account_tables()
     await ensure_business_contact_columns()
@@ -136,7 +139,44 @@ async def lifespan(_: FastAPI):
     await ensure_delivery_tables()
     await ensure_photo_tables()
     await ensure_review_tables()
+
+
+DB_STATE = {"ready": False, "error": None}
+
+
+async def _retry_database_setup():
+    """Keep trying until the database answers, then create the tables."""
+    import asyncio
+    delay = 30
+    while not DB_STATE["ready"]:
+        await asyncio.sleep(delay)
+        try:
+            await asyncio.wait_for(_setup_database(), timeout=60)
+            DB_STATE.update(ready=True, error=None)
+            _log.warning("Database is reachable again; tables are ready.")
+        except Exception as exc:  # noqa: BLE001
+            DB_STATE["error"] = type(exc).__name__
+            delay = min(delay * 2, 300)
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    # If the database is down (e.g. a suspended free database), still start, so the
+    # site can show a maintenance message instead of failing every deploy.
+    import asyncio
+    retry = None
+    try:
+        await asyncio.wait_for(_setup_database(), timeout=90)
+        DB_STATE.update(ready=True, error=None)
+    except Exception as exc:  # noqa: BLE001
+        if not is_db_down(exc):
+            raise
+        DB_STATE.update(ready=False, error=type(exc).__name__)
+        _log.error("Database unreachable at start-up (%s). Showing the maintenance message and retrying.", type(exc).__name__)
+        retry = asyncio.create_task(_retry_database_setup())
     yield
+    if retry:
+        retry.cancel()
 
 
 app = FastAPI(
@@ -151,6 +191,19 @@ app = FastAPI(
 from starlette.middleware.gzip import GZipMiddleware  # noqa: E402
 
 app.add_middleware(GZipMiddleware, minimum_size=800)
+
+
+@app.middleware("http")
+async def redirect_to_main_domain(request: Request, call_next):
+    """With CANONICAL_HOST set (e.g. saloncarparts.com), send visitors on the old
+    onrender.com address or on www. to the main address, keeping the path."""
+    canonical = os.getenv("CANONICAL_HOST", "").strip().lower().removeprefix("https://").removeprefix("http://").strip("/")
+    if canonical and request.method in ("GET", "HEAD") and request.url.path != "/health":
+        host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").split(":")[0].lower()
+        if host and host != canonical and (host.endswith(".onrender.com") or host == "www." + canonical):
+            target = f"https://{canonical}{request.url.path}" + (f"?{request.url.query}" if request.url.query else "")
+            return RedirectResponse(target, status_code=301)
+    return await call_next(request)
 
 
 @app.middleware("http")
@@ -180,6 +233,34 @@ app.include_router(drivers_router)
 app.include_router(shop_router)
 app.include_router(photos_router)
 app.include_router(sellers_router)
+
+
+MAINTENANCE_TEXT = "SalonAutoZone is down for a short maintenance. Please try again in a little while."
+MAINTENANCE_HTML = """<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Back soon · SalonAutoZone</title>
+<meta http-equiv="refresh" content="60"><link rel="icon" href="/static/icon-64.png">
+<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0e2a2b;
+font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;text-align:center;padding:24px}
+.c{max-width:420px}img{width:80px;height:80px;border-radius:50%}h1{font-size:28px;margin:18px 0 8px}
+p{color:#b9cbc9;font-size:17px;line-height:1.5}</style></head><body><div class="c">
+<img src="/static/logo-80.webp" alt=""><h1>Back soon</h1>
+<p>SalonAutoZone is down for a short maintenance. Please try again in a little while.</p>
+<p style="font-size:14px">This page checks again every minute.</p></div></body></html>"""
+
+
+async def database_down_handler(request: Request, exc: Exception):
+    if not is_db_down(exc):
+        raise exc
+    _log.error("Database unreachable during %s %s: %s", request.method, request.url.path, type(exc).__name__)
+    if request.url.path.startswith("/api/") or "text/html" not in request.headers.get("accept", ""):
+        return JSONResponse(status_code=503, content={"detail": MAINTENANCE_TEXT}, headers={"Retry-After": "60"})
+    return HTMLResponse(MAINTENANCE_HTML, status_code=503, headers={"Retry-After": "60"})
+
+
+import sqlalchemy.exc as _sa_exc  # noqa: E402
+
+for _exc_type in (_sa_exc.DBAPIError, ConnectionError, TimeoutError):
+    app.add_exception_handler(_exc_type, database_down_handler)
 
 
 @app.exception_handler(HTTPException)
@@ -236,7 +317,15 @@ async def api_status():
 
 @app.get("/health", tags=["Health"])
 async def health_check():
-    return {"status": "ok"}
+    """Always 200 for the host's health checks; 'database' says whether data is reachable."""
+    import asyncio
+    db = "ok"
+    try:
+        async with engine.connect() as conn:
+            await asyncio.wait_for(conn.execute(text("SELECT 1")), timeout=10)
+    except Exception as exc:  # noqa: BLE001
+        db = "unreachable" if is_db_down(exc) or isinstance(exc, asyncio.TimeoutError) else "error"
+    return {"status": "ok", "database": db, "tables_ready": DB_STATE["ready"]}
 
 
 @app.get("/login")
