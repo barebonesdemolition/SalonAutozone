@@ -15,17 +15,44 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://") and "+asyncpg" not in DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-print(f"[db.py] Using database: {DATABASE_URL.split('@')[-1] if '@' in DATABASE_URL else DATABASE_URL}")
+# Hosted Postgres (Neon, Supabase, ...) gives URLs ending in ?sslmode=require&channel_binding=require.
+# asyncpg doesn't understand those words: take them out of the async URL and ask for TLS directly.
+# The sync engine (psycopg) understands them, so it keeps the original URL.
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+def split_async_url(url: str):
+    """Return (url for asyncpg, connect_args) for a postgresql+asyncpg:// URL."""
+    args = {}
+    if not url.startswith("postgresql+asyncpg://"):
+        return url, args
+    parts = urlsplit(url)
+    query = dict(parse_qsl(parts.query))
+    sslmode = query.pop("sslmode", None)
+    query.pop("channel_binding", None)
+    if sslmode and sslmode != "disable":
+        args["ssl"] = "require" if sslmode in ("require", "prefer", "allow") else True
+    if "-pooler." in (parts.hostname or ""):
+        # Neon's pooled address (PgBouncer) can't keep prepared statements between queries.
+        args["statement_cache_size"] = 0
+    return urlunsplit(parts._replace(query=urlencode(query))), args
+
+
+_ORIGINAL_URL = DATABASE_URL
+DATABASE_URL, _async_connect_args = split_async_url(DATABASE_URL)
+
+print(f"[db.py] Using database: {DATABASE_URL.split('@')[-1].split('?')[0] if '@' in DATABASE_URL else DATABASE_URL}")
 
 # Tests open several event loops; pooled asyncpg connections can't cross them.
-_engine_kwargs = {}
+_engine_kwargs = {"pool_pre_ping": True}  # free databases sleep when idle; check a connection before using it
+if _async_connect_args:
+    _engine_kwargs["connect_args"] = _async_connect_args
 if os.getenv("DB_NULLPOOL", "false").lower() == "true":
     from sqlalchemy.pool import NullPool
     _engine_kwargs["poolclass"] = NullPool
 engine = create_async_engine(DATABASE_URL, echo=False, **_engine_kwargs)
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-sync_database_url = DATABASE_URL
+sync_database_url = _ORIGINAL_URL
 if sync_database_url.startswith("postgresql+asyncpg://"):
     sync_database_url = sync_database_url.replace("postgresql+asyncpg://", "postgresql://", 1)
 elif sync_database_url.startswith("sqlite+aiosqlite://"):
