@@ -40,6 +40,27 @@
     if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
   })();
 
+  // If the server says it's in maintenance (503), show one banner explaining why things are empty.
+  (function () {
+    if (!window.fetch) return;
+    var real = window.fetch, shown = false;
+    function banner() {
+      if (shown || !document.body) return;
+      shown = true;
+      var b = document.createElement('div');
+      b.setAttribute('role', 'status');
+      b.style.cssText = 'position:sticky;top:0;z-index:200;background:#8a5a00;color:#fff;padding:10px 16px;text-align:center;font-weight:700;font-size:15px';
+      b.textContent = 'SalonAutoZone is down for a short maintenance. Please try again in a little while.';
+      document.body.insertBefore(b, document.body.firstChild);
+    }
+    window.fetch = function () {
+      return real.apply(this, arguments).then(function (r) {
+        if (r.status === 503 && r.headers.get('Retry-After')) banner();
+        return r;
+      });
+    };
+  })();
+
   // Every password box gets an eye button to show or hide what's typed.
   (function () {
     var EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
