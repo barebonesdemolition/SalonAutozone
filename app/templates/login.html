@@ -101,6 +101,7 @@
 
  function setMode(m) {
   mode = m;
+  movedHint(false);
   var reg = m === 'register';
   document.querySelectorAll('.tabs button').forEach(function (x) {
    x.classList.toggle('active', x.dataset.mode === m);
@@ -128,6 +129,28 @@
   // Carry what they typed over to the next page (kept out of the address bar).
   try { if (v) sessionStorage.setItem('forgotWho', v); } catch (err) {}
  });
+
+ // On 4 November 2026 the site moved to a new database and accounts had to be made again.
+ // Remove this hint a few months after the move.
+ function movedHint(show) {
+  var el = document.getElementById('moved');
+  if (!show) { if (el) el.remove(); return; }
+  if (el) return;
+  el = document.createElement('div');
+  el.id = 'moved';
+  el.className = 'notice notice-warn';
+  el.style.marginTop = '14px';
+  el.innerHTML = '<b>Had an account before 4 November?</b> We moved SalonAutoZone to a new system, so old accounts need to be created again. Your phone number still works.' +
+   '<button type="button" class="btn btn-primary btn-block" style="margin-top:10px" id="moved-go">Create my account again</button>';
+  msg.parentNode.insertBefore(el, msg.nextSibling);
+  document.getElementById('moved-go').addEventListener('click', function () {
+   var who = form.phone.value.trim();
+   setMode('register');
+   if (who.indexOf('@') !== -1) { form.email.value = who; form.phone.value = ''; } else { form.phone.value = who; }
+   form.password.value = '';
+   form.full_name.focus();
+  });
+ }
 
  function fail(text) {
   msg.className = 'msg err';
@@ -157,7 +180,9 @@
    return r.json().catch(function () { return {}; }).then(function (d) {
     if (!r.ok) {
      var detail = typeof d.detail === 'string' ? d.detail : (Array.isArray(d.detail) ? 'Please check the details you entered.' : '');
-     return fail(detail || (mode === 'login' ? 'That phone, email or password is not right.' : 'We couldn\'t create your account.'));
+     fail(detail || (mode === 'login' ? 'That phone, email or password is not right.' : 'We couldn\'t create your account.'));
+     if (mode === 'login' && r.status === 401) movedHint(true);
+     return;
     }
     var token = d.access_token;
     try {
