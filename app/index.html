@@ -86,6 +86,9 @@
 .empty-state { grid-column: 1 / -1; text-align: center; padding: 48px 16px; color: var(--muted); }
 .empty-state h3 { font-size: 20px; margin-bottom: 6px; }
 .empty-state .btn { margin-top: 14px; }
+.empty-state.launch { background: var(--card); border: 1.5px dashed var(--line); border-radius: var(--r-lg); padding: 36px 20px; margin-top: 8px; }
+.empty-state.launch h3 { color: var(--ink); font-size: 22px; }
+.linkbtn { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--teal); text-decoration: underline; cursor: pointer; }
 
 /* ---------- Abroad banner ---------- */
 .abroad { margin-top: 36px; padding: 22px; display: grid; gap: 14px; align-items: center; background: var(--teal-50); border: 1px solid #c6e6e2; border-radius: var(--r-lg); }
@@ -423,7 +426,7 @@
   $('feat-title').textContent = 'Featured cars';
   $('feat').innerHTML = feat.map(vehicleCard).join('');
   setTimeout(decorateSellers, 0);
-  $('results').innerHTML = reg.length ? reg.map(vehicleCard).join('') : (feat.length ? '' : '<div class="empty-state"><h3>' + (filterText() ? 'No ' + esc(filterText()) + ' for sale right now' : 'No cars match') + '</h3><p>Try fewer filters or a different search.</p>' + (hasFilters() ? '<button type="button" class="btn btn-primary" data-act="clearfilters">Show all cars</button>' : '') + '</div>');
+  $('results').innerHTML = reg.length ? reg.map(vehicleCard).join('') : (feat.length ? '' : !hasFilters() ? launchState('cars') : '<div class="empty-state"><h3>' + (filterText() ? 'No ' + esc(filterText()) + ' for sale right now' : 'No cars match') + '</h3><p>Try fewer filters or a different search.</p>' + (hasFilters() ? '<button type="button" class="btn btn-primary" data-act="clearfilters">Show all cars</button>' : '') + '</div>');
   markSaved();
  }
  function renderParts() {
@@ -447,7 +450,9 @@
   if (data.did_you_mean && (reg.length || feat.length)) h += '<p class="group-title" style="font-size:16px;font-variation-settings:normal;font-weight:600;color:var(--muted)">Showing results for <b style="color:var(--ink)">' + esc(data.did_you_mean) + '</b></p>';
   if (reg.length) h += reg.map(function (p) { return partCard(p, false, fits(p)); }).join('');
   if (cat.length) h += '<h3 class="group-title">Order from abroad<small>Usually arrives in 7–14 days</small></h3>' + cat.map(catalogCard).join('');
-  if (!h && !feat.length) {
+  if (!h && !feat.length && !hasFilters() && !only) {
+   h = launchState('parts');
+  } else if (!h && !feat.length) {
    h = only ? '<div class="empty-state"><h3>Nothing here fits your car yet</h3><p>Show every part, or order one from abroad.</p><button type="button" class="btn btn-primary" data-act="showall">Show all parts</button></div>'
     : '<div class="empty-state"><h3>' + (filterText() ? 'No parts for the ' + esc(filterText()) + ' yet' : 'No parts match') + '</h3><p>' + (hasFilters() ? 'Show every part, or let us find this one abroad for you.' : 'Try a different search, or let us find it abroad for you.') + '</p>' +
      '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">' + (hasFilters() ? '<button type="button" class="btn btn-primary" data-act="clearfilters">Show all parts</button>' : '') + '<button type="button" class="btn ' + (hasFilters() ? 'btn-ghost' : 'btn-primary') + '" data-act="open" data-v="import-modal">Order from abroad</button></div></div>';
@@ -455,6 +460,16 @@
   $('results').innerHTML = h;
   markSaved();
   decorateSellers();
+ }
+ // Shown when nothing at all is listed yet, so a new marketplace doesn't look broken.
+ function launchState(kind) {
+  var cars = kind === 'cars';
+  return '<div class="empty-state launch"><h3>' + (cars ? 'Be the first to sell a car here' : 'Be among the first sellers') + '</h3>' +
+   '<p>SalonAutoZone is new. ' + (cars ? 'List your car in a few minutes and buyers across Sierra Leone can find it.' : 'Parts shops and sellers are joining now. List yours and buyers across Sierra Leone can find you.') + '</p>' +
+   '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">' +
+   '<a class="btn btn-primary" href="/sell' + (cars ? '?type=car' : '') + '">' + (cars ? 'Sell a car' : 'Sell a part') + '</a>' +
+   (cars ? '' : '<a class="btn btn-ghost" href="/become-a-seller">I run a parts shop</a>') +
+   '</div>' + (cars ? '' : '<p style="margin-top:18px">Looking for a part? <button type="button" class="linkbtn" data-act="open" data-v="import-modal">Tell us what you need</button> and we\'ll find it, here or abroad.</p>') + '</div>';
  }
  var FILTERS = [['s-cat', ''], ['s-make', ''], ['s-model', ''], ['s-year', ''], ['s-loc', 'in ']];
  function hasFilters() { return !!($('s-q').value.trim() || FILTERS.some(function (f) { return $(f[0]).value && !$(f[0]).hidden; })); }

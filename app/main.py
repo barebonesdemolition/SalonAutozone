@@ -298,7 +298,7 @@ def _public_base(request: Request) -> str:
 
 # ---------- Root & Health Endpoints ----------
 
-@app.get("/", tags=["Health"])
+@app.api_route("/", methods=["GET", "HEAD"], tags=["Health"])
 async def root(request: Request):
     base = _public_base(request)
     return HTMLResponse(share_meta.home_page(base, base + "/"))
@@ -313,6 +313,48 @@ async def api_status():
         "interactive_docs": "/docs",
         "redoc_docs": "/redoc",
     }
+
+
+@app.get("/robots.txt", include_in_schema=False)
+async def robots_txt(request: Request):
+    from fastapi.responses import PlainTextResponse
+    base = _public_base(request)
+    return PlainTextResponse(
+        "User-agent: *\n"
+        "Disallow: /admin\nDisallow: /api/\nDisallow: /my-account\nDisallow: /account/\n"
+        "Disallow: /business/\nDisallow: /cart\nDisallow: /checkout\nDisallow: /orders\n"
+        "Disallow: /reset-password\nDisallow: /forgot-password\nDisallow: /drive\n"
+        f"\nSitemap: {base}/sitemap.xml\n",
+        headers={"Cache-Control": "public, max-age=86400"})
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+async def sitemap_xml(request: Request, db: AsyncSession = Depends(get_db)):
+    """Every public page Google should know about: home, sections, listings, verified businesses."""
+    from xml.sax.saxutils import escape
+    from fastapi.responses import Response
+    base = _public_base(request)
+    urls = [(f"{base}/", None), (f"{base}/vin-tool", None), (f"{base}/businesses", None),
+            (f"{base}/plans", None), (f"{base}/become-a-seller", None)]
+    parts = (await db.execute(
+        _orm_select(models.PartListing.id, models.PartListing.created_at)
+        .where(models.PartListing.stock_quantity > 0)
+        .order_by(models.PartListing.id.desc()).limit(20000))).all()
+    urls += [(f"{base}/part/{i}", c) for i, c in parts]
+    cars = (await db.execute(
+        _orm_select(models.VehicleListing.id, models.VehicleListing.created_at)
+        .where(models.VehicleListing.is_sold.is_(False))
+        .order_by(models.VehicleListing.id.desc()).limit(20000))).all()
+    urls += [(f"{base}/vehicle/{i}", c) for i, c in cars]
+    shops = (await db.execute(
+        _orm_select(models.Business.slug, models.Business.created_at)
+        .where(models.Business.status == "verified"))).all()
+    urls += [(f"{base}/store/{slug}", c) for slug, c in shops]
+    body = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for loc, when in urls:
+        body.append(f"<url><loc>{escape(loc)}</loc>" + (f"<lastmod>{when.date().isoformat()}</lastmod>" if when else "") + "</url>")
+    body.append("</urlset>")
+    return Response("\n".join(body), media_type="application/xml", headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.get("/health", tags=["Health"])
@@ -433,6 +475,11 @@ async def vehicle_detail_page(vehicle_id: str, request: Request, db: AsyncSessio
 @app.get("/catalog/{catalog_id}")
 async def catalog_detail_page(catalog_id: str):
     return FileResponse("app/templates/catalog_detail.html")
+
+
+@app.get("/vin")
+async def vin_short_link():
+    return RedirectResponse("/vin-tool", status_code=301)
 
 
 @app.get("/vin-tool")
