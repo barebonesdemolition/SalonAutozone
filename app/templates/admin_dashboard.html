@@ -317,6 +317,11 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  </form>
  </div>
  <div class="panel" style="margin-top:16px">
+ <div class="bar"><h2>Riders to pay</h2><span id="riders-total" style="font-weight:800"></span></div>
+ <p style="margin:0 0 12px;color:#64748b">Riders are paid only after the buyer gives them the delivery code. Pay the ones marked <b>You pay</b>; shops pay their own riders (shown so you can follow up).</p>
+ <div class="table-wrap"><table><thead><tr><th>Order</th><th>Rider</th><th>Amount</th><th>Who pays</th><th></th></tr></thead><tbody id="tb-riders"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ <div class="panel" style="margin-top:16px">
  <div class="bar"><h2>Fees shops owe you</h2><span id="owed-total" style="font-weight:800"></span></div>
  <p style="margin:0 0 12px;color:#64748b">From delivered orders the shop was paid for directly. When a shop pays you, tap <b>Paid</b>.</p>
  <div class="table-wrap"><table><thead><tr><th>Shop</th><th>Orders</th><th>Owes</th><th></th></tr></thead><tbody id="tb-owed"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
@@ -410,6 +415,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  if (t.delivery_fees_missing) items.push(['delivery', 'Set delivery fees. Buyers can\'t check out until you do.', '!', true]);
  if (t.order_payments_to_check) items.push(['orders', 'Buyers say they\'ve paid: check the transaction ID', t.order_payments_to_check, true, 'awaiting_payment']);
  if (t.orders_awaiting_payment) items.push(['orders', 'Parts orders waiting for payment', t.orders_awaiting_payment]);
+ if (t.riders_to_pay) items.push(['delivery', 'Riders to pay for delivered orders', t.riders_to_pay, true]);
  if (t.drivers_pending) items.push(['drivers', 'Drivers waiting for approval', t.drivers_pending]);
  if (t.jobs_without_driver) items.push(['orders', 'Orders ready but no driver has taken them yet', t.jobs_without_driver, false, 'ready_for_pickup']);
  if (t.businesses_pending) items.push(['businesses', 'Business applications to review', t.businesses_pending]);
@@ -897,6 +903,30 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  });
 
  // ---------- delivery fees ----------
+ function loadRiders() {
+ var tb = $('tb-riders');
+ fetch('/api/shop/admin/rider-payouts', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+ if (!d) { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load.</td></tr>'; return; }
+ var mine = d.payouts.filter(function (p) { return p.paid_by === 'platform'; }).reduce(function (a, p) { return a + p.amount_sll; }, 0);
+ $('riders-total').textContent = mine ? 'You owe SLL ' + fmt(mine) : '';
+ tb.innerHTML = d.payouts.length ? d.payouts.map(function (p) {
+ var ph = String(p.rider_phone || '').replace(/[^\d+]/g, '');
+ return '<tr><td><strong>' + esc(p.code) + '</strong><br><small>' + esc(String(p.delivered_at || '').slice(0, 16).replace('T', ' ')) + '</small></td>' +
+ '<td>' + esc(p.rider_name || '') + (ph ? '<br><a href="tel:' + esc(ph) + '">' + esc(p.rider_phone) + '</a>' : '') + '</td>' +
+ '<td><strong>SLL ' + fmt(p.amount_sll) + '</strong></td><td>' + (p.paid_by === 'platform' ? '<span class="badge warn">You pay</span>' : '<span class="badge off">The shop</span>') + '</td>' +
+ '<td><button class="btn' + (p.paid_by === 'platform' ? ' btn-primary' : '') + '" data-rider="' + p.job_id + '" data-amt="' + p.amount_sll + '">Paid</button></td></tr>';
+ }).join('') : '<tr><td colspan="5" class="empty">No rider is waiting to be paid.</td></tr>';
+ }).catch(function () {});
+ }
+ $('tb-riders').addEventListener('click', function (e) {
+ var b = e.target.closest('[data-rider]'); if (!b) return;
+ var ref = prompt('Transaction ID of the payment to the rider (optional). Paying SLL ' + fmt(Number(b.dataset.amt)), '');
+ if (ref === null) return;
+ b.disabled = true;
+ fetch('/api/shop/admin/rider-payouts/' + b.dataset.rider + '/paid', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ reference: ref.trim() || null }) })
+ .then(function (r) { if (!r.ok) throw new Error('Could not update'); toast('Rider marked as paid', true); loadRiders(); loadTodo(); })
+ .catch(function (err) { b.disabled = false; toast(err.message, false); });
+ });
  function loadOwed() {
  var tb = $('tb-owed');
  fetch('/api/shop/admin/shop-fees', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
@@ -918,7 +948,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  .catch(function (err) { b.disabled = false; toast(err.message, false); });
  });
  function loadFees() {
- loadOwed();
+ loadOwed(); loadRiders();
  fetch('/api/shop/admin/settings', { headers: auth() }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
  $('fee-okada').value = d.okada_fee_sll != null ? d.okada_fee_sll : '';
  $('fee-van').value = d.van_fee_sll != null ? d.van_fee_sll : '';

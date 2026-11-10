@@ -153,6 +153,9 @@ async def admin_todo(_: dict = Depends(require_admin), db: AsyncSession = Depend
             models.ImportRequest.status.in_(["open", "pending", "new"]))),
         "inquiries_new": await scalar(select(func.count(models.Inquiry.id)).where(models.Inquiry.status == "new")),
         "order_payments_to_check": await scalar(text("SELECT COUNT(*) FROM order_payments p JOIN shop_orders o ON o.id = p.order_id WHERE p.status = 'submitted' AND o.pay_to <> 'shop'")),
+        "riders_to_pay": await scalar(text(
+            "SELECT COUNT(*) FROM delivery_jobs j JOIN shop_orders o ON o.id = j.order_id "
+            "WHERE j.status = 'delivered' AND j.rider_paid_at IS NULL AND j.payout_sll > 0 AND o.pay_to <> 'shop'")),
         "password_requests": await scalar(text("SELECT COUNT(*) FROM password_reset_requests WHERE status = 'open'")),
     }
 

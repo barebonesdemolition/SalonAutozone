@@ -97,6 +97,10 @@ jobs = Table("delivery_jobs", _md,
     Column("accepted_at", DateTime, nullable=True),
     Column("picked_up_at", DateTime, nullable=True),
     Column("delivered_at", DateTime, nullable=True),
+    # The rider is paid only after the buyer has the parts (delivery code entered).
+    Column("rider_paid_at", DateTime, nullable=True),
+    Column("rider_paid_by", Integer, nullable=True),
+    Column("rider_paid_ref", String, nullable=True),
 )
 settings_t = Table("delivery_settings", _md,
     Column("key", String, primary_key=True),
@@ -123,6 +127,14 @@ async def ensure_delivery_tables():
             for column in await conn.run_sync(missing_columns):
                 kind = {"pay_to": "VARCHAR NOT NULL DEFAULT 'platform'", "fee_settled_at": "TIMESTAMP"}.get(column, "FLOAT")
                 await conn.execute(text(f"ALTER TABLE shop_orders ADD COLUMN {column} {kind}"))
+
+            def missing_job_columns(sync_conn):
+                have = {col["name"] for col in sa_inspect(sync_conn).get_columns("delivery_jobs")}
+                return [c for c in ("rider_paid_at", "rider_paid_by", "rider_paid_ref") if c not in have]
+
+            for column in await conn.run_sync(missing_job_columns):
+                kind = {"rider_paid_at": "TIMESTAMP", "rider_paid_by": "INTEGER"}.get(column, "VARCHAR")
+                await conn.execute(text(f"ALTER TABLE delivery_jobs ADD COLUMN {column} {kind}"))
     except Exception:
         log.exception("Could not create delivery tables")
 
@@ -623,7 +635,82 @@ async def driver_earnings(user: models.User = Depends(get_current_user), db: Asy
     driver = await _verified_driver(db, user)
     n, total = (await db.execute(select(func.count(jobs.c.id), func.coalesce(func.sum(jobs.c.payout_sll), 0))
                                  .where(jobs.c.driver_id == driver.id, jobs.c.status == "delivered"))).one()
-    return {"deliveries": n, "earned_sll": round(float(total), 2)}
+    waiting = (await db.execute(select(func.coalesce(func.sum(jobs.c.payout_sll), 0)).where(
+        jobs.c.driver_id == driver.id, jobs.c.status == "delivered", jobs.c.rider_paid_at.is_(None)))).scalar()
+    rows = (await db.execute(
+        select(jobs.c.id, jobs.c.payout_sll, jobs.c.delivered_at, jobs.c.rider_paid_at, jobs.c.rider_paid_ref,
+               orders.c.code, orders.c.pay_to)
+        .select_from(jobs.join(orders, orders.c.id == jobs.c.order_id))
+        .where(jobs.c.driver_id == driver.id, jobs.c.status == "delivered")
+        .order_by(jobs.c.delivered_at.desc()).limit(20))).all()
+    return {"deliveries": n, "earned_sll": round(float(total), 2), "waiting_sll": round(float(waiting or 0), 2),
+            "paid_sll": round(float(total) - float(waiting or 0), 2),
+            "recent": [{"code": r.code, "payout_sll": r.payout_sll, "paid": r.rider_paid_at is not None,
+                        "paid_by": "the shop" if r.pay_to == "shop" else "SalonAutoZone", "reference": r.rider_paid_ref,
+                        "delivered_at": r.delivered_at.isoformat() if r.delivered_at else None} for r in rows]}
+
+
+# ---------- paying riders: only after delivery ----------
+
+def _rider_payouts_query():
+    return (select(jobs.c.id.label("job_id"), jobs.c.payout_sll, jobs.c.delivered_at, orders.c.id.label("order_id"),
+                   orders.c.code, orders.c.pay_to, orders.c.seller_id, drivers_t.c.phone.label("rider_phone"),
+                   USERS.c.full_name.label("rider_name"))
+            .select_from(jobs.join(orders, orders.c.id == jobs.c.order_id)
+                         .join(drivers_t, drivers_t.c.id == jobs.c.driver_id)
+                         .join(USERS, USERS.c.id == drivers_t.c.user_id))
+            .where(jobs.c.status == "delivered", jobs.c.rider_paid_at.is_(None), jobs.c.payout_sll > 0)
+            .order_by(jobs.c.delivered_at))
+
+
+def _payout_row(r):
+    return {"job_id": r.job_id, "order_id": r.order_id, "code": r.code, "amount_sll": r.payout_sll,
+            "rider_name": r.rider_name, "rider_phone": r.rider_phone,
+            "paid_by": "shop" if r.pay_to == "shop" else "platform",
+            "delivered_at": r.delivered_at.isoformat() if r.delivered_at else None}
+
+
+class RiderPaidIn(BaseModel):
+    reference: str | None = Field(default=None, max_length=60)
+
+
+async def _mark_rider_paid(db, job_id, actor_id, reference, **where):
+    q = update(jobs).where(jobs.c.id == job_id, jobs.c.status == "delivered", jobs.c.rider_paid_at.is_(None))
+    if "seller_id" in where:
+        own = select(orders.c.id).where(orders.c.seller_id == where["seller_id"], orders.c.pay_to == "shop")
+        q = q.where(jobs.c.order_id.in_(own))
+    got = await db.execute(q.values(rider_paid_at=datetime.utcnow(), rider_paid_by=actor_id,
+                                    rider_paid_ref=(reference or "").strip() or None))
+    if got.rowcount != 1:
+        raise HTTPException(409, "This delivery isn't waiting for the rider to be paid")
+    await db.commit()
+    return {"job_id": job_id, "rider_paid": True}
+
+
+@router.get("/seller/rider-payouts")
+async def seller_rider_payouts(user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    """Riders this shop must pay: delivered orders the shop was paid for directly."""
+    rows = (await db.execute(_rider_payouts_query().where(orders.c.seller_id == user.id, orders.c.pay_to == "shop"))).all()
+    return {"count": len(rows), "payouts": [_payout_row(r) for r in rows]}
+
+
+@router.post("/seller/rider-payouts/{job_id}/paid")
+async def seller_rider_paid(job_id: int, body: RiderPaidIn, user: models.User = Depends(get_current_user),
+                            db: AsyncSession = Depends(get_db)):
+    return await _mark_rider_paid(db, job_id, user.id, body.reference, seller_id=user.id)
+
+
+@router.get("/admin/rider-payouts")
+async def admin_rider_payouts(admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
+    """Every rider still waiting to be paid. SalonAutoZone pays the 'platform' ones; shops pay theirs."""
+    rows = (await db.execute(_rider_payouts_query())).all()
+    out = [_payout_row(r) for r in rows]
+    return {"count": len(out), "total_sll": round(sum(x["amount_sll"] for x in out), 2), "payouts": out}
+
+
+@router.post("/admin/rider-payouts/{job_id}/paid")
+async def admin_rider_paid(job_id: int, body: RiderPaidIn, admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
+    return await _mark_rider_paid(db, job_id, admin.id, body.reference)
 
 
 @router.get("/admin/orders")

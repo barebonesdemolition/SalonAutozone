@@ -159,11 +159,16 @@
    });
   },
   sales: function () {
-   return Promise.all([api('/api/shop/seller/orders'), api('/api/businesses/mine/payments').catch(function () { return null; }), api('/api/shop/seller/fees').catch(function () { return null; })]).then(function (res) {
-    var d = res[0], ps = res[1], fees = res[2];
+   return Promise.all([api('/api/shop/seller/orders'), api('/api/businesses/mine/payments').catch(function () { return null; }), api('/api/shop/seller/fees').catch(function () { return null; }), api('/api/shop/seller/rider-payouts').catch(function () { return null; })]).then(function (res) {
+    var d = res[0], ps = res[1], fees = res[2], riders = (res[3] && res[3].payouts) || [];
     var list = d.orders || [];
     var top = ps ? payBox(ps) : '';
     if (fees && fees.owed_sll > 0) top = '<div class="notice notice-warn" style="margin-bottom:14px"><b>You owe SalonAutoZone SLL ' + fmt(fees.owed_sll) + '</b> in fees for ' + plural(fees.orders, 'delivered order', 'delivered orders') + '.' + (fees.pay_to ? ' Send it with Orange Money to <b>' + esc(fees.pay_to) + '</b>, with your shop name as the reference.' : '') + '</div>' + top;
+    if (riders.length) top = riders.map(function (p) {
+     var ph = String(p.rider_phone || '').replace(/[^\d+]/g, '');
+     return '<div class="notice notice-warn" style="margin-bottom:10px"><b>Pay the rider SLL ' + fmt(p.amount_sll) + '</b> for order ' + esc(p.code) + '. The buyer has the parts. Send it to ' + esc(p.rider_name || 'the rider') + ' on ' + (ph ? '<a href="tel:' + esc(ph) + '">' + esc(p.rider_phone) + '</a>' : 'their phone') + '.' +
+      '<div style="margin-top:8px"><button class="btn btn-primary" data-rider-paid="' + p.job_id + '">I\'ve paid the rider</button></div></div>';
+    }).join('') + top;
     if (!list.length) return top + empty('No sales yet', 'When a buyer orders one of your parts it shows up here.', '');
     var S = { awaiting_payment: ['Waiting for the buyer to pay', 'gold'], confirmed: ['Paid: get the parts ready', ''], ready_for_pickup: ['Ready: waiting for a driver', ''], driver_assigned: ['Driver on the way to you', ''], out_for_delivery: ['With the driver', ''], delivered: ['Delivered', ''], cancelled: ['Cancelled', 'off'] };
     return top + '<div class="list">' + list.map(function (o) {
@@ -258,6 +263,16 @@
  });
 
  panel.addEventListener('click', function (e) {
+  var rp = e.target.closest('[data-rider-paid]');
+  if (rp) {
+   var ref = prompt('Transaction ID of the payment to the rider (optional)', '');
+   if (ref === null) return;
+   rp.disabled = true;
+   api('/api/shop/seller/rider-payouts/' + rp.dataset.riderPaid + '/paid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reference: ref.trim() || null }) })
+    .then(function () { toast('Thanks. The rider can see they\'ve been paid.', 'success'); show('sales'); })
+    .catch(function (err) { rp.disabled = false; if (err) toast(err.message, 'error'); });
+   return;
+  }
   var pok = e.target.closest('[data-pay-ok]'), pno = e.target.closest('[data-pay-no]');
   if (pok) {
    if (!confirm('Is the money on your phone, for the full amount?')) return;
