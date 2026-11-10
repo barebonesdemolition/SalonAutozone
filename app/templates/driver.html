@@ -91,7 +91,7 @@
  <p class="lead">Deliver car parts with your okada or van and get paid for every drop.</p>
  <div id="app" class="stack"><div class="lcard skeleton" style="min-height:200px"></div></div>
 </main>
-<script src="/static/site.js?v=8"></script>
+<script src="/static/site.js?v=9"></script>
 <script>
 (function () {
  'use strict';
@@ -148,7 +148,8 @@
   if (d.status === 'rejected') h += '<button class="btn btn-ghost btn-block" style="margin-top:14px" id="again" type="button">Fix details and apply again</button>';
   h += '</div>';
   if (d.status === 'verified') {
-   h += '<section><h2 class="section-title" style="margin-top:6px">Your delivery</h2><div id="mine"><div class="lcard skeleton" style="min-height:120px"></div></div></section>' +
+   h += '<a class="notice notice-info" href="/alerts" style="display:block;margin-bottom:12px;text-decoration:none">🔔 <b>Turn on alerts</b> to get a pop-up on your phone for new jobs near you.</a>' +
+    '<section><h2 class="section-title" style="margin-top:6px">Your delivery</h2><div id="mine"><div class="lcard skeleton" style="min-height:120px"></div></div></section>' +
     '<section><h2 class="section-title" style="margin-top:6px">Jobs near you</h2><div id="open"></div></section>' +
     '<div class="nums"><div><b id="earned">0</b><span>SLL earned</span></div><div><b id="waiting">0</b><span>SLL still to be paid</span></div><div><b id="count">0</b><span>deliveries</span></div></div>' +
     '<div id="paylist" style="margin-top:12px"></div>';

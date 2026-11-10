@@ -71,7 +71,7 @@
  </div>
  <section id="panel" aria-live="polite"></section>
 </main>
-<script src="/static/site.js?v=8"></script>
+<script src="/static/site.js?v=9"></script>
 <script>
 (function () {
  'use strict';
@@ -162,7 +162,7 @@
    return Promise.all([api('/api/shop/seller/orders'), api('/api/businesses/mine/payments').catch(function () { return null; }), api('/api/shop/seller/fees').catch(function () { return null; }), api('/api/shop/seller/rider-payouts').catch(function () { return null; }), api('/api/shop/seller/payouts').catch(function () { return null; })]).then(function (res) {
     var d = res[0], ps = res[1], fees = res[2], riders = (res[3] && res[3].payouts) || [], pay = res[4];
     var list = d.orders || [];
-    var top = ps ? payBox(ps) : '';
+    var top = (ps ? payBox(ps) : '') + '<a class="notice notice-info" href="/alerts" style="display:block;margin-bottom:12px;text-decoration:none">🔔 <b>Turn on alerts</b> to hear about new orders and payments straight away.</a>';
     if (pay && (pay.coming_sll || pay.due_sll || (pay.recent_paid || []).length)) top = '<div class="box" style="margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
      '<div><small class="hint">Waiting for delivery</small><b style="display:block;font-size:20px">SLL ' + fmt(pay.coming_sll) + '</b></div>' +
      '<div><small class="hint">Delivered, we\'re sending it</small><b style="display:block;font-size:20px">SLL ' + fmt(pay.due_sll) + '</b></div>' +

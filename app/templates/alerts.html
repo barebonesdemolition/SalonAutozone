@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alerts · SalonAutoZone</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" sizes="64x64" href="/static/icon-64.png">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
+<link rel="stylesheet" href="/static/ui.css?v=8">
+<link rel="stylesheet" href="/static/chrome.css?v=5">
+<style>
+.page { max-width: 640px; padding-bottom: 56px; }
+.page-title { font-size: clamp(28px, 6vw, 38px); margin: 22px 0 14px; font-variation-settings: "wdth" 78; }
+.box { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px 18px; }
+.box h2 { font-size: 18px; margin: 0 0 4px; }
+.onrow { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.list { display: grid; gap: 8px; margin-top: 16px; }
+.al { display: block; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: inherit; text-decoration: none; }
+.al:hover { border-color: var(--teal); }
+.al.new { border-left: 4px solid var(--gold); }
+.al b { display: block; color: var(--ink); }
+.al p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.al small { color: var(--muted); font-size: 12px; }
+.empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main class="wrap page">
+ <h1 class="page-title">Alerts</h1>
+ <section class="box" id="phone"><p class="hint">Checking…</p></section>
+ <div class="list" id="list"><div class="lcard skeleton" style="min-height:70px"></div></div>
+</main>
+<script src="/static/site.js?v=9"></script>
+<script>
+(function () {
+ 'use strict';
+ function token() { try { return localStorage.getItem('token') || ''; } catch (e) { return ''; } }
+ if (!token()) { location.replace('/login?next=/alerts'); return; }
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function api(path, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign({ Authorization: 'Bearer ' + token() }, opts.body ? { 'Content-Type': 'application/json' } : {});
+  return fetch(path, opts).then(function (r) {
+   if (r.status === 401) { location.href = '/login?next=/alerts'; throw null; }
+   return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Something went wrong'); return d; });
+  });
+ }
+ function ago(iso) {
+  var s = (Date.now() - new Date(iso + (iso.endsWith('Z') ? '' : 'Z')).getTime()) / 1000;
+  if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s / 60) + ' min ago';
+  if (s < 86400) return Math.floor(s / 3600) + ' h ago';
+  return new Date(iso + 'Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+ }
+ function b64ToBytes(s) {
+  var pad = '='.repeat((4 - s.length % 4) % 4), raw = atob((s + pad).replace(/-/g, '+').replace(/_/g, '/'));
+  var out = new Uint8Array(raw.length); for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out;
+ }
+
+ var box = document.getElementById('phone');
+ var supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+ var ios = /iphone|ipad|ipod/i.test(navigator.userAgent), standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+
+ function phoneBox(on) {
+  if (!supported) {
+   box.innerHTML = '<h2>Pop-up alerts on this phone</h2><p class="hint">' + (ios && !standalone
+    ? 'On iPhone: tap Share, then "Add to Home Screen", open SalonAutoZone from your home screen, and come back to this page.'
+    : 'This browser can\'t show pop-up alerts. Try Chrome. Your alerts still appear on this page.') + '</p>';
+   return;
+  }
+  if (Notification.permission === 'denied') {
+   box.innerHTML = '<h2>Alerts are blocked</h2><p class="hint">You blocked alerts for this site. Allow them in your browser\'s site settings, then reload this page.</p>';
+   return;
+  }
+  box.innerHTML = '<div class="onrow"><div><h2>' + (on ? 'Alerts are on for this phone' : 'Get alerts on this phone') + '</h2><p class="hint" style="margin:0">' +
+   (on ? 'You\'ll get a pop-up for new orders, payments and deliveries.' : 'A pop-up when an order is paid, a job is waiting, or your parts are on the way.') + '</p></div>' +
+   '<button class="btn ' + (on ? 'btn-ghost' : 'btn-primary') + '" id="toggle" type="button">' + (on ? 'Turn off' : 'Turn on alerts') + '</button></div><p class="hint" id="pmsg" role="alert"></p>';
+  document.getElementById('toggle').addEventListener('click', on ? turnOff : turnOn);
+ }
+
+ function reg() { return navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(function () { return navigator.serviceWorker.ready; }); }
+
+ function turnOn() {
+  var b = document.getElementById('toggle'), msg = document.getElementById('pmsg');
+  b.disabled = true; b.textContent = 'Turning on…';
+  Notification.requestPermission().then(function (perm) {
+   if (perm !== 'granted') throw new Error('You need to allow alerts when your phone asks.');
+   return Promise.all([reg(), api('/api/push/key')]);
+  }).then(function (r) {
+   return r[0].pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(r[1].key) });
+  }).then(function (sub) {
+   var j = sub.toJSON();
+   return api('/api/push/subscribe', { method: 'POST', body: JSON.stringify({ endpoint: j.endpoint, keys: j.keys }) });
+  }).then(function () { phoneBox(true); load(); })
+   .catch(function (e) { if (!e) return; b.disabled = false; b.textContent = 'Turn on alerts'; msg.textContent = e.message || 'Could not turn on alerts.'; if (Notification.permission === 'denied') phoneBox(false); });
+ }
+
+ function turnOff() {
+  reg().then(function (r) { return r.pushManager.getSubscription(); }).then(function (sub) {
+   if (!sub) return;
+   return api('/api/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: sub.endpoint }) }).then(function () { return sub.unsubscribe(); });
+  }).then(function () { phoneBox(false); }).catch(function () { phoneBox(false); });
+ }
+
+ if (supported) {
+  reg().then(function (r) { return r.pushManager.getSubscription(); })
+   .then(function (sub) { phoneBox(!!sub && Notification.permission === 'granted'); })
+   .catch(function () { phoneBox(false); });
+ } else phoneBox(false);
+
+ function load() {
+  api('/api/alerts').then(function (d) {
+   var list = document.getElementById('list');
+   if (!d.alerts.length) { list.innerHTML = '<div class="empty">No alerts yet. When something happens with your orders, sales or deliveries, it shows up here.</div>'; return; }
+   list.innerHTML = d.alerts.map(function (a) {
+    var url = a.url && a.url.charAt(0) === '/' ? a.url : '#';
+    return '<a class="al' + (a.read ? '' : ' new') + '" href="' + esc(url) + '"><b>' + esc(a.title) + '</b>' + (a.body ? '<p>' + esc(a.body) + '</p>' : '') + '<small>' + esc(ago(a.created_at)) + '</small></a>';
+   }).join('');
+   if (d.unread) api('/api/alerts/read', { method: 'POST' }).then(function () { if (window.SAZAlerts) SAZAlerts.refresh(); }).catch(function () {});
+  }).catch(function (e) { if (e) document.getElementById('list').innerHTML = '<div class="notice notice-bad">We couldn\'t load your alerts.</div>'; });
+ }
+ load();
+})();
+</script>
+</body>
+</html>

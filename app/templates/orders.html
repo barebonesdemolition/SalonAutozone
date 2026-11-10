@@ -53,7 +53,7 @@
 <body>
 <div id="site-header"></div>
 <main class="wrap" id="root"></main>
-<script src="/static/site.js?v=8"></script>
+<script src="/static/site.js?v=9"></script>
 <script>
 (function () {
  'use strict';
@@ -151,6 +151,37 @@
   }).catch(function () { box.remove(); });
  }
 
+ // ---------- refunds ----------
+ var RSTAT = { requested: ['We\'re looking at it', 'wait'], to_send: ['Refund approved, sending soon', 'wait'], sent: ['Refund sent', 'done'], declined: ['Not refunded', 'off'] };
+ function refundBox(id, o) {
+  var el = document.getElementById('refunds'); if (!el) return;
+  var auth = { Authorization: 'Bearer ' + token() };
+  fetch('/api/refunds/orders/' + encodeURIComponent(id), { headers: auth }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+   if (!d) return;
+   var h = (d.refunds || []).map(function (r) {
+    var s = RSTAT[r.status] || [r.status, ''];
+    return '<section class="box"><h2>Refund</h2><p><span class="status ' + s[1] + '">' + esc(s[0]) + '</span></p>' +
+     '<p>SLL ' + fmt(r.amount_sll) + (r.refund_phone ? ' to ' + esc(r.refund_phone) : '') + (r.sent_ref ? ' (ref ' + esc(r.sent_ref) + ')' : '') + '</p>' +
+     '<p class="hint">' + esc(r.reason) + (r.note ? '<br>' + esc(r.note) : '') + '</p></section>';
+   }).join('');
+   if (d.can_report_problem) h += '<button class="btn btn-ghost btn-block" id="problem" type="button">Problem with this order?</button>' +
+    '<form id="pform" class="box" hidden><h2>What\'s wrong?</h2><p class="hint">Wrong part, broken, or missing something? Tell us within ' + d.problem_days + ' days of delivery and we\'ll sort it out.</p>' +
+    '<textarea class="input" id="preason" rows="3" maxlength="300" placeholder="e.g. The brake pads don\'t fit my 2012 Corolla" style="width:100%"></textarea>' +
+    '<p class="hint" id="pmsg" role="alert" style="color:var(--bad)"></p><button class="btn btn-primary btn-block" type="submit">Send to SalonAutoZone</button></form>';
+   el.innerHTML = h;
+   var pb = document.getElementById('problem'), pf = document.getElementById('pform');
+   if (pb) pb.addEventListener('click', function () { pf.hidden = false; pb.hidden = true; document.getElementById('preason').focus(); });
+   if (pf) pf.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var reason = document.getElementById('preason').value.trim(), msg = document.getElementById('pmsg');
+    if (reason.length < 10) { msg.textContent = 'Tell us a little more (at least 10 letters).'; return; }
+    fetch('/api/refunds/orders/' + encodeURIComponent(id) + '/problem', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth), body: JSON.stringify({ reason: reason }) })
+     .then(function (r) { return r.json().then(function (x) { if (!r.ok) throw new Error(x.detail || 'Could not send'); }); })
+     .then(function () { refundBox(id, o); }).catch(function (err) { msg.textContent = err.message; });
+   });
+  }).catch(function () {});
+ }
+
  // ---------- one order (buyer) ----------
  function orderPage(id) {
   root.innerHTML = '<div class="lcard skeleton" style="margin-top:22px"></div>';
@@ -181,12 +212,14 @@
       (o.status === 'awaiting_payment' ? '<a class="btn btn-primary btn-block" href="/pay/' + encodeURIComponent(o.id) + '">Pay now</a>' : '') +
       '<a class="btn ' + (o.status === 'awaiting_payment' ? 'btn-ghost' : 'btn-primary') + ' btn-block" href="/receipt?id=' + encodeURIComponent(o.id) + '">' + (o.status === 'awaiting_payment' ? 'Order summary' : o.status === 'cancelled' ? 'Cancelled order' : 'Receipt') + '</a>' +
       (canCancel ? '<button class="btn btn-ghost btn-block" id="cancel">Cancel order</button>' : '') +
+      '<div id="refunds"></div>' +
       '<a class="btn btn-ghost btn-block" href="/orders">All my orders</a>' +
      '</aside></div>';
     if (o.status === 'delivered') rateBox(id);
+    refundBox(id, o);
     var c = document.getElementById('cancel');
     if (c) c.addEventListener('click', function () {
-     if (!confirm('Cancel this order?')) return;
+     if (!confirm(o.status === 'confirmed' ? 'Cancel this order? You\'ve already paid, so we\'ll send your money back to the number you paid from.' : 'Cancel this order?')) return;
      c.disabled = true;
      fetch('/api/shop/orders/' + encodeURIComponent(id) + '/cancel', { method: 'POST', headers: { Authorization: 'Bearer ' + token() } })
       .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not cancel'); }); })
