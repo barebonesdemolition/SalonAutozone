@@ -76,6 +76,7 @@ textarea.input, textarea.inp { min-height: 96px; resize: vertical; }
 .notice-warn { background: var(--warn-50); color: #7a4b00; border: 1px solid #f6d9a8; }
 .notice-ok { background: var(--ok-50); color: var(--ok); }
 .notice-bad { background: var(--bad-50); color: var(--bad); }
+.notice-info { background: var(--teal-50); color: var(--teal-600); }
 
 /* ---------- Listing cards ---------- */
 .listing-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }

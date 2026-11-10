@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
-<link rel="stylesheet" href="/static/ui.css?v=7">
+<link rel="stylesheet" href="/static/ui.css?v=8">
 <link rel="stylesheet" href="/static/chrome.css?v=5">
 <style>
 .page { max-width: 560px; padding: 22px 16px 56px; }
@@ -69,6 +69,19 @@
 .code-in { font-size: 24px; letter-spacing: .3em; text-align: center; font-family: ui-monospace, Menlo, monospace; }
 .acts { display: grid; gap: 8px; margin-top: 12px; }
 .empty { text-align: center; color: var(--muted); padding: 14px 0; font-size: 15px; }
+.scan { border: 1.5px dashed var(--line); border-radius: var(--r-md); padding: 12px; margin-top: 8px; background: var(--paper); }
+.scan.has { border-style: solid; border-color: var(--teal); }
+.scan-top { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.scan-top b { display: block; color: var(--ink); }
+.scan-top small { color: var(--muted); font-size: 13px; }
+.scan-ph { width: 72px; height: 52px; flex-shrink: 0; border-radius: 8px; background: var(--teal-50) center / cover no-repeat; }
+.scan-btn { gap: 8px; }
+.scan-btn svg { color: var(--gold); }
+.scan-st .notice { margin-top: 10px; }
+.row2 { display: grid; gap: 0 12px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 460px) { .row2 { grid-template-columns: 1fr; } }
+.spin { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; vertical-align: -2px; animation: sp .8s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -233,41 +246,135 @@
   }).catch(function () {});
  }
 
+ // ---------- photos: shrink on the phone, then upload and read ----------
+ function shrink(file, max) {
+  return new Promise(function (ok, bad) {
+   var url = URL.createObjectURL(file), img = new Image();
+   img.onload = function () {
+    var scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(url);
+    c.toBlob(function (b) { ok({ blob: b, preview: c.toDataURL('image/jpeg', .6) }); }, 'image/jpeg', .85);
+   };
+   img.onerror = function () { bad(new Error('That file isn\'t a photo we can open.')); };
+   img.src = url;
+  });
+ }
+ var ID_TYPES = [['national_id', 'National ID card'], ['drivers_licence', 'Driver\'s licence'], ['voter_card', 'Voter ID card'], ['passport', 'Passport'], ['ecowas_id', 'ECOWAS ID card'], ['other', 'Other ID']];
+ function accountName() { try { return (JSON.parse(localStorage.getItem('userInfo') || '{}').full_name || ''); } catch (e) { return ''; } }
+ function namesMatch(a, b) {
+  var A = (a || '').toLowerCase().match(/[a-z]{2,}/g) || [], B = (b || '').toLowerCase().match(/[a-z]{2,}/g) || [];
+  if (!A.length || !B.length) return true;
+  var n = A.filter(function (w) { return B.indexOf(w) !== -1; }).length;
+  return n >= Math.min(2, A.length, B.length);
+ }
+
  function showForm(prev) {
   prev = prev || {};
   clearInterval(timer);
-  var vt = prev.vehicle_type || '';
+  var vt = prev.vehicle_type || '', idUrl = prev.id_photo_url || '', plateUrl = prev.plate_photo_url || '', busy = 0;
+  var cam = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="4"/></svg>';
+  function scanCard(kind, title, help) {
+   return '<div class="scan" id="sc-' + kind + '"><div class="scan-top"><div class="scan-ph" id="ph-' + kind + '"></div><div><b>' + title + '</b><small>' + help + '</small></div></div>' +
+    '<label class="btn btn-dark btn-block scan-btn">' + cam + '<span id="bt-' + kind + '">Take a photo</span><input type="file" accept="image/*" capture="environment" id="in-' + kind + '" hidden></label>' +
+    '<div class="scan-st" id="st-' + kind + '" aria-live="polite"></div></div>';
+  }
   app.innerHTML = perks + '<form class="box" id="f" novalidate><h2>Apply to deliver</h2>' +
-   '<span class="lbl" style="margin-top:12px">What do you ride?</span><div class="vt" id="vt">' +
+   '<span class="lbl" style="margin-top:12px">1. What do you ride?</span><div class="vt" id="vt">' +
    '<button type="button" data-v="bike" aria-pressed="false"><b>Okada</b><small>Small and medium parts</small></button>' +
    '<button type="button" data-v="van" aria-pressed="false"><b>Van</b><small>Bulky parts like engines and doors</small></button></div>' +
-   '<label class="field"><span>Registration number</span><input class="input" id="plate" maxlength="20" autocomplete="off" style="text-transform:uppercase"></label>' +
+   '<span class="lbl" style="margin-top:18px">2. Your ID</span>' +
+   scanCard('id', 'Front of your ID card', 'National ID, driver\'s licence, voter card or passport. Lay it flat, in good light.') +
+   '<div class="row2"><label class="field"><span>Type of ID</span><select class="select" id="id_type"><option value="">Choose…</option>' + ID_TYPES.map(function (t) { return '<option value="' + t[0] + '">' + t[1] + '</option>'; }).join('') + '</select></label>' +
+   '<label class="field"><span>ID number</span><input class="input" id="id_number" maxlength="40" autocomplete="off" style="text-transform:uppercase"></label></div>' +
+   '<label class="field"><span>Name on the ID</span><input class="input" id="id_name" maxlength="100" autocomplete="off"></label>' +
+   '<input type="hidden" id="id_expiry"><div id="namewarn"></div>' +
+   '<span class="lbl" style="margin-top:18px">3. Your number plate</span>' +
+   scanCard('plate', 'Your bike\'s number plate', 'Stand straight in front of the plate, close enough to fill the photo.') +
+   '<label class="field"><span>Plate number</span><input class="input" id="plate" maxlength="20" autocomplete="off" style="text-transform:uppercase"></label>' +
+   '<span class="lbl" style="margin-top:18px">4. Where and how to reach you</span>' +
    '<label class="field"><span>City</span><input class="input" id="city" maxlength="60" value="Freetown"></label>' +
    '<label class="field"><span>WhatsApp number</span><input class="input" id="phone" type="tel" maxlength="25" placeholder="076 123456"></label>' +
-   '<label class="field"><span>Photo of your ID or licence</span><input class="input" id="photo" type="file" accept="image/*"></label>' +
-   '<p class="hint">Only our team sees this photo.</p>' +
+   '<p class="hint">Only our team sees your ID and photos. Buyers only see your name, phone and plate when you\'re delivering to them.</p>' +
    '<button class="btn btn-primary btn-block btn-lg" style="margin-top:16px" type="submit" id="go">Send application</button><div id="msg"></div></form>';
   var f = document.getElementById('f'), msg = document.getElementById('msg'), vtBox = document.getElementById('vt');
-  function pick(v) { vt = v; vtBox.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.v === v)); }); }
+  function $id(x) { return document.getElementById(x); }
+  function pick(v) { vt = v; vtBox.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.v === v)); }); $id('sc-plate').querySelector('b').textContent = v === 'van' ? 'Your van\'s number plate' : 'Your bike\'s number plate'; }
   if (vt) pick(vt);
   vtBox.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pick(b.dataset.v); });
-  document.getElementById('plate').value = prev.plate_number || '';
-  document.getElementById('city').value = prev.city || 'Freetown';
-  document.getElementById('phone').value = prev.phone || '';
+  $id('plate').value = prev.plate_number || '';
+  $id('city').value = prev.city || 'Freetown';
+  $id('phone').value = prev.phone || '';
+  $id('id_type').value = prev.id_type || '';
+  $id('id_number').value = prev.id_number || '';
+  $id('id_name').value = prev.id_name || '';
+  $id('id_expiry').value = prev.id_expiry || '';
+  function photoDone(kind, preview) { $id('ph-' + kind).style.backgroundImage = 'url(' + preview + ')'; $id('sc-' + kind).classList.add('has'); $id('bt-' + kind).textContent = 'Take it again'; }
+  if (prev.id_photo_url) photoDone('id', prev.id_photo_url);
+  if (prev.plate_photo_url) photoDone('plate', prev.plate_photo_url);
+  function status(kind, text, kindCls) { $id('st-' + kind).innerHTML = text ? '<div class="notice notice-' + (kindCls || 'ok') + '">' + text + '</div>' : ''; }
+  function checkName() {
+   var a = accountName(), b = $id('id_name').value.trim();
+   $id('namewarn').innerHTML = (a && b && !namesMatch(a, b)) ? '<div class="notice notice-warn" style="margin-top:10px">The name on your ID (' + esc(b) + ') is different from your account name (' + esc(a) + '). That\'s fine if it\'s you; our team will check.</div>' : '';
+  }
+  $id('id_name').addEventListener('input', checkName);
+  if (prev.id_name) checkName();
+
+  function handle(kind, file) {
+   if (!file) return;
+   busy++; status(kind, '<span class="spin" aria-hidden="true"></span> Reading the photo…', 'info');
+   shrink(file, 1600).then(function (img) {
+    photoDone(kind, img.preview);
+    var up = new FormData(); up.append('file', img.blob, kind + '.jpg');
+    var scan = new FormData(); scan.append('file', img.blob, kind + '.jpg');
+    var upload = api('/api/upload/', { method: 'POST', body: up }).then(function (u) { if (kind === 'id') idUrl = u.url; else plateUrl = u.url; });
+    var read = api('/api/drivers/scan?kind=' + kind, { method: 'POST', body: scan }).then(function (d) {
+     if (kind === 'id') {
+      if (d.id_type) $id('id_type').value = d.id_type;
+      if (d.id_number) $id('id_number').value = d.id_number;
+      if (d.full_name) $id('id_name').value = d.full_name;
+      $id('id_expiry').value = d.expiry_date || '';
+      checkName();
+      if (d.expired) return status(kind, 'This ID expired on ' + esc(d.expiry_date) + '. Please use an ID that is still valid.', 'bad');
+      if (!d.ok) return status(kind, esc(d.problem || 'We couldn\'t read everything.') + ' Take the photo again, or type the details below.', 'warn');
+      status(kind, '✓ Read your ID. Check the details below are right.');
+     } else {
+      if (d.plate_number) $id('plate').value = d.plate_number;
+      if (!vt && d.vehicle_type && (d.vehicle_type === 'bike' || d.vehicle_type === 'van')) pick(d.vehicle_type);
+      if (!d.ok) return status(kind, esc(d.problem || 'We couldn\'t read the plate.') + ' Take the photo again, or type the number below.', 'warn');
+      status(kind, '✓ Read your plate' + (d.colour || d.make ? ' (' + esc([d.colour, d.make].filter(Boolean).join(' ')) + ')' : '') + '. Check the number below is right.');
+     }
+    }, function (e) {
+     status(kind, (e.status === 503 || e.status === 429 || e.status === 502 ? esc(e.message) : 'We couldn\'t read the photo.') + ' Your photo is saved; type the details below.', 'warn');
+    });
+    return Promise.all([upload, read]);
+   }).catch(function (e) {
+    status(kind, esc(e.message) + ' Please try again.', 'bad');
+    if (kind === 'id') idUrl = prev.id_photo_url || ''; else plateUrl = prev.plate_photo_url || '';
+   }).then(function () { busy--; });
+  }
+  $id('in-id').addEventListener('change', function (e) { handle('id', e.target.files[0]); e.target.value = ''; });
+  $id('in-plate').addEventListener('change', function (e) { handle('plate', e.target.files[0]); e.target.value = ''; });
+
   f.addEventListener('submit', function (ev) {
    ev.preventDefault(); say(msg, '');
-   var plate = document.getElementById('plate').value.trim(), city = document.getElementById('city').value.trim(),
-    phone = document.getElementById('phone').value.trim(), file = document.getElementById('photo').files[0];
+   var plate = $id('plate').value.trim(), city = $id('city').value.trim(), phone = $id('phone').value.trim();
+   if (busy) return say(msg, 'Wait a moment, your photos are still uploading.');
    if (!vt) return say(msg, 'Choose Okada or Van.');
-   if (!plate) return say(msg, 'Enter your registration number.');
+   if (!idUrl) return say(msg, 'Take a photo of your ID.');
+   if (!$id('id_type').value) return say(msg, 'Choose your type of ID.');
+   if ($id('id_number').value.trim().length < 4) return say(msg, 'Enter the number on your ID.');
+   if (!plateUrl) return say(msg, 'Take a photo of your number plate.');
+   if (!plate) return say(msg, 'Enter your plate number.');
    if (city.length < 2) return say(msg, 'Enter your city.');
    if (phone.replace(/\D/g, '').length < 8) return say(msg, 'Enter your WhatsApp number.');
-   if (!file && !prev.id_photo_url) return say(msg, 'Add a photo of your ID or licence.');
-   var go = document.getElementById('go'); go.disabled = true; go.textContent = 'Sending…';
-   var photo = file ? (function () { var fd = new FormData(); fd.append('file', file); return api('/api/upload/', { method: 'POST', body: fd }).then(function (u) { return u.url; }); })() : Promise.resolve(prev.id_photo_url);
-   photo.then(function (url) {
-    return api('/api/drivers/apply', { method: 'POST', body: JSON.stringify({ vehicle_type: vt, plate_number: plate, city: city, phone: phone, id_photo_url: url }) });
-   }).then(function () { return api('/api/drivers/me'); }).then(function (d) { window.scrollTo(0, 0); showStatus(d); })
+   var go = $id('go'); go.disabled = true; go.textContent = 'Sending…';
+   api('/api/drivers/apply', { method: 'POST', body: JSON.stringify({
+    vehicle_type: vt, plate_number: plate, city: city, phone: phone, id_photo_url: idUrl, plate_photo_url: plateUrl,
+    id_type: $id('id_type').value, id_number: $id('id_number').value.trim(), id_name: $id('id_name').value.trim() || null,
+    id_expiry: $id('id_expiry').value || null }) })
+    .then(function () { return api('/api/drivers/me'); }).then(function (d) { window.scrollTo(0, 0); showStatus(d); })
     .catch(function (e) { say(msg, e.status === 409 ? 'You already have an application.' : e.message); go.disabled = false; go.textContent = 'Send application'; });
   });
  }
