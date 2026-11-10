@@ -207,88 +207,63 @@ def test_shop_sets_numbers_and_fees(client):
     assert r.json()["ready"] is True and r.json()["pay_orange_money"] == "+232 76 570222"
 
 
-def test_buyer_pays_the_shop_and_shop_confirms(client):
-    seller, buyer, order, _ = _shop_order(client)
-    oid = order["id"]
-    assert order["delivery_fee_sll"] == 15000 and order["total_to_pay_sll"] == 115000 and order["pay_to"] == "shop"
-    page = client.get(f"/api/pay/orders/{oid}", headers=buyer).json()
-    assert page["pay_to"] == "shop" and page["payee"].startswith("Lumley Motors")
-    assert [(m["id"], m["number"]) for m in page["methods"]] == [("orange_money", "+232 76 570111")]
-    assert client.post(f"/api/pay/orders/{oid}/manual", headers=buyer, json={"method": "afrimoney", "reference": _ref(), "payer_phone": "076888999"}).status_code == 400
-    ref = _ref()
-    pid = client.post(f"/api/pay/orders/{oid}/manual", headers=buyer, json={"method": "orange_money", "reference": ref, "payer_phone": "076888999"}).json()["id"]
-
-    # The shop sees it in its sales, with what it receives
-    sale = [o for o in client.get("/api/shop/seller/orders", headers=seller).json()["orders"] if o["id"] == oid][0]
-    assert sale["payment"]["reference"] == ref and sale["total_to_receive_sll"] == 115000 and sale["delivery_fee_sll"] == 15000
-    # Another seller or the buyer can't approve it
-    other = _user(client, "Not The Shop")
-    assert client.post(f"/api/pay/seller/payments/{pid}/approve", headers=other).status_code == 404
-    assert client.post(f"/api/pay/seller/payments/{pid}/approve", headers=buyer).status_code == 404
-    assert client.post(f"/api/pay/seller/payments/{pid}/approve", headers=seller).status_code == 200
-    assert client.get(f"/api/shop/orders/{oid}", headers=buyer).json()["status"] == "confirmed"
-
-    slip = client.get(f"/api/shop/orders/{oid}/receipt?copy=store", headers=seller).json()
-    assert slip["paid_to"] == "shop" and slip["received_by_store_sll"] == 115000
-    # 10% of the 15,000 delivery fee is SalonAutoZone's; the rider gets the rest
-    assert slip["pay_rider_sll"] == 13500 and slip["salonautozone_fee_sll"] == 1500 and slip["store_keeps_sll"] == 100000
-    rec = client.get(f"/api/shop/orders/{oid}/receipt", headers=buyer).json()
-    assert rec["paid_to"] == "shop" and rec["total_sll"] == 115000
-
-
-def test_shop_rejects_and_no_online_for_shop_orders(client, monime):
-    seller, buyer, order, _ = _shop_order(client)
-    oid = order["id"]
-    assert [m["id"] for m in client.get(f"/api/pay/orders/{oid}", headers=buyer).json()["methods"]] == ["orange_money"]
-    assert client.post(f"/api/pay/orders/{oid}/online", headers=buyer).status_code == 409
-    pid = client.post(f"/api/pay/orders/{oid}/manual", headers=buyer, json={"method": "orange_money", "reference": _ref(), "payer_phone": "076888999"}).json()["id"]
-    before = client.get("/api/admin/todo", headers=ADMIN).json()["order_payments_to_check"]
-    assert client.post(f"/api/pay/seller/payments/{pid}/reject", headers=seller, json={"reason": "Nothing came to my phone"}).status_code == 200
-    assert client.get(f"/api/pay/orders/{oid}", headers=buyer).json()["payments"][0]["note"] == "Nothing came to my phone"
-    assert client.get("/api/admin/todo", headers=ADMIN).json()["order_payments_to_check"] == before
-
-
-def test_shop_without_fees_falls_back_to_platform(client):
-    _, buyer, order, settings = _shop_order(client, fees=False)
-    assert settings["ready"] is False
-    assert order["pay_to"] == "platform" and order["delivery_fee_sll"] == 25000
-
-
-def test_rider_sees_shop_pays(client):
-    from app.shop import _pricing  # noqa: F401  (pricing is covered above; here just the job flag)
-    seller, buyer, order, _ = _shop_order(client)
-    pid = client.post(f"/api/pay/orders/{order['id']}/manual", headers=buyer, json={"method": "orange_money", "reference": _ref(), "payer_phone": "076888999"}).json()["id"]
-    client.post(f"/api/pay/seller/payments/{pid}/approve", headers=seller)
-    assert client.post(f"/api/shop/seller/orders/{order['id']}/ready", headers=seller).status_code == 200
+def _deliver(client, buyer, order):
+    """Pay, prepare and deliver an order (statuses only; rider flow is in test_rider_payouts)."""
     from sqlalchemy import text
     with sync_engine.begin() as c:
-        payout = c.execute(text("SELECT payout_sll FROM delivery_jobs WHERE order_id=:i"), {"i": order["id"]}).scalar()
-        # leave no open job behind for other tests' drivers to pick up
-        c.execute(text("UPDATE delivery_jobs SET status='delivered' WHERE order_id=:i"), {"i": order["id"]})
-    assert payout == 13500
+        c.execute(text("UPDATE shop_orders SET status='delivered' WHERE id=:i"), {"i": order["id"]})
 
 
-def test_three_way_split_and_fees_ledger(client):
+def test_buyer_pays_salonautozone_once(client):
+    seller, buyer, order, _ = _shop_order(client)
+    oid = order["id"]
+    # the shop's own delivery fee is used, but the buyer pays SalonAutoZone
+    assert order["delivery_fee_sll"] == 15000 and order["total_to_pay_sll"] == 115000 and order["pay_to"] == "platform"
+    page = client.get(f"/api/pay/orders/{oid}", headers=buyer).json()
+    assert page["payee"] == "SalonAutoZone"
+    assert [m["number"] for m in page["methods"]] == [get_settings().ORANGE_MONEY_NUMBER]
+    pid = client.post(f"/api/pay/orders/{oid}/manual", headers=buyer, json={"method": "orange_money", "reference": _ref(), "payer_phone": "076888999"}).json()["id"]
+    # the shop can't approve SalonAutoZone's money
+    assert client.post(f"/api/pay/seller/payments/{pid}/approve", headers=seller).status_code == 404
+    assert client.post(f"/api/pay/admin/payments/{pid}/approve", headers=ADMIN).status_code == 200
+
+
+def test_three_way_split_and_paying_the_shop(client):
     client.put("/api/shop/admin/settings", headers=ADMIN, json={"commission_pct": 5})
     try:
         seller, buyer, order, _ = _shop_order(client)
         oid = order["id"]
+        client.post(f"/api/shop/admin/orders/{oid}/confirm-payment", headers=ADMIN)
         sale = [o for o in client.get("/api/shop/seller/orders", headers=seller).json()["orders"] if o["id"] == oid][0]
-        # parts 100,000 + delivery 15,000 = 115,000 paid to the shop
-        # rider 13,500; SalonAutoZone 1,500 (10% of delivery) + 5,000 (5% of parts); shop keeps 95,000
-        assert sale["driver_payout_sll"] == 13500 and sale["platform_fee_sll"] == 6500 and sale["you_keep_sll"] == 95000
-        assert client.get("/api/shop/seller/fees", headers=seller).json()["owed_sll"] == 0  # not delivered yet
+        # parts 100,000: 5% commission -> shop gets 95,000. Delivery 15,000: 10% share -> rider 13,500.
+        assert sale["you_get_sll"] == 95000 and sale["commission_sll"] == 5000 and sale["shop_paid"] is False
+        assert "platform_fee_sll" not in sale and "driver_payout_sll" not in sale
+        p = client.get("/api/shop/seller/payouts", headers=seller).json()
+        assert p["coming_sll"] == 95000 and p["due_sll"] == 0
+        # not delivered: can't be paid out yet
+        assert client.post(f"/api/shop/admin/shop-payouts/{oid}/paid", headers=ADMIN, json={}).status_code == 409
 
-        from app.db import sync_engine
-        from sqlalchemy import text
-        with sync_engine.begin() as c:
-            c.execute(text("UPDATE shop_orders SET status='delivered' WHERE id=:i"), {"i": oid})
-        fees = client.get("/api/shop/seller/fees", headers=seller).json()
-        assert fees["owed_sll"] == 6500 and fees["orders"] == 1
-        shops = client.get("/api/shop/admin/shop-fees", headers=ADMIN).json()["shops"]
-        mine = [x for x in shops if x["owed_sll"] == 6500 and x["shop"].startswith("Lumley Motors")]
-        assert mine
-        assert client.post(f"/api/shop/admin/shop-fees/{mine[0]['seller_id']}/settle", headers=ADMIN).json()["orders_settled"] == 1
-        assert client.get("/api/shop/seller/fees", headers=seller).json()["owed_sll"] == 0
+        _deliver(client, buyer, order)
+        p = client.get("/api/shop/seller/payouts", headers=seller).json()
+        assert p["coming_sll"] == 0 and p["due_sll"] == 95000
+        assert client.get("/api/admin/todo", headers=ADMIN).json()["shops_to_pay"] >= 1
+        mine = [x for x in client.get("/api/shop/admin/shop-payouts", headers=ADMIN).json()["payouts"] if x["order_id"] == oid][0]
+        assert mine["amount_sll"] == 95000 and mine["orange_money"] == "+232 76 570111"
+        assert client.post(f"/api/shop/admin/shop-payouts/{oid}/paid", headers=ADMIN, json={"reference": "OM123"}).status_code == 200
+        assert client.post(f"/api/shop/admin/shop-payouts/{oid}/paid", headers=ADMIN, json={}).status_code == 409
+        p = client.get("/api/shop/seller/payouts", headers=seller).json()
+        assert p["due_sll"] == 0 and p["recent_paid"][0]["reference"] == "OM123"
+
+        slip = client.get(f"/api/shop/orders/{oid}/receipt?copy=store", headers=seller).json()
+        assert slip["paid_to"] == "platform" and slip["commission_sll"] == 5000 and slip["amount_due_to_store_sll"] == 95000
+        assert slip["store_paid_ref"] == "OM123"
+        rec = client.get(f"/api/shop/orders/{oid}/receipt", headers=buyer).json()
+        assert rec["total_sll"] == 115000
     finally:
         client.put("/api/shop/admin/settings", headers=ADMIN, json={"commission_pct": 0})
+
+
+def test_shop_without_fees_uses_site_fees(client):
+    _, buyer, order, settings = _shop_order(client, fees=False)
+    assert settings["ready"] is False
+    assert order["pay_to"] == "platform" and order["delivery_fee_sll"] == 25000

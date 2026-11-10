@@ -109,6 +109,7 @@ table.it .n { text-align: right; white-space: nowrap; }
       '<div class="tot"><span>You keep</span><span>SLL ' + fmt(r.store_keeps_sll) + '</span></div>')
    : store
    ? '<div><span>Parts sold</span><span>SLL ' + fmt(r.parts_total_sll) + '</span></div>' +
+     (r.commission_sll ? '<div><span>SalonAutoZone commission</span><span>− SLL ' + fmt(r.commission_sll) + '</span></div>' : '') +
      '<div class="tot"><span>' + (cancelled ? 'Amount due to you' : 'Amount due to you') + '</span><span>SLL ' + fmt(r.amount_due_to_store_sll) + '</span></div>'
    : '<div><span>Parts</span><span>SLL ' + fmt(r.parts_total_sll) + '</span></div>' +
      '<div><span>Delivery (' + esc(r.delivery_method) + ')</span><span>SLL ' + fmt(r.delivery_fee_sll) + '</span></div>' +
@@ -121,7 +122,8 @@ table.it .n { text-align: right; white-space: nowrap; }
   if (!r.paid && !cancelled && !store) note = '<div class="note">This is an order summary, not a receipt. A receipt is issued once ' + (shopPaid ? esc(s.name) : 'SalonAutoZone') + ' confirms your payment.</div>';
   if (store && !cancelled) note = '<div class="note">' + (!r.paid ? 'Don\'t hand over the parts yet: the customer hasn\'t paid.'
    : shopPaid ? 'The customer paid you directly, including delivery. Pay the rider their share once the customer has received the parts. The SalonAutoZone fee is added to what you owe us, payable after delivery.'
-   : 'The customer has paid SalonAutoZone. The delivery fee goes to the rider and SalonAutoZone; the amount above is yours.') + '</div>';
+   : r.store_paid_at ? 'SalonAutoZone sent you this amount on ' + esc(day(r.store_paid_at)) + (r.store_paid_ref ? ' (ref ' + esc(r.store_paid_ref) + ')' : '') + '.'
+   : 'The customer has paid SalonAutoZone. We send you the amount above once the customer has received the parts. The delivery fee goes to the rider.') + '</div>';
 
   app.innerHTML = '<article class="rc" aria-label="' + esc(r.title) + '">' +
    '<div class="head"><div class="brand"><img src="/static/logo-80.webp" alt=""><div><b>SalonAutoZone</b><small>Car parts and cars, Sierra Leone' + (r.platform.whatsapp ? '<br>WhatsApp +' + esc(r.platform.whatsapp) : '') + '</small></div></div>' +

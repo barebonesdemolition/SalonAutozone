@@ -311,17 +311,22 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <label style="display:block;margin-top:10px;font-weight:600">Okada (small and medium parts), SLL<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-okada" required></label>
  <label style="display:block;margin-top:10px;font-weight:600">Van (bulky parts), SLL<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-van" required></label>
  <label style="display:block;margin-top:10px;font-weight:600">Platform share of the delivery fee, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="100" step="0.5" id="fee-pct" required></label>
- <label style="display:block;margin-top:10px;font-weight:600">Commission on parts sold, % (shops that take payment directly)<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="50" step="0.5" id="fee-comm"></label>
- <p style="margin:8px 0 0;color:#64748b;font-size:13px">The okada and van fees above are used for shops that haven't set their own. Shops with their own numbers and fees are paid directly; they pay the rider and owe SalonAutoZone the platform share plus the commission.</p>
+ <label style="display:block;margin-top:10px;font-weight:600">Your commission on parts sold, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="50" step="0.5" id="fee-comm"></label>
+ <p style="margin:8px 0 0;color:#64748b;font-size:13px">Buyers pay SalonAutoZone everything. After delivery you pay the rider (delivery fee less your share) and the shop (parts less your commission). The okada and van fees above are used for shops that haven't set their own.</p>
  <button class="btn btn-primary" style="margin-top:16px" type="submit">Save fees</button>
  </form>
  </div>
  <div class="panel" style="margin-top:16px">
- <div class="bar"><h2>Riders to pay</h2><span id="riders-total" style="font-weight:800"></span></div>
- <p style="margin:0 0 12px;color:#64748b">Riders are paid only after the buyer gives them the delivery code. Pay the ones marked <b>You pay</b>; shops pay their own riders (shown so you can follow up).</p>
- <div class="table-wrap"><table><thead><tr><th>Order</th><th>Rider</th><th>Amount</th><th>Who pays</th><th></th></tr></thead><tbody id="tb-riders"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+ <div class="bar"><h2>Shops to pay</h2><span id="shops-total" style="font-weight:800"></span></div>
+ <p style="margin:0 0 12px;color:#64748b">Delivered orders. Send each shop its amount (parts less your commission) to its mobile money number, then tap <b>Paid</b>.</p>
+ <div class="table-wrap"><table><thead><tr><th>Order</th><th>Shop</th><th>Send to</th><th>Amount</th><th></th></tr></thead><tbody id="tb-shops"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
  </div>
  <div class="panel" style="margin-top:16px">
+ <div class="bar"><h2>Riders to pay</h2><span id="riders-total" style="font-weight:800"></span></div>
+ <p style="margin:0 0 12px;color:#64748b">Riders are paid only after the buyer gives them the delivery code. Send each one their amount, then tap <b>Paid</b>.</p>
+ <div class="table-wrap"><table><thead><tr><th>Order</th><th>Rider</th><th>Amount</th><th>Who pays</th><th></th></tr></thead><tbody id="tb-riders"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ <div class="panel hidden" id="owed-panel" style="margin-top:16px">
  <div class="bar"><h2>Fees shops owe you</h2><span id="owed-total" style="font-weight:800"></span></div>
  <p style="margin:0 0 12px;color:#64748b">From delivered orders the shop was paid for directly. When a shop pays you, tap <b>Paid</b>.</p>
  <div class="table-wrap"><table><thead><tr><th>Shop</th><th>Orders</th><th>Owes</th><th></th></tr></thead><tbody id="tb-owed"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
@@ -415,6 +420,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  if (t.delivery_fees_missing) items.push(['delivery', 'Set delivery fees. Buyers can\'t check out until you do.', '!', true]);
  if (t.order_payments_to_check) items.push(['orders', 'Buyers say they\'ve paid: check the transaction ID', t.order_payments_to_check, true, 'awaiting_payment']);
  if (t.orders_awaiting_payment) items.push(['orders', 'Parts orders waiting for payment', t.orders_awaiting_payment]);
+ if (t.shops_to_pay) items.push(['delivery', 'Shops to pay for delivered orders', t.shops_to_pay, true]);
  if (t.riders_to_pay) items.push(['delivery', 'Riders to pay for delivered orders', t.riders_to_pay, true]);
  if (t.drivers_pending) items.push(['drivers', 'Drivers waiting for approval', t.drivers_pending]);
  if (t.jobs_without_driver) items.push(['orders', 'Orders ready but no driver has taken them yet', t.jobs_without_driver, false, 'ready_for_pickup']);
@@ -903,6 +909,28 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  });
 
  // ---------- delivery fees ----------
+ function loadShopPay() {
+ var tb = $('tb-shops');
+ fetch('/api/shop/admin/shop-payouts', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+ if (!d) { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load.</td></tr>'; return; }
+ $('shops-total').textContent = d.total_sll ? 'You owe SLL ' + fmt(d.total_sll) : '';
+ tb.innerHTML = d.payouts.length ? d.payouts.map(function (p) {
+ var to = [p.orange_money ? 'Orange Money ' + p.orange_money : '', p.afrimoney ? 'Afrimoney ' + p.afrimoney : ''].filter(Boolean).join('<br>');
+ return '<tr><td><strong>' + esc(p.code) + '</strong></td><td>' + esc(p.shop) + (p.phone ? '<br><small>' + esc(p.phone) + '</small>' : '') + '</td>' +
+ '<td>' + (to || '<span class="badge bad">No number yet</span>') + '</td><td><strong>SLL ' + fmt(p.amount_sll) + '</strong>' + (p.amount_sll !== p.parts_total_sll ? '<br><small>of ' + fmt(p.parts_total_sll) + '</small>' : '') + '</td>' +
+ '<td><button class="btn btn-primary" data-shop-paid="' + p.order_id + '" data-amt="' + p.amount_sll + '">Paid</button></td></tr>';
+ }).join('') : '<tr><td colspan="5" class="empty">No shop is waiting to be paid.</td></tr>';
+ }).catch(function () {});
+ }
+ $('tb-shops').addEventListener('click', function (e) {
+ var b = e.target.closest('[data-shop-paid]'); if (!b) return;
+ var ref = prompt('Transaction ID of the payment to the shop (optional). Paying SLL ' + fmt(Number(b.dataset.amt)), '');
+ if (ref === null) return;
+ b.disabled = true;
+ fetch('/api/shop/admin/shop-payouts/' + b.dataset.shopPaid + '/paid', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ reference: ref.trim() || null }) })
+ .then(function (r) { if (!r.ok) throw new Error('Could not update'); toast('Shop marked as paid', true); loadShopPay(); loadTodo(); })
+ .catch(function (err) { b.disabled = false; toast(err.message, false); });
+ });
  function loadRiders() {
  var tb = $('tb-riders');
  fetch('/api/shop/admin/rider-payouts', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
@@ -932,6 +960,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  fetch('/api/shop/admin/shop-fees', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
  if (!d) { tb.innerHTML = '<tr><td colspan="4" class="empty">Could not load.</td></tr>'; return; }
  $('owed-total').textContent = d.total_owed_sll ? 'Total SLL ' + fmt(d.total_owed_sll) : '';
+ $('owed-panel').classList.toggle('hidden', !d.shops.length);
  tb.innerHTML = d.shops.length ? d.shops.map(function (s) {
  var ph = String(s.phone || '').replace(/[^\d+]/g, '');
  return '<tr><td><strong>' + esc(s.shop) + '</strong>' + (ph ? '<br><a href="tel:' + esc(ph) + '">' + esc(s.phone) + '</a>' : '') + '</td><td>' + esc(s.orders) + '</td><td><strong>SLL ' + fmt(s.owed_sll) + '</strong></td>' +
@@ -948,7 +977,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  .catch(function (err) { b.disabled = false; toast(err.message, false); });
  });
  function loadFees() {
- loadOwed(); loadRiders();
+ loadOwed(); loadRiders(); loadShopPay();
  fetch('/api/shop/admin/settings', { headers: auth() }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
  $('fee-okada').value = d.okada_fee_sll != null ? d.okada_fee_sll : '';
  $('fee-van').value = d.van_fee_sll != null ? d.van_fee_sll : '';
