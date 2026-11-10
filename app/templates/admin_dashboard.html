@@ -253,7 +253,8 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <option value="all">All orders</option>
  </select>
  </div>
- <p style="margin:0 0 12px;color:#64748b">Call the buyer to take payment, then confirm it here. The seller is then asked to get the parts ready.</p>
+ <p style="margin:0 0 12px;color:#64748b">When a buyer sends mobile money they type the transaction ID. Check it on the business phone, then tap <b>Money arrived</b> (or <b>Not found</b> to ask them to try again). Online payments confirm themselves.</p>
+ <p id="pay-status" style="margin:0 0 12px;font-size:13px;color:#64748b"></p>
  <div class="table-wrap"><table><thead><tr>
  <th>Order</th><th>Buyer</th><th>Delivery</th><th>Parts</th><th>Delivery fee</th><th>To pay</th><th>Status</th><th>Actions</th>
  </tr></thead><tbody id="tb-orders"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody></table></div>
@@ -400,6 +401,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  if (!t) { box.innerHTML = '<p class="empty">Could not load the to-do list.</p>'; return; }
  var items = [];
  if (t.delivery_fees_missing) items.push(['delivery', 'Set delivery fees. Buyers can\'t check out until you do.', '!', true]);
+ if (t.order_payments_to_check) items.push(['orders', 'Buyers say they\'ve paid: check the transaction ID', t.order_payments_to_check, true, 'awaiting_payment']);
  if (t.orders_awaiting_payment) items.push(['orders', 'Parts orders waiting for payment', t.orders_awaiting_payment]);
  if (t.drivers_pending) items.push(['drivers', 'Drivers waiting for approval', t.drivers_pending]);
  if (t.jobs_without_driver) items.push(['orders', 'Orders ready but no driver has taken them yet', t.jobs_without_driver, false, 'ready_for_pickup']);
@@ -767,8 +769,16 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
 
  // ---------- parts orders ----------
  var ORDER_LABEL = { awaiting_payment: ['Waiting for payment', 'warn'], confirmed: ['Paid', 'ok'], ready_for_pickup: ['Ready for pickup', 'ok'], driver_assigned: ['Driver assigned', 'ok'], out_for_delivery: ['Out for delivery', 'ok'], delivered: ['Delivered', 'ok'], cancelled: ['Cancelled', 'bad'] };
+ function loadPayStatus() {
+ fetch('/api/pay/admin/status', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+ if (!d || !$('pay-status')) return;
+ var names = (d.methods || []).map(function (m) { return m.label + (m.number ? ' (' + m.number + ')' : ''); });
+ $('pay-status').textContent = 'Buyers can pay with: ' + (names.join(', ') || 'nothing yet') + '. ' + (d.monime_ready ? 'Online payments are on.' : 'Online payments (Monime) are off until MONIME_ACCESS_TOKEN and MONIME_SPACE_ID are set on Render.');
+ }).catch(function () {});
+ }
  function loadOrders() {
  var tb = $('tb-orders');
+ loadPayStatus();
  tb.innerHTML = '<tr><td colspan="8" class="empty">Loading orders…</td></tr>';
  fetch('/api/shop/admin/orders?status=' + encodeURIComponent($('q-orders').value), { headers: auth() })
  .then(function (r) { if (!r.ok) throw new Error('Could not load orders'); return r.json(); })
@@ -777,7 +787,10 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  if (!items.length) { tb.innerHTML = '<tr><td colspan="8" class="empty">No orders in this view.</td></tr>'; return; }
  tb.innerHTML = items.map(function (o) {
  var l = ORDER_LABEL[o.status] || [o.status, 'off'];
- var act = o.status === 'awaiting_payment' ? '<button class="btn btn-primary" data-order-pay="' + o.id + '">Payment received</button>'
+ var p = o.payment;
+ var payInfo = p ? '<div style="margin-top:6px;font-size:13px"><b>' + esc(p.method_label) + '</b>' + (p.reference ? ' · ID <code>' + esc(p.reference) + '</code>' : '') + (p.payer_phone ? '<br>from ' + esc(p.payer_phone) : '') + '<br><span class="badge ' + ({ submitted: 'warn', approved: 'ok', rejected: 'bad' }[p.status] || 'off') + '">' + esc({ submitted: 'Check this', approved: 'Approved', rejected: 'Not found', pending: 'Online, not finished', cancelled: 'Cancelled' }[p.status] || p.status) + '</span>' + (p.note ? '<br><small>' + esc(p.note) + '</small>' : '') + '</div>' : '';
+ var act = (p && p.status === 'submitted') ? '<button class="btn btn-primary" data-pay-ok="' + p.id + '">Money arrived</button> <button class="btn" data-pay-no="' + p.id + '">Not found</button>'
+ : o.status === 'awaiting_payment' ? '<button class="btn btn-primary" data-order-pay="' + o.id + '">Payment received</button>'
  : (o.status === 'driver_assigned' || o.status === 'out_for_delivery') ? '<button class="btn" data-order-done="' + o.id + '">Mark delivered</button>' : '';
  var phone = String(o.buyer_phone || '').replace(/[^\d+]/g, '');
  return '<tr><td><strong>' + esc(o.code) + '</strong><br><small>' + esc(String(o.created_at || '').slice(0, 16).replace('T', ' ')) + '</small></td>' +
@@ -785,7 +798,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  '<td>' + esc(o.delivery_address || '') + '<br><small>' + esc(o.delivery_area || '') + ', ' + esc(o.vehicle_class || '') + '</small></td>' +
  '<td>SLL ' + fmt(o.parts_total_sll) + '</td><td>SLL ' + fmt(o.delivery_fee_sll) + '</td>' +
  '<td><strong>SLL ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + '</strong></td>' +
- '<td><span class="badge ' + l[1] + '">' + esc(l[0]) + '</span></td><td>' + act +
+ '<td><span class="badge ' + l[1] + '">' + esc(l[0]) + '</span>' + payInfo + '</td><td>' + act +
  '<div class="acts" style="margin-top:6px"><a class="btn btn-ghost" target="_blank" rel="noopener" href="/receipt?id=' + encodeURIComponent(o.id) + '&copy=customer">Receipt</a><a class="btn btn-ghost" target="_blank" rel="noopener" href="/receipt?id=' + encodeURIComponent(o.id) + '&copy=store">Store copy</a></div></td></tr>';
  }).join('');
  }).catch(function (e) { tb.innerHTML = '<tr><td colspan="8" class="empty">' + esc(e.message) + '.</td></tr>'; });
@@ -793,6 +806,24 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  $('q-orders').addEventListener('change', loadOrders);
  $('tb-orders').addEventListener('click', function (e) {
  var pay = e.target.closest('[data-order-pay]'), done = e.target.closest('[data-order-done]');
+ var ok = e.target.closest('[data-pay-ok]'), no = e.target.closest('[data-pay-no]');
+ if (ok) {
+ if (!confirm('Have you checked the money is on the phone, for the full amount?')) return;
+ ok.disabled = true;
+ fetch('/api/pay/admin/payments/' + ok.dataset.payOk + '/approve', { method: 'POST', headers: auth() })
+ .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not approve'); }); })
+ .then(function () { toast('Payment approved. The seller has been asked to get the parts ready.', true); loadOrders(); loadTodo(); })
+ .catch(function (err) { ok.disabled = false; toast(err.message, false); });
+ }
+ if (no) {
+ var why = prompt('What should we tell the buyer? (e.g. "No payment with this ID", "Amount was short by SLL 10,000")', 'No payment with this transaction ID arrived.');
+ if (!why || why.trim().length < 3) return;
+ no.disabled = true;
+ fetch('/api/pay/admin/payments/' + no.dataset.payNo + '/reject', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ reason: why.trim() }) })
+ .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not update'); }); })
+ .then(function () { toast('The buyer will see your message and can try again.', true); loadOrders(); loadTodo(); })
+ .catch(function (err) { no.disabled = false; toast(err.message, false); });
+ }
  if (pay) {
  if (!confirm('Confirm you have received the full payment for this order?')) return;
  pay.disabled = true;

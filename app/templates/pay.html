@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pay for your order · SalonAutoZone</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" sizes="64x64" href="/static/icon-64.png">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
+<link rel="stylesheet" href="/static/ui.css?v=8">
+<link rel="stylesheet" href="/static/chrome.css?v=5">
+<style>
+.page { max-width: 620px; padding-bottom: 56px; }
+.page-title { font-size: clamp(28px, 6vw, 38px); margin: 22px 0 4px; font-variation-settings: "wdth" 78; }
+.sub { color: var(--muted); margin: 0 0 18px; }
+.amount { background: var(--ink, #0e2a2b); color: #fff; border-radius: var(--r-md); padding: 18px 20px; display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.amount small { display: block; opacity: .75; font-size: 13px; }
+.amount b { font-size: clamp(28px, 8vw, 38px); letter-spacing: .01em; font-variation-settings: "wdth" 85; }
+.amount .code { font-weight: 800; letter-spacing: .12em; font-size: 18px; }
+.tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; margin: 18px 0 12px; }
+.tabs button { min-height: 52px; border: 2px solid var(--line); background: var(--card); border-radius: var(--r-md); font: inherit; font-weight: 800; color: var(--ink); cursor: pointer; padding: 6px 8px; }
+.tabs button[aria-selected="true"] { border-color: var(--teal); background: var(--teal-50); }
+.box { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px; }
+.box h2 { font-size: 19px; margin: 0 0 6px; }
+.payto { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border: 2px dashed var(--gold); background: var(--gold-50); border-radius: var(--r-md); margin: 12px 0; flex-wrap: wrap; }
+.payto small { display: block; color: var(--muted); font-size: 13px; }
+.payto b { font-size: 22px; letter-spacing: .04em; color: var(--ink); }
+.num { counter-reset: s; list-style: none; padding: 0; margin: 10px 0 14px; display: grid; gap: 10px; }
+.num li { counter-increment: s; position: relative; padding-left: 36px; }
+.num li::before { content: counter(s); position: absolute; left: 0; top: -2px; width: 26px; height: 26px; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 800; display: grid; place-items: center; font-size: 14px; }
+.field { display: grid; gap: 6px; margin-top: 12px; }
+.field span { font-weight: 700; font-size: 14px; }
+.ref { text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
+.hist { margin-top: 18px; display: grid; gap: 8px; }
+.hist div { display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); font-size: 14px; }
+.badge { font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; background: var(--teal-50); color: var(--teal-600); }
+.badge.wait { background: var(--gold-50); color: #7a4b00; }
+.badge.bad { background: var(--bad-50); color: var(--bad); }
+.badge.ok { background: var(--ok-50); color: var(--ok); }
+.done-mark { width: 64px; height: 64px; border-radius: 50%; background: var(--ok); color: #fff; display: grid; place-items: center; font-size: 34px; margin: 26px auto 10px; }
+.center { text-align: center; }
+.acts { display: grid; gap: 10px; margin-top: 16px; }
+.safe { font-size: 13px; color: var(--muted); margin-top: 14px; }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main class="wrap page" id="root"><div class="lcard skeleton" style="margin-top:22px;min-height:260px"></div></main>
+<script src="/static/site.js?v=8"></script>
+<script>
+(function () {
+ 'use strict';
+ var root = document.getElementById('root');
+ var id = location.pathname.split('/').pop();
+ var q = new URLSearchParams(location.search);
+ var data = null, pick = null, poll = null;
+ function token() { try { return localStorage.getItem('token') || localStorage.getItem('access_token') || ''; } catch (e) { return ''; } }
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Math.round(Number(n) || 0).toLocaleString('en-US'); }
+ function auth() { return { Authorization: 'Bearer ' + token() }; }
+ if (!token()) { location.replace('/login?next=' + encodeURIComponent(location.pathname)); return; }
+
+ function api(path, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign({}, auth(), opts.body ? { 'Content-Type': 'application/json' } : {}, opts.headers || {});
+  return fetch(path, opts).then(function (r) {
+   if (r.status === 401) { location.href = '/login?next=' + encodeURIComponent(location.pathname); throw null; }
+   return r.json().catch(function () { return {}; }).then(function (d) {
+    if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : 'Something went wrong. Please try again.');
+    return d;
+   });
+  });
+ }
+
+ var BADGE = { submitted: ['Checking', 'wait'], pending: ['Not finished', 'wait'], approved: ['Paid', 'ok'], rejected: ['Not found', 'bad'], cancelled: ['Cancelled', ''] };
+
+ function paidScreen(d) {
+  clearInterval(poll);
+  root.innerHTML = '<div class="center"><div class="done-mark" aria-hidden="true">✓</div>' +
+   '<h1 class="page-title">Payment received</h1><p class="sub">Order <b>' + esc(d.code) + '</b> is paid. The seller is getting your parts ready and a rider will bring them.</p></div>' +
+   '<div class="acts"><a class="btn btn-primary btn-lg" href="/receipt?id=' + encodeURIComponent(d.order_id) + '">See my receipt</a>' +
+   '<a class="btn btn-ghost" href="/orders?id=' + encodeURIComponent(d.order_id) + '">Track my order</a></div>';
+ }
+
+ function render() {
+  var d = data;
+  if (d.status !== 'awaiting_payment') {
+   if (d.status === 'cancelled') {
+    root.innerHTML = '<h1 class="page-title">This order was cancelled</h1><p class="sub">There is nothing to pay. If you already sent money, message us and we will refund it.</p>' +
+     '<a class="btn btn-ghost" href="/orders?id=' + encodeURIComponent(d.order_id) + '">Back to the order</a>';
+    return;
+   }
+   return paidScreen(d);
+  }
+  var methods = d.methods || [];
+  if (!pick || !methods.some(function (m) { return m.id === pick; })) pick = methods.length ? methods[0].id : null;
+  var last = (d.payments || [])[0];
+  var html = '<h1 class="page-title">Pay for your order</h1><p class="sub">Your parts are held for you while you pay.</p>' +
+   '<div class="amount"><div><small>Amount to pay</small><b>SLL ' + fmt(d.amount_sll) + '</b></div><div><small>Order code</small><span class="code">' + esc(d.code) + '</span></div></div>';
+
+  if (q.get('back') === 'cancel') html += '<div class="notice notice-warn" style="margin-top:14px">You left the online payment before finishing. You can try again or pay another way.</div>';
+
+  if (d.waiting_for_check) {
+   html += '<div class="box" style="margin-top:18px"><h2>We\'re checking your payment</h2>' +
+    '<p>You sent <b>' + esc(last.method_label) + '</b> with transaction ID <b>' + esc(last.reference) + '</b>. We\'ll confirm it as soon as we see it, usually within a few hours. This page updates by itself, and you can close it.</p>' +
+    (d.whatsapp ? '<a class="btn btn-wa" style="margin-top:6px" target="_blank" rel="noopener noreferrer" href="https://wa.me/' + esc(d.whatsapp) + '?text=' + encodeURIComponent('Hello, I paid for order ' + d.code + ' with ' + last.method_label + '. Transaction ID: ' + last.reference) + '">Tell us on WhatsApp</a>' : '') +
+    '</div>';
+  } else if (!methods.length) {
+   html += '<div class="notice notice-warn" style="margin-top:18px">Payment isn\'t set up yet. ' + (d.whatsapp ? '<a target="_blank" rel="noopener noreferrer" href="https://wa.me/' + esc(d.whatsapp) + '?text=' + encodeURIComponent('Hello, how do I pay for order ' + d.code + '?') + '">Message us on WhatsApp</a> and we\'ll help you pay.' : 'We\'ll call you to take payment.') + '</div>';
+  } else {
+   if (last && last.status === 'rejected') html += '<div class="notice notice-bad" style="margin-top:14px"><b>We couldn\'t find your last payment</b> (ID ' + esc(last.reference) + '). ' + esc(last.note || '') + ' Check the SMS and try again.</div>';
+   if (methods.length > 1) html += '<div class="tabs" role="tablist">' + methods.map(function (m) {
+    return '<button type="button" role="tab" aria-selected="' + (m.id === pick) + '" data-m="' + esc(m.id) + '">' + esc(m.label) + '</button>';
+   }).join('') + '</div>';
+   else html += '<div style="height:18px"></div>';
+   var m = methods.filter(function (x) { return x.id === pick; })[0];
+   if (m.online) {
+    html += '<div class="box"><h2>Pay online</h2><p>' + esc(m.detail || '') + ' You\'ll go to Monime\'s secure payment page, then come back here.</p>' +
+     (d.online_pending ? '<div class="notice notice-info" style="margin-top:10px">Already paid online? <button type="button" class="btn btn-ghost" id="recheck">Check again</button></div>' : '') +
+     '<div class="acts"><button type="button" class="btn btn-primary btn-lg" id="go-online">Pay SLL ' + fmt(d.amount_sll) + ' now</button></div>' +
+     '<p class="hint" id="msg" role="alert" style="color:var(--bad)"></p></div>';
+   } else {
+    html += '<div class="box"><h2>Pay with ' + esc(m.label) + '</h2>' +
+     '<div class="payto"><div><small>Send to</small><b>' + esc(m.number) + '</b></div><button type="button" class="btn btn-gold" id="copy">Copy number</button></div>' +
+     '<ol class="num"><li>Open ' + esc(m.label) + ' on your phone and send <b>exactly SLL ' + fmt(d.amount_sll) + '</b> to the number above.</li>' +
+     '<li>If it asks for a reason or reference, type your order code <b>' + esc(d.code) + '</b>.</li>' +
+     '<li>You\'ll get an SMS with a transaction ID. Type it below.</li></ol>' +
+     '<form id="f" novalidate><label class="field"><span>Transaction ID from the SMS</span><input class="input ref" id="ref" required maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. PP240512.1234.A12345"></label>' +
+     '<label class="field"><span>Phone number you paid from</span><input class="input" id="from" type="tel" required maxlength="24" autocomplete="tel" value="' + esc(d.buyer_phone || '') + '"></label>' +
+     '<p class="hint" id="msg" role="alert" style="color:var(--bad);min-height:1em"></p>' +
+     '<button class="btn btn-primary btn-lg btn-block" id="send">I\'ve paid. Check my payment</button></form>' +
+     '<p class="safe">Only send money to the number on this page. We will never ask for your PIN.</p></div>';
+   }
+  }
+  var hist = (d.payments || []).filter(function (p) { return p.method !== 'monime' || p.status !== 'cancelled'; });
+  if (hist.length) html += '<div class="hist"><b style="font-size:14px">Your payment tries</b>' + hist.map(function (p) {
+   var b = BADGE[p.status] || [p.status, ''];
+   return '<div><span>' + esc(p.method_label) + (p.reference ? ' · ' + esc(p.reference) : '') + '</span><span class="badge ' + b[1] + '">' + esc(b[0]) + '</span></div>';
+  }).join('') + '</div>';
+  html += '<div class="acts"><a class="btn btn-ghost" href="/orders?id=' + encodeURIComponent(d.order_id) + '">Back to my order</a></div>';
+  root.innerHTML = html;
+  wire();
+ }
+
+ function wire() {
+  root.querySelectorAll('[data-m]').forEach(function (b) { b.addEventListener('click', function () { pick = b.dataset.m; render(); }); });
+  var copy = document.getElementById('copy');
+  if (copy) copy.addEventListener('click', function () {
+   var m = data.methods.filter(function (x) { return x.id === pick; })[0];
+   try { navigator.clipboard.writeText(m.number.replace(/\s/g, '')).then(function () { copy.textContent = 'Copied'; }); } catch (e) {}
+  });
+  var f = document.getElementById('f');
+  if (f) f.addEventListener('submit', function (e) {
+   e.preventDefault();
+   var msg = document.getElementById('msg'), btn = document.getElementById('send');
+   var ref = document.getElementById('ref').value.trim(), from = document.getElementById('from').value.trim();
+   msg.textContent = '';
+   if (ref.replace(/[^A-Za-z0-9]/g, '').length < 4) { msg.textContent = 'Type the transaction ID from your SMS.'; return; }
+   if (from.replace(/\D/g, '').length < 6) { msg.textContent = 'Enter the phone number you paid from.'; return; }
+   btn.disabled = true; btn.textContent = 'Sending…';
+   api('/api/pay/orders/' + encodeURIComponent(id) + '/manual', { method: 'POST', body: JSON.stringify({ method: pick, reference: ref, payer_phone: from }) })
+    .then(load).catch(function (err) { if (!err) return; btn.disabled = false; btn.textContent = 'I\'ve paid. Check my payment'; msg.textContent = err.message; });
+  });
+  var go = document.getElementById('go-online');
+  if (go) go.addEventListener('click', function () {
+   go.disabled = true; go.textContent = 'Opening payment page…';
+   api('/api/pay/orders/' + encodeURIComponent(id) + '/online', { method: 'POST' })
+    .then(function (r) { location.href = r.redirect_url; })
+    .catch(function (err) { if (!err) return; go.disabled = false; go.textContent = 'Pay SLL ' + fmt(data.amount_sll) + ' now'; document.getElementById('msg').textContent = err.message; });
+  });
+  var re = document.getElementById('recheck');
+  if (re) re.addEventListener('click', function () { re.disabled = true; check().then(load); });
+ }
+
+ function check() {
+  return api('/api/pay/orders/' + encodeURIComponent(id) + '/check', { method: 'POST' }).catch(function () {});
+ }
+
+ function load() {
+  return api('/api/pay/orders/' + encodeURIComponent(id)).then(function (d) {
+   data = d; render();
+   clearInterval(poll);
+   if (d.status === 'awaiting_payment' && (d.waiting_for_check || d.online_pending)) {
+    poll = setInterval(function () {
+     (d.online_pending ? check() : Promise.resolve()).then(function () {
+      return api('/api/pay/orders/' + encodeURIComponent(id));
+     }).then(function (n) {
+      if (n.status !== data.status || n.waiting_for_check !== data.waiting_for_check || (n.payments[0] || {}).status !== (data.payments[0] || {}).status) { data = n; render(); }
+      if (n.status !== 'awaiting_payment') clearInterval(poll);
+     }).catch(function () {});
+    }, 20000);
+   }
+  }).catch(function (err) {
+   if (!err) return;
+   root.innerHTML = '<h1 class="page-title">Order not found</h1><p class="sub">' + esc(err.message) + '</p><a class="btn btn-primary" href="/orders">My orders</a>';
+  });
+ }
+
+ (q.get('back') === 'done' ? check() : Promise.resolve()).then(load);
+})();
+</script>
+</body>
+</html>

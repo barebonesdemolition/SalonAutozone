@@ -1,4 +1,4 @@
-﻿"""Orders with delivery: place -> pay -> ready -> driver job -> delivered."""
+"""Orders with delivery: place -> pay -> ready -> driver job -> delivered."""
 import logging
 import secrets
 from datetime import datetime
@@ -383,6 +383,9 @@ async def order_receipt(
         "platform": {"name": "SalonAutoZone", "whatsapp": wa or None},
         "currency": "SLL",
     }
+    if paid:
+        from app.payments import paid_with
+        out["paid_with"] = await paid_with(db, order_id)
     if copy == "customer":
         out["delivery_fee_sll"] = o.delivery_fee_sll
         out["total_sll"] = round(o.parts_total_sll + o.delivery_fee_sll, 2)
@@ -576,20 +579,37 @@ async def admin_orders(status: str = Query("awaiting_payment"), admin=Depends(ad
     if status != "all":
         q = q.where(orders.c.status == status)
     rows = (await db.execute(q)).all()
-    return {"count": len(rows), "orders": [_iso(dict(r._mapping)) for r in rows]}
+    from app.payments import latest_payments
+    latest = await latest_payments(db, [r.id for r in rows])
+    out = []
+    for r in rows:
+        d = _iso(dict(r._mapping))
+        d["payment"] = latest.get(r.id)
+        out.append(d)
+    return {"count": len(out), "orders": out}
 
 
 @router.post("/admin/orders/{order_id}/confirm-payment")
 async def confirm_payment(order_id: int, admin=Depends(admin_actor),
                           db: AsyncSession = Depends(get_db)):
     await _order_or_404(db, order_id)
+    if not await mark_order_paid(db, order_id, "Payment confirmed", admin.id):
+        raise HTTPException(409, "This order is not waiting for payment")
+    from app.payments import settle_open_payments
+    await settle_open_payments(db, order_id, admin.id)
+    await db.commit()
+    return {"id": order_id, "status": "confirmed"}
+
+
+async def mark_order_paid(db, order_id, note, actor_id=None):
+    """Move an order from awaiting_payment to confirmed. False if it wasn't waiting (already paid,
+    cancelled), so two confirmations at once can't both go through. The caller commits."""
     got = await db.execute(update(orders).where(orders.c.id == order_id, orders.c.status == "awaiting_payment")
                            .values(status="confirmed", updated_at=datetime.utcnow()))
     if got.rowcount != 1:
-        raise HTTPException(409, "This order is not waiting for payment")
-    await _event(db, order_id, "confirmed", "Payment confirmed", admin.id)
-    await db.commit()
-    return {"id": order_id, "status": "confirmed"}
+        return False
+    await _event(db, order_id, "confirmed", note, actor_id)
+    return True
 
 
 @router.post("/admin/orders/{order_id}/complete")
