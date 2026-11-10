@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Receipt · SalonAutoZone</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0e2a2b">
+<link rel="icon" type="image/png" sizes="64x64" href="/static/icon-64.png">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" data-saz-font media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
+<link rel="stylesheet" href="/static/ui.css?v=8">
+<link rel="stylesheet" href="/static/chrome.css?v=5">
+<style>
+.page { max-width: 720px; padding: 22px 16px 56px; }
+.acts { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.acts .btn { flex: 1 1 160px; }
+.copies { display: flex; gap: 8px; margin-bottom: 14px; }
+.copies a { flex: 1; text-align: center; padding: 9px; border-radius: var(--r-md); border: 1.5px solid var(--line); font-weight: 700; text-decoration: none; color: var(--ink); background: var(--card); }
+.copies a[aria-current="page"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.rc { position: relative; background: #fff; color: #1c2b2b; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px 26px; overflow: hidden; }
+.rc .head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; padding-bottom: 16px; border-bottom: 2px solid #0e2a2b; flex-wrap: wrap; }
+.brand { display: flex; gap: 10px; align-items: center; }
+.brand img { width: 44px; height: 44px; border-radius: 50%; }
+.brand b { font-size: 20px; color: #0e2a2b; display: block; font-variation-settings: "wdth" 85; }
+.brand small { color: #5d6f6e; }
+.rc h1 { font-size: 26px; margin: 0; text-align: right; color: #0e2a2b; }
+.rc .no { text-align: right; font-family: ui-monospace, Menlo, monospace; font-weight: 700; letter-spacing: .04em; }
+.rc .when { text-align: right; color: #5d6f6e; font-size: 14px; }
+.parties { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
+.parties h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #5d6f6e; margin: 0 0 4px; }
+.parties p { margin: 0; line-height: 1.45; font-size: 15px; }
+.vb { display: inline-block; font-size: 11px; font-weight: 800; padding: 1px 6px; border-radius: 4px; background: #d6f5e3; color: #116b3a; margin-left: 4px; vertical-align: 1px; }
+table.it { width: 100%; border-collapse: collapse; font-size: 15px; }
+table.it th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #5d6f6e; border-bottom: 1px solid #d5dedc; padding: 6px 4px; }
+table.it td { padding: 8px 4px; border-bottom: 1px solid #edf1f0; vertical-align: top; }
+table.it .n { text-align: right; white-space: nowrap; }
+.sum { margin-left: auto; width: min(100%, 320px); margin-top: 12px; font-size: 15px; }
+.sum div { display: flex; justify-content: space-between; padding: 5px 0; }
+.sum .tot { border-top: 2px solid #0e2a2b; margin-top: 4px; padding-top: 8px; font-size: 19px; font-weight: 800; color: #0e2a2b; }
+.stamp { display: inline-block; margin-top: 18px; padding: 6px 14px; border: 3px solid; border-radius: 8px; font-weight: 800; font-size: 18px; letter-spacing: .08em; transform: rotate(-4deg); }
+.stamp.paid { color: #116b3a; border-color: #116b3a; }
+.stamp.unpaid { color: #9a5b00; border-color: #c98a12; }
+.stamp.void { color: #b42318; border-color: #b42318; }
+.foot { margin-top: 22px; padding-top: 14px; border-top: 1px dashed #c9d4d2; color: #5d6f6e; font-size: 13px; line-height: 1.5; }
+.note { background: #fff7e8; border: 1px solid #f6d9a8; color: #7a4b00; border-radius: 8px; padding: 10px 12px; margin-top: 14px; font-size: 14px; }
+@media (max-width: 520px) { .rc { padding: 20px 16px; } .parties { grid-template-columns: 1fr; } .rc h1, .rc .no, .rc .when { text-align: left; } }
+@media print {
+ @page { margin: 12mm; }
+ body { background: #fff !important; }
+ .no-print, #site-header, .saz-tabbar, .saz-footer, header, footer { display: none !important; }
+ .page { padding: 0; max-width: none; }
+ .rc { border: 0; padding: 0; }
+}
+</style>
+</head>
+<body>
+<div id="site-header" class="no-print"></div>
+<main class="wrap page">
+ <div class="no-print" id="tools"></div>
+ <div id="app"><div class="lcard skeleton" style="min-height:360px"></div></div>
+</main>
+<script src="/static/site.js?v=8"></script>
+<script>
+(function () {
+ 'use strict';
+ var app = document.getElementById('app'), tools = document.getElementById('tools');
+ var q = new URLSearchParams(location.search), id = q.get('id'), copy = q.get('copy') === 'store' ? 'store' : 'customer';
+ var token = '', key = '';
+ try { token = localStorage.getItem('token') || localStorage.getItem('access_token') || ''; key = sessionStorage.getItem('adminKey') || ''; } catch (e) {}
+ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+ function fmt(n) { return Number(n || 0).toLocaleString('en-GB', { maximumFractionDigits: 2 }); }
+ function day(iso) {
+  if (!iso) return '';
+  var d = new Date(iso + (/[zZ]|[+-]\d\d:?\d\d$/.test(iso) ? '' : 'Z'));
+  return isNaN(d) ? '' : d.toLocaleString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Freetown' });
+ }
+ if (!id) { app.innerHTML = '<div class="notice notice-bad">No order was given.</div>'; return; }
+ if (!token && !key) { location.replace('/login?next=' + encodeURIComponent(location.pathname + location.search)); return; }
+ var h = {}; if (token) h.Authorization = 'Bearer ' + token; if (key) h['X-Admin-Key'] = key;
+
+ fetch('/api/shop/orders/' + encodeURIComponent(id) + '/receipt?copy=' + copy, { headers: h }).then(function (r) {
+  return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, status: r.status, d: d }; });
+ }).then(function (x) {
+  if (x.status === 401) { location.replace('/login?next=' + encodeURIComponent(location.pathname + location.search)); return; }
+  if (!x.ok) { app.innerHTML = '<div class="notice notice-bad">' + esc(typeof x.d.detail === 'string' ? x.d.detail : 'We couldn\'t load this receipt.') + '</div>'; return; }
+  render(x.d);
+ }).catch(function () { app.innerHTML = '<div class="notice notice-bad">No connection. Please try again.</div>'; });
+
+ function render(r) {
+  var store = r.copy === 'store', cancelled = r.status === 'cancelled';
+  document.title = r.title + ' ' + r.number + ' · SalonAutoZone';
+  var stamp = cancelled ? '<span class="stamp void">CANCELLED</span>' : r.paid ? '<span class="stamp paid">PAID' + (r.paid_at ? ' · ' + esc(day(r.paid_at).split(' at ')[0].split(',')[0]) : '') + '</span>' : '<span class="stamp unpaid">NOT PAID YET</span>';
+  var s = r.seller, b = r.buyer;
+  var rows = r.items.map(function (it) {
+   return '<tr><td>' + esc(it.title) + '</td><td class="n">' + it.qty + '</td><td class="n">' + fmt(it.unit_price_sll) + '</td><td class="n">' + fmt(it.line_total_sll) + '</td></tr>';
+  }).join('');
+  var sums = store
+   ? '<div><span>Parts sold</span><span>SLL ' + fmt(r.parts_total_sll) + '</span></div>' +
+     '<div class="tot"><span>' + (cancelled ? 'Amount due to you' : 'Amount due to you') + '</span><span>SLL ' + fmt(r.amount_due_to_store_sll) + '</span></div>'
+   : '<div><span>Parts</span><span>SLL ' + fmt(r.parts_total_sll) + '</span></div>' +
+     '<div><span>Delivery (' + esc(r.delivery_method) + ')</span><span>SLL ' + fmt(r.delivery_fee_sll) + '</span></div>' +
+     '<div class="tot"><span>' + (r.paid ? 'Total paid' : 'Total to pay') + '</span><span>SLL ' + fmt(r.total_sll) + '</span></div>';
+  var dates = '<div class="when">Ordered ' + esc(day(r.ordered_at)) + '</div>' +
+   (r.paid_at ? '<div class="when">Paid ' + esc(day(r.paid_at)) + '</div>' : '') +
+   (r.delivered_at ? '<div class="when">Delivered ' + esc(day(r.delivered_at)) + '</div>' : '') +
+   (r.cancelled_at ? '<div class="when">Cancelled ' + esc(day(r.cancelled_at)) + '</div>' : '');
+  var note = '';
+  if (!r.paid && !cancelled && !store) note = '<div class="note">This is an order summary, not a receipt. A receipt is issued once SalonAutoZone confirms your payment.</div>';
+  if (store && !cancelled) note = '<div class="note">' + (r.paid ? 'The customer has paid SalonAutoZone. The delivery fee goes to the rider and SalonAutoZone; the amount above is yours.' : 'Don\'t hand over the parts yet: the customer hasn\'t paid.') + '</div>';
+
+  app.innerHTML = '<article class="rc" aria-label="' + esc(r.title) + '">' +
+   '<div class="head"><div class="brand"><img src="/static/logo-80.webp" alt=""><div><b>SalonAutoZone</b><small>Car parts and cars, Sierra Leone' + (r.platform.whatsapp ? '<br>WhatsApp +' + esc(r.platform.whatsapp) : '') + '</small></div></div>' +
+   '<div><h1>' + esc(r.title) + '</h1><div class="no">No. ' + esc(r.number) + '</div>' + dates + '</div></div>' +
+   '<div class="parties"><div><h3>Sold by</h3><p><b>' + esc(s.name) + '</b>' + (s.verified ? '<span class="vb">✓ Verified</span>' : '') + '<br>' +
+    (s.address ? esc(s.address) + '<br>' : '') + (s.city && !(s.address || '').toLowerCase().includes(s.city.toLowerCase()) ? esc(s.city) + '<br>' : '') + (s.phone ? esc(s.phone) : '') + '</p></div>' +
+   '<div><h3>' + (store ? 'Customer' : 'Customer') + '</h3><p><b>' + esc(b.name) + '</b><br>' + esc(b.phone || '') + '<br>' +
+    (b.address ? esc(b.address) + ', ' : '') + esc(b.area || '') + '</p></div></div>' +
+   '<table class="it"><thead><tr><th>Item</th><th class="n">Qty</th><th class="n">Price</th><th class="n">Amount</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+   '<div class="sum">' + sums + '</div>' + stamp + note +
+   '<div class="foot">' + (store ? 'Store copy for your records. ' : 'Thank you for buying on SalonAutoZone. ') + 'All amounts in Sierra Leonean Leones (SLL).' +
+    (r.platform.whatsapp ? ' Questions about this order? Message us on WhatsApp +' + esc(r.platform.whatsapp) + ' and quote ' + esc(r.number) + '.' : '') + '</div></article>';
+
+  var other = store ? 'customer' : 'store';
+  tools.innerHTML = '<div class="acts"><button class="btn btn-primary" type="button" id="print">Print or save as PDF</button>' +
+   '<a class="btn btn-wa" id="share" target="_blank" rel="noopener noreferrer">Send on WhatsApp</a>' +
+   '<a class="btn btn-ghost" href="' + (store ? '/my-account?tab=sales' : '/orders?id=' + encodeURIComponent(id)) + '">Back</a></div>' +
+   (key ? '<div class="copies"><a href="?id=' + encodeURIComponent(id) + '&copy=customer"' + (store ? '' : ' aria-current="page"') + '>Customer receipt</a><a href="?id=' + encodeURIComponent(id) + '&copy=store"' + (store ? ' aria-current="page"' : '') + '>Store copy</a></div>' : '');
+  document.getElementById('print').addEventListener('click', function () { window.print(); });
+  var lines = [r.title + ' ' + r.number + ' - SalonAutoZone'].concat(r.items.map(function (it) { return it.qty + ' x ' + it.title + ': SLL ' + fmt(it.line_total_sll); }));
+  lines.push(store ? 'Amount due to the store: SLL ' + fmt(r.amount_due_to_store_sll) : (r.paid ? 'Total paid: SLL ' : 'Total to pay: SLL ') + fmt(r.total_sll));
+  lines.push(cancelled ? 'Status: cancelled' : r.paid ? 'Status: paid' : 'Status: not paid yet');
+  document.getElementById('share').href = 'https://wa.me/?text=' + encodeURIComponent(lines.join('\n'));
+  if (q.get('print') === '1') setTimeout(function () { window.print(); }, 400);
+ }
+})();
+</script>
+</body>
+</html>

@@ -785,7 +785,8 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  '<td>' + esc(o.delivery_address || '') + '<br><small>' + esc(o.delivery_area || '') + ', ' + esc(o.vehicle_class || '') + '</small></td>' +
  '<td>SLL ' + fmt(o.parts_total_sll) + '</td><td>SLL ' + fmt(o.delivery_fee_sll) + '</td>' +
  '<td><strong>SLL ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + '</strong></td>' +
- '<td><span class="badge ' + l[1] + '">' + esc(l[0]) + '</span></td><td>' + act + '</td></tr>';
+ '<td><span class="badge ' + l[1] + '">' + esc(l[0]) + '</span></td><td>' + act +
+ '<div class="acts" style="margin-top:6px"><a class="btn btn-ghost" target="_blank" rel="noopener" href="/receipt?id=' + encodeURIComponent(o.id) + '&copy=customer">Receipt</a><a class="btn btn-ghost" target="_blank" rel="noopener" href="/receipt?id=' + encodeURIComponent(o.id) + '&copy=store">Store copy</a></div></td></tr>';
  }).join('');
  }).catch(function (e) { tb.innerHTML = '<tr><td colspan="8" class="empty">' + esc(e.message) + '.</td></tr>'; });
  }

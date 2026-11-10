@@ -123,10 +123,11 @@ def test_apply_rejects_bad_details(client, extra, word):
 
 def test_admin_sees_checks(client):
     a1, a2 = _rider(client, "Abu Bangura"), _rider(client, "Sorie Kamara")
-    assert _apply(client, a1, id_number="SL-DUP-77", plate_number="AKB 900").status_code == 201
-    assert _apply(client, a2, id_number="sl-dup-77", plate_number="akb 900", id_name="Musa Kanu").status_code == 201
+    tag = uuid.uuid4().hex[:6].upper()
+    assert _apply(client, a1, id_number=f"SL-{tag}", plate_number=f"AK {tag}").status_code == 201
+    assert _apply(client, a2, id_number=f"sl-{tag.lower()}", plate_number=f"ak {tag.lower()}", id_name="Musa Kanu").status_code == 201
     rows = {d["full_name"]: d for d in client.get("/api/drivers/admin/list?status=pending", headers=ADMIN).json()["drivers"]
-            if d.get("id_number") == "SL-DUP-77"}
+            if d.get("id_number") == f"SL-{tag}"}
     first, second = rows["Abu Bangura"], rows["Sorie Kamara"]
     assert first["name_matches"] is True and second["name_matches"] is False
     assert second["same_id_as"] == [first["id"]] and second["same_plate_as"] == [first["id"]]

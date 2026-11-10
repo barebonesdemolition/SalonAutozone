@@ -3,7 +3,9 @@ import logging
 import secrets
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import inspect as sa_inspect, text
 from sqlalchemy import (
@@ -15,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models
 from app.auth import get_current_user
-from app.routers.admin import admin_actor
+from app.routers.admin import admin_actor, require_admin
 from app.db import engine, get_db
 from app.drivers import drivers as drivers_t
 
@@ -304,6 +306,90 @@ async def my_orders(user: models.User = Depends(get_current_user), db: AsyncSess
 async def my_order(order_id: int, user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     await _order_or_404(db, order_id, buyer_id=user.id)
     return await _buyer_view(db, order_id)
+
+
+PAID_STATUSES = ("confirmed", "ready_for_pickup", "driver_assigned", "picked_up", "out_for_delivery", "delivered")
+
+
+async def _receipt_viewer(db, order, copy, x_admin_key, authorization):
+    """Who may see which copy: the buyer the customer copy, the seller the store copy, admins both."""
+    try:
+        await require_admin(x_admin_key=x_admin_key, authorization=authorization, db=db)
+        return "admin"
+    except HTTPException:
+        pass
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(401, "Please sign in to see this receipt")
+    user = await get_current_user(token=authorization[7:], db=db)
+    if copy == "customer" and order.buyer_id == user.id:
+        return "buyer"
+    if copy == "store" and order.seller_id == user.id:
+        return "seller"
+    raise HTTPException(404, "Order not found")
+
+
+@router.get("/orders/{order_id}/receipt")
+async def order_receipt(
+    order_id: int,
+    copy: str = Query("customer", pattern="^(customer|store)$"),
+    x_admin_key: Optional[str] = Header(None),
+    authorization: Optional[str] = Header(None),
+    db: AsyncSession = Depends(get_db),
+):
+    """Everything needed to print a receipt (customer copy) or a sales slip (store copy)."""
+    from app.config import get_settings
+    o = (await db.execute(select(orders).where(orders.c.id == order_id))).first()
+    if not o:
+        raise HTTPException(404, "Order not found")
+    await _receipt_viewer(db, o, copy, x_admin_key, authorization)
+
+    people = {r.id: r for r in (await db.execute(
+        select(USERS.c.id, USERS.c.full_name, USERS.c.phone, USERS.c.email).where(USERS.c.id.in_([o.buyer_id, o.seller_id])))).all()}
+    buyer, seller = people.get(o.buyer_id), people.get(o.seller_id)
+    biz = (await db.execute(select(models.Business).where(models.Business.owner_id == o.seller_id))).scalars().first()
+    events = await _order_events(db, order_id)
+    at = {}
+    for e in events:
+        at.setdefault(e["status"], e.get("created_at") or e.get("at"))
+    paid = o.status in PAID_STATUSES
+    items = [{"title": it["title"], "qty": it["qty"], "unit_price_sll": it["unit_price_sll"],
+              "line_total_sll": round(it["unit_price_sll"] * it["qty"], 2)} for it in await _order_items(db, order_id)]
+    seller_block = {
+        "name": (biz.name if biz else None) or (seller.full_name if seller else "Seller"),
+        "person": seller.full_name if seller else None,
+        "phone": ("+" + biz.whatsapp) if biz and biz.whatsapp else (seller.phone if seller else None),
+        "city": biz.city if biz else o.pickup_area,
+        "address": getattr(biz, "address", None) if biz else None,
+        "verified": bool(biz and biz.status == "verified"),
+    }
+    cfg = get_settings()
+    wa = "".join(ch for ch in (cfg.ADMIN_WHATSAPP or "") if ch.isdigit())
+    out = {
+        "copy": copy,
+        "number": o.code,
+        "status": o.status,
+        "paid": paid,
+        "title": ("Receipt" if paid else "Order summary") if copy == "customer" else "Sales slip",
+        "ordered_at": o.created_at.isoformat() if o.created_at else None,
+        "paid_at": at.get("confirmed"),
+        "delivered_at": at.get("delivered"),
+        "cancelled_at": at.get("cancelled"),
+        "seller": seller_block,
+        "buyer": {"name": buyer.full_name if buyer else "Customer", "phone": o.buyer_phone,
+                  "area": o.delivery_area, "address": o.delivery_address if copy == "customer" else None},
+        "items": items,
+        "parts_total_sll": o.parts_total_sll,
+        "delivery_method": "Van" if o.vehicle_class == "van" else "Okada",
+        "platform": {"name": "SalonAutoZone", "whatsapp": wa or None},
+        "currency": "SLL",
+    }
+    if copy == "customer":
+        out["delivery_fee_sll"] = o.delivery_fee_sll
+        out["total_sll"] = round(o.parts_total_sll + o.delivery_fee_sll, 2)
+    else:
+        # What the store is owed: the parts. The delivery fee goes to the rider and SalonAutoZone.
+        out["amount_due_to_store_sll"] = o.parts_total_sll if o.status != "cancelled" else 0
+    return out
 
 
 @router.post("/orders/{order_id}/cancel")

@@ -178,6 +178,7 @@
       '<section class="box"><h2>Delivering to</h2><p>' + esc(o.delivery_address) + '<br>' + esc(o.delivery_area) + '</p>' +
        (o.delivery_lat != null ? '<p><a href="https://www.google.com/maps?q=' + encodeURIComponent(o.delivery_lat + ',' + o.delivery_lng) + '" target="_blank" rel="noopener">See your pin on the map</a></p>' : '') +
        '<p class="hint">The driver will call ' + esc(o.buyer_phone) + '</p></section>' +
+      '<a class="btn ' + (o.status === 'awaiting_payment' ? 'btn-ghost' : 'btn-primary') + ' btn-block" href="/receipt?id=' + encodeURIComponent(o.id) + '">' + (o.status === 'awaiting_payment' ? 'Order summary' : o.status === 'cancelled' ? 'Cancelled order' : 'Receipt') + '</a>' +
       (canCancel ? '<button class="btn btn-ghost btn-block" id="cancel">Cancel order</button>' : '') +
       '<a class="btn btn-ghost btn-block" href="/orders">All my orders</a>' +
      '</aside></div>';

@@ -169,7 +169,8 @@
      return item({ noimg: true, title: 'Order ' + o.code, href: '#',
       meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> SLL ' + fmt(o.parts_total_sll) + ', ' + esc(when(o.created_at)),
       extra: '<p class="msg">' + items + (o.pickup_area ? '<br><span class="hint">Pickup from ' + esc(o.pickup_area) + '</span>' : '') + '</p>',
-      ops: o.status === 'confirmed' ? '<button class="btn btn-primary" data-ready="' + o.id + '">The parts are ready for pickup</button>' : '' });
+      ops: (o.status === 'confirmed' ? '<button class="btn btn-primary" data-ready="' + o.id + '">The parts are ready for pickup</button>' : '') +
+       '<a class="btn btn-ghost" href="/receipt?id=' + encodeURIComponent(o.id) + '&copy=store">Sales slip</a>' });
     }).join('') + '</div>';
    });
   },
