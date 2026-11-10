@@ -64,6 +64,10 @@ orders = Table("shop_orders", _md,
     Column("pay_to", String, nullable=False, server_default="platform"),
     # Shop-paid orders: when the shop paid SalonAutoZone its fee (platform_fee_sll) for this order.
     Column("fee_settled_at", DateTime, nullable=True),
+    # What SalonAutoZone sends the shop after delivery (parts less commission), and when it did.
+    Column("shop_payout_sll", Float, nullable=True),
+    Column("shop_paid_at", DateTime, nullable=True),
+    Column("shop_paid_ref", String, nullable=True),
     Column("code_attempts", Integer, nullable=False, server_default="0"),
     Column("created_at", DateTime, nullable=False, default=datetime.utcnow),
     Column("updated_at", DateTime, nullable=False, default=datetime.utcnow),
@@ -122,10 +126,12 @@ async def ensure_delivery_tables():
 
             def missing_columns(sync_conn):
                 have = {col["name"] for col in sa_inspect(sync_conn).get_columns("shop_orders")}
-                return [c for c in ("delivery_lat", "delivery_lng", "pay_to", "fee_settled_at") if c not in have]
+                return [c for c in ("delivery_lat", "delivery_lng", "pay_to", "fee_settled_at",
+                                    "shop_payout_sll", "shop_paid_at", "shop_paid_ref") if c not in have]
 
             for column in await conn.run_sync(missing_columns):
-                kind = {"pay_to": "VARCHAR NOT NULL DEFAULT 'platform'", "fee_settled_at": "TIMESTAMP"}.get(column, "FLOAT")
+                kind = {"pay_to": "VARCHAR NOT NULL DEFAULT 'platform'", "fee_settled_at": "TIMESTAMP",
+                        "shop_paid_at": "TIMESTAMP", "shop_paid_ref": "VARCHAR"}.get(column, "FLOAT")
                 await conn.execute(text(f"ALTER TABLE shop_orders ADD COLUMN {column} {kind}"))
 
             def missing_job_columns(sync_conn):
@@ -170,29 +176,28 @@ async def _fee_for(db, vehicle_class):
     return round(fee, 2), cut, round(fee - cut, 2)
 
 
-def shop_takes_payment(biz):
-    """A shop is paid directly once it has a mobile money number and its own delivery fees."""
-    return bool(biz and (biz.pay_orange_money or biz.pay_afrimoney)
-                and biz.okada_fee_sll is not None and biz.van_fee_sll is not None)
+def shop_sets_delivery(biz):
+    return bool(biz and biz.okada_fee_sll is not None and biz.van_fee_sll is not None)
 
 
 async def _pricing(db, seller_id, vehicle_class, parts_total=0.0):
-    """(pay_to, delivery fee, SalonAutoZone's fee, rider payout) for an order from this seller.
+    """(delivery fee, SalonAutoZone's fee, rider payout, shop payout) for an order from this seller.
 
-    Shop-paid orders split three ways: the rider gets the delivery fee less the platform share,
-    SalonAutoZone gets that share plus its commission on the parts, and the shop keeps the rest.
-    The shop collects everything from the buyer, pays the rider, and owes SalonAutoZone its fee."""
+    The buyer pays SalonAutoZone everything in one payment. After delivery SalonAutoZone pays the
+    rider (delivery fee less the platform share) and the shop (parts less the commission), and
+    keeps the platform share plus the commission. The delivery fee is the shop's own if it set
+    one, otherwise the site-wide fee."""
     biz = (await db.execute(select(models.Business).where(models.Business.owner_id == seller_id))).scalars().first()
-    if shop_takes_payment(biz):
+    if shop_sets_delivery(biz):
         fee = round(float(biz.van_fee_sll if vehicle_class == "van" else biz.okada_fee_sll), 2)
-        delivery_cut = round(fee * (await _setting(db, "platform_pct") or 0) / 100.0, 2)
-        commission = round(parts_total * (await _setting(db, "commission_pct") or 0) / 100.0, 2)
-        return "shop", fee, round(delivery_cut + commission, 2), round(fee - delivery_cut, 2)
-    try:
-        fee, cut, payout = await _fee_for(db, vehicle_class)
-    except HTTPException:
-        raise HTTPException(503, "This shop hasn't set up payments and delivery yet. Message the shop or try another seller.")
-    return "platform", fee, cut, payout
+    else:
+        fee = await _setting(db, "van_fee_sll" if vehicle_class == "van" else "okada_fee_sll")
+        if fee is None:
+            raise HTTPException(503, "Delivery isn't set up for this shop yet. Message the shop or try another seller.")
+        fee = round(fee, 2)
+    delivery_cut = round(fee * (await _setting(db, "platform_pct") or 0) / 100.0, 2)
+    commission = round(parts_total * (await _setting(db, "commission_pct") or 0) / 100.0, 2)
+    return fee, round(delivery_cut + commission, 2), round(fee - delivery_cut, 2), round(parts_total - commission, 2)
 
 
 async def _order_or_404(db, order_id, **where):
@@ -282,7 +287,7 @@ async def place_order(body: OrderIn, user: models.User = Depends(get_current_use
             vehicle = "van"
         total += float(part.price_sll) * it.qty
         lines.append((part, it.qty, size))
-    pay_to, fee, cut, payout = await _pricing(db, seller_id, vehicle, round(total, 2))
+    fee, cut, payout, shop_payout = await _pricing(db, seller_id, vehicle, round(total, 2))
     for _ in range(5):
         code = "SAZ-" + "".join(secrets.choice("ABCDEFGHJKMNPQRSTUVWXYZ23456789") for _ in range(6))
         if not (await db.execute(select(orders.c.id).where(orders.c.code == code))).first():
@@ -293,7 +298,7 @@ async def place_order(body: OrderIn, user: models.User = Depends(get_current_use
             code=code, buyer_id=user.id, seller_id=seller_id, status="awaiting_payment",
             delivery_address=body.delivery_address.strip(), delivery_area=body.delivery_area.strip(),
             pickup_area=(lines[0][0].location or None), buyer_phone=body.phone.strip(),
-            vehicle_class=vehicle, parts_total_sll=round(total, 2), delivery_fee_sll=fee, pay_to=pay_to,
+            vehicle_class=vehicle, parts_total_sll=round(total, 2), delivery_fee_sll=fee, pay_to="platform", shop_payout_sll=shop_payout,
             platform_fee_sll=cut, driver_payout_sll=payout, delivery_code=delivery_code,
             delivery_lat=body.delivery_lat if body.delivery_lng is not None else None,
             delivery_lng=body.delivery_lng if body.delivery_lat is not None else None))
@@ -444,8 +449,12 @@ async def order_receipt(
             out["store_keeps_sll"] = round(o.parts_total_sll + o.delivery_fee_sll - o.driver_payout_sll - o.platform_fee_sll, 2) if o.status != "cancelled" else 0
             out["amount_due_to_store_sll"] = 0
         else:
-            # What the store is owed: the parts. The delivery fee goes to the rider and SalonAutoZone.
-            out["amount_due_to_store_sll"] = o.parts_total_sll if o.status != "cancelled" else 0
+            # What the store is owed: the parts less commission. Delivery goes to the rider and SalonAutoZone.
+            due = o.shop_payout_sll if o.shop_payout_sll is not None else o.parts_total_sll
+            out["commission_sll"] = round(o.parts_total_sll - due, 2)
+            out["amount_due_to_store_sll"] = due if o.status != "cancelled" else 0
+            out["store_paid_at"] = o.shop_paid_at.isoformat() if o.shop_paid_at else None
+            out["store_paid_ref"] = o.shop_paid_ref
     return out
 
 
@@ -485,6 +494,12 @@ async def seller_orders(user: models.User = Depends(get_current_user), db: Async
         if not shop_paid:
             hidden += ["buyer_phone", "driver_payout_sll", "delivery_fee_sll", "platform_fee_sll"]
         for key in hidden:
+            d.pop(key, None)
+        if not shop_paid:
+            d["you_get_sll"] = r.shop_payout_sll if r.shop_payout_sll is not None else r.parts_total_sll
+            d["commission_sll"] = round(r.parts_total_sll - d["you_get_sll"], 2)
+            d["shop_paid"] = r.shop_paid_at is not None
+        for key in ("shop_payout_sll", "fee_settled_at"):
             d.pop(key, None)
         if shop_paid:
             d["total_to_receive_sll"] = round(r.parts_total_sll + r.delivery_fee_sll, 2)
@@ -765,6 +780,63 @@ async def force_complete(order_id: int, note: str = Query(..., min_length=3, max
     await _event(db, order_id, "delivered", "Completed by admin: " + note, admin.id)
     await db.commit()
     return {"id": order_id, "status": "delivered"}
+
+
+# ---------- paying shops: after delivery ----------
+
+def _shop_due(o):
+    return o.shop_payout_sll if o.shop_payout_sll is not None else o.parts_total_sll
+
+
+@router.get("/seller/payouts")
+async def seller_payouts(user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    """Money SalonAutoZone holds for this shop: waiting for delivery, ready to send, and sent."""
+    rows = (await db.execute(select(orders).where(
+        orders.c.seller_id == user.id, orders.c.pay_to == "platform",
+        orders.c.status.in_(PAID_STATUSES)).order_by(orders.c.id.desc()).limit(200))).all()
+    coming = sum(_shop_due(o) for o in rows if o.status != "delivered")
+    due = sum(_shop_due(o) for o in rows if o.status == "delivered" and not o.shop_paid_at)
+    paid = [o for o in rows if o.shop_paid_at][:10]
+    return {"coming_sll": round(coming, 2), "due_sll": round(due, 2),
+            "recent_paid": [{"code": o.code, "amount_sll": _shop_due(o), "paid_at": o.shop_paid_at.isoformat(),
+                             "reference": o.shop_paid_ref} for o in paid]}
+
+
+@router.get("/admin/shop-payouts")
+async def admin_shop_payouts(admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
+    """Delivered orders whose shop hasn't been sent its money yet, with where to send it."""
+    rows = (await db.execute(select(orders).where(
+        orders.c.pay_to == "platform", orders.c.status == "delivered", orders.c.shop_paid_at.is_(None))
+        .order_by(orders.c.updated_at))).all()
+    shops = {}
+    for o in rows:
+        if o.seller_id not in shops:
+            biz = (await db.execute(select(models.Business).where(models.Business.owner_id == o.seller_id))).scalars().first()
+            user = (await db.execute(select(USERS.c.full_name, USERS.c.phone).where(USERS.c.id == o.seller_id))).first()
+            shops[o.seller_id] = {
+                "shop": biz.name if biz else (user.full_name if user else "Seller"),
+                "orange_money": biz.pay_orange_money if biz else None,
+                "afrimoney": biz.pay_afrimoney if biz else None,
+                "phone": ("+" + biz.whatsapp) if biz and biz.whatsapp else (user.phone if user else None)}
+    out = [{"order_id": o.id, "code": o.code, "seller_id": o.seller_id, "amount_sll": _shop_due(o),
+            "parts_total_sll": o.parts_total_sll, **shops[o.seller_id]} for o in rows]
+    return {"count": len(out), "total_sll": round(sum(x["amount_sll"] for x in out), 2), "payouts": out}
+
+
+class ShopPaidIn(BaseModel):
+    reference: str | None = Field(default=None, max_length=60)
+
+
+@router.post("/admin/shop-payouts/{order_id}/paid")
+async def admin_shop_paid(order_id: int, body: ShopPaidIn, admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
+    got = await db.execute(update(orders).where(
+        orders.c.id == order_id, orders.c.pay_to == "platform", orders.c.status == "delivered",
+        orders.c.shop_paid_at.is_(None)).values(shop_paid_at=datetime.utcnow(),
+                                                 shop_paid_ref=(body.reference or "").strip() or None))
+    if got.rowcount != 1:
+        raise HTTPException(409, "This order isn't waiting for the shop to be paid")
+    await db.commit()
+    return {"order_id": order_id, "shop_paid": True}
 
 
 FEE_DUE_STATUSES = ("delivered",)

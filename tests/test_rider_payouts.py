@@ -54,26 +54,6 @@ def _delivered(client, shop_paid):
     return seller, buyer, rider, phone, order, job
 
 
-def test_shop_pays_rider_after_delivery(client):
-    seller, buyer, rider, phone, order, job = _delivered(client, shop_paid=True)
-    # Not delivered yet: nothing to pay
-    assert all(p["job_id"] != job["id"] for p in client.get("/api/shop/seller/rider-payouts", headers=seller).json()["payouts"])
-    code = client.get(f"/api/shop/orders/{order['id']}", headers=buyer).json()["delivery_code"]
-    assert client.post(f"/api/shop/driver/jobs/{job['id']}/deliver", headers=rider, json={"code": code}).status_code == 200
-
-    owed = client.get("/api/shop/seller/rider-payouts", headers=seller).json()["payouts"]
-    assert [(p["job_id"], p["amount_sll"], p["rider_phone"]) for p in owed] == [(job["id"], 18000, phone)]
-    e = client.get("/api/shop/driver/earnings", headers=rider).json()
-    assert e["waiting_sll"] == 18000 and e["recent"][0]["paid"] is False and e["recent"][0]["paid_by"] == "the shop"
-
-    other = _user(client, "Other Shop")
-    assert client.post(f"/api/shop/seller/rider-payouts/{job['id']}/paid", headers=other, json={}).status_code == 409
-    assert client.post(f"/api/shop/seller/rider-payouts/{job['id']}/paid", headers=seller, json={"reference": "PP99"}).status_code == 200
-    assert client.post(f"/api/shop/seller/rider-payouts/{job['id']}/paid", headers=seller, json={}).status_code == 409
-    e = client.get("/api/shop/driver/earnings", headers=rider).json()
-    assert e["waiting_sll"] == 0 and e["paid_sll"] == 18000 and e["recent"][0]["reference"] == "PP99"
-
-
 def test_platform_pays_rider_after_delivery(client):
     seller, buyer, rider, phone, order, job = _delivered(client, shop_paid=False)
     code = client.get(f"/api/shop/orders/{order['id']}", headers=buyer).json()["delivery_code"]
@@ -81,7 +61,21 @@ def test_platform_pays_rider_after_delivery(client):
     assert client.get("/api/admin/todo", headers=ADMIN).json()["riders_to_pay"] >= 1
     mine = [p for p in client.get("/api/shop/admin/rider-payouts", headers=ADMIN).json()["payouts"] if p["job_id"] == job["id"]][0]
     assert mine["paid_by"] == "platform" and mine["amount_sll"] == 22500
+    # rider sees it waiting until SalonAutoZone pays
+    e = client.get("/api/shop/driver/earnings", headers=rider).json()
+    assert e["waiting_sll"] == 22500 and e["recent"][0]["paid_by"] == "SalonAutoZone"
     # the shop can't mark a SalonAutoZone-paid rider as paid
     assert client.post(f"/api/shop/seller/rider-payouts/{job['id']}/paid", headers=seller, json={}).status_code == 409
     assert client.post(f"/api/shop/admin/rider-payouts/{job['id']}/paid", headers=ADMIN, json={}).status_code == 200
+    assert client.post(f"/api/shop/admin/rider-payouts/{job['id']}/paid", headers=ADMIN, json={}).status_code == 409
     assert client.get("/api/shop/driver/earnings", headers=rider).json()["waiting_sll"] == 0
+
+
+def test_shop_with_own_fees_rider_paid_by_salonautozone(client):
+    seller, buyer, rider, phone, order, job = _delivered(client, shop_paid=True)
+    assert job["paid_by_shop"] is False
+    code = client.get(f"/api/shop/orders/{order['id']}", headers=buyer).json()["delivery_code"]
+    client.post(f"/api/shop/driver/jobs/{job['id']}/deliver", headers=rider, json={"code": code})
+    mine = [p for p in client.get("/api/shop/admin/rider-payouts", headers=ADMIN).json()["payouts"] if p["job_id"] == job["id"]][0]
+    assert mine["paid_by"] == "platform" and mine["amount_sll"] == 18000  # shop's 20,000 fee less 10%
+    assert client.get("/api/shop/seller/rider-payouts", headers=seller).json()["count"] == 0

@@ -159,23 +159,33 @@
    });
   },
   sales: function () {
-   return Promise.all([api('/api/shop/seller/orders'), api('/api/businesses/mine/payments').catch(function () { return null; }), api('/api/shop/seller/fees').catch(function () { return null; }), api('/api/shop/seller/rider-payouts').catch(function () { return null; })]).then(function (res) {
-    var d = res[0], ps = res[1], fees = res[2], riders = (res[3] && res[3].payouts) || [];
+   return Promise.all([api('/api/shop/seller/orders'), api('/api/businesses/mine/payments').catch(function () { return null; }), api('/api/shop/seller/fees').catch(function () { return null; }), api('/api/shop/seller/rider-payouts').catch(function () { return null; }), api('/api/shop/seller/payouts').catch(function () { return null; })]).then(function (res) {
+    var d = res[0], ps = res[1], fees = res[2], riders = (res[3] && res[3].payouts) || [], pay = res[4];
     var list = d.orders || [];
     var top = ps ? payBox(ps) : '';
+    if (pay && (pay.coming_sll || pay.due_sll || (pay.recent_paid || []).length)) top = '<div class="box" style="margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+     '<div><small class="hint">Waiting for delivery</small><b style="display:block;font-size:20px">SLL ' + fmt(pay.coming_sll) + '</b></div>' +
+     '<div><small class="hint">Delivered, we\'re sending it</small><b style="display:block;font-size:20px">SLL ' + fmt(pay.due_sll) + '</b></div>' +
+     ((pay.recent_paid || []).length ? '<div style="grid-column:1/-1;font-size:14px"><small class="hint">Last paid to you</small><br>' + pay.recent_paid.slice(0, 3).map(function (r) { return esc(r.code) + ': SLL ' + fmt(r.amount_sll) + (r.reference ? ' (ref ' + esc(r.reference) + ')' : ''); }).join('<br>') + '</div>' : '') +
+     (ps && !ps.pay_orange_money && !ps.pay_afrimoney ? '<div class="notice notice-bad" style="grid-column:1/-1">Add your mobile money number below so we can send you your money.</div>' : '') +
+     '</div>' + top;
     if (fees && fees.owed_sll > 0) top = '<div class="notice notice-warn" style="margin-bottom:14px"><b>You owe SalonAutoZone SLL ' + fmt(fees.owed_sll) + '</b> in fees for ' + plural(fees.orders, 'delivered order', 'delivered orders') + '.' + (fees.pay_to ? ' Send it with Orange Money to <b>' + esc(fees.pay_to) + '</b>, with your shop name as the reference.' : '') + '</div>' + top;
     if (riders.length) top = riders.map(function (p) {
      var ph = String(p.rider_phone || '').replace(/[^\d+]/g, '');
      return '<div class="notice notice-warn" style="margin-bottom:10px"><b>Pay the rider SLL ' + fmt(p.amount_sll) + '</b> for order ' + esc(p.code) + '. The buyer has the parts. Send it to ' + esc(p.rider_name || 'the rider') + ' on ' + (ph ? '<a href="tel:' + esc(ph) + '">' + esc(p.rider_phone) + '</a>' : 'their phone') + '.' +
       '<div style="margin-top:8px"><button class="btn btn-primary" data-rider-paid="' + p.job_id + '">I\'ve paid the rider</button></div></div>';
     }).join('') + top;
-    if (!list.length) return top + empty('No sales yet', 'When a buyer orders one of your parts it shows up here.', '');
+    if (!list.length) return top + empty('No sales yet', 'When a buyer orders one of your parts it shows up here. Get the parts ready once the order says Paid.', '');
     var S = { awaiting_payment: ['Waiting for the buyer to pay', 'gold'], confirmed: ['Paid: get the parts ready', ''], ready_for_pickup: ['Ready: waiting for a driver', ''], driver_assigned: ['Driver on the way to you', ''], out_for_delivery: ['With the driver', ''], delivered: ['Delivered', ''], cancelled: ['Cancelled', 'off'] };
     return top + '<div class="list">' + list.map(function (o) {
      var s = S[o.status] || [o.status, ''];
      var items = (o.items || []).map(function (it) { return esc(it.title) + ' × ' + it.qty; }).join(', ');
      var p = o.payment, shop = o.pay_to === 'shop';
      var payLine = '';
+     if (!shop && o.you_get_sll != null && ['awaiting_payment', 'cancelled'].indexOf(o.status) < 0) {
+      payLine = '<br><span class="hint">You get SLL ' + fmt(o.you_get_sll) + (o.commission_sll ? ' (SLL ' + fmt(o.commission_sll) + ' SalonAutoZone commission)' : '') + '. ' +
+       (o.shop_paid ? '<b style="color:var(--ok)">Sent to you.</b>' : o.status === 'delivered' ? 'Delivered: we\'re sending it to your mobile money.' : 'We send it once the buyer has the parts.') + '</span>';
+     }
      if (shop) {
       payLine = '<br><span class="hint">Buyer pays you SLL ' + fmt(o.total_to_receive_sll) + ' (parts + delivery). You pay the rider SLL ' + fmt(o.driver_payout_sll) + ', SalonAutoZone fee SLL ' + fmt(o.platform_fee_sll) + ', you keep SLL ' + fmt(o.you_keep_sll) + '.</span>';
       if (p && p.status === 'submitted') payLine += '<div class="notice notice-warn" style="margin-top:8px"><b>Check your phone:</b> ' + esc(p.method_label) + ' from ' + esc(p.payer_phone || 'the buyer') + ', transaction ID <b>' + esc(p.reference) + '</b>, for SLL ' + fmt(p.amount_sll) + '.</div>';
@@ -230,10 +240,10 @@
  };
  function payBox(ps) {
   var v = function (x) { return x == null ? '' : esc(x); };
-  return '<details class="box" style="margin-bottom:14px"' + (ps.ready ? '' : ' open') + '><summary style="cursor:pointer;font-weight:800">How buyers pay you ' + (ps.ready ? '<span class="tag">On</span>' : '<span class="tag gold">Set this up</span>') + '</summary>' +
-   '<p class="hint" style="margin:8px 0">Buyers pay you directly for the parts and delivery. You pay the rider when they collect, and SalonAutoZone\'s fee after delivery. Until this is filled in, buyers pay SalonAutoZone instead.</p>' +
+  return '<details class="box" style="margin-bottom:14px"' + (ps.ready ? '' : ' open') + '><summary style="cursor:pointer;font-weight:800">Your payout number and delivery fees ' + (ps.ready ? '<span class="tag">Done</span>' : '<span class="tag gold">Set this up</span>') + '</summary>' +
+   '<p class="hint" style="margin:8px 0">Buyers pay SalonAutoZone. Once the buyer has the parts, we pay the rider and send you your money (the parts price, less our commission) to the number below. Your delivery fees are what buyers pay for delivery from your shop; if you leave them empty, the standard fees are used.</p>' +
    '<form id="payf" style="display:grid;gap:10px">' +
-   '<label class="field"><span>Orange Money number</span><input class="input" name="pay_orange_money" type="tel" value="' + v(ps.pay_orange_money) + '" placeholder="076 123 456"></label>' +
+   '<label class="field"><span>Orange Money number we pay you on</span><input class="input" name="pay_orange_money" type="tel" value="' + v(ps.pay_orange_money) + '" placeholder="076 123 456"></label>' +
    '<label class="field"><span>Afrimoney number (optional)</span><input class="input" name="pay_afrimoney" type="tel" value="' + v(ps.pay_afrimoney) + '" placeholder="030 123 456"></label>' +
    '<label class="field"><span>Delivery fee by okada (small parts), SLL</span><input class="input" name="okada_fee_sll" type="number" min="0" step="500" value="' + v(ps.okada_fee_sll) + '"></label>' +
    '<label class="field"><span>Delivery fee by van (bulky parts), SLL</span><input class="input" name="van_fee_sll" type="number" min="0" step="500" value="' + v(ps.van_fee_sll) + '"></label>' +
@@ -258,7 +268,7 @@
   ['okada_fee_sll', 'van_fee_sll'].forEach(function (k) { body[k] = f[k].value === '' ? null : Number(f[k].value); });
   if (!body.pay_orange_money && !body.pay_afrimoney) { toast('Add at least one mobile money number', 'error'); return; }
   api('/api/businesses/mine/payments', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-   .then(function (d) { toast(d.ready ? 'Saved. Buyers will now pay you directly.' : 'Saved. Add both delivery fees to start taking payments.', 'success'); show('sales'); })
+   .then(function (d) { toast('Saved. We\'ll send your money to this number.', 'success'); show('sales'); })
    .catch(function (err) { if (err) toast(/object/i.test(err.message) ? 'Check the numbers: use a Sierra Leone mobile number like 076 123 456.' : err.message, 'error'); });
  });
 
