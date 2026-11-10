@@ -65,7 +65,7 @@
  function token() { try { return localStorage.getItem('token') || ''; } catch (e) { return ''; } }
 
  var STEPS = [
-  ['awaiting_payment', 'Order placed', 'We\'ll contact you to confirm payment'],
+  ['awaiting_payment', 'Order placed', 'Pay to confirm your order'],
   ['confirmed', 'Payment confirmed', 'The seller is getting your parts ready'],
   ['ready_for_pickup', 'Ready for pickup', 'Waiting for a driver'],
   ['driver_assigned', 'Driver on the way to the seller', ''],
@@ -162,7 +162,7 @@
     var canCancel = o.status === 'awaiting_payment' || o.status === 'confirmed';
     var showPin = ['confirmed', 'ready_for_pickup', 'driver_assigned', 'out_for_delivery', 'awaiting_payment'].indexOf(o.status) > -1 && o.delivery_code;
     root.innerHTML =
-     (q.get('new') ? '<div class="notice notice-ok" style="margin-top:20px"><b>Order placed.</b> We\'ll contact you on ' + esc(o.buyer_phone) + ' to confirm payment.</div>' : '') +
+     (o.status === 'awaiting_payment' ? '<div class="notice notice-warn" style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span><b>Waiting for payment.</b> Pay SLL ' + fmt(o.total_to_pay_sll) + ' to confirm this order.</span><a class="btn btn-primary" href="/pay/' + encodeURIComponent(o.id) + '">Pay now</a></div>' : '') +
      '<h1 class="page-title">Order <span style="letter-spacing:.06em">' + esc(o.code) + '</span></h1>' +
      '<div class="two"><div style="display:grid;gap:16px">' +
       driverBox(o.driver, o.status) +
@@ -178,6 +178,7 @@
       '<section class="box"><h2>Delivering to</h2><p>' + esc(o.delivery_address) + '<br>' + esc(o.delivery_area) + '</p>' +
        (o.delivery_lat != null ? '<p><a href="https://www.google.com/maps?q=' + encodeURIComponent(o.delivery_lat + ',' + o.delivery_lng) + '" target="_blank" rel="noopener">See your pin on the map</a></p>' : '') +
        '<p class="hint">The driver will call ' + esc(o.buyer_phone) + '</p></section>' +
+      (o.status === 'awaiting_payment' ? '<a class="btn btn-primary btn-block" href="/pay/' + encodeURIComponent(o.id) + '">Pay now</a>' : '') +
       '<a class="btn ' + (o.status === 'awaiting_payment' ? 'btn-ghost' : 'btn-primary') + ' btn-block" href="/receipt?id=' + encodeURIComponent(o.id) + '">' + (o.status === 'awaiting_payment' ? 'Order summary' : o.status === 'cancelled' ? 'Cancelled order' : 'Receipt') + '</a>' +
       (canCancel ? '<button class="btn btn-ghost btn-block" id="cancel">Cancel order</button>' : '') +
       '<a class="btn btn-ghost btn-block" href="/orders">All my orders</a>' +

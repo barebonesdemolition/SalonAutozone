@@ -23,6 +23,16 @@ class Settings(BaseSettings):
     # Orange Money number sellers pay plan fees to. Set it to empty to hide it:
     # the pages then tell sellers to ask on WhatsApp instead.
     ORANGE_MONEY_NUMBER: str = "+232 76 570104"
+    # Optional second mobile money number buyers can pay to. Empty hides it.
+    AFRIMONEY_NUMBER: str = ""
+    # Online payments through Monime (monime.io). Both must be set to show "Pay online":
+    # the access token from Monime's dashboard (Developers > API keys) and the Space ID (spc-...).
+    MONIME_ACCESS_TOKEN: str = ""
+    MONIME_SPACE_ID: str = ""
+    MONIME_API_BASE: str = "https://api.monime.io"
+    MONIME_VERSION: str = "caph.2025-08-23"
+    # Prices on the site are in old leones (SLL); Monime charges new leones (SLE).
+    MONIME_SLL_PER_SLE: float = 1000
     # Emails (password reset codes) go out through Brevo's API. Both must be set:
     # BREVO_API_KEY from Brevo > SMTP & API > API keys, and EMAIL_FROM an address
     # verified in Brevo > Senders. Leave empty and resets use the WhatsApp link instead.

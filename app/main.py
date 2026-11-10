@@ -30,6 +30,7 @@ _log = _logging.getLogger("salonautozone")
 # --- drivers (must exist as app/drivers.py or the app will not boot) ---
 from app.drivers import ensure_driver_tables, router as drivers_router
 from app.shop import ensure_delivery_tables, router as shop_router
+from app.payments import ensure_payment_tables, router as payments_router
 from app.photos import ensure_photo_tables, router as photos_router
 from app.sellers import ensure_review_tables, router as sellers_router
 # ---------------------------------------------------------------------
@@ -137,6 +138,7 @@ async def _setup_database():
     await ensure_subscription_tables()
     await ensure_driver_tables()
     await ensure_delivery_tables()
+    await ensure_payment_tables()
     await ensure_photo_tables()
     await ensure_review_tables()
 
@@ -231,6 +233,7 @@ app.include_router(stores_router)
 app.include_router(businesses.router)
 app.include_router(drivers_router)
 app.include_router(shop_router)
+app.include_router(payments_router)
 app.include_router(photos_router)
 app.include_router(sellers_router)
 
@@ -736,6 +739,11 @@ async def business_page_editor():
 @app.get("/receipt")
 async def receipt_page():
     return FileResponse("app/templates/receipt.html")
+
+
+@app.get("/pay/{order_id}")
+async def pay_page(order_id: int):
+    return FileResponse("app/templates/pay.html", headers={"Cache-Control": "no-store"})
 
 
 @app.get("/forgot-password")

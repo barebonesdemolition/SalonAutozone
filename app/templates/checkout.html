@@ -153,7 +153,7 @@
      if (r.status === 401) { location.href = '/login?next=' + encodeURIComponent(location.pathname + location.search); return; }
      if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : 'We couldn\'t place your order. Check the details and try again.');
      try { rows.forEach(function (row) { SAZCart.remove(row.part.id); }); } catch (err) {}
-     location.href = '/orders?id=' + encodeURIComponent(d.id) + '&new=1';
+     location.href = '/pay/' + encodeURIComponent(d.id) + '?new=1';
     });
    }).catch(function (err) { btn.disabled = false; btn.textContent = 'Place order'; msg.textContent = err.message; });
   });

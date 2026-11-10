@@ -106,7 +106,7 @@ table.it .n { text-align: right; white-space: nowrap; }
      '<div><span>Delivery (' + esc(r.delivery_method) + ')</span><span>SLL ' + fmt(r.delivery_fee_sll) + '</span></div>' +
      '<div class="tot"><span>' + (r.paid ? 'Total paid' : 'Total to pay') + '</span><span>SLL ' + fmt(r.total_sll) + '</span></div>';
   var dates = '<div class="when">Ordered ' + esc(day(r.ordered_at)) + '</div>' +
-   (r.paid_at ? '<div class="when">Paid ' + esc(day(r.paid_at)) + '</div>' : '') +
+   (r.paid_at ? '<div class="when">Paid ' + esc(day(r.paid_at)) + (r.paid_with ? ' · ' + esc(r.paid_with.method) + (r.paid_with.reference ? ' (ref ' + esc(r.paid_with.reference) + ')' : '') : '') + '</div>' : '') +
    (r.delivered_at ? '<div class="when">Delivered ' + esc(day(r.delivered_at)) + '</div>' : '') +
    (r.cancelled_at ? '<div class="when">Cancelled ' + esc(day(r.cancelled_at)) + '</div>' : '');
   var note = '';
