@@ -59,6 +59,11 @@ orders = Table("shop_orders", _md,
     Column("delivery_code", String, nullable=False),
     Column("delivery_lat", Float, nullable=True),   # pin the buyer dropped at checkout
     Column("delivery_lng", Float, nullable=True),
+    # "shop": the buyer pays the shop's own number (parts + delivery) and the shop pays the rider.
+    # "platform": the buyer pays SalonAutoZone, which pays the shop and the rider.
+    Column("pay_to", String, nullable=False, server_default="platform"),
+    # Shop-paid orders: when the shop paid SalonAutoZone its fee (platform_fee_sll) for this order.
+    Column("fee_settled_at", DateTime, nullable=True),
     Column("code_attempts", Integer, nullable=False, server_default="0"),
     Column("created_at", DateTime, nullable=False, default=datetime.utcnow),
     Column("updated_at", DateTime, nullable=False, default=datetime.utcnow),
@@ -111,12 +116,13 @@ async def ensure_delivery_tables():
         async with engine.begin() as conn:
             await conn.run_sync(lambda c: _md.create_all(c, tables=_OWN_TABLES, checkfirst=True))
 
-            def missing_pin_columns(sync_conn):
+            def missing_columns(sync_conn):
                 have = {col["name"] for col in sa_inspect(sync_conn).get_columns("shop_orders")}
-                return [c for c in ("delivery_lat", "delivery_lng") if c not in have]
+                return [c for c in ("delivery_lat", "delivery_lng", "pay_to", "fee_settled_at") if c not in have]
 
-            for column in await conn.run_sync(missing_pin_columns):
-                await conn.execute(text(f"ALTER TABLE shop_orders ADD COLUMN {column} FLOAT"))
+            for column in await conn.run_sync(missing_columns):
+                kind = {"pay_to": "VARCHAR NOT NULL DEFAULT 'platform'", "fee_settled_at": "TIMESTAMP"}.get(column, "FLOAT")
+                await conn.execute(text(f"ALTER TABLE shop_orders ADD COLUMN {column} {kind}"))
     except Exception:
         log.exception("Could not create delivery tables")
 
@@ -150,6 +156,31 @@ async def _fee_for(db, vehicle_class):
         raise HTTPException(503, "Delivery is not available yet")
     cut = round(fee * pct / 100.0, 2)
     return round(fee, 2), cut, round(fee - cut, 2)
+
+
+def shop_takes_payment(biz):
+    """A shop is paid directly once it has a mobile money number and its own delivery fees."""
+    return bool(biz and (biz.pay_orange_money or biz.pay_afrimoney)
+                and biz.okada_fee_sll is not None and biz.van_fee_sll is not None)
+
+
+async def _pricing(db, seller_id, vehicle_class, parts_total=0.0):
+    """(pay_to, delivery fee, SalonAutoZone's fee, rider payout) for an order from this seller.
+
+    Shop-paid orders split three ways: the rider gets the delivery fee less the platform share,
+    SalonAutoZone gets that share plus its commission on the parts, and the shop keeps the rest.
+    The shop collects everything from the buyer, pays the rider, and owes SalonAutoZone its fee."""
+    biz = (await db.execute(select(models.Business).where(models.Business.owner_id == seller_id))).scalars().first()
+    if shop_takes_payment(biz):
+        fee = round(float(biz.van_fee_sll if vehicle_class == "van" else biz.okada_fee_sll), 2)
+        delivery_cut = round(fee * (await _setting(db, "platform_pct") or 0) / 100.0, 2)
+        commission = round(parts_total * (await _setting(db, "commission_pct") or 0) / 100.0, 2)
+        return "shop", fee, round(delivery_cut + commission, 2), round(fee - delivery_cut, 2)
+    try:
+        fee, cut, payout = await _fee_for(db, vehicle_class)
+    except HTTPException:
+        raise HTTPException(503, "This shop hasn't set up payments and delivery yet. Message the shop or try another seller.")
+    return "platform", fee, cut, payout
 
 
 async def _order_or_404(db, order_id, **where):
@@ -210,6 +241,7 @@ class SettingsIn(BaseModel):
     okada_fee_sll: float | None = Field(default=None, ge=0, le=10_000_000)
     van_fee_sll: float | None = Field(default=None, ge=0, le=10_000_000)
     platform_pct: float | None = Field(default=None, ge=0, le=100)
+    commission_pct: float | None = Field(default=None, ge=0, le=50)
 
 
 @router.post("/orders", status_code=201)
@@ -238,7 +270,7 @@ async def place_order(body: OrderIn, user: models.User = Depends(get_current_use
             vehicle = "van"
         total += float(part.price_sll) * it.qty
         lines.append((part, it.qty, size))
-    fee, cut, payout = await _fee_for(db, vehicle)
+    pay_to, fee, cut, payout = await _pricing(db, seller_id, vehicle, round(total, 2))
     for _ in range(5):
         code = "SAZ-" + "".join(secrets.choice("ABCDEFGHJKMNPQRSTUVWXYZ23456789") for _ in range(6))
         if not (await db.execute(select(orders.c.id).where(orders.c.code == code))).first():
@@ -249,7 +281,7 @@ async def place_order(body: OrderIn, user: models.User = Depends(get_current_use
             code=code, buyer_id=user.id, seller_id=seller_id, status="awaiting_payment",
             delivery_address=body.delivery_address.strip(), delivery_area=body.delivery_area.strip(),
             pickup_area=(lines[0][0].location or None), buyer_phone=body.phone.strip(),
-            vehicle_class=vehicle, parts_total_sll=round(total, 2), delivery_fee_sll=fee,
+            vehicle_class=vehicle, parts_total_sll=round(total, 2), delivery_fee_sll=fee, pay_to=pay_to,
             platform_fee_sll=cut, driver_payout_sll=payout, delivery_code=delivery_code,
             delivery_lat=body.delivery_lat if body.delivery_lng is not None else None,
             delivery_lng=body.delivery_lng if body.delivery_lat is not None else None))
@@ -381,6 +413,7 @@ async def order_receipt(
         "parts_total_sll": o.parts_total_sll,
         "delivery_method": "Van" if o.vehicle_class == "van" else "Okada",
         "platform": {"name": "SalonAutoZone", "whatsapp": wa or None},
+        "paid_to": "shop" if o.pay_to == "shop" else "platform",
         "currency": "SLL",
     }
     if paid:
@@ -390,8 +423,17 @@ async def order_receipt(
         out["delivery_fee_sll"] = o.delivery_fee_sll
         out["total_sll"] = round(o.parts_total_sll + o.delivery_fee_sll, 2)
     else:
-        # What the store is owed: the parts. The delivery fee goes to the rider and SalonAutoZone.
-        out["amount_due_to_store_sll"] = o.parts_total_sll if o.status != "cancelled" else 0
+        if o.pay_to == "shop":
+            # The buyer paid the store everything; the store pays the rider the delivery fee.
+            out["delivery_fee_sll"] = o.delivery_fee_sll
+            out["received_by_store_sll"] = round(o.parts_total_sll + o.delivery_fee_sll, 2) if paid else 0
+            out["pay_rider_sll"] = o.driver_payout_sll if o.status != "cancelled" else 0
+            out["salonautozone_fee_sll"] = o.platform_fee_sll if o.status != "cancelled" else 0
+            out["store_keeps_sll"] = round(o.parts_total_sll + o.delivery_fee_sll - o.driver_payout_sll - o.platform_fee_sll, 2) if o.status != "cancelled" else 0
+            out["amount_due_to_store_sll"] = 0
+        else:
+            # What the store is owed: the parts. The delivery fee goes to the rider and SalonAutoZone.
+            out["amount_due_to_store_sll"] = o.parts_total_sll if o.status != "cancelled" else 0
     return out
 
 
@@ -426,11 +468,21 @@ async def seller_orders(user: models.User = Depends(get_current_user), db: Async
     out = []
     for r in rows:
         d = _iso(dict(r._mapping))
-        for hidden in ("delivery_code","code_attempts","delivery_address","buyer_phone","buyer_id",
-                       "platform_fee_sll","driver_payout_sll","delivery_fee_sll"):
-            d.pop(hidden, None)
+        shop_paid = d.get("pay_to") == "shop"
+        hidden = ["delivery_code", "code_attempts", "delivery_address", "buyer_id"]
+        if not shop_paid:
+            hidden += ["buyer_phone", "driver_payout_sll", "delivery_fee_sll", "platform_fee_sll"]
+        for key in hidden:
+            d.pop(key, None)
+        if shop_paid:
+            d["total_to_receive_sll"] = round(r.parts_total_sll + r.delivery_fee_sll, 2)
+            d["you_keep_sll"] = round(d["total_to_receive_sll"] - r.driver_payout_sll - r.platform_fee_sll, 2)
         d["items"] = await _order_items(db, r.id)
         out.append(d)
+    from app.payments import latest_payments
+    latest = await latest_payments(db, [o["id"] for o in out if o.get("pay_to") == "shop"])
+    for o in out:
+        o["payment"] = latest.get(o["id"])
     return {"count": len(out), "orders": out}
 
 
@@ -454,19 +506,20 @@ async def driver_jobs(scope: str = Query("open"), user: models.User = Depends(ge
     driver = await _verified_driver(db, user, need_online=(scope == "open"))
     if scope == "open":
         rows = (await db.execute(
-            select(jobs, orders.c.code, orders.c.pickup_area, orders.c.delivery_area)
+            select(jobs, orders.c.code, orders.c.pickup_area, orders.c.delivery_area, orders.c.pay_to)
             .select_from(jobs.join(orders, orders.c.id == jobs.c.order_id))
             .where(jobs.c.status == "open", jobs.c.vehicle_class == driver.vehicle_type)
             .order_by(jobs.c.id).limit(50))).all()
         return {"count": len(rows), "jobs": [
             {"id": r.id, "code": r.code, "vehicle_class": r.vehicle_class, "payout_sll": r.payout_sll,
+             "paid_by_shop": r.pay_to == "shop",
              "pickup_area": r.pickup_area, "delivery_area": r.delivery_area} for r in rows]}
     if scope == "mine":
         rows = (await db.execute(
             select(jobs.c.id, jobs.c.status, jobs.c.payout_sll, jobs.c.order_id,
                    orders.c.code, orders.c.pickup_area, orders.c.seller_id, orders.c.buyer_id,
                    orders.c.delivery_address, orders.c.delivery_area, orders.c.buyer_phone,
-                   orders.c.delivery_lat, orders.c.delivery_lng)
+                   orders.c.delivery_lat, orders.c.delivery_lng, orders.c.pay_to)
             .select_from(jobs.join(orders, orders.c.id == jobs.c.order_id))
             .where(jobs.c.driver_id == driver.id, jobs.c.status.in_(["accepted","picked_up"])))).all()
         out = []
@@ -476,6 +529,7 @@ async def driver_jobs(scope: str = Query("open"), user: models.User = Depends(ge
                                        .where(USERS.c.id == m["seller_id"]))).first()
             out.append(_iso({
                 "id": m["id"], "status": m["status"], "code": m["code"], "payout_sll": m["payout_sll"],
+                "paid_by_shop": m["pay_to"] == "shop",
                 "pickup_area": m["pickup_area"], "seller_name": seller.full_name if seller else None,
                 "seller_phone": seller.phone if seller else None,
                 "delivery_address": m["delivery_address"], "delivery_area": m["delivery_area"],
@@ -626,11 +680,56 @@ async def force_complete(order_id: int, note: str = Query(..., min_length=3, max
     return {"id": order_id, "status": "delivered"}
 
 
+FEE_DUE_STATUSES = ("delivered",)
+
+
+def _fees_owed_query():
+    return (select(orders.c.seller_id, func.count(orders.c.id).label("orders"),
+                   func.coalesce(func.sum(orders.c.platform_fee_sll), 0).label("owed"))
+            .where(orders.c.pay_to == "shop", orders.c.status.in_(FEE_DUE_STATUSES),
+                   orders.c.fee_settled_at.is_(None), orders.c.platform_fee_sll > 0)
+            .group_by(orders.c.seller_id))
+
+
+@router.get("/seller/fees")
+async def seller_fees(user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    """What this shop owes SalonAutoZone for delivered orders it was paid for directly."""
+    from app.config import get_settings
+    row = (await db.execute(_fees_owed_query().where(orders.c.seller_id == user.id))).first()
+    return {"owed_sll": round(float(row.owed), 2) if row else 0.0, "orders": row.orders if row else 0,
+            "pay_to": get_settings().ORANGE_MONEY_NUMBER or None}
+
+
+@router.get("/admin/shop-fees")
+async def admin_shop_fees(admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
+    """Every shop that owes SalonAutoZone fees, biggest first."""
+    rows = (await db.execute(_fees_owed_query())).all()
+    out = []
+    for r in rows:
+        biz = (await db.execute(select(models.Business).where(models.Business.owner_id == r.seller_id))).scalars().first()
+        user = (await db.execute(select(USERS.c.full_name, USERS.c.phone).where(USERS.c.id == r.seller_id))).first()
+        out.append({"seller_id": r.seller_id, "shop": biz.name if biz else (user.full_name if user else "Seller"),
+                    "phone": ("+" + biz.whatsapp) if biz and biz.whatsapp else (user.phone if user else None),
+                    "orders": r.orders, "owed_sll": round(float(r.owed), 2)})
+    out.sort(key=lambda x: -x["owed_sll"])
+    return {"count": len(out), "total_owed_sll": round(sum(x["owed_sll"] for x in out), 2), "shops": out}
+
+
+@router.post("/admin/shop-fees/{seller_id}/settle")
+async def settle_shop_fees(seller_id: int, admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
+    """The shop has paid what it owed: clear its delivered orders up to now."""
+    got = await db.execute(update(orders).where(
+        orders.c.seller_id == seller_id, orders.c.pay_to == "shop", orders.c.status.in_(FEE_DUE_STATUSES),
+        orders.c.fee_settled_at.is_(None)).values(fee_settled_at=datetime.utcnow()))
+    await db.commit()
+    return {"seller_id": seller_id, "orders_settled": got.rowcount}
+
+
 @router.get("/admin/settings")
 async def get_settings(admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
     rows = (await db.execute(select(settings_t))).all()
     cur = {r.key: r.value for r in rows}
-    return {k: cur.get(k) for k in ("okada_fee_sll", "van_fee_sll", "platform_pct")}
+    return {k: cur.get(k) for k in ("okada_fee_sll", "van_fee_sll", "platform_pct", "commission_pct")}
 
 
 @router.put("/admin/settings")

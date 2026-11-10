@@ -94,6 +94,23 @@ def methods():
     return out
 
 
+async def _shop(db, seller_id):
+    return (await db.execute(select(models.Business).where(models.Business.owner_id == seller_id))).scalars().first()
+
+
+async def order_methods(db, o):
+    """Where the buyer of this order sends money: the shop's own numbers, or SalonAutoZone's."""
+    if getattr(o, "pay_to", "platform") != "shop":
+        return methods(), "SalonAutoZone"
+    biz = await _shop(db, o.seller_id)
+    out = []
+    if biz and biz.pay_orange_money:
+        out.append({"id": "orange_money", "label": "Orange Money", "number": biz.pay_orange_money, "online": False})
+    if biz and biz.pay_afrimoney:
+        out.append({"id": "afrimoney", "label": "Afrimoney", "number": biz.pay_afrimoney, "online": False})
+    return out, (biz.name if biz else "the shop")
+
+
 def reference_key(ref):
     return re.sub(r"[^A-Z0-9]", "", (ref or "").upper())
 
@@ -184,10 +201,16 @@ async def payment_page(order_id: int, user: models.User = Depends(get_current_us
     o = await _buyer_order(db, order_id, user)
     tries = await _attempts(db, order_id)
     cfg = get_settings()
+    ways, payee = await order_methods(db, o)
+    shop_phone = None
+    if o.pay_to == "shop":
+        biz = await _shop(db, o.seller_id)
+        shop_phone = _digits(biz.whatsapp or biz.call_phone) if biz else None
     return {
+        "pay_to": o.pay_to, "payee": payee, "payee_whatsapp": shop_phone or None,
         "order_id": o.id, "code": o.code, "status": o.status, "amount_sll": _total(o),
         "parts_total_sll": o.parts_total_sll, "delivery_fee_sll": o.delivery_fee_sll,
-        "buyer_phone": o.buyer_phone, "methods": methods(),
+        "buyer_phone": o.buyer_phone, "methods": ways,
         "waiting_for_check": any(t.status == "submitted" for t in tries),
         "online_pending": any(t.status == "pending" for t in tries),
         "tries_left": max(0, MAX_TRIES_PER_ORDER - len([t for t in tries if t.method != "monime"])),
@@ -209,7 +232,7 @@ async def submit_manual(order_id: int, body: ManualPaymentIn, user: models.User 
     o = await _buyer_order(db, order_id, user)
     if o.status != "awaiting_payment":
         raise HTTPException(409, "This order doesn't need paying any more")
-    if body.method not in {m["id"] for m in methods()}:
+    if body.method not in {m["id"] for m in (await order_methods(db, o))[0]}:
         raise HTTPException(400, "That payment method isn't available")
     key = reference_key(body.reference)
     if len(key) < 4:
@@ -287,6 +310,8 @@ async def start_online(order_id: int, request: Request, user: models.User = Depe
     if not monime_ready():
         raise HTTPException(404, "Online payment isn't switched on yet")
     o = await _buyer_order(db, order_id, user)
+    if o.pay_to == "shop":
+        raise HTTPException(409, "This shop takes payment directly. Pay it with mobile money.")
     if o.status != "awaiting_payment":
         raise HTTPException(409, "This order doesn't need paying any more")
     recent = (await db.execute(select(func.count(order_payments.c.id)).where(
@@ -430,36 +455,64 @@ async def _payment_or_404(db, pid):
     return p
 
 
+class RejectIn(BaseModel):
+    reason: str = Field(min_length=3, max_length=200)
+
+
+async def _approve(db, p, actor_id, who):
+    if p.status != "submitted":
+        raise HTTPException(409, "This payment has already been dealt with")
+    note = f"Payment confirmed by {who} ({METHOD_LABELS.get(p.method, p.method)} {p.reference or ''})".strip()
+    if not await mark_order_paid(db, p.order_id, note, actor_id):
+        raise HTTPException(409, "This order is not waiting for payment (it may be cancelled or already paid)")
+    await db.execute(update(order_payments).where(order_payments.c.id == p.id)
+                     .values(status="approved", reviewed_at=datetime.utcnow(), reviewed_by=actor_id, note=None))
+    await settle_open_payments(db, p.order_id, actor_id)
+    await db.commit()
+    return {"id": p.id, "status": "approved", "order_status": "confirmed"}
+
+
+async def _reject(db, p, actor_id, reason):
+    if p.status != "submitted":
+        raise HTTPException(409, "This payment has already been dealt with")
+    await db.execute(update(order_payments).where(order_payments.c.id == p.id)
+                     .values(status="rejected", reviewed_at=datetime.utcnow(), reviewed_by=actor_id, note=reason.strip()))
+    await db.commit()
+    return {"id": p.id, "status": "rejected"}
+
+
 @router.post("/admin/payments/{pid}/approve")
 async def approve(pid: int, admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
     """The money is on the phone: confirm the order."""
-    p = await _payment_or_404(db, pid)
-    if p.status != "submitted":
-        raise HTTPException(409, "This payment has already been dealt with")
-    if not await mark_order_paid(db, p.order_id, f"Payment confirmed ({METHOD_LABELS.get(p.method, p.method)} {p.reference or ''})".strip(), admin.id):
-        raise HTTPException(409, "This order is not waiting for payment (it may be cancelled or already paid)")
-    await db.execute(update(order_payments).where(order_payments.c.id == pid)
-                     .values(status="approved", reviewed_at=datetime.utcnow(), reviewed_by=admin.id, note=None))
-    await settle_open_payments(db, p.order_id, admin.id)
-    await db.commit()
-    return {"id": pid, "status": "approved", "order_status": "confirmed"}
-
-
-class RejectIn(BaseModel):
-    reason: str = Field(min_length=3, max_length=200)
+    return await _approve(db, await _payment_or_404(db, pid), admin.id, "SalonAutoZone")
 
 
 @router.post("/admin/payments/{pid}/reject")
 async def reject(pid: int, body: RejectIn, admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
     """Nothing arrived, or the amount is wrong: tell the buyer why so they can try again."""
+    return await _reject(db, await _payment_or_404(db, pid), admin.id, body.reason)
+
+
+# ---------- shop (seller) checks payments sent to its own number ----------
+
+async def _seller_payment(db, pid, user):
     p = await _payment_or_404(db, pid)
-    if p.status != "submitted":
-        raise HTTPException(409, "This payment has already been dealt with")
-    await db.execute(update(order_payments).where(order_payments.c.id == pid)
-                     .values(status="rejected", reviewed_at=datetime.utcnow(), reviewed_by=admin.id,
-                             note=body.reason.strip()))
-    await db.commit()
-    return {"id": pid, "status": "rejected"}
+    o = (await db.execute(select(orders.c.seller_id, orders.c.pay_to).where(orders.c.id == p.order_id))).first()
+    if not o or o.seller_id != user.id or o.pay_to != "shop":
+        raise HTTPException(404, "Payment not found")
+    return p
+
+
+@router.post("/seller/payments/{pid}/approve")
+async def seller_approve(pid: int, user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    """The shop has the money on its phone."""
+    return await _approve(db, await _seller_payment(db, pid, user), user.id, "the shop")
+
+
+@router.post("/seller/payments/{pid}/reject")
+async def seller_reject(pid: int, body: RejectIn, user: models.User = Depends(get_current_user),
+                        db: AsyncSession = Depends(get_db)):
+    return await _reject(db, await _seller_payment(db, pid, user), user.id, body.reason)
 
 
 @router.get("/admin/status")

@@ -176,6 +176,7 @@
    if (!d.jobs || !d.jobs.length) { el.innerHTML = '<div class="box empty">No jobs right now. This page checks again every 15 seconds.</div>'; return; }
    el.innerHTML = d.jobs.map(function (j) {
     return '<div class="job"><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">SLL ' + fmt(j.payout_sll) + '</span></div>' +
+     (j.paid_by_shop ? '<div class="hint" style="margin:4px 0 8px">The shop pays you this fee when you collect.</div>' : '') +
      '<div class="route"><div><small>Collect in</small> <b>' + esc(j.pickup_area || '-') + '</b></div><div><small>Deliver to</small> <b>' + esc(j.delivery_area || '-') + '</b></div></div>' +
      '<button class="btn btn-primary btn-block" data-accept="' + j.id + '" type="button">Accept job</button><div data-msg="' + j.id + '"></div></div>';
    }).join('');
@@ -209,6 +210,7 @@
    var dest = hasPin ? j.delivery_lat + ',' + j.delivery_lng : [j.delivery_address, j.delivery_area, 'Sierra Leone'].filter(Boolean).join(', ');
    var items = (j.items || []).map(function (i) { return '<li>' + esc(i.qty > 1 ? i.qty + ' × ' + i.title : i.title) + '</li>'; }).join('');
    el.innerHTML = '<div class="job"><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">SLL ' + fmt(j.payout_sll) + '</span></div>' +
+    (j.paid_by_shop ? '<div class="notice notice-info" style="margin:6px 0 10px">Collect your SLL ' + fmt(j.payout_sll) + ' delivery fee from the shop when you pick up.</div>' : '') +
     '<div class="leg' + (picked ? '' : ' go') + '"><small>1. Collect' + (picked ? 'ed' : '') + '</small><b>' + esc(j.pickup_area || '-') + '</b>' + (items ? '<ul class="items">' + items + '</ul>' : '') + (picked ? '' : person('Seller', j.seller_name, j.seller_phone)) + '</div>' +
     '<div class="leg' + (picked ? ' go' : '') + '"><small>2. Deliver to</small><b>' + esc(j.delivery_address || '-') + '</b>' + (j.delivery_area ? ', ' + esc(j.delivery_area) : '') + (hasPin ? ' <span class="pin">Pin on map</span>' : '') +
      person('Buyer', j.buyer_name, j.buyer_phone) +
