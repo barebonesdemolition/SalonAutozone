@@ -101,15 +101,16 @@
   var methods = d.methods || [];
   if (!pick || !methods.some(function (m) { return m.id === pick; })) pick = methods.length ? methods[0].id : null;
   var last = (d.payments || [])[0];
-  var html = '<h1 class="page-title">Pay for your order</h1><p class="sub">Your parts are held for you while you pay.</p>' +
+  var html = '<h1 class="page-title">Pay for your order</h1><p class="sub">' + (d.pay_to === 'shop' ? 'You pay <b>' + esc(d.payee) + '</b> directly. ' : '') + 'Your parts are held for you while you pay.</p>' +
    '<div class="amount"><div><small>Amount to pay</small><b>SLL ' + fmt(d.amount_sll) + '</b></div><div><small>Order code</small><span class="code">' + esc(d.code) + '</span></div></div>';
 
   if (q.get('back') === 'cancel') html += '<div class="notice notice-warn" style="margin-top:14px">You left the online payment before finishing. You can try again or pay another way.</div>';
 
   if (d.waiting_for_check) {
-   html += '<div class="box" style="margin-top:18px"><h2>We\'re checking your payment</h2>' +
-    '<p>You sent <b>' + esc(last.method_label) + '</b> with transaction ID <b>' + esc(last.reference) + '</b>. We\'ll confirm it as soon as we see it, usually within a few hours. This page updates by itself, and you can close it.</p>' +
-    (d.whatsapp ? '<a class="btn btn-wa" style="margin-top:6px" target="_blank" rel="noopener noreferrer" href="https://wa.me/' + esc(d.whatsapp) + '?text=' + encodeURIComponent('Hello, I paid for order ' + d.code + ' with ' + last.method_label + '. Transaction ID: ' + last.reference) + '">Tell us on WhatsApp</a>' : '') +
+   var shop = d.pay_to === 'shop', chat = shop ? d.payee_whatsapp : d.whatsapp;
+   html += '<div class="box" style="margin-top:18px"><h2>' + (shop ? esc(d.payee) + ' is checking your payment' : 'We\'re checking your payment') + '</h2>' +
+    '<p>You sent <b>' + esc(last.method_label) + '</b> with transaction ID <b>' + esc(last.reference) + '</b>. ' + (shop ? 'The shop' : 'We') + '\'ll confirm it as soon as ' + (shop ? 'it sees' : 'we see') + ' it, usually within a few hours. This page updates by itself, and you can close it.</p>' +
+    (chat ? '<a class="btn btn-wa" style="margin-top:6px" target="_blank" rel="noopener noreferrer" href="https://wa.me/' + esc(chat) + '?text=' + encodeURIComponent('Hello, I paid for SalonAutoZone order ' + d.code + ' with ' + last.method_label + '. Transaction ID: ' + last.reference) + '">' + (shop ? 'Tell the shop on WhatsApp' : 'Tell us on WhatsApp') + '</a>' : '') +
     '</div>';
   } else if (!methods.length) {
    html += '<div class="notice notice-warn" style="margin-top:18px">Payment isn\'t set up yet. ' + (d.whatsapp ? '<a target="_blank" rel="noopener noreferrer" href="https://wa.me/' + esc(d.whatsapp) + '?text=' + encodeURIComponent('Hello, how do I pay for order ' + d.code + '?') + '">Message us on WhatsApp</a> and we\'ll help you pay.' : 'We\'ll call you to take payment.') + '</div>';
@@ -127,7 +128,7 @@
      '<p class="hint" id="msg" role="alert" style="color:var(--bad)"></p></div>';
    } else {
     html += '<div class="box"><h2>Pay with ' + esc(m.label) + '</h2>' +
-     '<div class="payto"><div><small>Send to</small><b>' + esc(m.number) + '</b></div><button type="button" class="btn btn-gold" id="copy">Copy number</button></div>' +
+     '<div class="payto"><div><small>Send to ' + esc(d.payee || '') + '</small><b>' + esc(m.number) + '</b></div><button type="button" class="btn btn-gold" id="copy">Copy number</button></div>' +
      '<ol class="num"><li>Open ' + esc(m.label) + ' on your phone and send <b>exactly SLL ' + fmt(d.amount_sll) + '</b> to the number above.</li>' +
      '<li>If it asks for a reason or reference, type your order code <b>' + esc(d.code) + '</b>.</li>' +
      '<li>You\'ll get an SMS with a transaction ID. Type it below.</li></ol>' +
@@ -135,7 +136,7 @@
      '<label class="field"><span>Phone number you paid from</span><input class="input" id="from" type="tel" required maxlength="24" autocomplete="tel" value="' + esc(d.buyer_phone || '') + '"></label>' +
      '<p class="hint" id="msg" role="alert" style="color:var(--bad);min-height:1em"></p>' +
      '<button class="btn btn-primary btn-lg btn-block" id="send">I\'ve paid. Check my payment</button></form>' +
-     '<p class="safe">Only send money to the number on this page. We will never ask for your PIN.</p></div>';
+     '<p class="safe">' + (d.pay_to === 'shop' ? 'You pay the shop directly. The total includes delivery; the shop pays the rider. ' : '') + 'Only send money to the number on this page. Nobody from SalonAutoZone will ask for your PIN.</p></div>';
    }
   }
   var hist = (d.payments || []).filter(function (p) { return p.method !== 'monime' || p.status !== 'cancelled'; });

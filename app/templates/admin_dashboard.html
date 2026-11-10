@@ -311,8 +311,15 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <label style="display:block;margin-top:10px;font-weight:600">Okada (small and medium parts), SLL<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-okada" required></label>
  <label style="display:block;margin-top:10px;font-weight:600">Van (bulky parts), SLL<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-van" required></label>
  <label style="display:block;margin-top:10px;font-weight:600">Platform share of the delivery fee, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="100" step="0.5" id="fee-pct" required></label>
+ <label style="display:block;margin-top:10px;font-weight:600">Commission on parts sold, % (shops that take payment directly)<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="50" step="0.5" id="fee-comm"></label>
+ <p style="margin:8px 0 0;color:#64748b;font-size:13px">The okada and van fees above are used for shops that haven't set their own. Shops with their own numbers and fees are paid directly; they pay the rider and owe SalonAutoZone the platform share plus the commission.</p>
  <button class="btn btn-primary" style="margin-top:16px" type="submit">Save fees</button>
  </form>
+ </div>
+ <div class="panel" style="margin-top:16px">
+ <div class="bar"><h2>Fees shops owe you</h2><span id="owed-total" style="font-weight:800"></span></div>
+ <p style="margin:0 0 12px;color:#64748b">From delivered orders the shop was paid for directly. When a shop pays you, tap <b>Paid</b>.</p>
+ <div class="table-wrap"><table><thead><tr><th>Shop</th><th>Orders</th><th>Owes</th><th></th></tr></thead><tbody id="tb-owed"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
  </div>
  </div>
  </div>
@@ -788,7 +795,8 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  tb.innerHTML = items.map(function (o) {
  var l = ORDER_LABEL[o.status] || [o.status, 'off'];
  var p = o.payment;
- var payInfo = p ? '<div style="margin-top:6px;font-size:13px"><b>' + esc(p.method_label) + '</b>' + (p.reference ? ' · ID <code>' + esc(p.reference) + '</code>' : '') + (p.payer_phone ? '<br>from ' + esc(p.payer_phone) : '') + '<br><span class="badge ' + ({ submitted: 'warn', approved: 'ok', rejected: 'bad' }[p.status] || 'off') + '">' + esc({ submitted: 'Check this', approved: 'Approved', rejected: 'Not found', pending: 'Online, not finished', cancelled: 'Cancelled' }[p.status] || p.status) + '</span>' + (p.note ? '<br><small>' + esc(p.note) + '</small>' : '') + '</div>' : '';
+ var toShop = o.pay_to === 'shop' ? '<div style="margin-top:4px"><span class="badge off">Paid to the shop</span></div>' : '';
+ var payInfo = toShop + (p ? '<div style="margin-top:6px;font-size:13px"><b>' + esc(p.method_label) + '</b>' + (p.reference ? ' · ID <code>' + esc(p.reference) + '</code>' : '') + (p.payer_phone ? '<br>from ' + esc(p.payer_phone) : '') + '<br><span class="badge ' + ({ submitted: 'warn', approved: 'ok', rejected: 'bad' }[p.status] || 'off') + '">' + esc({ submitted: 'Check this', approved: 'Approved', rejected: 'Not found', pending: 'Online, not finished', cancelled: 'Cancelled' }[p.status] || p.status) + '</span>' + (p.note ? '<br><small>' + esc(p.note) + '</small>' : '') + '</div>' : '');
  var act = (p && p.status === 'submitted') ? '<button class="btn btn-primary" data-pay-ok="' + p.id + '">Money arrived</button> <button class="btn" data-pay-no="' + p.id + '">Not found</button>'
  : o.status === 'awaiting_payment' ? '<button class="btn btn-primary" data-order-pay="' + o.id + '">Payment received</button>'
  : (o.status === 'driver_assigned' || o.status === 'out_for_delivery') ? '<button class="btn" data-order-done="' + o.id + '">Mark delivered</button>' : '';
@@ -889,17 +897,39 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  });
 
  // ---------- delivery fees ----------
+ function loadOwed() {
+ var tb = $('tb-owed');
+ fetch('/api/shop/admin/shop-fees', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+ if (!d) { tb.innerHTML = '<tr><td colspan="4" class="empty">Could not load.</td></tr>'; return; }
+ $('owed-total').textContent = d.total_owed_sll ? 'Total SLL ' + fmt(d.total_owed_sll) : '';
+ tb.innerHTML = d.shops.length ? d.shops.map(function (s) {
+ var ph = String(s.phone || '').replace(/[^\d+]/g, '');
+ return '<tr><td><strong>' + esc(s.shop) + '</strong>' + (ph ? '<br><a href="tel:' + esc(ph) + '">' + esc(s.phone) + '</a>' : '') + '</td><td>' + esc(s.orders) + '</td><td><strong>SLL ' + fmt(s.owed_sll) + '</strong></td>' +
+ '<td><button class="btn btn-primary" data-settle="' + s.seller_id + '" data-amt="' + s.owed_sll + '">Paid</button></td></tr>';
+ }).join('') : '<tr><td colspan="4" class="empty">No shop owes anything right now.</td></tr>';
+ }).catch(function () {});
+ }
+ $('tb-owed').addEventListener('click', function (e) {
+ var b = e.target.closest('[data-settle]'); if (!b) return;
+ if (!confirm('Has this shop paid you SLL ' + fmt(Number(b.dataset.amt)) + '?')) return;
+ b.disabled = true;
+ fetch('/api/shop/admin/shop-fees/' + b.dataset.settle + '/settle', { method: 'POST', headers: auth() })
+ .then(function (r) { if (!r.ok) throw new Error('Could not update'); toast('Marked as paid', true); loadOwed(); })
+ .catch(function (err) { b.disabled = false; toast(err.message, false); });
+ });
  function loadFees() {
+ loadOwed();
  fetch('/api/shop/admin/settings', { headers: auth() }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
  $('fee-okada').value = d.okada_fee_sll != null ? d.okada_fee_sll : '';
  $('fee-van').value = d.van_fee_sll != null ? d.van_fee_sll : '';
  $('fee-pct').value = d.platform_pct != null ? d.platform_pct : '';
+ $('fee-comm').value = d.commission_pct != null ? d.commission_pct : '';
  if (d.okada_fee_sll == null) toast('Delivery fees are not set yet, so buyers cannot check out.', false);
  });
  }
  $('fees-form').addEventListener('submit', function (e) {
  e.preventDefault();
- var body = { okada_fee_sll: Number($('fee-okada').value), van_fee_sll: Number($('fee-van').value), platform_pct: Number($('fee-pct').value) };
+ var body = { okada_fee_sll: Number($('fee-okada').value), van_fee_sll: Number($('fee-van').value), platform_pct: Number($('fee-pct').value), commission_pct: Number($('fee-comm').value || 0) };
  fetch('/api/shop/admin/settings', { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify(body) })
  .then(function (r) { if (!r.ok) throw new Error('Could not save fees'); return r.json(); })
  .then(function () { toast('Delivery fees saved', true); })

@@ -159,17 +159,27 @@
    });
   },
   sales: function () {
-   return api('/api/shop/seller/orders').then(function (d) {
+   return Promise.all([api('/api/shop/seller/orders'), api('/api/businesses/mine/payments').catch(function () { return null; }), api('/api/shop/seller/fees').catch(function () { return null; })]).then(function (res) {
+    var d = res[0], ps = res[1], fees = res[2];
     var list = d.orders || [];
-    if (!list.length) return empty('No sales yet', 'When a buyer orders one of your parts it shows up here. You\'ll get the parts ready once we confirm their payment.', '');
+    var top = ps ? payBox(ps) : '';
+    if (fees && fees.owed_sll > 0) top = '<div class="notice notice-warn" style="margin-bottom:14px"><b>You owe SalonAutoZone SLL ' + fmt(fees.owed_sll) + '</b> in fees for ' + plural(fees.orders, 'delivered order', 'delivered orders') + '.' + (fees.pay_to ? ' Send it with Orange Money to <b>' + esc(fees.pay_to) + '</b>, with your shop name as the reference.' : '') + '</div>' + top;
+    if (!list.length) return top + empty('No sales yet', 'When a buyer orders one of your parts it shows up here.', '');
     var S = { awaiting_payment: ['Waiting for the buyer to pay', 'gold'], confirmed: ['Paid: get the parts ready', ''], ready_for_pickup: ['Ready: waiting for a driver', ''], driver_assigned: ['Driver on the way to you', ''], out_for_delivery: ['With the driver', ''], delivered: ['Delivered', ''], cancelled: ['Cancelled', 'off'] };
-    return '<div class="list">' + list.map(function (o) {
+    return top + '<div class="list">' + list.map(function (o) {
      var s = S[o.status] || [o.status, ''];
      var items = (o.items || []).map(function (it) { return esc(it.title) + ' × ' + it.qty; }).join(', ');
+     var p = o.payment, shop = o.pay_to === 'shop';
+     var payLine = '';
+     if (shop) {
+      payLine = '<br><span class="hint">Buyer pays you SLL ' + fmt(o.total_to_receive_sll) + ' (parts + delivery). You pay the rider SLL ' + fmt(o.driver_payout_sll) + ', SalonAutoZone fee SLL ' + fmt(o.platform_fee_sll) + ', you keep SLL ' + fmt(o.you_keep_sll) + '.</span>';
+      if (p && p.status === 'submitted') payLine += '<div class="notice notice-warn" style="margin-top:8px"><b>Check your phone:</b> ' + esc(p.method_label) + ' from ' + esc(p.payer_phone || 'the buyer') + ', transaction ID <b>' + esc(p.reference) + '</b>, for SLL ' + fmt(p.amount_sll) + '.</div>';
+     }
+     var payOps = (shop && p && p.status === 'submitted') ? '<button class="btn btn-primary" data-pay-ok="' + p.id + '">Money arrived</button><button class="btn btn-ghost" data-pay-no="' + p.id + '">Not on my phone</button>' : '';
      return item({ noimg: true, title: 'Order ' + o.code, href: '#',
-      meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> SLL ' + fmt(o.parts_total_sll) + ', ' + esc(when(o.created_at)),
-      extra: '<p class="msg">' + items + (o.pickup_area ? '<br><span class="hint">Pickup from ' + esc(o.pickup_area) + '</span>' : '') + '</p>',
-      ops: (o.status === 'confirmed' ? '<button class="btn btn-primary" data-ready="' + o.id + '">The parts are ready for pickup</button>' : '') +
+      meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> SLL ' + fmt(shop ? o.total_to_receive_sll : o.parts_total_sll) + ', ' + esc(when(o.created_at)),
+      extra: '<p class="msg">' + items + (o.pickup_area ? '<br><span class="hint">Pickup from ' + esc(o.pickup_area) + '</span>' : '') + payLine + '</p>',
+      ops: payOps + (o.status === 'confirmed' ? '<button class="btn btn-primary" data-ready="' + o.id + '">The parts are ready for pickup</button>' : '') +
        '<a class="btn btn-ghost" href="/receipt?id=' + encodeURIComponent(o.id) + '&copy=store">Sales slip</a>' });
     }).join('') + '</div>';
    });
@@ -213,6 +223,17 @@
    });
   }
  };
+ function payBox(ps) {
+  var v = function (x) { return x == null ? '' : esc(x); };
+  return '<details class="box" style="margin-bottom:14px"' + (ps.ready ? '' : ' open') + '><summary style="cursor:pointer;font-weight:800">How buyers pay you ' + (ps.ready ? '<span class="tag">On</span>' : '<span class="tag gold">Set this up</span>') + '</summary>' +
+   '<p class="hint" style="margin:8px 0">Buyers pay you directly for the parts and delivery. You pay the rider when they collect, and SalonAutoZone\'s fee after delivery. Until this is filled in, buyers pay SalonAutoZone instead.</p>' +
+   '<form id="payf" style="display:grid;gap:10px">' +
+   '<label class="field"><span>Orange Money number</span><input class="input" name="pay_orange_money" type="tel" value="' + v(ps.pay_orange_money) + '" placeholder="076 123 456"></label>' +
+   '<label class="field"><span>Afrimoney number (optional)</span><input class="input" name="pay_afrimoney" type="tel" value="' + v(ps.pay_afrimoney) + '" placeholder="030 123 456"></label>' +
+   '<label class="field"><span>Delivery fee by okada (small parts), SLL</span><input class="input" name="okada_fee_sll" type="number" min="0" step="500" value="' + v(ps.okada_fee_sll) + '"></label>' +
+   '<label class="field"><span>Delivery fee by van (bulky parts), SLL</span><input class="input" name="van_fee_sll" type="number" min="0" step="500" value="' + v(ps.van_fee_sll) + '"></label>' +
+   '<button class="btn btn-primary" type="submit">Save</button></form></details>';
+ }
  var current = 'orders';
  function show(tab) {
   current = tab;
@@ -224,7 +245,36 @@
  }
  document.querySelectorAll('#tabs button').forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.tab); }); });
 
+ panel.addEventListener('submit', function (e) {
+  if (e.target.id !== 'payf') return;
+  e.preventDefault();
+  var f = e.target, body = {};
+  ['pay_orange_money', 'pay_afrimoney'].forEach(function (k) { body[k] = f[k].value.trim() || null; });
+  ['okada_fee_sll', 'van_fee_sll'].forEach(function (k) { body[k] = f[k].value === '' ? null : Number(f[k].value); });
+  if (!body.pay_orange_money && !body.pay_afrimoney) { toast('Add at least one mobile money number', 'error'); return; }
+  api('/api/businesses/mine/payments', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+   .then(function (d) { toast(d.ready ? 'Saved. Buyers will now pay you directly.' : 'Saved. Add both delivery fees to start taking payments.', 'success'); show('sales'); })
+   .catch(function (err) { if (err) toast(/object/i.test(err.message) ? 'Check the numbers: use a Sierra Leone mobile number like 076 123 456.' : err.message, 'error'); });
+ });
+
  panel.addEventListener('click', function (e) {
+  var pok = e.target.closest('[data-pay-ok]'), pno = e.target.closest('[data-pay-no]');
+  if (pok) {
+   if (!confirm('Is the money on your phone, for the full amount?')) return;
+   pok.disabled = true;
+   api('/api/pay/seller/payments/' + pok.dataset.payOk + '/approve', { method: 'POST' }).then(function () { toast('Payment confirmed. Get the parts ready.', 'success'); show('sales'); })
+    .catch(function (err) { pok.disabled = false; if (err) toast(err.message, 'error'); });
+   return;
+  }
+  if (pno) {
+   var why = prompt('What should we tell the buyer?', 'No payment with this transaction ID came to my phone.');
+   if (!why || why.trim().length < 3) return;
+   pno.disabled = true;
+   api('/api/pay/seller/payments/' + pno.dataset.payNo + '/reject', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reason: why.trim() }) })
+    .then(function () { toast('The buyer will see your message and can try again.', 'success'); show('sales'); })
+    .catch(function (err) { pno.disabled = false; if (err) toast(err.message, 'error'); });
+   return;
+  }
   var ready = e.target.closest('[data-ready]');
   if (ready) {
    ready.disabled = true;

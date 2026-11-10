@@ -44,6 +44,7 @@ PROFILE_COLUMNS = {
     "tagline": "VARCHAR", "cover_url": "VARCHAR", "accent": "VARCHAR", "address": "VARCHAR",
     "hours": "TEXT", "call_phone": "VARCHAR", "facebook": "VARCHAR", "instagram": "VARCHAR",
     "tiktok": "VARCHAR", "specialties": "VARCHAR",
+    "pay_orange_money": "VARCHAR", "pay_afrimoney": "VARCHAR", "okada_fee_sll": "FLOAT", "van_fee_sll": "FLOAT",
 }
 
 _md = MetaData()
@@ -235,6 +236,56 @@ async def update_profile(body: ProfileIn, user=Depends(get_current_user), db: As
     await db.commit()
     await db.refresh(biz)
     return {"ok": True, **profile_fields(biz)}
+
+
+def payment_settings(biz) -> dict:
+    return {
+        "pay_orange_money": biz.pay_orange_money, "pay_afrimoney": biz.pay_afrimoney,
+        "okada_fee_sll": biz.okada_fee_sll, "van_fee_sll": biz.van_fee_sll,
+        "ready": bool((biz.pay_orange_money or biz.pay_afrimoney) and biz.okada_fee_sll is not None and biz.van_fee_sll is not None),
+    }
+
+
+def _money_number(v):
+    v = (v or "").strip()
+    if not v:
+        return None
+    digits = re.sub(r"\D", "", v)
+    if len(digits) == 8:
+        digits = "232" + digits
+    elif len(digits) == 9 and digits.startswith("0"):
+        digits = "232" + digits[1:]
+    if not (len(digits) == 11 and digits.startswith("232")):
+        raise ValueError("Enter a Sierra Leone mobile number, like 076 123 456")
+    return f"+232 {digits[3:5]} {digits[5:]}"
+
+
+class PaymentSettingsIn(BaseModel):
+    pay_orange_money: str | None = None
+    pay_afrimoney: str | None = None
+    okada_fee_sll: float | None = Field(default=None, ge=0, le=5_000_000)
+    van_fee_sll: float | None = Field(default=None, ge=0, le=5_000_000)
+
+    @field_validator("pay_orange_money", "pay_afrimoney")
+    @classmethod
+    def _num(cls, v):
+        return _money_number(v)
+
+
+@router.get("/api/businesses/mine/payments")
+async def get_payment_settings(user=Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    """The shop's own mobile money numbers and delivery fees."""
+    return payment_settings(await _my_business(db, user))
+
+
+@router.put("/api/businesses/mine/payments")
+async def put_payment_settings(body: PaymentSettingsIn, user=Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    biz = await _my_business(db, user)
+    for key, value in body.model_dump(exclude_unset=True).items():
+        setattr(biz, key, value)
+    await db.commit()
+    await db.refresh(biz)
+    return payment_settings(biz)
 
 
 @router.get("/api/stores/options")

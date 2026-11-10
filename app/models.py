@@ -95,6 +95,11 @@ class Business(Base):
     instagram = Column(String, nullable=True)
     tiktok = Column(String, nullable=True)
     specialties = Column(String, nullable=True)     # comma-separated makes, e.g. "Toyota,Nissan"
+    # How buyers pay this shop directly, and what it charges for delivery (it pays the rider).
+    pay_orange_money = Column(String, nullable=True)
+    pay_afrimoney = Column(String, nullable=True)
+    okada_fee_sll = Column(Float, nullable=True)
+    van_fee_sll = Column(Float, nullable=True)
 
     # Relationships
     owner = relationship("User", back_populates="businesses")
