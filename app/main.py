@@ -733,6 +733,11 @@ async def business_page_editor():
     return FileResponse("app/templates/business_page.html")
 
 
+@app.get("/receipt")
+async def receipt_page():
+    return FileResponse("app/templates/receipt.html")
+
+
 @app.get("/forgot-password")
 async def forgot_password_page():
     return FileResponse("app/templates/forgot_password.html")
