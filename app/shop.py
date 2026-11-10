@@ -20,6 +20,7 @@ from app.auth import get_current_user
 from app.routers.admin import admin_actor, require_admin
 from app.db import engine, get_db
 from app.drivers import drivers as drivers_t
+from app.notify import notify, notify_admins
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/shop", tags=["Orders & delivery"])
@@ -200,6 +201,20 @@ async def _pricing(db, seller_id, vehicle_class, parts_total=0.0):
     return fee, round(delivery_cut + commission, 2), round(fee - delivery_cut, 2), round(parts_total - commission, 2)
 
 
+def _sll(v):
+    return f"SLL {float(v or 0):,.0f}"
+
+
+async def alert_order_paid(db, order_id):
+    """Tell the buyer and the shop once an order is paid. Call after commit."""
+    o = (await db.execute(select(orders).where(orders.c.id == order_id))).first()
+    if not o:
+        return
+    await notify(o.buyer_id, f"Payment received for {o.code}", "The shop is getting your parts ready.", f"/orders?id={o.id}", "paid")
+    await notify(o.seller_id, f"Order {o.code} is paid", "Get the parts ready, then tap 'The parts are ready for pickup'.",
+                 "/my-account?tab=sales", "paid")
+
+
 async def _order_or_404(db, order_id, **where):
     q = select(orders).where(orders.c.id == order_id)
     for col, val in where.items():
@@ -316,6 +331,8 @@ async def place_order(body: OrderIn, user: models.User = Depends(get_current_use
                                                 unit_price_sll=float(part.price_sll), qty=qty, size_class=size))
     await _event(db, order_id, "awaiting_payment", "Order placed", user.id)
     await db.commit()
+    await notify(seller_id, f"New order {code}", f"{len(lines)} item(s), {_sll(total)}. Waiting for the buyer to pay.",
+                 "/my-account?tab=sales", "order")
     return await _buyer_view(db, order_id)
 
 
@@ -460,16 +477,28 @@ async def order_receipt(
 
 @router.post("/orders/{order_id}/cancel")
 async def cancel_order(order_id: int, user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    await _order_or_404(db, order_id, buyer_id=user.id)
+    o = await _order_or_404(db, order_id, buyer_id=user.id)
     got = await db.execute(update(orders).where(
-        orders.c.id == order_id, orders.c.status.in_(["awaiting_payment","confirmed"]))
+        orders.c.id == order_id, orders.c.status == o.status, orders.c.status.in_(["awaiting_payment","confirmed"]))
         .values(status="cancelled", updated_at=datetime.utcnow()))
     if got.rowcount != 1:
         raise HTTPException(409, "This order can no longer be cancelled here.")
     await _restore_stock(db, order_id)
     await _event(db, order_id, "cancelled", "Cancelled by buyer", user.id)
+    refund = o.status == "confirmed"
+    if refund:
+        from app.refunds import create_refund
+        await create_refund(db, o, o.parts_total_sll + o.delivery_fee_sll, "Buyer cancelled after paying", "buyer_cancel", "to_send", user.id)
+    else:
+        from app.payments import order_payments
+        # a payment they told us about but we hadn't checked: an admin must look before closing it
+        await db.execute(update(order_payments).where(order_payments.c.order_id == order_id, order_payments.c.status == "pending")
+                         .values(status="cancelled", note="Order cancelled"))
     await db.commit()
-    return {"id": order_id, "status": "cancelled"}
+    await notify(o.seller_id, f"Order {o.code} was cancelled", "The buyer cancelled it. Nothing to prepare.", "/my-account?tab=sales", "cancel")
+    if refund:
+        await notify_admins(f"Refund to send: {o.code}", f"Buyer cancelled a paid order. Send back {_sll(o.parts_total_sll + o.delivery_fee_sll)}.", "/admin", "refund")
+    return {"id": order_id, "status": "cancelled", "refund": refund}
 
 
 @router.get("/track/{code}")
@@ -524,6 +553,11 @@ async def mark_ready(order_id: int, user: models.User = Depends(get_current_user
                                          fee_sll=o.delivery_fee_sll, payout_sll=o.driver_payout_sll))
     await _event(db, order_id, "ready_for_pickup", "Seller marked the parts ready", user.id)
     await db.commit()
+    await notify(o.buyer_id, f"Your parts are ready ({o.code})", "We're finding a rider to bring them to you.", f"/orders?id={o.id}", "ready")
+    riders = (await db.execute(select(drivers_t.c.user_id).where(
+        drivers_t.c.status == "verified", drivers_t.c.is_online.is_(True), drivers_t.c.vehicle_type == o.vehicle_class))).scalars().all()
+    await notify(list(riders), "New delivery job", f"Collect in {o.pickup_area or 'town'}, deliver to {o.delivery_area}. You earn {_sll(o.driver_payout_sll)}.",
+                 "/drive", "job")
     return {"id": order_id, "status": "ready_for_pickup"}
 
 
@@ -584,6 +618,9 @@ async def accept_job(job_id: int, user: models.User = Depends(get_current_user),
     await _touch(db, job.order_id, "driver_assigned")
     await _event(db, job.order_id, "driver_assigned", "A driver accepted the delivery", user.id)
     await db.commit()
+    o = (await db.execute(select(orders).where(orders.c.id == job.order_id))).first()
+    await notify(o.buyer_id, f"A rider is collecting your parts ({o.code})", f"{user.full_name} on {driver.vehicle_type}, {driver.phone}.", f"/orders?id={o.id}", "rider")
+    await notify(o.seller_id, f"Rider coming for {o.code}", f"{user.full_name}, {driver.phone}. Hand over the parts when they arrive.", "/my-account?tab=sales", "rider")
     return {"id": job_id, "status": "accepted"}
 
 
@@ -602,9 +639,11 @@ async def _my_job_step(db, user, job_id, from_status, to_status, order_status, n
 
 @router.post("/driver/jobs/{job_id}/pickup")
 async def pickup_job(job_id: int, user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    await _my_job_step(db, user, job_id, "accepted", "picked_up", "out_for_delivery",
-                       "Driver collected the parts", "picked_up_at")
+    job = await _my_job_step(db, user, job_id, "accepted", "picked_up", "out_for_delivery",
+                             "Driver collected the parts", "picked_up_at")
     await db.commit()
+    o = (await db.execute(select(orders).where(orders.c.id == job.order_id))).first()
+    await notify(o.buyer_id, f"Your parts are on the way ({o.code})", "Check them when they arrive, then give the rider your delivery code.", f"/orders?id={o.id}", "on_way")
     return {"id": job_id, "status": "picked_up"}
 
 
@@ -627,6 +666,10 @@ async def deliver_job(job_id: int, body: CodeIn, user: models.User = Depends(get
     await _my_job_step(db, user, job_id, "picked_up", "delivered", "delivered",
                        "Delivered. Buyer's code entered", "delivered_at")
     await db.commit()
+    due = order.shop_payout_sll if order.shop_payout_sll is not None else order.parts_total_sll
+    await notify(order.buyer_id, f"Delivered: {order.code}", "Thanks for buying on SalonAutoZone. Your receipt is ready.", f"/receipt?id={order.id}", "delivered")
+    await notify(order.seller_id, f"Delivered: {order.code}", f"We'll send you {_sll(due)}.", "/my-account?tab=sales", "delivered")
+    await notify_admins(f"Pay rider and shop for {order.code}", f"Rider {_sll(job.payout_sll)}, shop {_sll(due)}.", "/admin", "payout")
     return {"id": job_id, "status": "delivered", "payout_sll": job.payout_sll}
 
 
@@ -699,6 +742,11 @@ async def _mark_rider_paid(db, job_id, actor_id, reference, **where):
     if got.rowcount != 1:
         raise HTTPException(409, "This delivery isn't waiting for the rider to be paid")
     await db.commit()
+    row = (await db.execute(select(jobs.c.payout_sll, orders.c.code, drivers_t.c.user_id)
+                            .select_from(jobs.join(orders, orders.c.id == jobs.c.order_id).join(drivers_t, drivers_t.c.id == jobs.c.driver_id))
+                            .where(jobs.c.id == job_id))).first()
+    if row:
+        await notify(row.user_id, f"You've been paid {_sll(row.payout_sll)}", f"For delivery {row.code}." + (f" Ref {reference.strip()}" if reference and reference.strip() else ""), "/drive", "rider_paid")
     return {"job_id": job_id, "rider_paid": True}
 
 
@@ -754,6 +802,7 @@ async def confirm_payment(order_id: int, admin=Depends(admin_actor),
     from app.payments import settle_open_payments
     await settle_open_payments(db, order_id, admin.id)
     await db.commit()
+    await alert_order_paid(db, order_id)
     return {"id": order_id, "status": "confirmed"}
 
 
@@ -818,8 +867,10 @@ async def admin_shop_payouts(admin=Depends(admin_actor), db: AsyncSession = Depe
                 "orange_money": biz.pay_orange_money if biz else None,
                 "afrimoney": biz.pay_afrimoney if biz else None,
                 "phone": ("+" + biz.whatsapp) if biz and biz.whatsapp else (user.phone if user else None)}
+    from app.refunds import refunded_sll
+    refunded = await refunded_sll(db, [o.id for o in rows])
     out = [{"order_id": o.id, "code": o.code, "seller_id": o.seller_id, "amount_sll": _shop_due(o),
-            "parts_total_sll": o.parts_total_sll, **shops[o.seller_id]} for o in rows]
+            "parts_total_sll": o.parts_total_sll, "refunded_sll": refunded.get(o.id, 0), **shops[o.seller_id]} for o in rows]
     return {"count": len(out), "total_sll": round(sum(x["amount_sll"] for x in out), 2), "payouts": out}
 
 
@@ -836,6 +887,9 @@ async def admin_shop_paid(order_id: int, body: ShopPaidIn, admin=Depends(admin_a
     if got.rowcount != 1:
         raise HTTPException(409, "This order isn't waiting for the shop to be paid")
     await db.commit()
+    o = (await db.execute(select(orders).where(orders.c.id == order_id))).first()
+    await notify(o.seller_id, f"We sent you {_sll(_shop_due(o))}", f"For order {o.code}." + (f" Ref {body.reference.strip()}" if body.reference and body.reference.strip() else ""),
+                 "/my-account?tab=sales", "shop_paid")
     return {"order_id": order_id, "shop_paid": True}
 
 

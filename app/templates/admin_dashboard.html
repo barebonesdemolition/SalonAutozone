@@ -123,6 +123,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <button type="button" data-view="businesses">Business applications</button>
  <button type="button" data-view="payments">Payments</button>
  <button type="button" data-view="orders">Parts orders</button>
+ <button type="button" data-view="refunds">Refunds</button>
  <button type="button" data-view="drivers">Drivers</button>
  <button type="button" data-view="delivery">Delivery fees</button>
  <button type="button" data-view="users">Users &amp; logins</button>
@@ -143,6 +144,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <div class="panel" id="todo-panel" style="margin-bottom:16px">
  <div class="bar"><h2>Needs your attention</h2></div>
  <div id="todo" class="todo"><p class="empty">Checking…</p></div>
+ <p style="margin:0 16px 16px;font-size:14px"><a href="/alerts" target="_blank" rel="noopener">🔔 Turn on alerts on your phone</a> to hear about payments to check, refunds and deliveries. Sign in to the main site with your admin account first.</p>
  </div>
  <div class="stats" id="stats">
  <div class="stat"><div class="k">Vehicles</div><div class="v" id="s-vehicles">—</div></div>
@@ -235,6 +237,26 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <div class="table-wrap"><table><thead><tr>
  <th>ID</th><th>Business</th><th>Plan</th><th>Amount</th><th>Reference</th><th>Status</th><th>Actions</th>
  </tr></thead><tbody id="tb-payments"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
+
+ <div id="view-refunds" class="hidden">
+ <div class="panel">
+ <div class="bar">
+ <h2>Refunds</h2>
+ <select class="inp" id="q-refunds" aria-label="Refund status">
+ <option value="open">To decide or send</option>
+ <option value="requested">Buyer asked, to decide</option>
+ <option value="to_send">Approved, to send</option>
+ <option value="sent">Sent</option>
+ <option value="declined">Declined</option>
+ <option value="all">All</option>
+ </select>
+ </div>
+ <p style="margin:0 0 12px;color:#64748b">Buyers who cancelled a paid order, or reported a problem after delivery. Approve or decline problems, then send the money with mobile money and tap <b>Sent</b>. Cancelled orders never reach the shop or rider payout lists.</p>
+ <div class="table-wrap"><table><thead><tr>
+ <th>Order</th><th>Why</th><th>Refund</th><th>Send to</th><th>Status</th><th>Actions</th>
+ </tr></thead><tbody id="tb-refunds"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
  </div>
  </div>
 
@@ -367,6 +389,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  businesses: 'Business applications',
  payments: 'Payments',
  orders: 'Parts orders',
+ refunds: 'Refunds',
  drivers: 'Drivers',
  delivery: 'Delivery fees',
  users: 'Users & logins'
@@ -378,7 +401,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  btn.classList.add('active');
  var v = btn.dataset.view;
  $('page-title').textContent = titles[v] || v;
- ['overview','vehicles','parts','imports','inquiries','businesses','payments','orders','drivers','delivery','users'].forEach(function (name) {
+ ['overview','vehicles','parts','imports','inquiries','businesses','payments','orders','refunds','drivers','delivery','users'].forEach(function (name) {
  var el = $('view-' + name);
  if (el) el.classList.toggle('hidden', name !== v);
  });
@@ -400,6 +423,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  if (v === 'businesses') loadBusinesses();
  if (v === 'payments') loadPayments();
  if (v === 'orders') loadOrders();
+ if (v === 'refunds') loadRefunds();
  if (v === 'drivers') loadDrivers();
  if (v === 'delivery') loadFees();
  if (v === 'users') loadUsersView();
@@ -420,6 +444,8 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  if (t.delivery_fees_missing) items.push(['delivery', 'Set delivery fees. Buyers can\'t check out until you do.', '!', true]);
  if (t.order_payments_to_check) items.push(['orders', 'Buyers say they\'ve paid: check the transaction ID', t.order_payments_to_check, true, 'awaiting_payment']);
  if (t.orders_awaiting_payment) items.push(['orders', 'Parts orders waiting for payment', t.orders_awaiting_payment]);
+ if (t.refunds_to_decide) items.push(['refunds', 'Buyers reported a problem: decide on a refund', t.refunds_to_decide, true, 'requested']);
+ if (t.refunds_to_send) items.push(['refunds', 'Refunds to send back to buyers', t.refunds_to_send, true, 'to_send']);
  if (t.shops_to_pay) items.push(['delivery', 'Shops to pay for delivered orders', t.shops_to_pay, true]);
  if (t.riders_to_pay) items.push(['delivery', 'Riders to pay for delivered orders', t.riders_to_pay, true]);
  if (t.drivers_pending) items.push(['drivers', 'Drivers waiting for approval', t.drivers_pending]);
@@ -437,7 +463,8 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  $('todo').addEventListener('click', function (e) {
  var b = e.target.closest('[data-todo]');
  if (!b) return;
- if (b.dataset.todoFilter && $('q-orders')) $('q-orders').value = b.dataset.todoFilter;
+ if (b.dataset.todoFilter && b.dataset.todo === 'orders' && $('q-orders')) $('q-orders').value = b.dataset.todoFilter;
+ if (b.dataset.todoFilter && b.dataset.todo === 'refunds' && $('q-refunds')) $('q-refunds').value = b.dataset.todoFilter;
  var target = document.querySelector('.side [data-view="' + b.dataset.todo + '"]');
  if (target) target.click();
  });
@@ -786,6 +813,58 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  });
 
 
+ // ---------- refunds ----------
+ var REF_LABEL = { requested: ['Buyer asked', 'warn'], to_send: ['To send', 'warn'], sent: ['Sent', 'ok'], declined: ['Declined', 'off'] };
+ function loadRefunds() {
+ var tb = $('tb-refunds');
+ tb.innerHTML = '<tr><td colspan="6" class="empty">Loading…</td></tr>';
+ fetch('/api/refunds/admin?status=' + encodeURIComponent($('q-refunds').value), { headers: auth() })
+ .then(function (r) { if (!r.ok) throw new Error('Could not load refunds'); return r.json(); })
+ .then(function (d) {
+ if (!d.refunds.length) { tb.innerHTML = '<tr><td colspan="6" class="empty">No refunds in this view.</td></tr>'; return; }
+ tb.innerHTML = d.refunds.map(function (r) {
+ var l = REF_LABEL[r.status] || [r.status, 'off'];
+ var ph = String(r.refund_phone || '').replace(/[^\d+]/g, '');
+ var act = r.status === 'requested' ? '<button class="btn btn-primary" data-ref-ok="' + r.id + '" data-amt="' + r.amount_sll + '">Approve</button> <button class="btn" data-ref-no="' + r.id + '">Decline</button>'
+ : r.status === 'to_send' ? '<button class="btn btn-primary" data-ref-sent="' + r.id + '" data-amt="' + r.amount_sll + '">Sent</button>' : '';
+ return '<tr><td><strong>' + esc(r.order_code) + '</strong><br><small>' + esc({ buyer_cancel: 'Buyer cancelled', buyer_problem: 'Problem reported', admin: 'By admin' }[r.source] || r.source) + '</small></td>' +
+ '<td>' + esc(r.reason) + (r.note ? '<br><small>' + esc(r.note) + '</small>' : '') + (r.shop_already_paid && r.status !== 'declined' ? '<br><span class="badge bad">Shop already paid: recover from shop</span>' : '') + '</td>' +
+ '<td><strong>SLL ' + fmt(r.amount_sll) + '</strong><br><small>of ' + fmt(r.order_total_sll) + '</small></td>' +
+ '<td>' + (ph ? '<a href="tel:' + esc(ph) + '">' + esc(r.refund_phone) + '</a>' : '—') + (r.sent_ref ? '<br><small>ref ' + esc(r.sent_ref) + '</small>' : '') + '</td>' +
+ '<td><span class="badge ' + l[1] + '">' + esc(l[0]) + '</span></td><td>' + act + '</td></tr>';
+ }).join('');
+ }).catch(function (e) { tb.innerHTML = '<tr><td colspan="6" class="empty">' + esc(e.message) + '.</td></tr>'; });
+ }
+ $('q-refunds').addEventListener('change', loadRefunds);
+ $('tb-refunds').addEventListener('click', function (e) {
+ var ok = e.target.closest('[data-ref-ok]'), no = e.target.closest('[data-ref-no]'), sent = e.target.closest('[data-ref-sent]');
+ function post(url, body, msg) {
+ return fetch(url, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify(body || {}) })
+ .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not update'); }); })
+ .then(function () { toast(msg, true); loadRefunds(); loadTodo(); });
+ }
+ if (ok) {
+ var amt = prompt('Refund how much (SLL)?', ok.dataset.amt);
+ if (amt === null) return;
+ amt = Number(String(amt).replace(/[^\d.]/g, ''));
+ if (!amt) return;
+ ok.disabled = true;
+ post('/api/refunds/admin/' + ok.dataset.refOk + '/approve', { amount_sll: amt }, 'Approved. Now send the money and tap Sent.').catch(function (err) { ok.disabled = false; toast(err.message, false); });
+ }
+ if (no) {
+ var why = prompt('Tell the buyer why (e.g. "The part matches what you ordered")');
+ if (!why || why.trim().length < 3) return;
+ no.disabled = true;
+ post('/api/refunds/admin/' + no.dataset.refNo + '/decline', { note: why.trim() }, 'Declined. The buyer has been told.').catch(function (err) { no.disabled = false; toast(err.message, false); });
+ }
+ if (sent) {
+ var ref = prompt('Transaction ID of the refund (optional). Sending SLL ' + fmt(Number(sent.dataset.amt)), '');
+ if (ref === null) return;
+ sent.disabled = true;
+ post('/api/refunds/admin/' + sent.dataset.refSent + '/sent', { reference: ref.trim() || null }, 'Refund marked as sent.').catch(function (err) { sent.disabled = false; toast(err.message, false); });
+ }
+ });
+
  // ---------- parts orders ----------
  var ORDER_LABEL = { awaiting_payment: ['Waiting for payment', 'warn'], confirmed: ['Paid', 'ok'], ready_for_pickup: ['Ready for pickup', 'ok'], driver_assigned: ['Driver assigned', 'ok'], out_for_delivery: ['Out for delivery', 'ok'], delivered: ['Delivered', 'ok'], cancelled: ['Cancelled', 'bad'] };
  function loadPayStatus() {
@@ -812,6 +891,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  var act = (p && p.status === 'submitted') ? '<button class="btn btn-primary" data-pay-ok="' + p.id + '">Money arrived</button> <button class="btn" data-pay-no="' + p.id + '">Not found</button>'
  : o.status === 'awaiting_payment' ? '<button class="btn btn-primary" data-order-pay="' + o.id + '">Payment received</button>'
  : (o.status === 'driver_assigned' || o.status === 'out_for_delivery') ? '<button class="btn" data-order-done="' + o.id + '">Mark delivered</button>' : '';
+ if (['confirmed', 'ready_for_pickup', 'driver_assigned', 'delivered'].indexOf(o.status) > -1) act += ' <button class="btn" data-order-refund="' + o.id + '" data-total="' + ((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + '" data-st="' + o.status + '">Refund</button>';
  var phone = String(o.buyer_phone || '').replace(/[^\d+]/g, '');
  return '<tr><td><strong>' + esc(o.code) + '</strong><br><small>' + esc(String(o.created_at || '').slice(0, 16).replace('T', ' ')) + '</small></td>' +
  '<td>' + (phone ? '<a href="tel:' + esc(phone) + '">' + esc(o.buyer_phone) + '</a>' : '—') + '</td>' +
@@ -826,6 +906,22 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  $('q-orders').addEventListener('change', loadOrders);
  $('tb-orders').addEventListener('click', function (e) {
  var pay = e.target.closest('[data-order-pay]'), done = e.target.closest('[data-order-done]');
+ var rf = e.target.closest('[data-order-refund]');
+ if (rf) {
+ var total = Number(rf.dataset.total), before = rf.dataset.st !== 'delivered';
+ var why = prompt((before ? 'This cancels the order and refunds the buyer. ' : 'The order stays delivered. ') + 'Why are you refunding?');
+ if (!why || why.trim().length < 3) return;
+ var amt = prompt('How much to refund (SLL)? Full amount is ' + fmt(total), String(total));
+ if (amt === null) return;
+ amt = Number(String(amt).replace(/[^\d.]/g, ''));
+ if (!amt || amt > total) { toast('Enter an amount up to SLL ' + fmt(total), false); return; }
+ rf.disabled = true;
+ fetch('/api/refunds/admin/orders/' + rf.dataset.orderRefund, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ reason: why.trim(), amount_sll: amt }) })
+ .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not refund'); }); })
+ .then(function () { toast('Refund added. Send it from the Refunds page.', true); loadOrders(); loadTodo(); })
+ .catch(function (err) { rf.disabled = false; toast(err.message, false); });
+ return;
+ }
  var ok = e.target.closest('[data-pay-ok]'), no = e.target.closest('[data-pay-no]');
  if (ok) {
  if (!confirm('Have you checked the money is on the phone, for the full amount?')) return;
@@ -917,7 +1013,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  tb.innerHTML = d.payouts.length ? d.payouts.map(function (p) {
  var to = [p.orange_money ? 'Orange Money ' + p.orange_money : '', p.afrimoney ? 'Afrimoney ' + p.afrimoney : ''].filter(Boolean).join('<br>');
  return '<tr><td><strong>' + esc(p.code) + '</strong></td><td>' + esc(p.shop) + (p.phone ? '<br><small>' + esc(p.phone) + '</small>' : '') + '</td>' +
- '<td>' + (to || '<span class="badge bad">No number yet</span>') + '</td><td><strong>SLL ' + fmt(p.amount_sll) + '</strong>' + (p.amount_sll !== p.parts_total_sll ? '<br><small>of ' + fmt(p.parts_total_sll) + '</small>' : '') + '</td>' +
+ '<td>' + (to || '<span class="badge bad">No number yet</span>') + '</td><td><strong>SLL ' + fmt(p.amount_sll) + '</strong>' + (p.amount_sll !== p.parts_total_sll ? '<br><small>of ' + fmt(p.parts_total_sll) + '</small>' : '') + (p.refunded_sll ? '<br><span class="badge bad">Buyer refunded SLL ' + fmt(p.refunded_sll) + ': pay the shop less</span>' : '') + '</td>' +
  '<td><button class="btn btn-primary" data-shop-paid="' + p.order_id + '" data-amt="' + p.amount_sll + '">Paid</button></td></tr>';
  }).join('') : '<tr><td colspan="5" class="empty">No shop is waiting to be paid.</td></tr>';
  }).catch(function () {});

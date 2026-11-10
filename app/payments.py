@@ -29,7 +29,8 @@ from app.auth import get_current_user
 from app.config import get_settings
 from app.db import engine, get_db
 from app.routers.admin import admin_actor
-from app.shop import mark_order_paid, orders
+from app.notify import notify, notify_admins
+from app.shop import alert_order_paid, mark_order_paid, orders
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/pay", tags=["Payments"])
@@ -253,6 +254,8 @@ async def submit_manual(order_id: int, body: ManualPaymentIn, user: models.User 
         reference=body.reference.strip(), reference_key=key, payer_phone=body.payer_phone.strip()))
     pid = res.inserted_primary_key[0]
     await db.commit()
+    label = METHOD_LABELS.get(body.method, body.method)
+    await notify_admins(f"Payment to check: {o.code}", f"{label} ID {body.reference.strip()}, SLL {_total(o):,.0f}, from {body.payer_phone.strip()}.", "/admin", "payment")
     return {"id": pid, "status": "submitted"}
 
 
@@ -389,6 +392,8 @@ async def check_online(order_id: int, user: models.User = Depends(get_current_us
                 continue
             paid = await _verify_monime(db, p) or paid
         await db.commit()
+        if paid:
+            await alert_order_paid(db, order_id)
     o = (await db.execute(select(orders.c.status).where(orders.c.id == order_id))).first()
     return {"paid": paid or o.status != "awaiting_payment", "status": o.status}
 
@@ -422,9 +427,10 @@ async def monime_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         return {"ok": True}
     rows = (await db.execute(select(order_payments).where(
         order_payments.c.provider_ref.in_(list(ids)), order_payments.c.status == "pending"))).all()
-    for p in rows:
-        await _verify_monime(db, p)
+    paid = [p.order_id for p in rows if await _verify_monime(db, p)]
     await db.commit()
+    for oid in paid:
+        await alert_order_paid(db, oid)
     return {"ok": True}
 
 
@@ -469,6 +475,7 @@ async def _approve(db, p, actor_id, who):
                      .values(status="approved", reviewed_at=datetime.utcnow(), reviewed_by=actor_id, note=None))
     await settle_open_payments(db, p.order_id, actor_id)
     await db.commit()
+    await alert_order_paid(db, p.order_id)
     return {"id": p.id, "status": "approved", "order_status": "confirmed"}
 
 
@@ -478,6 +485,8 @@ async def _reject(db, p, actor_id, reason):
     await db.execute(update(order_payments).where(order_payments.c.id == p.id)
                      .values(status="rejected", reviewed_at=datetime.utcnow(), reviewed_by=actor_id, note=reason.strip()))
     await db.commit()
+    o = (await db.execute(select(orders.c.buyer_id, orders.c.code).where(orders.c.id == p.order_id))).first()
+    await notify(o.buyer_id, f"We couldn't find your payment for {o.code}", reason.strip(), f"/pay/{p.order_id}", "payment")
     return {"id": p.id, "status": "rejected"}
 
 

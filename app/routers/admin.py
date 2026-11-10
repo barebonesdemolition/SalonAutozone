@@ -158,6 +158,8 @@ async def admin_todo(_: dict = Depends(require_admin), db: AsyncSession = Depend
             "WHERE j.status = 'delivered' AND j.rider_paid_at IS NULL AND j.payout_sll > 0 AND o.pay_to <> 'shop'")),
         "shops_to_pay": await scalar(text(
             "SELECT COUNT(*) FROM shop_orders WHERE pay_to <> 'shop' AND status = 'delivered' AND shop_paid_at IS NULL")),
+        "refunds_to_decide": await scalar(text("SELECT COUNT(*) FROM refunds WHERE status = 'requested'")),
+        "refunds_to_send": await scalar(text("SELECT COUNT(*) FROM refunds WHERE status = 'to_send'")),
         "password_requests": await scalar(text("SELECT COUNT(*) FROM password_reset_requests WHERE status = 'open'")),
     }
 

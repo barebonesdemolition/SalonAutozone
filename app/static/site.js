@@ -107,6 +107,7 @@
   })();
 
   var ICONS = {
+    bell: '<path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
     part: '<path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',
     car: '<path d="M5 17h14v-5l-2-5H7l-2 5v5z"/><path d="M5 12h14"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/>',
     vin: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6m3-6v6m3-6v6m4-6v6"/>',
@@ -171,6 +172,8 @@
         '<a class="saz-sell-btn" href="/sell" data-saz-sell>' + icon('plus') + 'Sell</a>' +
         '<a class="saz-icon" href="/cart" aria-label="Cart' + (count ? ', ' + count + ' items' : '') + '">' + icon('cart') +
           '<span class="saz-count" id="saz-cart-count"' + (count ? '' : ' hidden') + '>' + count + '</span></a>' +
+        (loggedIn ? '<a class="saz-icon" href="/alerts" aria-label="Alerts" id="saz-bell">' + icon('bell') +
+          '<span class="saz-count" id="saz-alert-count" hidden></span></a>' : '') +
         '<a class="saz-icon" href="' + accountHref + '" aria-label="' + (loggedIn ? 'My account' : 'Sign in') + '">' + icon('user') + '</a>' +
       '</div>' +
     '</div></header>';
@@ -245,6 +248,26 @@
     el.hidden = !n;
   });
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
-  else mount();
+  // Unread alerts badge on the bell. Checks once a minute while the page is open.
+  function refreshAlerts() {
+    if (!loggedIn || !window.fetch) return;
+    fetch('/api/alerts/unread', { headers: { Authorization: 'Bearer ' + token() } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        var el = document.getElementById('saz-alert-count');
+        if (!el || !d) return;
+        el.textContent = d.unread > 9 ? '9+' : d.unread;
+        el.hidden = !d.unread;
+        var bell = document.getElementById('saz-bell');
+        if (bell) bell.setAttribute('aria-label', d.unread ? 'Alerts, ' + d.unread + ' new' : 'Alerts');
+      }).catch(function () {});
+  }
+  window.SAZAlerts = { refresh: refreshAlerts };
+  function startAlerts() {
+    refreshAlerts();
+    setInterval(function () { if (!document.hidden) refreshAlerts(); }, 60000);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { mount(); startAlerts(); });
+  else { mount(); startAlerts(); }
 })();
