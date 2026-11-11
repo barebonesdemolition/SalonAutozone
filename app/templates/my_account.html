@@ -71,7 +71,7 @@
  </div>
  <section id="panel" aria-live="polite"></section>
 </main>
-<script src="/static/site.js?v=9"></script>
+<script src="/static/site.js?v=10"></script>
 <script>
 (function () {
  'use strict';
@@ -159,10 +159,10 @@
    });
   },
   sales: function () {
-   return Promise.all([api('/api/shop/seller/orders'), api('/api/businesses/mine/payments').catch(function () { return null; }), api('/api/shop/seller/fees').catch(function () { return null; }), api('/api/shop/seller/rider-payouts').catch(function () { return null; }), api('/api/shop/seller/payouts').catch(function () { return null; })]).then(function (res) {
-    var d = res[0], ps = res[1], fees = res[2], riders = (res[3] && res[3].payouts) || [], pay = res[4];
+   return Promise.all([api('/api/shop/seller/orders'), api('/api/businesses/mine/payments').catch(function () { return null; }), api('/api/shop/seller/fees').catch(function () { return null; }), api('/api/shop/seller/rider-payouts').catch(function () { return null; }), api('/api/shop/seller/payouts').catch(function () { return null; }), api('/api/analytics/seller/month').catch(function () { return null; })]).then(function (res) {
+    var d = res[0], ps = res[1], fees = res[2], riders = (res[3] && res[3].payouts) || [], pay = res[4], stats = res[5];
     var list = d.orders || [];
-    var top = (ps ? payBox(ps) : '') + '<a class="notice notice-info" href="/alerts" style="display:block;margin-bottom:12px;text-decoration:none">🔔 <b>Turn on alerts</b> to hear about new orders and payments straight away.</a>';
+    var top = (stats ? statsBox(stats) : '') + (ps ? payBox(ps) : '') + '<a class="notice notice-info" href="/alerts" style="display:block;margin-bottom:12px;text-decoration:none">🔔 <b>Turn on alerts</b> to hear about new orders and payments straight away.</a>';
     if (pay && (pay.coming_sll || pay.due_sll || (pay.recent_paid || []).length)) top = '<div class="box" style="margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
      '<div><small class="hint">Waiting for delivery</small><b style="display:block;font-size:20px">Le ' + fmt(pay.coming_sll) + '</b></div>' +
      '<div><small class="hint">Delivered, we\'re sending it</small><b style="display:block;font-size:20px">Le ' + fmt(pay.due_sll) + '</b></div>' +
@@ -238,6 +238,20 @@
    });
   }
  };
+ function statsBox(st) {
+  var t = st.this_month, l = st.last_month;
+  function cell(n, label, prev) {
+   var diff = prev != null && prev > 0 ? Math.round((n - prev) / prev * 100) : null;
+   return '<div><b style="display:block;font-size:22px">' + fmt(n) + '</b><small class="hint">' + label + (diff != null ? ' <span style="color:' + (diff >= 0 ? 'var(--ok)' : 'var(--bad)') + '">' + (diff >= 0 ? '+' : '') + diff + '%</span>' : '') + '</small></div>';
+  }
+  return '<div class="box" style="margin-bottom:14px"><h2 style="font-size:17px;margin:0 0 10px">Your shop in ' + esc(st.month) + '</h2>' +
+   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px">' +
+   cell(t.views, 'views of your shop and parts', l.views) + cell(t.people, 'people', l.people) +
+   cell(t.contacts, 'WhatsApp and call taps', l.contacts) + cell(t.orders, 'paid orders', l.orders) +
+   '<div><b style="display:block;font-size:22px">Le ' + fmt(t.sales_sll) + '</b><small class="hint">sales</small></div></div>' +
+   ((st.top_parts || []).length ? '<p class="hint" style="margin:10px 0 0">Most viewed: ' + st.top_parts.map(function (p) { return esc(p.name) + ' (' + p.views + ')'; }).join(', ') + '</p>' : '') +
+   '<p class="hint" style="margin:6px 0 0">Compared with last month. Counted by SalonAutoZone; no outside trackers.</p></div>';
+ }
  function payBox(ps) {
   var v = function (x) { return x == null ? '' : esc(x); };
   var pinTxt = ps.has_pin ? '<b style="color:var(--ok)">Shop location set.</b> <a href="https://www.openstreetmap.org/?mlat=' + ps.shop_lat + '&mlon=' + ps.shop_lng + '#map=17/' + ps.shop_lat + '/' + ps.shop_lng + '" target="_blank" rel="noopener noreferrer">Check it on the map</a>'

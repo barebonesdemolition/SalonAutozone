@@ -269,7 +269,7 @@
  </div>
 </div>
 
-<script src="/static/site.js?v=9"></script>
+<script src="/static/site.js?v=10"></script>
 <script>
 (function () {
  'use strict';
@@ -403,7 +403,7 @@
   var vehicles = tab === 'vehicles';
   if (!vehicles && $('s-cat').value) p.append('category', $('s-cat').value);
   syncChips();
-  timed((vehicles ? '/api/vehicles/?' : '/api/unified/parts?') + p.toString(), 10000)
+  timed((vehicles ? '/api/vehicles/?' : '/api/unified/parts?') + p.toString(), 10000, { headers: window.SAZTrack ? SAZTrack.headers() : {} })
    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
    .then(function (data) {
     if (my !== seq) return;

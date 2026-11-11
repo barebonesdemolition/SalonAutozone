@@ -33,6 +33,7 @@ from app.shop import ensure_delivery_tables, router as shop_router
 from app.payments import ensure_payment_tables, router as payments_router
 from app.notify import ensure_notify_tables, router as notify_router
 from app.refunds import ensure_refund_tables, router as refunds_router
+from app.analytics import ensure_analytics_tables, router as analytics_router
 from app.photos import ensure_photo_tables, router as photos_router
 from app.sellers import ensure_review_tables, router as sellers_router
 # ---------------------------------------------------------------------
@@ -146,6 +147,7 @@ async def _setup_database():
     await ensure_payment_tables()
     await ensure_notify_tables()
     await ensure_refund_tables()
+    await ensure_analytics_tables()
     await ensure_photo_tables()
     await ensure_review_tables()
 
@@ -243,6 +245,7 @@ app.include_router(shop_router)
 app.include_router(payments_router)
 app.include_router(notify_router)
 app.include_router(refunds_router)
+app.include_router(analytics_router)
 app.include_router(photos_router)
 app.include_router(sellers_router)
 

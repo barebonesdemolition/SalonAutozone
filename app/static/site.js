@@ -263,6 +263,33 @@
       }).catch(function () {});
   }
   window.SAZAlerts = { refresh: refreshAlerts };
+
+  // ---- Our own visit counting (no outside trackers). A random id stays in this browser. ----
+  function visitorId() {
+    try {
+      var v = localStorage.getItem('saz_vid');
+      if (!v) { v = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10); localStorage.setItem('saz_vid', v); }
+      return v;
+    } catch (e) { return null; }
+  }
+  function hit(kind, detail) {
+    try {
+      var body = JSON.stringify({ kind: kind, path: location.pathname, ref: document.referrer || null, visitor: visitorId(),
+        detail: detail || null, signed_in: loggedIn });
+      if (navigator.sendBeacon) navigator.sendBeacon('/api/analytics/hit', new Blob([body], { type: 'application/json' }));
+      else fetch('/api/analytics/hit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true });
+    } catch (e) {}
+  }
+  window.SAZTrack = { hit: hit, headers: function () { return { 'X-SAZ-Page': '1', 'X-SAZ-Visitor': visitorId() || '' }; } };
+  if (!/^\/admin/.test(location.pathname)) hit('view');
+  // WhatsApp and call taps, so shops can see how many people contacted them
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var h = a.getAttribute('href') || '';
+    if (/^https:\/\/(wa\.me|api\.whatsapp\.com)\/\d/.test(h)) hit('contact', 'whatsapp');
+    else if (/^tel:/.test(h)) hit('contact', 'call');
+  }, true);
   function startAlerts() {
     refreshAlerts();
     setInterval(function () { if (!document.hidden) refreshAlerts(); }, 60000);

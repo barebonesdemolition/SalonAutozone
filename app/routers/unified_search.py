@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import func
@@ -40,6 +40,7 @@ async def unified_parts_search(
     seller: Optional[int] = Query(None, description="Only this seller's parts"),
     page: int = Query(1, ge=1),
     limit: int = Query(24, ge=1, le=100),
+    request: Request = None,
     db: AsyncSession = Depends(get_db),
 ):
     offset = (page - 1) * limit
@@ -101,6 +102,9 @@ async def unified_parts_search(
     catalog_q = catalog_q.limit(limit).offset(offset)
     catalog_parts = (await db.execute(catalog_q)).scalars().all()
 
+    if q and page == 1 and seller is None:
+        from app.analytics import record_search
+        await record_search(q, local_count + catalog_count, request)
     return {
         "total": local_count + catalog_count,
         "did_you_mean": did_you_mean,

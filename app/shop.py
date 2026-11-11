@@ -1,7 +1,7 @@
 """Orders with delivery: place -> pay -> ready -> driver job -> delivered."""
 import logging
 import secrets
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from typing import Optional
 
@@ -108,6 +108,13 @@ jobs = Table("delivery_jobs", _md,
     Column("rider_paid_at", DateTime, nullable=True),
     Column("rider_paid_by", Integer, nullable=True),
     Column("rider_paid_ref", String, nullable=True),
+    # Live tracking: where the rider's phone was last seen during the job, and where the
+    # delivery code was entered (proof of where it was handed over).
+    Column("rider_lat", Float, nullable=True),
+    Column("rider_lng", Float, nullable=True),
+    Column("rider_loc_at", DateTime, nullable=True),
+    Column("delivered_lat", Float, nullable=True),
+    Column("delivered_lng", Float, nullable=True),
 )
 settings_t = Table("delivery_settings", _md,
     Column("key", String, primary_key=True),
@@ -139,10 +146,12 @@ async def ensure_delivery_tables():
 
             def missing_job_columns(sync_conn):
                 have = {col["name"] for col in sa_inspect(sync_conn).get_columns("delivery_jobs")}
-                return [c for c in ("rider_paid_at", "rider_paid_by", "rider_paid_ref") if c not in have]
+                return [c for c in ("rider_paid_at", "rider_paid_by", "rider_paid_ref", "rider_lat", "rider_lng",
+                                    "rider_loc_at", "delivered_lat", "delivered_lng") if c not in have]
 
             for column in await conn.run_sync(missing_job_columns):
-                kind = {"rider_paid_at": "TIMESTAMP", "rider_paid_by": "INTEGER"}.get(column, "VARCHAR")
+                kind = {"rider_paid_at": "TIMESTAMP", "rider_paid_by": "INTEGER", "rider_loc_at": "TIMESTAMP",
+                        "rider_paid_ref": "VARCHAR"}.get(column, "FLOAT")
                 await conn.execute(text(f"ALTER TABLE delivery_jobs ADD COLUMN {column} {kind}"))
     except Exception:
         log.exception("Could not create delivery tables")
@@ -246,8 +255,10 @@ async def _pricing(db, seller_id, vehicle_class, parts_total=0.0, lat=None, lng=
     keeps the platform share plus the commission. Shares are rounded to whole leones."""
     q = await delivery_quote(db, seller_id, vehicle_class, lat, lng)
     fee = q["fee"]
-    delivery_cut = float(round(fee * (await _setting(db, "platform_pct") or 0) / 100.0))
-    commission = float(round(parts_total * (await _setting(db, "commission_pct") or 0) / 100.0))
+    # whole leones, halves rounded up (5% of Le 450 = Le 22.50 -> Le 23)
+    half_up = lambda x: float(int(x + 0.5))
+    delivery_cut = half_up(fee * (await _setting(db, "platform_pct") or 0) / 100.0)
+    commission = half_up(parts_total * (await _setting(db, "commission_pct") or 0) / 100.0)
     return fee, delivery_cut + commission, round(fee - delivery_cut, 2), round(parts_total - commission, 2), q["distance_km"]
 
 
@@ -317,6 +328,8 @@ class OrderIn(BaseModel):
 
 class CodeIn(BaseModel):
     code: str = Field(pattern=r"^\d{6}$")
+    lat: float | None = Field(default=None, ge=-90, le=90)
+    lng: float | None = Field(default=None, ge=-180, le=180)
 
 
 class SettingsIn(BaseModel):
@@ -743,12 +756,83 @@ async def deliver_job(job_id: int, body: CodeIn, user: models.User = Depends(get
         raise HTTPException(400, f"Wrong code. {max(left, 0)} tries left.")
     await _my_job_step(db, user, job_id, "picked_up", "delivered", "delivered",
                        "Delivered. Buyer's code entered", "delivered_at")
+    if body.lat is not None and body.lng is not None:
+        await db.execute(update(jobs).where(jobs.c.id == job_id).values(delivered_lat=body.lat, delivered_lng=body.lng))
     await db.commit()
     due = order.shop_payout_sll if order.shop_payout_sll is not None else order.parts_total_sll
     await notify(order.buyer_id, f"Delivered: {order.code}", "Thanks for buying on SalonAutoZone. Your receipt is ready.", f"/receipt?id={order.id}", "delivered")
     await notify(order.seller_id, f"Delivered: {order.code}", f"We'll send you {_sll(due)}.", "/my-account?tab=sales", "delivered")
     await notify_admins(f"Pay rider and shop for {order.code}", f"Rider {_sll(job.payout_sll)}, shop {_sll(due)}.", "/admin", "payout")
     return {"id": job_id, "status": "delivered", "payout_sll": job.payout_sll}
+
+
+# ---------- live tracking ----------
+
+class LocIn(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
+
+
+LIVE_STATUSES = ("accepted", "picked_up")
+
+
+@router.post("/driver/jobs/{job_id}/location")
+async def rider_location(job_id: int, body: LocIn, user: models.User = Depends(get_current_user),
+                         db: AsyncSession = Depends(get_db)):
+    """The rider's phone reports where it is, only while it has this job."""
+    driver = await _verified_driver(db, user)
+    got = await db.execute(update(jobs).where(jobs.c.id == job_id, jobs.c.driver_id == driver.id,
+                                              jobs.c.status.in_(LIVE_STATUSES))
+                           .values(rider_lat=body.lat, rider_lng=body.lng, rider_loc_at=datetime.utcnow()))
+    if got.rowcount != 1:
+        raise HTTPException(409, "You're not on this delivery any more")
+    await db.commit()
+    return {"ok": True}
+
+
+def _ago_s(dt):
+    return int((datetime.utcnow() - dt).total_seconds()) if dt else None
+
+
+async def _tracking(db, o):
+    biz = (await db.execute(select(models.Business).where(models.Business.owner_id == o.seller_id))).scalars().first()
+    job = (await db.execute(select(jobs).where(jobs.c.order_id == o.id).order_by(jobs.c.id.desc()))).first()
+    rider = None
+    if job and job.driver_id and job.status in LIVE_STATUSES:
+        d = (await db.execute(select(drivers_t.c.phone, drivers_t.c.vehicle_type, USERS.c.full_name)
+                              .select_from(drivers_t.join(USERS, USERS.c.id == drivers_t.c.user_id))
+                              .where(drivers_t.c.id == job.driver_id))).first()
+        rider = {"name": d.full_name if d else None, "phone": d.phone if d else None,
+                 "vehicle": d.vehicle_type if d else None, "stage": job.status}
+        if job.rider_lat is not None and job.rider_loc_at and job.rider_loc_at > datetime.utcnow() - timedelta(minutes=30):
+            rider.update(lat=job.rider_lat, lng=job.rider_lng, seen_s=_ago_s(job.rider_loc_at))
+            if o.delivery_lat is not None and job.status == "picked_up":
+                rider["km_left"] = km_between(job.rider_lat, job.rider_lng, o.delivery_lat, o.delivery_lng)
+    return {
+        "order_id": o.id, "code": o.code, "status": o.status, "live": rider is not None,
+        "shop": {"name": biz.name if biz else None, "lat": biz.shop_lat if biz else None, "lng": biz.shop_lng if biz else None},
+        "buyer": {"lat": o.delivery_lat, "lng": o.delivery_lng, "area": o.delivery_area},
+        "rider": rider,
+        "delivered_at": {"lat": job.delivered_lat, "lng": job.delivered_lng} if job and job.delivered_lat is not None else None,
+    }
+
+
+@router.get("/orders/{order_id}/tracking")
+async def order_tracking(order_id: int, user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    """Where the parts are: for the buyer and the shop on this order (and admins)."""
+    o = (await db.execute(select(orders).where(orders.c.id == order_id))).first()
+    if not o or (user.id not in (o.buyer_id, o.seller_id) and not user.is_admin):
+        raise HTTPException(404, "Order not found")
+    return await _tracking(db, o)
+
+
+@router.get("/admin/live")
+async def admin_live(admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
+    """Every delivery happening now, with the rider's last position."""
+    rows = (await db.execute(select(orders).join(jobs, jobs.c.order_id == orders.c.id)
+                             .where(jobs.c.status.in_(LIVE_STATUSES)).order_by(orders.c.id))).all()
+    out = [await _tracking(db, o) for o in rows]
+    return {"count": len(out), "deliveries": out}
 
 
 @router.post("/driver/jobs/{job_id}/release")

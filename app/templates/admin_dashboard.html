@@ -124,6 +124,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <button type="button" data-view="payments">Payments</button>
  <button type="button" data-view="orders">Parts orders</button>
  <button type="button" data-view="refunds">Refunds</button>
+ <button type="button" data-view="traffic">Traffic &amp; buyers</button>
  <button type="button" data-view="drivers">Drivers</button>
  <button type="button" data-view="delivery">Delivery fees</button>
  <button type="button" data-view="users">Users &amp; logins</button>
@@ -237,6 +238,40 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <div class="table-wrap"><table><thead><tr>
  <th>ID</th><th>Business</th><th>Plan</th><th>Amount</th><th>Reference</th><th>Status</th><th>Actions</th>
  </tr></thead><tbody id="tb-payments"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+ </div>
+ </div>
+
+ <div id="view-traffic" class="hidden">
+ <div class="panel">
+ <div class="bar"><h2>Deliveries happening now</h2><span id="live-count" style="font-weight:800"></span></div>
+ <p style="margin:0 0 10px;color:#64748b">R = rider (last position from their phone), S = shop, B = buyer. Updates every 20 seconds while this page is open.</p>
+ <div id="live-map" style="height:320px;border-radius:12px;display:none"></div><p id="live-empty" class="empty" style="display:none">No deliveries on the road right now.</p>
+ </div>
+ <div class="panel" style="margin-top:16px">
+ <div class="bar"><h2>Traffic</h2>
+ <select class="inp" id="q-days" aria-label="Period"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last year</option></select></div>
+ <div class="stats" id="tr-stats"></div>
+ <div id="tr-chart" style="margin-top:16px"></div>
+ <div id="tr-funnel" style="margin-top:16px"></div>
+ </div>
+ <div class="panel" style="margin-top:16px">
+ <div class="bar"><h2>Where buyers are</h2></div>
+ <p style="margin:0 0 10px;color:#64748b">From delivery areas and map pins on orders. Pins are rounded to about 100 m.</p>
+ <div id="buyer-map" style="height:320px;border-radius:12px;display:none"></div>
+ <div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>Area</th><th>Orders</th><th>Parts sales</th></tr></thead><tbody id="tb-areas"></tbody></table></div>
+ </div>
+ <div class="panel" style="margin-top:16px">
+ <div class="bar"><h2>Shops</h2></div>
+ <p style="margin:0 0 10px;color:#64748b">Views of each shop and its parts, WhatsApp and call taps, and paid orders. Use this to decide monthly fees.</p>
+ <div class="table-wrap"><table><thead><tr><th>Shop</th><th>Views</th><th>Contacts</th><th>Paid orders</th><th>Sales</th></tr></thead><tbody id="tb-shopstats"></tbody></table></div>
+ </div>
+ <div class="panel" style="margin-top:16px">
+ <div class="bar"><h2>What people search for</h2></div>
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+ <div><h3 style="font-size:15px;margin:0 0 6px">Most searched</h3><div id="tr-search"></div></div>
+ <div><h3 style="font-size:15px;margin:0 0 6px">Searched but not found <small style="color:#64748b;font-weight:400">(tell shops to stock these)</small></h3><div id="tr-notfound"></div></div>
+ <div><h3 style="font-size:15px;margin:0 0 6px">Where visitors come from</h3><div id="tr-sources"></div></div>
+ </div>
  </div>
  </div>
 
@@ -400,6 +435,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  payments: 'Payments',
  orders: 'Parts orders',
  refunds: 'Refunds',
+ traffic: 'Traffic & buyers',
  drivers: 'Drivers',
  delivery: 'Delivery fees',
  users: 'Users & logins'
@@ -411,7 +447,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  btn.classList.add('active');
  var v = btn.dataset.view;
  $('page-title').textContent = titles[v] || v;
- ['overview','vehicles','parts','imports','inquiries','businesses','payments','orders','refunds','drivers','delivery','users'].forEach(function (name) {
+ ['overview','vehicles','parts','imports','inquiries','businesses','payments','orders','refunds','traffic','drivers','delivery','users'].forEach(function (name) {
  var el = $('view-' + name);
  if (el) el.classList.toggle('hidden', name !== v);
  });
@@ -434,6 +470,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  if (v === 'payments') loadPayments();
  if (v === 'orders') loadOrders();
  if (v === 'refunds') loadRefunds();
+ if (v === 'traffic') loadTraffic();
  if (v === 'drivers') loadDrivers();
  if (v === 'delivery') loadFees();
  if (v === 'users') loadUsersView();
@@ -822,6 +859,62 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  .catch(function (error) { button.disabled = false; toast(error.message, false); });
  });
 
+
+ // ---------- traffic & buyers ----------
+ var liveTimer = null;
+ function loadLive() {
+ fetch('/api/shop/admin/live', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+ if (!d || !window.SAZMap) return;
+ $('live-count').textContent = d.count ? d.count + ' on the road' : '';
+ $('live-empty').style.display = d.count ? 'none' : 'block';
+ if (!d.count) { $('live-map').style.display = 'none'; return; }
+ var pts = [];
+ d.deliveries.forEach(function (t) {
+ var r = t.rider || {};
+ if (r.lat != null) pts.push({ lat: r.lat, lng: r.lng, color: '#d4432c', label: 'R', text: '<b>' + esc(t.code) + '</b><br>' + esc(r.name || 'Rider') + (r.phone ? ', ' + esc(r.phone) : '') + '<br>' + (r.stage === 'picked_up' ? 'On the way to the buyer' : 'Going to the shop') });
+ if (t.shop.lat != null) pts.push({ lat: t.shop.lat, lng: t.shop.lng, color: '#0e7c74', label: 'S', text: esc(t.shop.name || 'Shop') + ' (' + esc(t.code) + ')' });
+ if (t.buyer.lat != null) pts.push({ lat: t.buyer.lat, lng: t.buyer.lng, color: '#c98a00', label: 'B', text: 'Buyer, ' + esc(t.buyer.area || '') + ' (' + esc(t.code) + ')' });
+ });
+ SAZMap.points($('live-map'), pts);
+ }).catch(function () {});
+ }
+ function bars(series) {
+ var max = Math.max.apply(null, series.map(function (s) { return s.visitors; }).concat([1]));
+ var w = Math.max(4, Math.floor(100 / series.length));
+ return '<div style="font-weight:700;margin-bottom:6px">Visitors per day</div><div style="display:flex;align-items:flex-end;gap:2px;height:120px;border-bottom:1px solid var(--border)">' +
+ series.map(function (s) { return '<div title="' + esc(s.day) + ': ' + s.visitors + ' visitors, ' + s.views + ' page views" style="flex:1;min-width:3px;background:#0e7c74;border-radius:3px 3px 0 0;height:' + Math.round(s.visitors / max * 100) + '%"></div>'; }).join('') +
+ '</div><div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-top:4px"><span>' + esc(series[0].day) + '</span><span>' + esc(series[series.length - 1].day) + '</span></div>';
+ }
+ function list(items, key, n) {
+ return items.length ? '<ol style="margin:0;padding-left:20px">' + items.map(function (x) { return '<li>' + esc(x[key]) + ' <span style="color:#64748b">(' + x[n] + ')</span></li>'; }).join('') + '</ol>' : '<p class="empty" style="margin:0">Nothing yet.</p>';
+ }
+ function loadTraffic() {
+ if (!window.SAZMap) { var s = document.createElement('script'); s.src = '/static/trackmap.js?v=2'; s.onload = loadTraffic; document.head.appendChild(s); return; }
+ loadLive();
+ clearInterval(liveTimer);
+ liveTimer = setInterval(function () { var v = $('view-traffic'); if (v && !v.classList.contains('hidden') && !document.hidden) loadLive(); }, 20000);
+ fetch('/api/analytics/admin/summary?days=' + $('q-days').value, { headers: auth() }).then(function (r) { if (!r.ok) throw new Error('Could not load traffic'); return r.json(); }).then(function (d) {
+ var t = d.totals;
+ var stat = function (k, v) { return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; };
+ $('tr-stats').innerHTML = stat('Visitors', fmt(t.visitors)) + stat('Came back', fmt(t.returning)) + stat('Page views', fmt(t.views)) +
+ stat('WhatsApp / call taps', fmt(t.contacts)) + stat('Orders', fmt(t.orders)) + stat('Paid', fmt(t.paid_orders)) +
+ stat('Parts sales', 'Le ' + fmt(t.sales_sll)) + stat('Your commission', 'Le ' + fmt(t.commission_sll));
+ $('tr-chart').innerHTML = bars(d.series) + '<p style="margin:6px 0 0;font-size:13px;color:#64748b">Phones: ' + fmt(d.devices.phone || 0) + ' views · Computers: ' + fmt(d.devices.computer || 0) + ' views</p>';
+ var top = (d.funnel[0] || {}).n || 0;
+ $('tr-funnel').innerHTML = '<div style="font-weight:700;margin-bottom:6px">From visit to delivery</div>' + d.funnel.map(function (f) {
+ var pct = top ? Math.round(f.n / top * 100) : 0;
+ return '<div style="display:flex;align-items:center;gap:10px;margin:4px 0"><span style="width:150px;font-size:14px">' + esc(f.step) + '</span><div style="flex:1;background:#eef2f2;border-radius:6px;height:18px"><div style="width:' + pct + '%;background:#c98a00;height:18px;border-radius:6px"></div></div><b style="width:70px;text-align:right">' + fmt(f.n) + '</b></div>';
+ }).join('');
+ $('tb-areas').innerHTML = d.areas.length ? d.areas.map(function (a) { return '<tr><td>' + esc(a.area) + '</td><td>' + a.orders + '</td><td>Le ' + fmt(a.sales_sll) + '</td></tr>'; }).join('') : '<tr><td colspan="3" class="empty">No orders yet.</td></tr>';
+ if (d.pins.length) SAZMap.points($('buyer-map'), d.pins.map(function (p) { return { lat: p[0], lng: p[1], small: true, color: '#c98a00' }; }));
+ else $('buyer-map').style.display = 'none';
+ $('tb-shopstats').innerHTML = d.shops.length ? d.shops.map(function (s) { return '<tr><td>' + esc(s.name) + '</td><td>' + fmt(s.views) + '</td><td>' + fmt(s.contacts) + '</td><td>' + s.orders + '</td><td>Le ' + fmt(s.sales_sll) + '</td></tr>'; }).join('') : '<tr><td colspan="5" class="empty">No shop activity yet.</td></tr>';
+ $('tr-search').innerHTML = list(d.top_searches, 'query', 'count');
+ $('tr-notfound').innerHTML = list(d.not_found, 'query', 'count');
+ $('tr-sources').innerHTML = list(d.sources, 'site', 'visits');
+ }).catch(function (e) { $('tr-stats').innerHTML = '<p class="empty">' + esc(e.message) + '</p>'; });
+ }
+ $('q-days').addEventListener('change', loadTraffic);
 
  // ---------- refunds ----------
  var REF_LABEL = { requested: ['Buyer asked', 'warn'], to_send: ['To send', 'warn'], sent: ['Sent', 'ok'], declined: ['Declined', 'off'] };
