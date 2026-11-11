@@ -161,7 +161,7 @@
    var h = (d.refunds || []).map(function (r) {
     var s = RSTAT[r.status] || [r.status, ''];
     return '<section class="box"><h2>Refund</h2><p><span class="status ' + s[1] + '">' + esc(s[0]) + '</span></p>' +
-     '<p>SLL ' + fmt(r.amount_sll) + (r.refund_phone ? ' to ' + esc(r.refund_phone) : '') + (r.sent_ref ? ' (ref ' + esc(r.sent_ref) + ')' : '') + '</p>' +
+     '<p>Le ' + fmt(r.amount_sll) + (r.refund_phone ? ' to ' + esc(r.refund_phone) : '') + (r.sent_ref ? ' (ref ' + esc(r.sent_ref) + ')' : '') + '</p>' +
      '<p class="hint">' + esc(r.reason) + (r.note ? '<br>' + esc(r.note) : '') + '</p></section>';
    }).join('');
    if (d.can_report_problem) h += '<button class="btn btn-ghost btn-block" id="problem" type="button">Problem with this order?</button>' +
@@ -193,17 +193,17 @@
     var canCancel = o.status === 'awaiting_payment' || o.status === 'confirmed';
     var showPin = ['confirmed', 'ready_for_pickup', 'driver_assigned', 'out_for_delivery', 'awaiting_payment'].indexOf(o.status) > -1 && o.delivery_code;
     root.innerHTML =
-     (o.status === 'awaiting_payment' ? '<div class="notice notice-warn" style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span><b>Waiting for payment.</b> Pay SLL ' + fmt(o.total_to_pay_sll) + ' to confirm this order.</span><a class="btn btn-primary" href="/pay/' + encodeURIComponent(o.id) + '">Pay now</a></div>' : '') +
+     (o.status === 'awaiting_payment' ? '<div class="notice notice-warn" style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span><b>Waiting for payment.</b> Pay Le ' + fmt(o.total_to_pay_sll) + ' to confirm this order.</span><a class="btn btn-primary" href="/pay/' + encodeURIComponent(o.id) + '">Pay now</a></div>' : '') +
      '<h1 class="page-title">Order <span style="letter-spacing:.06em">' + esc(o.code) + '</span></h1>' +
      '<div class="two"><div style="display:grid;gap:16px">' +
       driverBox(o.driver, o.status) +
       (o.status === 'delivered' ? '<section class="box" id="rate"></section>' : '') +
       '<section class="box"><h2>Progress</h2>' + timeline(o.status, o.events) + '</section>' +
       '<section class="box"><h2>Items</h2>' + (o.items || []).map(function (it) {
-        return '<div class="row"><span>' + esc(it.title) + ' <span style="color:var(--muted)">× ' + it.qty + '</span></span><b>SLL ' + fmt(it.unit_price_sll * it.qty) + '</b></div>';
+        return '<div class="row"><span>' + esc(it.title) + ' <span style="color:var(--muted)">× ' + it.qty + '</span></span><b>Le ' + fmt(it.unit_price_sll * it.qty) + '</b></div>';
        }).join('') +
-       '<div class="row"><span>Delivery (' + esc(o.vehicle_class === 'van' ? 'van' : 'okada') + ')</span><b>SLL ' + fmt(o.delivery_fee_sll) + '</b></div>' +
-       '<div class="row total"><span>Total to pay</span><span>SLL ' + fmt(o.total_to_pay_sll) + '</span></div></section>' +
+       '<div class="row"><span>Delivery (' + esc(o.vehicle_class === 'van' ? 'van' : 'okada') + ')</span><b>Le ' + fmt(o.delivery_fee_sll) + '</b></div>' +
+       '<div class="row total"><span>Total to pay</span><span>Le ' + fmt(o.total_to_pay_sll) + '</span></div></section>' +
      '</div><aside style="display:grid;gap:16px">' +
       (showPin ? '<section class="box"><h2>Your delivery code</h2><div class="pin">' + esc(o.delivery_code) + '</div><p class="hint">Give this code to the driver only when your parts arrive and you\'ve checked them.</p></section>' : '') +
       '<section class="box"><h2>Delivering to</h2><p>' + esc(o.delivery_address) + '<br>' + esc(o.delivery_area) + '</p>' +
@@ -238,7 +238,7 @@
     var list = d.orders || [];
     document.getElementById('ol').innerHTML = list.length ? '<div class="olist">' + list.map(function (o) {
      return '<a class="orow" href="/orders?id=' + encodeURIComponent(o.id) + '"><div><b>' + esc(o.code) + '</b><div class="hint" style="margin:2px 0 0">' + esc(when(o.created_at)) + ', ' + esc(o.delivery_area) + '</div></div>' +
-      '<div style="text-align:right">' + statusChip(o.status) + '<div style="font-weight:800;margin-top:4px">SLL ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + '</div></div></a>';
+      '<div style="text-align:right">' + statusChip(o.status) + '<div style="font-weight:800;margin-top:4px">Le ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + '</div></div></a>';
     }).join('') + '</div>' : '<div class="box" style="text-align:center;padding:40px 16px"><h2>No orders yet</h2><p style="color:var(--muted);margin:6px 0 16px">Parts you buy will show up here.</p><a class="btn btn-primary" href="/">Browse parts</a></div>';
    }).catch(function (e) { if (e) document.getElementById('ol').innerHTML = '<div class="notice notice-bad">We couldn\'t load your orders.</div>'; });
  }

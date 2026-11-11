@@ -78,22 +78,45 @@
     '<label class="field"><span>Street address</span><input class="input" id="addr" maxlength="200" placeholder="12 Kissy Road, near the mosque" autocomplete="street-address"></label>' +
     '<label class="field"><span>Area or town</span><input class="input" id="area" maxlength="60" value="Freetown" autocomplete="address-level2"></label>' +
     '<label class="field"><span>Phone number for the driver</span><input class="input" id="phone" type="tel" maxlength="25" placeholder="+232 76 123456" autocomplete="tel" value="' + esc(u.phone || '') + '"></label>' +
-    '<div class="pin-box"><b>Show the driver exactly where you are</b><p class="hint" style="margin:2px 0 0">Optional, but it helps when the address is hard to find. Uses a little mobile data for the map.</p>' +
+    '<div class="pin-box"><b>Show the driver exactly where you are</b><p class="hint" style="margin:2px 0 0">Gets you the exact delivery price and helps the rider find you. Uses a little mobile data for the map.</p>' +
      '<div class="acts"><button type="button" class="btn btn-ghost" id="pin-here">Use my current location</button><button type="button" class="btn btn-ghost" id="pin-map">Drop a pin on the map</button></div>' +
      '<div id="map" aria-label="Map: tap to move your pin"></div><div class="pin-state" id="pin-state" aria-live="polite"></div></div>' +
     '<button class="btn btn-primary btn-lg btn-block" style="margin-top:20px" type="submit" id="place">Place order</button>' +
     '<div class="msg" id="msg" aria-live="polite"></div>' +
-    '<p class="hint">After you order you pay SalonAutoZone on the next screen. We hold your money until the parts reach you. The delivery fee depends on the shop and the size of the parts.</p>' +
+    '<p class="hint">After you order you pay SalonAutoZone on the next screen. We hold your money until the parts reach you. Delivery is priced by distance from the shop, and bulky parts go by van.</p>' +
    '</form>' +
    '<aside class="box"><h2>Your order</h2>' + rows.map(function (r) {
-     return '<div class="item"><span>' + esc(r.part.name) + ' <span style="color:var(--muted)">× ' + r.qty + '</span></span><b>SLL ' + fmt(r.price * r.qty) + '</b></div>';
+     return '<div class="item"><span>' + esc(r.part.name) + ' <span style="color:var(--muted)">× ' + r.qty + '</span></span><b>Le ' + fmt(r.price * r.qty) + '</b></div>';
     }).join('') +
-    '<div class="row total"><span>Parts</span><span>SLL ' + fmt(total) + '</span></div>' +
+    '<div class="row"><span>Parts</span><span>Le ' + fmt(total) + '</span></div>' +
+    '<div class="row"><span id="del-label">Delivery</span><span id="del-fee">…</span></div>' +
+    '<div class="row total"><span>Total</span><span id="grand">Le ' + fmt(total) + '</span></div>' +
+    '<p class="hint" id="del-note" style="margin:6px 0 0"></p>' +
     '<a href="/cart" class="hint" style="display:inline-block">Edit cart</a>' +
    '</aside></div>';
 
+  // ---- delivery price: asked again whenever the pin changes ----
+  var quoteSeq = 0;
+  function quote() {
+   var seq = ++quoteSeq, fee = document.getElementById('del-fee'), note = document.getElementById('del-note');
+   fee.textContent = '…';
+   fetch('/api/shop/quote', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
+    body: JSON.stringify({ items: rows.map(function (r) { return { part_id: r.part.id, qty: r.qty }; }), delivery_lat: pin ? pin.lat : null, delivery_lng: pin ? pin.lng : null })
+   }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(typeof d.detail === 'string' ? d.detail : ''); return d; }); })
+    .then(function (d) {
+     if (seq !== quoteSeq) return;
+     document.getElementById('del-label').textContent = 'Delivery by ' + d.delivery_method + (d.distance_km ? ' (about ' + Math.round(d.distance_km) + ' km)' : '');
+     fee.textContent = 'Le ' + fmt(d.delivery_fee_sll);
+     document.getElementById('grand').textContent = 'Le ' + fmt(d.total_sll);
+     note.textContent = d.exact ? '' : 'This is a typical in-town price. Drop your pin below for the exact price; it may be less if you\'re close to the shop.';
+    }).catch(function (err) {
+     if (seq !== quoteSeq) return;
+     fee.textContent = '—'; note.textContent = err.message || 'We\'ll show the delivery price on the next screen.';
+    });
+  }
   // ---- delivery pin (Leaflet + OpenStreetMap, loaded only if the buyer asks for it) ----
   var pin = null, map = null, marker = null;
+  quote();
   var FREETOWN = [8.4844, -13.2344];
   function pinState(text, ok) { var el = document.getElementById('pin-state'); el.textContent = text; el.className = 'pin-state' + (ok ? ' ok' : ''); }
   function setPin(lat, lng) {
@@ -103,6 +126,7 @@
     else { marker = L.marker([lat, lng], { draggable: true }).addTo(map); marker.on('dragend', function () { var p = marker.getLatLng(); setPin(p.lat, p.lng); }); }
    }
    pinState('Pin set. The driver will get directions to it. Tap the map or drag the pin to adjust.', true);
+   clearTimeout(setPin.t); setPin.t = setTimeout(quote, 400);
   }
   function loadLeaflet() {
    if (window.L) return Promise.resolve();

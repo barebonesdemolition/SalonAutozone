@@ -102,7 +102,7 @@
   if (!pick || !methods.some(function (m) { return m.id === pick; })) pick = methods.length ? methods[0].id : null;
   var last = (d.payments || [])[0];
   var html = '<h1 class="page-title">Pay for your order</h1><p class="sub">' + (d.pay_to === 'shop' ? 'You pay <b>' + esc(d.payee) + '</b> directly. ' : '') + 'Your parts are held for you while you pay.</p>' +
-   '<div class="amount"><div><small>Amount to pay</small><b>SLL ' + fmt(d.amount_sll) + '</b></div><div><small>Order code</small><span class="code">' + esc(d.code) + '</span></div></div>';
+   '<div class="amount"><div><small>Amount to pay</small><b>Le ' + fmt(d.amount_sll) + '</b></div><div><small>Order code</small><span class="code">' + esc(d.code) + '</span></div></div>';
 
   if (q.get('back') === 'cancel') html += '<div class="notice notice-warn" style="margin-top:14px">You left the online payment before finishing. You can try again or pay another way.</div>';
 
@@ -124,12 +124,12 @@
    if (m.online) {
     html += '<div class="box"><h2>Pay online</h2><p>' + esc(m.detail || '') + ' You\'ll go to Monime\'s secure payment page, then come back here.</p>' +
      (d.online_pending ? '<div class="notice notice-info" style="margin-top:10px">Already paid online? <button type="button" class="btn btn-ghost" id="recheck">Check again</button></div>' : '') +
-     '<div class="acts"><button type="button" class="btn btn-primary btn-lg" id="go-online">Pay SLL ' + fmt(d.amount_sll) + ' now</button></div>' +
+     '<div class="acts"><button type="button" class="btn btn-primary btn-lg" id="go-online">Pay Le ' + fmt(d.amount_sll) + ' now</button></div>' +
      '<p class="hint" id="msg" role="alert" style="color:var(--bad)"></p></div>';
    } else {
     html += '<div class="box"><h2>Pay with ' + esc(m.label) + '</h2>' +
      '<div class="payto"><div><small>Send to ' + esc(d.payee || '') + '</small><b>' + esc(m.number) + '</b></div><button type="button" class="btn btn-gold" id="copy">Copy number</button></div>' +
-     '<ol class="num"><li>Open ' + esc(m.label) + ' on your phone and send <b>exactly SLL ' + fmt(d.amount_sll) + '</b> to the number above.</li>' +
+     '<ol class="num"><li>Open ' + esc(m.label) + ' on your phone and send <b>exactly Le ' + fmt(d.amount_sll) + '</b> to the number above.</li>' +
      '<li>If it asks for a reason or reference, type your order code <b>' + esc(d.code) + '</b>.</li>' +
      '<li>You\'ll get an SMS with a transaction ID. Type it below.</li></ol>' +
      '<form id="f" novalidate><label class="field"><span>Transaction ID from the SMS</span><input class="input ref" id="ref" required maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. PP240512.1234.A12345"></label>' +
@@ -173,7 +173,7 @@
    go.disabled = true; go.textContent = 'Opening payment page…';
    api('/api/pay/orders/' + encodeURIComponent(id) + '/online', { method: 'POST' })
     .then(function (r) { location.href = r.redirect_url; })
-    .catch(function (err) { if (!err) return; go.disabled = false; go.textContent = 'Pay SLL ' + fmt(data.amount_sll) + ' now'; document.getElementById('msg').textContent = err.message; });
+    .catch(function (err) { if (!err) return; go.disabled = false; go.textContent = 'Pay Le ' + fmt(data.amount_sll) + ' now'; document.getElementById('msg').textContent = err.message; });
   });
   var re = document.getElementById('recheck');
   if (re) re.addEventListener('click', function () { re.disabled = true; check().then(load); });

@@ -32,7 +32,7 @@ def test_part_page_has_preview_tags(client):
         "image_url": "https://res.cloudinary.com/demo/image/upload/v1/saloncarparts/abc.jpg"}).json()["id"]
     page = client.get(f"/part/{pid}", headers={"x-forwarded-proto": "https", "host": "saloncarparts.onrender.com"}).text
     assert '<meta property="og:title" content="Brake pads &quot;OEM&quot; &lt;front&gt;">' in page
-    assert "SLL 185,000, New, fits Toyota Corolla, Freetown" in page
+    assert "Le 185,000, New, fits Toyota Corolla, Freetown" in page
     assert 'content="https://res.cloudinary.com/demo/image/upload/w_1200,h_630,c_fill,f_jpg,q_auto/v1/saloncarparts/abc.jpg"' in page
     assert f'<meta property="og:url" content="https://saloncarparts.onrender.com/part/{pid}">' in page
     assert "<title>Brake pads &quot;OEM&quot; &lt;front&gt; · SalonAutoZone</title>" in page
@@ -46,7 +46,7 @@ def test_car_page_has_preview_tags_and_local_photo_is_absolute(client):
         "mileage_km": 120000, "transmission": "Automatic", "location": "Bo"}).json()["id"]
     page = client.get(f"/vehicle/{vid}").text
     assert '<meta property="og:title" content="2012 Toyota RAV4">' in page
-    assert "SLL 185,000,000, 2012, 120,000 km, Automatic, Bo" in page
+    assert "Le 185,000,000, 2012, 120,000 km, Automatic, Bo" in page
 
 
 def test_unknown_listing_still_serves_the_page(client):

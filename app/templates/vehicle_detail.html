@@ -79,7 +79,7 @@
      '<div id="gal" class="gal-wrap"></div>' +
     '<aside class="buybox">' +
      '<h1>' + esc(title) + '</h1>' +
-     '<div><div class="big-price"><small>SLL</small>' + fmt(v.price_sll) + '</div>' + (v.price_usd ? '<div class="sub-price">About $' + fmt(v.price_usd) + '</div>' : '') + '</div>' +
+     '<div><div class="big-price"><small>Le</small>' + fmt(v.price_sll) + '</div>' + (v.price_usd ? '<div class="sub-price">About $' + fmt(v.price_usd) + '</div>' : '') + '</div>' +
      '<dl class="facts">' + facts.map(function (f) { return '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>'; }).join('') + '</dl>' +
      '<div class="cta-row">' +
       (wa ? '<a class="btn btn-wa btn-lg wide" href="' + esc(wa) + '" target="_blank" rel="noopener">Message the seller on WhatsApp</a>' : '') +
@@ -106,7 +106,7 @@
 
   if (wa || phone) {
    document.body.insertAdjacentHTML('beforeend',
-    '<div class="sticky-cta"><span class="price-mini">SLL ' + fmt(v.price_sll) + '</span>' +
+    '<div class="sticky-cta"><span class="price-mini">Le ' + fmt(v.price_sll) + '</span>' +
     (phone ? '<a class="btn btn-ghost" href="tel:' + esc(phone) + '">Call</a>' : '') +
     (wa ? '<a class="btn btn-wa" href="' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') + '</div>');
    document.body.classList.add('has-sticky-cta');
@@ -160,7 +160,7 @@
 
   // ---- actions ----
   $('btn-share').onclick = function () {
-   var text = title + ' · SLL ' + fmt(v.price_sll);
+   var text = title + ' · Le ' + fmt(v.price_sll);
    if (navigator.share) { navigator.share({ title: title, text: text, url: location.href }).catch(function () {}); return; }
    window.open('https://wa.me/?text=' + encodeURIComponent(text + '\n' + location.href), '_blank', 'noopener');
   };

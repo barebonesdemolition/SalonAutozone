@@ -86,8 +86,8 @@
   '<label><input type="radio" name="mode" value="replace"><span><b>Replace the whole catalogue</b><small>Deletes every part first. Use when the supplier sends a full new list.</small></span></label></div>' +
   '<button class="btn btn-primary btn-block" style="margin-top:14px" id="go" type="button" disabled>Import</button><div id="res"></div>' +
   '<details style="margin-top:14px"><summary class="hint" style="cursor:pointer">What should the file look like?</summary>' +
-  '<p class="hint">A category name on its own line, then one part per line: part number, vehicle, brand, price in SLL. Up to three brand and price pairs per line.</p>' +
-  '<div class="fmt">Brake pads\nPart Number,Vehicle,Brand,Price SLL,Price CAD\n04465-02220,Toyota Corolla 2007-2013,Akebono,450000,25</div></details></div>' +
+  '<p class="hint">A category name on its own line, then one part per line: part number, vehicle, brand, price. Up to three brand and price pairs per line. Prices in new leones (Le); a column called "Price SLL" is read as old leones and divided by 1,000.</p>' +
+  '<div class="fmt">Brake pads\nPart Number,Vehicle,Brand,Price Le,Price CAD\n04465-02220,Toyota Corolla 2007-2013,Akebono,450,25</div></details></div>' +
   '<div class="box"><h2>In the catalogue</h2><input class="input" id="q" type="search" placeholder="Search part number, car or brand" style="margin-top:6px"><div class="cats" id="cats"></div><div class="rows" id="rows"></div></div>';
 
  var file = null, drop = document.getElementById('drop'), go = document.getElementById('go'), res = document.getElementById('res');

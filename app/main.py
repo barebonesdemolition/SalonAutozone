@@ -107,9 +107,9 @@ SUBSCRIPTION_DDL = [
     """
     INSERT INTO plans (code, name, price_sll, listing_limit, featured_slots, verified_badge, description, sort_order) VALUES
     ('free', 'Free', 0, 5, 0, FALSE, 'Get started. 5 listings, no badge.', 1),
-    ('starter', 'Starter', 75000, 30, 0, TRUE, '30 listings, verified badge.', 2),
-    ('pro', 'Pro', 200000, 100, 3, TRUE, '100 listings, 3 featured slots.', 3),
-    ('dealer', 'Dealer', 500000, NULL, 10, TRUE, 'Unlimited listings, 10 featured slots.', 4)
+    ('starter', 'Starter', 75, 30, 0, TRUE, '30 listings, verified badge.', 2),
+    ('pro', 'Pro', 200, 100, 3, TRUE, '100 listings, 3 featured slots.', 3),
+    ('dealer', 'Dealer', 500, NULL, 10, TRUE, 'Unlimited listings, 10 featured slots.', 4)
     ON CONFLICT (code) DO NOTHING
     """,
 ]
@@ -137,6 +137,9 @@ async def _setup_database():
     await ensure_store_tables()
     await ensure_vehicle_listing_columns()
     await drop_wrong_listing_foreign_keys()
+    # Before plans are seeded: existing amounts are old leones, new seeds are already new leones.
+    from app.currency import convert_to_new_leones
+    await convert_to_new_leones()
     await ensure_subscription_tables()
     await ensure_driver_tables()
     await ensure_delivery_tables()
@@ -616,7 +619,7 @@ async def submit_payment(
     if payload.amount_sll != plan.price_sll:
         raise HTTPException(
             status_code=400,
-            detail=f"The amount for this plan is {plan.price_sll:,} SLL. Please pay and enter that exact amount.",
+            detail=f"The amount for this plan is Le {plan.price_sll:,}. Please pay and enter that exact amount.",
         )
 
     dup = await db.execute(text("SELECT id FROM payments WHERE reference = :ref"), {"ref": reference})

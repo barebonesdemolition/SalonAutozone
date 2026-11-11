@@ -101,19 +101,19 @@ table.it .n { text-align: right; white-space: nowrap; }
   }).join('');
   var shopPaid = r.paid_to === 'shop';
   var sums = store && shopPaid
-   ? '<div><span>Parts sold</span><span>SLL ' + fmt(r.parts_total_sll) + '</span></div>' +
-     '<div><span>Delivery (' + esc(r.delivery_method) + ')</span><span>SLL ' + fmt(r.delivery_fee_sll) + '</span></div>' +
-     '<div class="tot"><span>' + (r.paid ? 'Paid to you' : 'Customer to pay you') + '</span><span>SLL ' + fmt(r.parts_total_sll + r.delivery_fee_sll) + '</span></div>' +
-     (cancelled ? '' : '<div><span>You pay the rider</span><span>− SLL ' + fmt(r.pay_rider_sll) + '</span></div>' +
-      '<div><span>SalonAutoZone fee</span><span>− SLL ' + fmt(r.salonautozone_fee_sll) + '</span></div>' +
-      '<div class="tot"><span>You keep</span><span>SLL ' + fmt(r.store_keeps_sll) + '</span></div>')
+   ? '<div><span>Parts sold</span><span>Le ' + fmt(r.parts_total_sll) + '</span></div>' +
+     '<div><span>Delivery (' + esc(r.delivery_method) + ')</span><span>Le ' + fmt(r.delivery_fee_sll) + '</span></div>' +
+     '<div class="tot"><span>' + (r.paid ? 'Paid to you' : 'Customer to pay you') + '</span><span>Le ' + fmt(r.parts_total_sll + r.delivery_fee_sll) + '</span></div>' +
+     (cancelled ? '' : '<div><span>You pay the rider</span><span>− Le ' + fmt(r.pay_rider_sll) + '</span></div>' +
+      '<div><span>SalonAutoZone fee</span><span>− Le ' + fmt(r.salonautozone_fee_sll) + '</span></div>' +
+      '<div class="tot"><span>You keep</span><span>Le ' + fmt(r.store_keeps_sll) + '</span></div>')
    : store
-   ? '<div><span>Parts sold</span><span>SLL ' + fmt(r.parts_total_sll) + '</span></div>' +
-     (r.commission_sll ? '<div><span>SalonAutoZone commission</span><span>− SLL ' + fmt(r.commission_sll) + '</span></div>' : '') +
-     '<div class="tot"><span>' + (cancelled ? 'Amount due to you' : 'Amount due to you') + '</span><span>SLL ' + fmt(r.amount_due_to_store_sll) + '</span></div>'
-   : '<div><span>Parts</span><span>SLL ' + fmt(r.parts_total_sll) + '</span></div>' +
-     '<div><span>Delivery (' + esc(r.delivery_method) + ')</span><span>SLL ' + fmt(r.delivery_fee_sll) + '</span></div>' +
-     '<div class="tot"><span>' + (r.paid ? 'Total paid' : 'Total to pay') + '</span><span>SLL ' + fmt(r.total_sll) + '</span></div>';
+   ? '<div><span>Parts sold</span><span>Le ' + fmt(r.parts_total_sll) + '</span></div>' +
+     (r.commission_sll ? '<div><span>SalonAutoZone commission</span><span>− Le ' + fmt(r.commission_sll) + '</span></div>' : '') +
+     '<div class="tot"><span>' + (cancelled ? 'Amount due to you' : 'Amount due to you') + '</span><span>Le ' + fmt(r.amount_due_to_store_sll) + '</span></div>'
+   : '<div><span>Parts</span><span>Le ' + fmt(r.parts_total_sll) + '</span></div>' +
+     '<div><span>Delivery (' + esc(r.delivery_method) + ')</span><span>Le ' + fmt(r.delivery_fee_sll) + '</span></div>' +
+     '<div class="tot"><span>' + (r.paid ? 'Total paid' : 'Total to pay') + '</span><span>Le ' + fmt(r.total_sll) + '</span></div>';
   var dates = '<div class="when">Ordered ' + esc(day(r.ordered_at)) + '</div>' +
    (r.paid_at ? '<div class="when">Paid ' + esc(day(r.paid_at)) + (r.paid_with ? ' · ' + esc(r.paid_with.method) + (r.paid_with.reference ? ' (ref ' + esc(r.paid_with.reference) + ')' : '') : '') + '</div>' : '') +
    (r.delivered_at ? '<div class="when">Delivered ' + esc(day(r.delivered_at)) + '</div>' : '') +
@@ -134,7 +134,7 @@ table.it .n { text-align: right; white-space: nowrap; }
     (b.address ? esc(b.address) + ', ' : '') + esc(b.area || '') + '</p></div></div>' +
    '<table class="it"><thead><tr><th>Item</th><th class="n">Qty</th><th class="n">Price</th><th class="n">Amount</th></tr></thead><tbody>' + rows + '</tbody></table>' +
    '<div class="sum">' + sums + '</div>' + stamp + note +
-   '<div class="foot">' + (store ? 'Store copy for your records. ' : 'Thank you for buying on SalonAutoZone. ') + 'All amounts in Sierra Leonean Leones (SLL).' +
+   '<div class="foot">' + (store ? 'Store copy for your records. ' : 'Thank you for buying on SalonAutoZone. ') + 'All amounts in Sierra Leonean leones (Le).' +
     (r.platform.whatsapp ? ' Questions about this order? Message us on WhatsApp +' + esc(r.platform.whatsapp) + ' and quote ' + esc(r.number) + '.' : '') + '</div></article>';
 
   var other = store ? 'customer' : 'store';
@@ -143,8 +143,8 @@ table.it .n { text-align: right; white-space: nowrap; }
    '<a class="btn btn-ghost" href="' + (store ? '/my-account?tab=sales' : '/orders?id=' + encodeURIComponent(id)) + '">Back</a></div>' +
    (key ? '<div class="copies"><a href="?id=' + encodeURIComponent(id) + '&copy=customer"' + (store ? '' : ' aria-current="page"') + '>Customer receipt</a><a href="?id=' + encodeURIComponent(id) + '&copy=store"' + (store ? ' aria-current="page"' : '') + '>Store copy</a></div>' : '');
   document.getElementById('print').addEventListener('click', function () { window.print(); });
-  var lines = [r.title + ' ' + r.number + ' - SalonAutoZone'].concat(r.items.map(function (it) { return it.qty + ' x ' + it.title + ': SLL ' + fmt(it.line_total_sll); }));
-  lines.push(store ? (shopPaid ? 'Paid to the store: SLL ' + fmt(r.parts_total_sll + r.delivery_fee_sll) : 'Amount due to the store: SLL ' + fmt(r.amount_due_to_store_sll)) : (r.paid ? 'Total paid: SLL ' : 'Total to pay: SLL ') + fmt(r.total_sll));
+  var lines = [r.title + ' ' + r.number + ' - SalonAutoZone'].concat(r.items.map(function (it) { return it.qty + ' x ' + it.title + ': Le ' + fmt(it.line_total_sll); }));
+  lines.push(store ? (shopPaid ? 'Paid to the store: Le ' + fmt(r.parts_total_sll + r.delivery_fee_sll) : 'Amount due to the store: Le ' + fmt(r.amount_due_to_store_sll)) : (r.paid ? 'Total paid: Le ' : 'Total to pay: Le ') + fmt(r.total_sll));
   lines.push(cancelled ? 'Status: cancelled' : r.paid ? 'Status: paid' : 'Status: not paid yet');
   document.getElementById('share').href = 'https://wa.me/?text=' + encodeURIComponent(lines.join('\n'));
   if (q.get('print') === '1') setTimeout(function () { window.print(); }, 400);

@@ -48,7 +48,7 @@ async def suggest(
             vehicles = result.scalars().all()
 
             for v in vehicles:
-                price_str = f"SLL {int(v.price_sll):,}" if v.price_sll else "Contact for Price"
+                price_str = f"Le {int(v.price_sll):,}" if v.price_sll else "Contact for Price"
                 
                 # Format availability indicator for scam awareness
                 avail_label = ""
@@ -124,7 +124,7 @@ async def suggest(
             parts = result.scalars().all()
 
             for p in parts:
-                price_str = f"SLL {int(p.price_sll):,}" if p.price_sll else "Contact for Price"
+                price_str = f"Le {int(p.price_sll):,}" if p.price_sll else "Contact for Price"
                 suggestions.append({
                     "type": "part",
                     "id": p.id,

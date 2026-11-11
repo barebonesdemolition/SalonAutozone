@@ -117,8 +117,8 @@ def reference_key(ref):
 
 
 def to_monime_minor(amount_sll):
-    """SLL on the site -> Monime's amount: new leones (SLE) in cents."""
-    per_sle = get_settings().MONIME_SLL_PER_SLE or 1000
+    """Site amount (new leones) -> Monime's amount: new leones (SLE) in cents."""
+    per_sle = get_settings().MONIME_SLL_PER_SLE or 1
     return int(round(amount_sll / per_sle * 100))
 
 
@@ -255,7 +255,7 @@ async def submit_manual(order_id: int, body: ManualPaymentIn, user: models.User 
     pid = res.inserted_primary_key[0]
     await db.commit()
     label = METHOD_LABELS.get(body.method, body.method)
-    await notify_admins(f"Payment to check: {o.code}", f"{label} ID {body.reference.strip()}, SLL {_total(o):,.0f}, from {body.payer_phone.strip()}.", "/admin", "payment")
+    await notify_admins(f"Payment to check: {o.code}", f"{label} ID {body.reference.strip()}, Le {_total(o):,.0f}, from {body.payer_phone.strip()}.", "/admin", "payment")
     return {"id": pid, "status": "submitted"}
 
 

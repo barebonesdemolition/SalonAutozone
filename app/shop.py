@@ -69,6 +69,8 @@ orders = Table("shop_orders", _md,
     Column("shop_payout_sll", Float, nullable=True),
     Column("shop_paid_at", DateTime, nullable=True),
     Column("shop_paid_ref", String, nullable=True),
+    # About how far the rider travels (km), when both the shop and the buyer dropped a pin.
+    Column("distance_km", Float, nullable=True),
     Column("code_attempts", Integer, nullable=False, server_default="0"),
     Column("created_at", DateTime, nullable=False, default=datetime.utcnow),
     Column("updated_at", DateTime, nullable=False, default=datetime.utcnow),
@@ -128,7 +130,7 @@ async def ensure_delivery_tables():
             def missing_columns(sync_conn):
                 have = {col["name"] for col in sa_inspect(sync_conn).get_columns("shop_orders")}
                 return [c for c in ("delivery_lat", "delivery_lng", "pay_to", "fee_settled_at",
-                                    "shop_payout_sll", "shop_paid_at", "shop_paid_ref") if c not in have]
+                                    "shop_payout_sll", "shop_paid_at", "shop_paid_ref", "distance_km") if c not in have]
 
             for column in await conn.run_sync(missing_columns):
                 kind = {"pay_to": "VARCHAR NOT NULL DEFAULT 'platform'", "fee_settled_at": "TIMESTAMP",
@@ -181,28 +183,76 @@ def shop_sets_delivery(biz):
     return bool(biz and biz.okada_fee_sll is not None and biz.van_fee_sll is not None)
 
 
-async def _pricing(db, seller_id, vehicle_class, parts_total=0.0):
-    """(delivery fee, SalonAutoZone's fee, rider payout, shop payout) for an order from this seller.
+# Delivery is priced by distance, in new leones. Worked out from a real trip: central Freetown
+# to Mile 13 (about 20 km) cost Le 140 by okada. Admins can change these in Delivery fees.
+RATE_DEFAULTS = {"rate_base": 20.0, "rate_per_km": 6.0, "rate_min": 30.0, "van_multiplier": 3.0, "max_km": 60.0}
+ROAD_FACTOR = 1.05      # straight-line distance -> rough road distance on Freetown's main roads
+GUESS_KM = 10.0         # used when we don't know where the shop or the buyer is
 
-    The buyer pays SalonAutoZone everything in one payment. After delivery SalonAutoZone pays the
-    rider (delivery fee less the platform share) and the shop (parts less the commission), and
-    keeps the platform share plus the commission. The delivery fee is the shop's own if it set
-    one, otherwise the site-wide fee."""
+
+def km_between(lat1, lng1, lat2, lng2):
+    """Rough road distance in km between two map pins."""
+    import math
+    r = 6371.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp, dl = math.radians(lat2 - lat1), math.radians(lng2 - lng1)
+    a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return round(2 * r * math.asin(math.sqrt(a)) * ROAD_FACTOR, 1)
+
+
+def _round5(x):
+    return float(int(5 * round(float(x) / 5)))
+
+
+async def _rates(db):
+    out = dict(RATE_DEFAULTS)
+    for key in RATE_DEFAULTS:
+        v = await _setting(db, key)
+        if v is not None:
+            out[key] = v
+    return out
+
+
+def fee_for_km(km, vehicle_class, rates):
+    okada = _round5(max(rates["rate_min"], rates["rate_base"] + rates["rate_per_km"] * km))
+    return _round5(okada * rates["van_multiplier"]) if vehicle_class == "van" else okada
+
+
+async def delivery_quote(db, seller_id, vehicle_class, lat=None, lng=None):
+    """{fee, distance_km, exact}. Exact when both the shop and the buyer have a map pin."""
     biz = (await db.execute(select(models.Business).where(models.Business.owner_id == seller_id))).scalars().first()
+    rates = await _rates(db)
+    shop_pin = biz is not None and biz.shop_lat is not None and biz.shop_lng is not None
+    if shop_pin and lat is not None and lng is not None:
+        km = km_between(biz.shop_lat, biz.shop_lng, lat, lng)
+        if km > rates["max_km"]:
+            raise HTTPException(409, f"This shop is about {km:.0f} km away, too far for delivery. Message the shop to arrange it.")
+        return {"fee": fee_for_km(km, vehicle_class, rates), "distance_km": km, "exact": True}
+    # No pins: the shop's own fixed fee, then the site's fixed fee, then a typical in-town trip.
     if shop_sets_delivery(biz):
-        fee = round(float(biz.van_fee_sll if vehicle_class == "van" else biz.okada_fee_sll), 2)
+        fee = float(biz.van_fee_sll if vehicle_class == "van" else biz.okada_fee_sll)
     else:
         fee = await _setting(db, "van_fee_sll" if vehicle_class == "van" else "okada_fee_sll")
         if fee is None:
-            raise HTTPException(503, "Delivery isn't set up for this shop yet. Message the shop or try another seller.")
-        fee = round(fee, 2)
-    delivery_cut = round(fee * (await _setting(db, "platform_pct") or 0) / 100.0, 2)
-    commission = round(parts_total * (await _setting(db, "commission_pct") or 0) / 100.0, 2)
-    return fee, round(delivery_cut + commission, 2), round(fee - delivery_cut, 2), round(parts_total - commission, 2)
+            fee = fee_for_km(GUESS_KM, vehicle_class, rates)
+    return {"fee": round(fee, 2), "distance_km": None, "exact": False}
+
+
+async def _pricing(db, seller_id, vehicle_class, parts_total=0.0, lat=None, lng=None):
+    """(delivery fee, SalonAutoZone's fee, rider payout, shop payout, distance km).
+
+    The buyer pays SalonAutoZone everything in one payment. After delivery SalonAutoZone pays the
+    rider (delivery fee less the platform share) and the shop (parts less the commission), and
+    keeps the platform share plus the commission. Shares are rounded to whole leones."""
+    q = await delivery_quote(db, seller_id, vehicle_class, lat, lng)
+    fee = q["fee"]
+    delivery_cut = float(round(fee * (await _setting(db, "platform_pct") or 0) / 100.0))
+    commission = float(round(parts_total * (await _setting(db, "commission_pct") or 0) / 100.0))
+    return fee, delivery_cut + commission, round(fee - delivery_cut, 2), round(parts_total - commission, 2), q["distance_km"]
 
 
 def _sll(v):
-    return f"SLL {float(v or 0):,.0f}"
+    return f"Le {float(v or 0):,.0f}"
 
 
 async def alert_order_paid(db, order_id):
@@ -274,12 +324,15 @@ class SettingsIn(BaseModel):
     van_fee_sll: float | None = Field(default=None, ge=0, le=10_000_000)
     platform_pct: float | None = Field(default=None, ge=0, le=100)
     commission_pct: float | None = Field(default=None, ge=0, le=50)
+    rate_base: float | None = Field(default=None, ge=0, le=10_000)
+    rate_per_km: float | None = Field(default=None, ge=0, le=1_000)
+    rate_min: float | None = Field(default=None, ge=0, le=10_000)
+    van_multiplier: float | None = Field(default=None, ge=1, le=10)
+    max_km: float | None = Field(default=None, ge=1, le=500)
 
 
-@router.post("/orders", status_code=201)
-async def place_order(body: OrderIn, user: models.User = Depends(get_current_user),
-                      db: AsyncSession = Depends(get_db)):
-    ids = [i.part_id for i in body.items]
+async def _order_lines(db, items, user):
+    ids = [i.part_id for i in items]
     if len(set(ids)) != len(ids):
         raise HTTPException(422, "List each part once and use the quantity field")
     rows = (await db.execute(select(PARTS).where(PARTS.c.id.in_(ids)))).all()
@@ -295,14 +348,39 @@ async def place_order(body: OrderIn, user: models.User = Depends(get_current_use
     overrides = {r.part_id: r.size_class for r in
                  (await db.execute(select(sizes_t).where(sizes_t.c.part_id.in_(ids)))).all()}
     lines, total, vehicle = [], 0.0, "bike"
-    for it in body.items:
+    for it in items:
         part = by_id[it.part_id]
         size = overrides.get(part.id) or _default_size(part)
         if size == "bulky":
             vehicle = "van"
         total += float(part.price_sll) * it.qty
         lines.append((part, it.qty, size))
-    fee, cut, payout, shop_payout = await _pricing(db, seller_id, vehicle, round(total, 2))
+    return seller_id, lines, round(total, 2), vehicle
+
+
+class QuoteIn(BaseModel):
+    items: list[ItemIn] = Field(min_length=1, max_length=20)
+    delivery_lat: float | None = Field(default=None, ge=-90, le=90)
+    delivery_lng: float | None = Field(default=None, ge=-180, le=180)
+
+
+@router.post("/quote")
+async def quote(body: QuoteIn, user: models.User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    """What delivery will cost, before the buyer places the order."""
+    seller_id, lines, total, vehicle = await _order_lines(db, body.items, user)
+    q = await delivery_quote(db, seller_id, vehicle, body.delivery_lat, body.delivery_lng)
+    return {"parts_total_sll": total, "delivery_fee_sll": q["fee"], "total_sll": round(total + q["fee"], 2),
+            "vehicle_class": vehicle, "delivery_method": "van" if vehicle == "van" else "okada",
+            "distance_km": q["distance_km"], "exact": q["exact"]}
+
+
+@router.post("/orders", status_code=201)
+async def place_order(body: OrderIn, user: models.User = Depends(get_current_user),
+                      db: AsyncSession = Depends(get_db)):
+    lat = body.delivery_lat if body.delivery_lng is not None else None
+    lng = body.delivery_lng if body.delivery_lat is not None else None
+    seller_id, lines, total, vehicle = await _order_lines(db, body.items, user)
+    fee, cut, payout, shop_payout, distance = await _pricing(db, seller_id, vehicle, total, lat, lng)
     for _ in range(5):
         code = "SAZ-" + "".join(secrets.choice("ABCDEFGHJKMNPQRSTUVWXYZ23456789") for _ in range(6))
         if not (await db.execute(select(orders.c.id).where(orders.c.code == code))).first():
@@ -313,7 +391,7 @@ async def place_order(body: OrderIn, user: models.User = Depends(get_current_use
             code=code, buyer_id=user.id, seller_id=seller_id, status="awaiting_payment",
             delivery_address=body.delivery_address.strip(), delivery_area=body.delivery_area.strip(),
             pickup_area=(lines[0][0].location or None), buyer_phone=body.phone.strip(),
-            vehicle_class=vehicle, parts_total_sll=round(total, 2), delivery_fee_sll=fee, pay_to="platform", shop_payout_sll=shop_payout,
+            vehicle_class=vehicle, parts_total_sll=round(total, 2), delivery_fee_sll=fee, pay_to="platform", shop_payout_sll=shop_payout, distance_km=distance,
             platform_fee_sll=cut, driver_payout_sll=payout, delivery_code=delivery_code,
             delivery_lat=body.delivery_lat if body.delivery_lng is not None else None,
             delivery_lng=body.delivery_lng if body.delivery_lat is not None else None))
@@ -448,7 +526,7 @@ async def order_receipt(
         "delivery_method": "Van" if o.vehicle_class == "van" else "Okada",
         "platform": {"name": "SalonAutoZone", "whatsapp": wa or None},
         "paid_to": "shop" if o.pay_to == "shop" else "platform",
-        "currency": "SLL",
+        "currency": "SLE",
     }
     if paid:
         from app.payments import paid_with
@@ -567,13 +645,13 @@ async def driver_jobs(scope: str = Query("open"), user: models.User = Depends(ge
     driver = await _verified_driver(db, user, need_online=(scope == "open"))
     if scope == "open":
         rows = (await db.execute(
-            select(jobs, orders.c.code, orders.c.pickup_area, orders.c.delivery_area, orders.c.pay_to)
+            select(jobs, orders.c.code, orders.c.pickup_area, orders.c.delivery_area, orders.c.pay_to, orders.c.distance_km)
             .select_from(jobs.join(orders, orders.c.id == jobs.c.order_id))
             .where(jobs.c.status == "open", jobs.c.vehicle_class == driver.vehicle_type)
             .order_by(jobs.c.id).limit(50))).all()
         return {"count": len(rows), "jobs": [
             {"id": r.id, "code": r.code, "vehicle_class": r.vehicle_class, "payout_sll": r.payout_sll,
-             "paid_by_shop": r.pay_to == "shop",
+             "paid_by_shop": r.pay_to == "shop", "distance_km": r.distance_km,
              "pickup_area": r.pickup_area, "delivery_area": r.delivery_area} for r in rows]}
     if scope == "mine":
         rows = (await db.execute(
@@ -942,7 +1020,12 @@ async def settle_shop_fees(seller_id: int, admin=Depends(admin_actor), db: Async
 async def get_settings(admin=Depends(admin_actor), db: AsyncSession = Depends(get_db)):
     rows = (await db.execute(select(settings_t))).all()
     cur = {r.key: r.value for r in rows}
-    return {k: cur.get(k) for k in ("okada_fee_sll", "van_fee_sll", "platform_pct", "commission_pct")}
+    out = {k: cur.get(k) for k in ("okada_fee_sll", "van_fee_sll", "platform_pct", "commission_pct")}
+    out.update({k: cur.get(k, v) for k, v in RATE_DEFAULTS.items()})
+    # examples so the admin sees what the rates mean
+    out["examples"] = [{"km": km, "okada_sll": fee_for_km(km, "bike", out), "van_sll": fee_for_km(km, "van", out)}
+                       for km in (2, 5, 10, 15, 20, 28)]
+    return out
 
 
 @router.put("/admin/settings")

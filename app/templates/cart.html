@@ -66,16 +66,16 @@
    var img = safeUrl(window.SAZImg ? SAZImg(it.image_url, 160) : it.image_url);
    return '<div class="line">' +
     '<div class="th"' + (img ? ' style="background-image:url(\'' + esc(img) + '\')"' : '') + '></div>' +
-    '<div><a class="name" href="/part/' + encodeURIComponent(it.part_id) + '">' + esc(it.name) + '</a><div class="each">SLL ' + fmt(it.price_sll) + ' each</div>' +
+    '<div><a class="name" href="/part/' + encodeURIComponent(it.part_id) + '">' + esc(it.name) + '</a><div class="each">Le ' + fmt(it.price_sll) + ' each</div>' +
      '<button class="remove" data-act="rm" data-id="' + it.part_id + '">Remove</button></div>' +
-    '<div class="right"><div class="sum">SLL ' + fmt(it.qty * it.price_sll) + '</div>' +
+    '<div class="right"><div class="sum">Le ' + fmt(it.qty * it.price_sll) + '</div>' +
      '<div class="stepper"><button data-act="dec" data-id="' + it.part_id + '" aria-label="One fewer"' + (it.qty <= 1 ? ' disabled' : '') + '>−</button><span aria-live="polite">' + it.qty + '</span><button data-act="inc" data-id="' + it.part_id + '" aria-label="One more"' + (it.qty >= 20 ? ' disabled' : '') + '>+</button></div></div>' +
    '</div>';
   }).join('') + '</div>' +
   '<aside class="box summary"><h2>Order summary</h2>' +
-   '<div class="row"><span>Parts (' + count + ')</span><span>SLL ' + fmt(SAZCart.total()) + '</span></div>' +
+   '<div class="row"><span>Parts (' + count + ')</span><span>Le ' + fmt(SAZCart.total()) + '</span></div>' +
    '<div class="row"><span>Delivery</span><span class="muted" style="color:var(--muted)">Next step</span></div>' +
-   '<div class="row total"><span>Subtotal</span><span>SLL ' + fmt(SAZCart.total()) + '</span></div>' +
+   '<div class="row total"><span>Subtotal</span><span>Le ' + fmt(SAZCart.total()) + '</span></div>' +
    '<button class="btn btn-primary btn-lg btn-block" style="margin-top:14px" id="checkout">Continue to delivery</button>' +
    '<p class="hint">One seller per order. Delivery is by okada or van, based on the size of the parts.</p>' +
   '</aside></div>';

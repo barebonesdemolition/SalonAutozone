@@ -247,7 +247,7 @@
    </div>
    <div class="row2">
     <label class="field"><span>Quantity</span><input class="input" name="quantity" type="number" value="1" min="1"></label>
-    <label class="field"><span>Budget in SLL (optional)</span><input class="input" name="budget_sll" type="number" min="0"></label>
+    <label class="field"><span>Budget in Le (optional)</span><input class="input" name="budget_sll" type="number" min="0"></label>
    </div>
    <label class="field"><span>How soon do you need it?</span><select class="select" name="urgency"><option>Normal</option><option>Urgent (need within 1 week)</option><option>Flexible (can wait 1+ month)</option></select></label>
    <label class="field"><span>Notes</span><textarea class="input" name="notes" rows="3" placeholder="OEM preferred, any colour is fine…"></textarea></label>
@@ -353,7 +353,7 @@
   if (o.type) h += '<button type="button" class="save-btn" aria-label="Save ' + esc(o.title) + '" data-act="save" data-type="' + o.type + '" data-id="' + esc(o.id) + '"><svg><use href="#i-heart"/></svg></button>';
   return h + '<div class="bd">' + o.body + '</div></article>';
  }
- function price(n) { return '<div class="price"><small>SLL</small>' + fmt(n) + '</div>'; }
+ function price(n) { return '<div class="price"><small>Le</small>' + fmt(n) + '</div>'; }
  function partCard(p, featured, fits) {
   var flags = (featured ? '<span class="flag gold">Featured</span>' : '') + (fits ? '<span class="flag fit">Fits your car</span>' : '');
   var cond = p.condition ? String(p.condition).charAt(0).toUpperCase() + String(p.condition).slice(1) : '';
@@ -625,7 +625,7 @@
     '<div class="row3">' + fld('Make', 'make', 'required', 'select', opts(MAKES, 'Make')) +
     fld('Model', 'model', 'required', 'select', '<option value="">Choose make first</option>') +
     fld('Year', 'year', 'required', 'select', opts(YEARS, 'Year')) + '</div>' +
-    '<div class="row2">' + fld('Price (SLL)', 'price_sll', 'required type="number" min="0" inputmode="numeric"') + fld('Price in USD (optional)', 'price_usd', 'type="number" min="0"') +
+    '<div class="row2">' + fld('Price (Le)', 'price_sll', 'required type="number" min="0" inputmode="numeric"') + fld('Price in USD (optional)', 'price_usd', 'type="number" min="0"') +
     fld('Mileage (km)', 'mileage_km', 'required type="number" min="0" inputmode="numeric"') +
     fld('Fuel', 'fuel_type', 'required', 'select', '<option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>') +
     fld('Gearbox', 'transmission', 'required', 'select', '<option>Automatic</option><option>Manual</option>') + city + '</div>' + phone + desc;
@@ -635,7 +635,7 @@
     '<div class="row2">' + fld('Category', 'category', 'required', 'select', opts(CATS, 'Choose a category')) +
     fld('Condition', 'condition', 'required', 'select', '<option>New</option><option>Used</option><option>Refurbished</option>') +
     fld('Fits make (optional)', 'compatible_make', '', 'select', opts(MAKES, 'Any make')) + fld('Fits model (optional)', 'compatible_model', 'placeholder="Corolla"') +
-    fld('Price (SLL)', 'price_sll', 'required type="number" min="0" inputmode="numeric"') + fld('How many do you have?', 'stock_quantity', 'required type="number" min="1" value="1"') + '</div>' +
+    fld('Price (Le)', 'price_sll', 'required type="number" min="0" inputmode="numeric"') + fld('How many do you have?', 'stock_quantity', 'required type="number" min="1" value="1"') + '</div>' +
     city + phone + desc;
   }
   openM('list-modal');
@@ -681,7 +681,7 @@
    h = '<h2>We couldn\'t identify this car</h2><p class="muted">Try a clearer photo of the front or side.</p><button type="button" class="btn btn-primary btn-block btn-lg" style="margin-top:16px" data-act="idAgain">Try another photo</button>';
   } else {
    h = '<h2 style="margin-bottom:4px">' + esc(c.make) + ' ' + esc(c.model) + '</h2><p class="muted" style="margin-bottom:14px">' + [c.year_range, c.body_type, c.color].filter(Boolean).map(esc).join(', ') + '</p>';
-   if (c.estimated_price_sll_low && c.estimated_price_sll_high) h += '<div class="notice notice-ok" style="margin-bottom:14px"><b>Estimated price:</b> SLL ' + fmt(Math.round(c.estimated_price_sll_low)) + ' to ' + fmt(Math.round(c.estimated_price_sll_high)) + '</div>';
+   if (c.estimated_price_sll_low && c.estimated_price_sll_high) h += '<div class="notice notice-ok" style="margin-bottom:14px"><b>Estimated price:</b> Le ' + fmt(Math.round(c.estimated_price_sll_low)) + ' to ' + fmt(Math.round(c.estimated_price_sll_high)) + '</div>';
    if (c.common_parts && c.common_parts.length) h += '<p style="font-weight:700;margin-bottom:4px">Parts often replaced</p><div style="margin-bottom:14px">' + c.common_parts.map(function (p) { return '<span class="pill">' + esc(p) + '</span>'; }).join('') + '</div>';
    if (c.description) h += '<p class="muted" style="margin-bottom:14px">' + esc(c.description) + '</p>';
    var d = ' data-make="' + esc(c.make) + '" data-model="' + esc(c.model) + '"';

@@ -136,7 +136,7 @@
     var L = { awaiting_payment: ['Waiting for payment', 'gold'], confirmed: ['Paid', ''], ready_for_pickup: ['Ready for pickup', ''], driver_assigned: ['Driver assigned', ''], out_for_delivery: ['On the way', ''], delivered: ['Delivered', ''], cancelled: ['Cancelled', 'off'] };
     return '<div class="list">' + list.map(function (o) {
      var s = L[o.status] || [o.status, ''];
-     return item({ noimg: true, href: '/orders?id=' + o.id, title: 'Order ' + o.code, meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> SLL ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + ', ' + esc(when(o.created_at)) });
+     return item({ noimg: true, href: '/orders?id=' + o.id, title: 'Order ' + o.code, meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> Le ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + ', ' + esc(when(o.created_at)) });
     }).join('') + '</div>';
    });
   },
@@ -147,12 +147,12 @@
     var h = '<div class="list">';
     h += parts.map(function (p) {
      return item({ img: p.image_url, href: '/part/' + p.id, title: p.name,
-      meta: (p.is_featured ? '<span class="tag gold">Featured</span>' : '') + 'SLL ' + fmt(p.price_sll) + ', ' + fmt(p.stock_quantity) + ' in stock, ' + plural(p.views, 'view', 'views') + ', ' + plural(p.inquiry_count, 'enquiry', 'enquiries'),
+      meta: (p.is_featured ? '<span class="tag gold">Featured</span>' : '') + 'Le ' + fmt(p.price_sll) + ', ' + fmt(p.stock_quantity) + ' in stock, ' + plural(p.views, 'view', 'views') + ', ' + plural(p.inquiry_count, 'enquiry', 'enquiries'),
       ops: '<a class="btn btn-ghost" href="/part/' + p.id + '">View</a><button class="btn btn-ghost" data-del="part" data-id="' + p.id + '">Delete</button>' });
     }).join('');
     h += cars.map(function (v) {
      return item({ img: v.image_url, href: '/vehicle/' + v.id, title: v.title,
-      meta: (v.is_sold ? '<span class="tag off">Sold</span>' : '') + (v.is_featured ? '<span class="tag gold">Featured</span>' : '') + 'SLL ' + fmt(v.price_sll) + ', ' + plural(v.views, 'view', 'views') + ', ' + plural(v.inquiry_count, 'enquiry', 'enquiries'),
+      meta: (v.is_sold ? '<span class="tag off">Sold</span>' : '') + (v.is_featured ? '<span class="tag gold">Featured</span>' : '') + 'Le ' + fmt(v.price_sll) + ', ' + plural(v.views, 'view', 'views') + ', ' + plural(v.inquiry_count, 'enquiry', 'enquiries'),
       ops: '<a class="btn btn-ghost" href="/vehicle/' + v.id + '">View</a>' + (v.is_sold ? '' : '<button class="btn btn-ghost" data-sold="' + v.id + '">Mark as sold</button>') + '<button class="btn btn-ghost" data-del="vehicle" data-id="' + v.id + '">Delete</button>' });
     }).join('');
     return h + '</div>';
@@ -164,15 +164,15 @@
     var list = d.orders || [];
     var top = (ps ? payBox(ps) : '') + '<a class="notice notice-info" href="/alerts" style="display:block;margin-bottom:12px;text-decoration:none">🔔 <b>Turn on alerts</b> to hear about new orders and payments straight away.</a>';
     if (pay && (pay.coming_sll || pay.due_sll || (pay.recent_paid || []).length)) top = '<div class="box" style="margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
-     '<div><small class="hint">Waiting for delivery</small><b style="display:block;font-size:20px">SLL ' + fmt(pay.coming_sll) + '</b></div>' +
-     '<div><small class="hint">Delivered, we\'re sending it</small><b style="display:block;font-size:20px">SLL ' + fmt(pay.due_sll) + '</b></div>' +
-     ((pay.recent_paid || []).length ? '<div style="grid-column:1/-1;font-size:14px"><small class="hint">Last paid to you</small><br>' + pay.recent_paid.slice(0, 3).map(function (r) { return esc(r.code) + ': SLL ' + fmt(r.amount_sll) + (r.reference ? ' (ref ' + esc(r.reference) + ')' : ''); }).join('<br>') + '</div>' : '') +
+     '<div><small class="hint">Waiting for delivery</small><b style="display:block;font-size:20px">Le ' + fmt(pay.coming_sll) + '</b></div>' +
+     '<div><small class="hint">Delivered, we\'re sending it</small><b style="display:block;font-size:20px">Le ' + fmt(pay.due_sll) + '</b></div>' +
+     ((pay.recent_paid || []).length ? '<div style="grid-column:1/-1;font-size:14px"><small class="hint">Last paid to you</small><br>' + pay.recent_paid.slice(0, 3).map(function (r) { return esc(r.code) + ': Le ' + fmt(r.amount_sll) + (r.reference ? ' (ref ' + esc(r.reference) + ')' : ''); }).join('<br>') + '</div>' : '') +
      (ps && !ps.pay_orange_money && !ps.pay_afrimoney ? '<div class="notice notice-bad" style="grid-column:1/-1">Add your mobile money number below so we can send you your money.</div>' : '') +
      '</div>' + top;
-    if (fees && fees.owed_sll > 0) top = '<div class="notice notice-warn" style="margin-bottom:14px"><b>You owe SalonAutoZone SLL ' + fmt(fees.owed_sll) + '</b> in fees for ' + plural(fees.orders, 'delivered order', 'delivered orders') + '.' + (fees.pay_to ? ' Send it with Orange Money to <b>' + esc(fees.pay_to) + '</b>, with your shop name as the reference.' : '') + '</div>' + top;
+    if (fees && fees.owed_sll > 0) top = '<div class="notice notice-warn" style="margin-bottom:14px"><b>You owe SalonAutoZone Le ' + fmt(fees.owed_sll) + '</b> in fees for ' + plural(fees.orders, 'delivered order', 'delivered orders') + '.' + (fees.pay_to ? ' Send it with Orange Money to <b>' + esc(fees.pay_to) + '</b>, with your shop name as the reference.' : '') + '</div>' + top;
     if (riders.length) top = riders.map(function (p) {
      var ph = String(p.rider_phone || '').replace(/[^\d+]/g, '');
-     return '<div class="notice notice-warn" style="margin-bottom:10px"><b>Pay the rider SLL ' + fmt(p.amount_sll) + '</b> for order ' + esc(p.code) + '. The buyer has the parts. Send it to ' + esc(p.rider_name || 'the rider') + ' on ' + (ph ? '<a href="tel:' + esc(ph) + '">' + esc(p.rider_phone) + '</a>' : 'their phone') + '.' +
+     return '<div class="notice notice-warn" style="margin-bottom:10px"><b>Pay the rider Le ' + fmt(p.amount_sll) + '</b> for order ' + esc(p.code) + '. The buyer has the parts. Send it to ' + esc(p.rider_name || 'the rider') + ' on ' + (ph ? '<a href="tel:' + esc(ph) + '">' + esc(p.rider_phone) + '</a>' : 'their phone') + '.' +
       '<div style="margin-top:8px"><button class="btn btn-primary" data-rider-paid="' + p.job_id + '">I\'ve paid the rider</button></div></div>';
     }).join('') + top;
     if (!list.length) return top + empty('No sales yet', 'When a buyer orders one of your parts it shows up here. Get the parts ready once the order says Paid.', '');
@@ -183,16 +183,16 @@
      var p = o.payment, shop = o.pay_to === 'shop';
      var payLine = '';
      if (!shop && o.you_get_sll != null && ['awaiting_payment', 'cancelled'].indexOf(o.status) < 0) {
-      payLine = '<br><span class="hint">You get SLL ' + fmt(o.you_get_sll) + (o.commission_sll ? ' (SLL ' + fmt(o.commission_sll) + ' SalonAutoZone commission)' : '') + '. ' +
+      payLine = '<br><span class="hint">You get Le ' + fmt(o.you_get_sll) + (o.commission_sll ? ' (Le ' + fmt(o.commission_sll) + ' SalonAutoZone commission)' : '') + '. ' +
        (o.shop_paid ? '<b style="color:var(--ok)">Sent to you.</b>' : o.status === 'delivered' ? 'Delivered: we\'re sending it to your mobile money.' : 'We send it once the buyer has the parts.') + '</span>';
      }
      if (shop) {
-      payLine = '<br><span class="hint">Buyer pays you SLL ' + fmt(o.total_to_receive_sll) + ' (parts + delivery). You pay the rider SLL ' + fmt(o.driver_payout_sll) + ', SalonAutoZone fee SLL ' + fmt(o.platform_fee_sll) + ', you keep SLL ' + fmt(o.you_keep_sll) + '.</span>';
-      if (p && p.status === 'submitted') payLine += '<div class="notice notice-warn" style="margin-top:8px"><b>Check your phone:</b> ' + esc(p.method_label) + ' from ' + esc(p.payer_phone || 'the buyer') + ', transaction ID <b>' + esc(p.reference) + '</b>, for SLL ' + fmt(p.amount_sll) + '.</div>';
+      payLine = '<br><span class="hint">Buyer pays you Le ' + fmt(o.total_to_receive_sll) + ' (parts + delivery). You pay the rider Le ' + fmt(o.driver_payout_sll) + ', SalonAutoZone fee Le ' + fmt(o.platform_fee_sll) + ', you keep Le ' + fmt(o.you_keep_sll) + '.</span>';
+      if (p && p.status === 'submitted') payLine += '<div class="notice notice-warn" style="margin-top:8px"><b>Check your phone:</b> ' + esc(p.method_label) + ' from ' + esc(p.payer_phone || 'the buyer') + ', transaction ID <b>' + esc(p.reference) + '</b>, for Le ' + fmt(p.amount_sll) + '.</div>';
      }
      var payOps = (shop && p && p.status === 'submitted') ? '<button class="btn btn-primary" data-pay-ok="' + p.id + '">Money arrived</button><button class="btn btn-ghost" data-pay-no="' + p.id + '">Not on my phone</button>' : '';
      return item({ noimg: true, title: 'Order ' + o.code, href: '#',
-      meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> SLL ' + fmt(shop ? o.total_to_receive_sll : o.parts_total_sll) + ', ' + esc(when(o.created_at)),
+      meta: '<span class="tag ' + s[1] + '">' + esc(s[0]) + '</span> Le ' + fmt(shop ? o.total_to_receive_sll : o.parts_total_sll) + ', ' + esc(when(o.created_at)),
       extra: '<p class="msg">' + items + (o.pickup_area ? '<br><span class="hint">Pickup from ' + esc(o.pickup_area) + '</span>' : '') + payLine + '</p>',
       ops: payOps + (o.status === 'confirmed' ? '<button class="btn btn-primary" data-ready="' + o.id + '">The parts are ready for pickup</button>' : '') +
        '<a class="btn btn-ghost" href="/receipt?id=' + encodeURIComponent(o.id) + '&copy=store">Sales slip</a>' });
@@ -222,7 +222,7 @@
     if (!list.length) return empty('Nothing saved yet', 'Tap the heart on a part or car to keep it here.', '<a class="btn btn-primary" href="/">Browse</a>');
     return '<div class="list">' + list.map(function (s) {
      return item({ img: s.listing_image_url, href: (s.listing_type === 'part' ? '/part/' : '/vehicle/') + s.listing_id, title: s.listing_title || (s.listing_type === 'part' ? 'Part' : 'Car'),
-      meta: s.listing_price_sll ? 'SLL ' + fmt(s.listing_price_sll) : '', ops: '<button class="btn btn-ghost" data-unsave="' + s.id + '">Remove</button>' });
+      meta: s.listing_price_sll ? 'Le ' + fmt(s.listing_price_sll) : '', ops: '<button class="btn btn-ghost" data-unsave="' + s.id + '">Remove</button>' });
     }).join('') + '</div>';
    });
   },
@@ -231,7 +231,7 @@
     var list = d.requests || [];
     if (!list.length) return empty('No import requests', 'Can\'t find a part locally? We can source it from abroad.', '<a class="btn btn-primary" href="/?action=import">Order a part from abroad</a>');
     return '<div class="list">' + list.map(function (r) {
-     var quote = r.quoted_price_sll ? 'Quoted SLL ' + fmt(r.quoted_price_sll) + (r.estimated_days ? ', about ' + r.estimated_days + ' days' : '') : 'Waiting for a quote';
+     var quote = r.quoted_price_sll ? 'Quoted Le ' + fmt(r.quoted_price_sll) + (r.estimated_days ? ', about ' + r.estimated_days + ' days' : '') : 'Waiting for a quote';
      return item({ noimg: true, title: r.part_name || 'Part', meta: esc([r.car_year, r.car_make, r.car_model].filter(Boolean).join(' ')) + ', ' + esc(when(r.created_at)),
       extra: '<p class="msg"><span class="tag ' + (r.quoted_price_sll ? '' : 'gold') + '">' + esc(r.status || 'open') + '</span>' + esc(quote) + '</p>' + (r.admin_notes ? '<p class="msg hint">' + esc(r.admin_notes) + '</p>' : '') });
     }).join('') + '</div>';
@@ -240,13 +240,17 @@
  };
  function payBox(ps) {
   var v = function (x) { return x == null ? '' : esc(x); };
-  return '<details class="box" style="margin-bottom:14px"' + (ps.ready ? '' : ' open') + '><summary style="cursor:pointer;font-weight:800">Your payout number and delivery fees ' + (ps.ready ? '<span class="tag">Done</span>' : '<span class="tag gold">Set this up</span>') + '</summary>' +
-   '<p class="hint" style="margin:8px 0">Buyers pay SalonAutoZone. Once the buyer has the parts, we pay the rider and send you your money (the parts price, less our commission) to the number below. Your delivery fees are what buyers pay for delivery from your shop; if you leave them empty, the standard fees are used.</p>' +
+  var pinTxt = ps.has_pin ? '<b style="color:var(--ok)">Shop location set.</b> <a href="https://www.openstreetmap.org/?mlat=' + ps.shop_lat + '&mlon=' + ps.shop_lng + '#map=17/' + ps.shop_lat + '/' + ps.shop_lng + '" target="_blank" rel="noopener noreferrer">Check it on the map</a>'
+   : '<b style="color:#7a4b00">Not set yet.</b> Until you set it, buyers see a rough delivery price.';
+  return '<details class="box" style="margin-bottom:14px"' + (ps.ready ? '' : ' open') + '><summary style="cursor:pointer;font-weight:800">Your payout number and shop location ' + (ps.ready ? '<span class="tag">Done</span>' : '<span class="tag gold">Set this up</span>') + '</summary>' +
+   '<p class="hint" style="margin:8px 0">Buyers pay SalonAutoZone. Once the buyer has the parts, we pay the rider and send you your money (the parts price, less our commission) to the number below.</p>' +
    '<form id="payf" style="display:grid;gap:10px">' +
    '<label class="field"><span>Orange Money number we pay you on</span><input class="input" name="pay_orange_money" type="tel" value="' + v(ps.pay_orange_money) + '" placeholder="076 123 456"></label>' +
    '<label class="field"><span>Afrimoney number (optional)</span><input class="input" name="pay_afrimoney" type="tel" value="' + v(ps.pay_afrimoney) + '" placeholder="030 123 456"></label>' +
-   '<label class="field"><span>Delivery fee by okada (small parts), SLL</span><input class="input" name="okada_fee_sll" type="number" min="0" step="500" value="' + v(ps.okada_fee_sll) + '"></label>' +
-   '<label class="field"><span>Delivery fee by van (bulky parts), SLL</span><input class="input" name="van_fee_sll" type="number" min="0" step="500" value="' + v(ps.van_fee_sll) + '"></label>' +
+   '<div class="field"><span>Shop location (where riders collect)</span><p class="hint" style="margin:2px 0 6px">Delivery is priced by distance from your shop to the buyer, so buyers near you pay less. Stand inside your shop and tap the button.</p>' +
+   '<p class="hint" id="pin-txt" style="margin:0 0 6px">' + pinTxt + '</p>' +
+   '<input type="hidden" name="shop_lat" value="' + v(ps.shop_lat) + '"><input type="hidden" name="shop_lng" value="' + v(ps.shop_lng) + '">' +
+   '<button class="btn btn-ghost" type="button" id="pin-shop">' + (ps.has_pin ? 'Update to where I am now' : 'Use my current location') + '</button></div>' +
    '<button class="btn btn-primary" type="submit">Save</button></form></details>';
  }
  var current = 'orders';
@@ -265,14 +269,26 @@
   e.preventDefault();
   var f = e.target, body = {};
   ['pay_orange_money', 'pay_afrimoney'].forEach(function (k) { body[k] = f[k].value.trim() || null; });
-  ['okada_fee_sll', 'van_fee_sll'].forEach(function (k) { body[k] = f[k].value === '' ? null : Number(f[k].value); });
+  if (f.shop_lat.value && f.shop_lng.value) { body.shop_lat = Number(f.shop_lat.value); body.shop_lng = Number(f.shop_lng.value); }
   if (!body.pay_orange_money && !body.pay_afrimoney) { toast('Add at least one mobile money number', 'error'); return; }
   api('/api/businesses/mine/payments', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-   .then(function (d) { toast('Saved. We\'ll send your money to this number.', 'success'); show('sales'); })
-   .catch(function (err) { if (err) toast(/object/i.test(err.message) ? 'Check the numbers: use a Sierra Leone mobile number like 076 123 456.' : err.message, 'error'); });
+   .then(function (d) { toast(d.has_pin ? 'Saved. Delivery from your shop is now priced by distance.' : 'Saved. Set your shop location too, so buyers get the right delivery price.', 'success'); show('sales'); })
+   .catch(function (err) { if (err) toast(/object/i.test(err.message) ? 'Check the numbers (a Sierra Leone mobile number like 076 123 456) and that your location is in Sierra Leone.' : err.message, 'error'); });
  });
 
  panel.addEventListener('click', function (e) {
+  var ps = e.target.closest('#pin-shop');
+  if (ps) {
+   var txt = document.getElementById('pin-txt'), f = document.getElementById('payf');
+   if (!navigator.geolocation) { txt.textContent = 'Your phone can\'t share its location here.'; return; }
+   ps.disabled = true; txt.textContent = 'Finding your location…';
+   navigator.geolocation.getCurrentPosition(function (p) {
+    f.shop_lat.value = Math.round(p.coords.latitude * 1e6) / 1e6; f.shop_lng.value = Math.round(p.coords.longitude * 1e6) / 1e6;
+    ps.disabled = false;
+    txt.innerHTML = '<b style="color:var(--ok)">Got it</b> (accurate to about ' + Math.round(p.coords.accuracy) + ' m). Tap Save.';
+   }, function () { ps.disabled = false; txt.textContent = 'We couldn\'t get your location. Allow location access for this site and try again.'; }, { enableHighAccuracy: true, timeout: 20000 });
+   return;
+  }
   var rp = e.target.closest('[data-rider-paid]');
   if (rp) {
    var ref = prompt('Transaction ID of the payment to the rider (optional)', '');

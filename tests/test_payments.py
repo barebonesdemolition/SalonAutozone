@@ -143,7 +143,7 @@ def test_online_payment_confirmed_by_webhook(client, monime):
     assert r["redirect_url"].startswith("https://checkout.example/sps-")
     payload = monime["created"][-1]
     assert payload["reference"] == order["code"]
-    assert payload["lineItems"][0]["price"] == {"currency": "SLE", "value": 12500}  # SLL 125,000 = SLE 125.00
+    assert payload["lineItems"][0]["price"] == {"currency": "SLE", "value": 12500000}  # Le 125,000.00 in cents
     sid = r["redirect_url"].rsplit("/", 1)[1]
 
     # A webhook claiming success is not believed while Monime still says pending
@@ -204,6 +204,8 @@ def test_shop_sets_numbers_and_fees(client):
     assert client.put("/api/businesses/mine/payments", headers=seller, json={"pay_afrimoney": "12"}).status_code == 422
     assert client.put("/api/businesses/mine/payments", headers=seller, json={"okada_fee_sll": -5}).status_code == 422
     r = client.put("/api/businesses/mine/payments", headers=seller, json={"okada_fee_sll": 10000, "van_fee_sll": 50000})
+    assert r.json()["ready"] is False  # still needs the shop's location
+    r = client.put("/api/businesses/mine/payments", headers=seller, json={"shop_lat": 8.48, "shop_lng": -13.23})
     assert r.json()["ready"] is True and r.json()["pay_orange_money"] == "+232 76 570222"
 
 

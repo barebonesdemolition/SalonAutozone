@@ -69,7 +69,7 @@
      '<div id="gal" class="gal-wrap"></div>' +
     '<aside class="buybox">' +
      '<h1>' + esc(title) + '</h1>' +
-     '<div><div class="big-price"><small>SLL</small>' + fmt(p.price_sll) + '</div>' + (p.price_usd ? '<div class="sub-price">About $' + fmt(p.price_usd) + '</div>' : '') + '</div>' +
+     '<div><div class="big-price"><small>Le</small>' + fmt(p.price_sll) + '</div>' + (p.price_usd ? '<div class="sub-price">About $' + fmt(p.price_usd) + '</div>' : '') + '</div>' +
      '<div class="box" id="fit-box"><h2>Will it fit?</h2><p id="fit-body" class="muted">Checking your car…</p></div>' +
      '<dl class="facts">' + facts.map(function (f) { return '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>'; }).join('') + '</dl>' +
      '<div class="cta-row">' +
@@ -96,7 +96,7 @@
   })();
 
   document.body.insertAdjacentHTML('beforeend',
-   '<div class="sticky-cta"><span class="price-mini">SLL ' + fmt(p.price_sll) + '</span>' +
+   '<div class="sticky-cta"><span class="price-mini">Le ' + fmt(p.price_sll) + '</span>' +
    (wa ? '<a class="btn btn-wa" href="' + esc(wa) + '" target="_blank" rel="noopener" aria-label="WhatsApp the seller">WhatsApp</a>' : '') +
    '<button type="button" class="btn btn-primary" id="btn-cart-2"' + (stock ? '' : ' disabled') + '>Add to cart</button></div>');
   document.body.classList.add('has-sticky-cta');
@@ -146,7 +146,7 @@
   document.getElementById('btn-cart').onclick = addToCart;
   document.getElementById('btn-cart-2').onclick = addToCart;
   document.getElementById('btn-share').onclick = function () {
-   var text = title + ' · SLL ' + fmt(p.price_sll);
+   var text = title + ' · Le ' + fmt(p.price_sll);
    if (navigator.share) { navigator.share({ title: title, text: text, url: location.href }).catch(function () {}); return; }
    window.open('https://wa.me/?text=' + encodeURIComponent(text + '\n' + location.href), '_blank', 'noopener');
   };
@@ -171,7 +171,7 @@
      var u = safeUrl(window.SAZImg ? SAZImg(x.image_url, 480) : x.image_url);
      return '<a class="lcard" href="/part/' + encodeURIComponent(x.id) + '">' +
       (u ? '<div class="ph" data-bg="' + esc(u) + '"></div>' : '<div class="ph"><svg aria-hidden="true"><use href="#i-part"/></svg></div>') +
-      '<div class="bd"><div class="price"><small>SLL</small>' + fmt(x.price_sll) + '</div><div class="ttl">' + esc(x.name) + '</div><div class="meta">' + (x.location ? '<span class="loc">' + esc(x.location) + '</span>' : '') + '</div></div></a>';
+      '<div class="bd"><div class="price"><small>Le</small>' + fmt(x.price_sll) + '</div><div class="ttl">' + esc(x.name) + '</div><div class="meta">' + (x.location ? '<span class="loc">' + esc(x.location) + '</span>' : '') + '</div></div></a>';
     }).join('');
    }).catch(function () {});
   }

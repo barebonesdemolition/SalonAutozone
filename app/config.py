@@ -11,7 +11,7 @@ load_dotenv()
 class Settings(BaseSettings):
     APP_NAME: str = "SalonAutoZone"
     APP_VERSION: str = "1.0.0"
-    DEFAULT_CURRENCY: str = "SLL"
+    DEFAULT_CURRENCY: str = "SLE"
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./saloncarparts.db"
     JWT_SECRET_KEY: str = "salon-autozone-secret-change-in-prod"
@@ -31,8 +31,9 @@ class Settings(BaseSettings):
     MONIME_SPACE_ID: str = ""
     MONIME_API_BASE: str = "https://api.monime.io"
     MONIME_VERSION: str = "caph.2025-08-23"
-    # Prices on the site are in old leones (SLL); Monime charges new leones (SLE).
-    MONIME_SLL_PER_SLE: float = 1000
+    # Amounts on the site are in new leones (Le / SLE), the same unit Monime charges in.
+    # (Kept as a setting in case the site's unit ever changes again.)
+    MONIME_SLL_PER_SLE: float = 1
     # Emails (password reset codes) go out through Brevo's API. Both must be set:
     # BREVO_API_KEY from Brevo > SMTP & API > API keys, and EMAIL_FROM an address
     # verified in Brevo > Senders. Leave empty and resets use the WhatsApp link instead.
