@@ -140,9 +140,9 @@ async def admin_todo(_: dict = Depends(require_admin), db: AsyncSession = Depend
         except Exception:  # a table that doesn't exist on this database yet
             return default
 
-    fees = await scalar(select(func.count()).select_from(settings_t).where(settings_t.c.key == "platform_pct"))
+    fees = await scalar(select(func.count()).select_from(settings_t).where(settings_t.c.key == "commission_pct"))
     return {
-        # Delivery is priced by distance with built-in rates, so only the platform share is needed.
+        # SalonAutoZone earns a commission on parts; riders keep the whole delivery fee.
         "delivery_fees_missing": fees < 1,
         "orders_awaiting_payment": await scalar(select(func.count(orders_t.c.id)).where(orders_t.c.status == "awaiting_payment")),
         "jobs_without_driver": await scalar(select(func.count(jobs_t.c.id)).where(jobs_t.c.status == "open")),
