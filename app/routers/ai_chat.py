@@ -73,12 +73,12 @@ async def chat(request: ChatRequest, http_request: Request, db: AsyncSession = D
 
     vehicle_summary = "\n".join([
         f"- {v.title} | {v.year} | {v.transmission} | {v.fuel_type} | "
-        f"SLL {int(v.price_sll):,} | {v.location} | Phone: {v.contact_phone or 'N/A'}"
+        f"Le {int(v.price_sll):,} | {v.location} | Phone: {v.contact_phone or 'N/A'}"
         for v in vehicles
     ]) or "No vehicles currently listed."
 
     part_summary = "\n".join([
-        f"- {p.name} | {p.category} | {p.condition} | SLL {int(p.price_sll):,} | {p.location}"
+        f"- {p.name} | {p.category} | {p.condition} | Le {int(p.price_sll):,} | {p.location}"
         for p in parts
     ]) or "No parts currently listed."
 
@@ -109,7 +109,7 @@ Parts:
 {vin_context}
 
 Guidelines:
-- Prices are in Sierra Leone Leone (SLL). 1 USD is about 23,000 SLL in 2026.
+- Prices are in new Sierra Leone leones (Le, also written SLE). 1 USD is about 23 Le in 2026. Write prices like "Le 1,500".
 - Common cities: Freetown, Bo, Kenema, Makeni, Koidu
 - When recommending, mention specific cars from the inventory above
 - Mention seller phone numbers when relevant

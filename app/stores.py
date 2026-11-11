@@ -45,6 +45,7 @@ PROFILE_COLUMNS = {
     "hours": "TEXT", "call_phone": "VARCHAR", "facebook": "VARCHAR", "instagram": "VARCHAR",
     "tiktok": "VARCHAR", "specialties": "VARCHAR",
     "pay_orange_money": "VARCHAR", "pay_afrimoney": "VARCHAR", "okada_fee_sll": "FLOAT", "van_fee_sll": "FLOAT",
+    "shop_lat": "FLOAT", "shop_lng": "FLOAT",
 }
 
 _md = MetaData()
@@ -242,7 +243,8 @@ def payment_settings(biz) -> dict:
     return {
         "pay_orange_money": biz.pay_orange_money, "pay_afrimoney": biz.pay_afrimoney,
         "okada_fee_sll": biz.okada_fee_sll, "van_fee_sll": biz.van_fee_sll,
-        "ready": bool((biz.pay_orange_money or biz.pay_afrimoney) and biz.okada_fee_sll is not None and biz.van_fee_sll is not None),
+        "shop_lat": biz.shop_lat, "shop_lng": biz.shop_lng, "has_pin": biz.shop_lat is not None and biz.shop_lng is not None,
+        "ready": bool((biz.pay_orange_money or biz.pay_afrimoney) and biz.shop_lat is not None and biz.shop_lng is not None),
     }
 
 
@@ -265,6 +267,9 @@ class PaymentSettingsIn(BaseModel):
     pay_afrimoney: str | None = None
     okada_fee_sll: float | None = Field(default=None, ge=0, le=5_000_000)
     van_fee_sll: float | None = Field(default=None, ge=0, le=5_000_000)
+    # Sierra Leone only (roughly 6.9-10.0 N, 10.2-13.4 W)
+    shop_lat: float | None = Field(default=None, ge=6.5, le=10.5)
+    shop_lng: float | None = Field(default=None, ge=-13.6, le=-10.0)
 
     @field_validator("pay_orange_money", "pay_afrimoney")
     @classmethod

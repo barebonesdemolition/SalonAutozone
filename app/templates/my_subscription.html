@@ -99,9 +99,9 @@
    var sel = (wantPlan && wantPlan.price_sll > 0) ? wantPlan : paid[0];
    h += '<form class="box" id="pay"><h2>Pay for a plan</h2>' +
     '<label class="field"><span>Plan</span><select class="select" id="plan">' + paid.map(function (p) {
-     return '<option value="' + p.id + '" data-price="' + p.price_sll + '"' + (p.id === sel.id ? ' selected' : '') + '>' + esc(p.name) + ', SLL ' + fmt(p.price_sll) + ' a month</option>';
+     return '<option value="' + p.id + '" data-price="' + p.price_sll + '"' + (p.id === sel.id ? ' selected' : '') + '>' + esc(p.name) + ', Le ' + fmt(p.price_sll) + ' a month</option>';
     }).join('') + '</select></label>' +
-    '<div class="field"><span class="lbl">Amount to send</span><div class="amount">SLL <span id="amt">' + fmt(sel.price_sll) + '</span></div></div>' +
+    '<div class="field"><span class="lbl">Amount to send</span><div class="amount">Le <span id="amt">' + fmt(sel.price_sll) + '</span></div></div>' +
     (contact.orange_money
      ? '<div class="payto"><div><small>Send with Orange Money to</small><b>' + esc(contact.orange_money) + '</b></div><button type="button" class="btn btn-gold" id="copy">Copy number</button></div>'
      : '<div class="notice notice-warn" style="margin-top:12px">Message us on WhatsApp and we\'ll send you the Orange Money number to pay.' + (wa ? ' <a href="' + esc(wa + '?text=' + encodeURIComponent('Hello, I want to pay for a plan for ' + d.business.name + '.')) + '" target="_blank" rel="noopener noreferrer">Message us</a>' : '') + '</div>') +
@@ -114,7 +114,7 @@
 
   var pays = d.pending_payments || [];
   h += '<div class="box"><h2>Payments</h2>' + (pays.length ? pays.map(function (p) {
-   return '<div class="pay-row"><div>Ref <b>' + esc(p.reference) + '</b><small>' + esc(day(p.created_at)) + '</small></div><div style="text-align:right">SLL ' + fmt(p.amount_sll) + '<br>' + pill(PAY_ST, p.status) + '</div></div>';
+   return '<div class="pay-row"><div>Ref <b>' + esc(p.reference) + '</b><small>' + esc(day(p.created_at)) + '</small></div><div style="text-align:right">Le ' + fmt(p.amount_sll) + '<br>' + pill(PAY_ST, p.status) + '</div></div>';
   }).join('') : '<p class="hint">No payments yet.</p>') + '</div>';
 
   if (wa) h += '<p class="hint">Questions about your plan? <a href="' + esc(wa) + '" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>';

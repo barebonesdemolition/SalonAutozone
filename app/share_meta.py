@@ -41,7 +41,7 @@ def absolute(url: str | None, base_url: str) -> str | None:
 
 def _money(n) -> str:
     try:
-        return f"SLL {float(n):,.0f}"
+        return f"Le {float(n):,.0f}"
     except (TypeError, ValueError):
         return ""
 

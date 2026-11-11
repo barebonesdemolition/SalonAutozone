@@ -100,6 +100,9 @@ class Business(Base):
     pay_afrimoney = Column(String, nullable=True)
     okada_fee_sll = Column(Float, nullable=True)
     van_fee_sll = Column(Float, nullable=True)
+    # Where riders collect from: the shop's map pin. Used to price delivery by distance.
+    shop_lat = Column(Float, nullable=True)
+    shop_lng = Column(Float, nullable=True)
 
     # Relationships
     owner = relationship("User", back_populates="businesses")

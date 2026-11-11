@@ -1,4 +1,5 @@
 import csv
+import re
 import io
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -95,6 +96,9 @@ def parse_csv(content: str):
 
     parts = []
     current_category = None
+    # Prices are kept in new leones (Le). Supplier files with a "Price SLL" column are in old
+    # leones (1 Le = 1,000 old leones), so those are converted.
+    divide = 1
 
     for row in rows:
         if not row or not any(c and c.strip() for c in row):
@@ -110,6 +114,8 @@ def parse_csv(content: str):
 
         # Column header row
         if is_header_row(row):
+            heads = " ".join((c or "").upper() for c in row)
+            divide = 1000 if re.search(r"\bSLL\b", heads) else 1
             continue
 
         # Part row
@@ -128,6 +134,10 @@ def parse_csv(content: str):
                 "price_3_cad": parse_price(row[10]) if len(row) > 10 else None,
                 "category": current_category,
             }
+            if divide != 1:
+                for k in ("price_1_sll", "price_2_sll", "price_3_sll"):
+                    if part[k] is not None:
+                        part[k] = round(part[k] / divide, 2)
             # Only add if part_number is not empty
             if part["part_number"]:
                 parts.append(part)

@@ -113,15 +113,15 @@ Analyze this photo of a car and identify it. Return ONLY valid JSON with these e
   "color": "Silver",
   "body_type": "Sedan",
   "confidence": "high|medium|low",
-  "estimated_price_sll_low": 140000000,
-  "estimated_price_sll_high": 180000000,
+  "estimated_price_sll_low": 140000,
+  "estimated_price_sll_high": 180000,
   "common_parts": ["Brake Pads", "Oil Filter", "Air Filter", "Spark Plugs", "Battery"],
   "description": "Brief 1-2 sentence description"
 }
 
 Rules:
 - If you cannot identify the car, set make/model to null and confidence to "low"
-- Prices should be realistic for the Sierra Leone used car market (in Sierra Leone Leones)
+- Prices should be realistic for the Sierra Leone used car market (in new Sierra Leone leones, Le / SLE; 1 USD is about 23 Le)
 - Common parts should be the top 5 maintenance parts for that model
 - Return ONLY JSON, no markdown, no explanation
 """

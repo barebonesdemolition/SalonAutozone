@@ -151,7 +151,7 @@
    h += '<a class="notice notice-info" href="/alerts" style="display:block;margin-bottom:12px;text-decoration:none">🔔 <b>Turn on alerts</b> to get a pop-up on your phone for new jobs near you.</a>' +
     '<section><h2 class="section-title" style="margin-top:6px">Your delivery</h2><div id="mine"><div class="lcard skeleton" style="min-height:120px"></div></div></section>' +
     '<section><h2 class="section-title" style="margin-top:6px">Jobs near you</h2><div id="open"></div></section>' +
-    '<div class="nums"><div><b id="earned">0</b><span>SLL earned</span></div><div><b id="waiting">0</b><span>SLL still to be paid</span></div><div><b id="count">0</b><span>deliveries</span></div></div>' +
+    '<div class="nums"><div><b id="earned">0</b><span>Le earned</span></div><div><b id="waiting">0</b><span>Le still to be paid</span></div><div><b id="count">0</b><span>deliveries</span></div></div>' +
     '<div id="paylist" style="margin-top:12px"></div>';
   }
   app.innerHTML = h;
@@ -177,9 +177,9 @@
   api('/api/shop/driver/jobs?scope=open').then(function (d) {
    if (!d.jobs || !d.jobs.length) { el.innerHTML = '<div class="box empty">No jobs right now. This page checks again every 15 seconds.</div>'; return; }
    el.innerHTML = d.jobs.map(function (j) {
-    return '<div class="job"><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">SLL ' + fmt(j.payout_sll) + '</span></div>' +
+    return '<div class="job"><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">Le ' + fmt(j.payout_sll) + '</span></div>' +
      '<div class="hint" style="margin:4px 0 8px">Paid to you after the buyer receives the parts' + (j.paid_by_shop ? ', by the shop' : '') + '.</div>' +
-     '<div class="route"><div><small>Collect in</small> <b>' + esc(j.pickup_area || '-') + '</b></div><div><small>Deliver to</small> <b>' + esc(j.delivery_area || '-') + '</b></div></div>' +
+     '<div class="route"><div><small>Collect in</small> <b>' + esc(j.pickup_area || '-') + '</b></div><div><small>Deliver to</small> <b>' + esc(j.delivery_area || '-') + '</b></div>' + (j.distance_km ? '<div><small>Distance</small> <b>about ' + Math.round(j.distance_km) + ' km</b></div>' : '') + '</div>' +
      '<button class="btn btn-primary btn-block" data-accept="' + j.id + '" type="button">Accept job</button><div data-msg="' + j.id + '"></div></div>';
    }).join('');
   }).catch(function (e) { el.innerHTML = '<div class="box empty">' + esc(e.status === 403 ? 'Go online to see jobs.' : 'We couldn\'t load jobs.') + '</div>'; });
@@ -211,8 +211,8 @@
    var hasPin = j.delivery_lat != null && j.delivery_lng != null;
    var dest = hasPin ? j.delivery_lat + ',' + j.delivery_lng : [j.delivery_address, j.delivery_area, 'Sierra Leone'].filter(Boolean).join(', ');
    var items = (j.items || []).map(function (i) { return '<li>' + esc(i.qty > 1 ? i.qty + ' × ' + i.title : i.title) + '</li>'; }).join('');
-   el.innerHTML = '<div class="job"><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">SLL ' + fmt(j.payout_sll) + '</span></div>' +
-    '<div class="notice notice-info" style="margin:6px 0 10px">You get SLL ' + fmt(j.payout_sll) + ' once the buyer gives you their delivery code. ' + (j.paid_by_shop ? 'The shop' : 'SalonAutoZone') + ' sends it to your phone.</div>' +
+   el.innerHTML = '<div class="job"><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">Le ' + fmt(j.payout_sll) + '</span></div>' +
+    '<div class="notice notice-info" style="margin:6px 0 10px">You get Le ' + fmt(j.payout_sll) + ' once the buyer gives you their delivery code. ' + (j.paid_by_shop ? 'The shop' : 'SalonAutoZone') + ' sends it to your phone.</div>' +
     '<div class="leg' + (picked ? '' : ' go') + '"><small>1. Collect' + (picked ? 'ed' : '') + '</small><b>' + esc(j.pickup_area || '-') + '</b>' + (items ? '<ul class="items">' + items + '</ul>' : '') + (picked ? '' : person('Seller', j.seller_name, j.seller_phone)) + '</div>' +
     '<div class="leg' + (picked ? ' go' : '') + '"><small>2. Deliver to</small><b>' + esc(j.delivery_address || '-') + '</b>' + (j.delivery_area ? ', ' + esc(j.delivery_area) : '') + (hasPin ? ' <span class="pin">Pin on map</span>' : '') +
      person('Buyer', j.buyer_name, j.buyer_phone) +
@@ -237,7 +237,7 @@
     var code = document.getElementById('code').value.replace(/\D/g, '');
     if (code.length !== 6) { say(msg, 'Ask the buyer for their 6-digit code.'); return; }
     del.disabled = true;
-    flash = 'Delivered. Well done! SLL ' + fmt(j.payout_sll) + ' is now due to you' + (j.paid_by_shop ? ' from the shop.' : ' from SalonAutoZone.');
+    flash = 'Delivered. Well done! Le ' + fmt(j.payout_sll) + ' is now due to you' + (j.paid_by_shop ? ' from the shop.' : ' from SalonAutoZone.');
     step('deliver', { code: code }).catch(function () { flash = ''; del.disabled = false; });
    });
   }).catch(function () { el.innerHTML = '<div class="box empty">We couldn\'t load your delivery.</div>'; });
@@ -250,7 +250,7 @@
    var w = document.getElementById('waiting'), pl = document.getElementById('paylist');
    if (w) w.textContent = fmt(d.waiting_sll || 0);
    if (pl) pl.innerHTML = (d.recent || []).length ? '<h2 class="section-title" style="font-size:18px">Recent deliveries</h2>' + d.recent.map(function (r) {
-    return '<div class="box" style="display:flex;justify-content:space-between;gap:10px;padding:10px 14px;margin-top:6px"><span><b>' + esc(r.code) + '</b><br><small>SLL ' + fmt(r.payout_sll) + ' from ' + esc(r.paid_by) + '</small></span>' +
+    return '<div class="box" style="display:flex;justify-content:space-between;gap:10px;padding:10px 14px;margin-top:6px"><span><b>' + esc(r.code) + '</b><br><small>Le ' + fmt(r.payout_sll) + ' from ' + esc(r.paid_by) + '</small></span>' +
      '<span style="font-weight:800;color:' + (r.paid ? 'var(--ok)' : '#7a4b00') + '">' + (r.paid ? 'Paid' + (r.reference ? '<br><small>' + esc(r.reference) + '</small>' : '') : 'Waiting') + '</span></div>';
    }).join('') : '';
   }).catch(function () {});

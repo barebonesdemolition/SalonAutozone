@@ -196,7 +196,7 @@ async def approve(rid: int, body: ApproveIn, admin=Depends(admin_actor), db: Asy
     await db.execute(update(refunds).where(refunds.c.id == rid).values(
         status="to_send", amount_sll=round(amount, 2), decided_at=datetime.utcnow(), note=(body.note or "").strip() or None))
     await db.commit()
-    await notify(o.buyer_id, f"Refund approved for {o.code}", f"We'll send you SLL {amount:,.0f} soon.", f"/orders?id={o.id}", "refund")
+    await notify(o.buyer_id, f"Refund approved for {o.code}", f"We'll send you Le {amount:,.0f} soon.", f"/orders?id={o.id}", "refund")
     return {"id": rid, "status": "to_send"}
 
 
@@ -230,7 +230,7 @@ async def sent(rid: int, body: SentIn, admin=Depends(admin_actor), db: AsyncSess
     await db.commit()
     r = await _refund_or_404(db, rid)
     o = await _order(db, r.order_id)
-    await notify(o.buyer_id, f"Refund sent for {o.code}", f"We sent SLL {r.amount_sll:,.0f} to {r.refund_phone}.", f"/orders?id={o.id}", "refund")
+    await notify(o.buyer_id, f"Refund sent for {o.code}", f"We sent Le {r.amount_sll:,.0f} to {r.refund_phone}.", f"/orders?id={o.id}", "refund")
     return {"id": rid, "status": "sent"}
 
 
@@ -274,7 +274,7 @@ async def admin_refund_order(order_id: int, body: AdminRefundIn, admin=Depends(a
         await _event(db, order_id, "cancelled", "Cancelled and refunded by admin: " + body.reason.strip(), admin.id)
     rid = await create_refund(db, o, amount, body.reason.strip(), "admin", "to_send", admin.id)
     await db.commit()
-    await notify(o.buyer_id, f"Refund on its way for {o.code}", f"SLL {amount:,.0f}. {body.reason.strip()}", f"/orders?id={o.id}", "refund")
+    await notify(o.buyer_id, f"Refund on its way for {o.code}", f"Le {amount:,.0f}. {body.reason.strip()}", f"/orders?id={o.id}", "refund")
     if o.status in CANCELLABLE_PAID:
         await notify(o.seller_id, f"Order {o.code} was cancelled", "Don't hand the parts to a rider. The buyer is being refunded.", "/my-account?tab=sales", "cancel")
         if rider:

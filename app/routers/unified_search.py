@@ -155,7 +155,7 @@ async def unified_suggest(
             "type": "vehicle",
             "icon": "🚗",
             "label": v.title or f"{v.year} {v.make} {v.model}",
-            "sublabel": ", ".join(x for x in (f"SLL {int(v.price_sll or 0):,}", v.location) if x),
+            "sublabel": ", ".join(x for x in (f"Le {int(v.price_sll or 0):,}", v.location) if x),
             "url": f"/vehicle/{v.id}",
         })
 

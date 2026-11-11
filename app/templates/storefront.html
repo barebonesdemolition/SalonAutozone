@@ -74,7 +74,7 @@ body.accented .listing-grid .lcard:hover { border-color: var(--accent); }
  function card(href, img, icon, price, title, meta) {
   var u = safeUrl(window.SAZImg ? SAZImg(img, 480) : img);
   return '<a class="lcard" href="' + href + '">' + (u ? '<div class="ph" data-bg="' + esc(u) + '"></div>' : '<div class="ph"><svg aria-hidden="true"><use href="#' + icon + '"/></svg></div>') +
-   '<div class="bd"><div class="price"><small>SLL</small>' + fmt(price) + '</div><div class="ttl">' + esc(title) + '</div><div class="meta">' + (meta ? '<span class="loc">' + esc(meta) + '</span>' : '') + '</div></div></a>';
+   '<div class="bd"><div class="price"><small>Le</small>' + fmt(price) + '</div><div class="ttl">' + esc(title) + '</div><div class="meta">' + (meta ? '<span class="loc">' + esc(meta) + '</span>' : '') + '</div></div></a>';
  }
 
  fetch('/api/businesses/' + encodeURIComponent(slug)).then(function (r) { return r.ok ? r.json() : null; }).then(function (b) {

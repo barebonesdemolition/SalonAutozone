@@ -328,13 +328,22 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <div id="view-delivery" class="hidden">
  <div class="panel" style="max-width:560px">
  <div class="bar"><h2>Delivery fees</h2></div>
- <p style="margin:0 0 12px;color:#64748b">Buyers can't check out until these are set. The platform share is kept from each delivery fee; the rest goes to the driver.</p>
+ <p style="margin:0 0 12px;color:#64748b">Delivery is priced by distance from the shop's map pin to the buyer's pin: starting charge + price per km, never less than the minimum, rounded to Le 5. Bulky parts go by van at a multiple of the okada price.</p>
  <form id="fees-form">
- <label style="display:block;margin-top:10px;font-weight:600">Okada (small and medium parts), SLL<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-okada" required></label>
- <label style="display:block;margin-top:10px;font-weight:600">Van (bulky parts), SLL<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-van" required></label>
+ <label style="display:block;margin-top:10px;font-weight:600">Starting charge, Le<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" step="1" id="rate-base" required></label>
+ <label style="display:block;margin-top:10px;font-weight:600">Price per km, Le<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" step="0.5" id="rate-km" required></label>
+ <label style="display:block;margin-top:10px;font-weight:600">Minimum okada fee, Le<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" step="5" id="rate-min" required></label>
+ <label style="display:block;margin-top:10px;font-weight:600">Van costs this many times the okada price<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="1" max="10" step="0.5" id="rate-van" required></label>
+ <label style="display:block;margin-top:10px;font-weight:600">Furthest delivery, km<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="1" max="500" step="1" id="rate-max" required></label>
+ <div id="rate-examples" style="margin-top:12px;font-size:14px"></div>
+ <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600">Fixed fee when there's no map pin (optional)</summary>
+ <p style="margin:6px 0 0;color:#64748b;font-size:13px">Used when the shop or the buyer hasn't dropped a pin. Leave empty to charge a typical 10 km trip.</p>
+ <label style="display:block;margin-top:10px;font-weight:600">Okada, Le<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-okada"></label>
+ <label style="display:block;margin-top:10px;font-weight:600">Van, Le<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-van"></label>
+ </details>
  <label style="display:block;margin-top:10px;font-weight:600">Platform share of the delivery fee, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="100" step="0.5" id="fee-pct" required></label>
  <label style="display:block;margin-top:10px;font-weight:600">Your commission on parts sold, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="50" step="0.5" id="fee-comm"></label>
- <p style="margin:8px 0 0;color:#64748b;font-size:13px">Buyers pay SalonAutoZone everything. After delivery you pay the rider (delivery fee less your share) and the shop (parts less your commission). The okada and van fees above are used for shops that haven't set their own.</p>
+ <p style="margin:8px 0 0;color:#64748b;font-size:13px">Buyers pay SalonAutoZone everything. After delivery you pay the rider (delivery fee less your share) and the shop (parts less your commission).</p>
  <button class="btn btn-primary" style="margin-top:16px" type="submit">Save fees</button>
  </form>
  </div>
@@ -441,7 +450,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  var box = $('todo');
  if (!t) { box.innerHTML = '<p class="empty">Could not load the to-do list.</p>'; return; }
  var items = [];
- if (t.delivery_fees_missing) items.push(['delivery', 'Set delivery fees. Buyers can\'t check out until you do.', '!', true]);
+ if (t.delivery_fees_missing) items.push(['delivery', 'Set your platform share in Delivery fees (it\'s 0% until you do).', '!', true]);
  if (t.order_payments_to_check) items.push(['orders', 'Buyers say they\'ve paid: check the transaction ID', t.order_payments_to_check, true, 'awaiting_payment']);
  if (t.orders_awaiting_payment) items.push(['orders', 'Parts orders waiting for payment', t.orders_awaiting_payment]);
  if (t.refunds_to_decide) items.push(['refunds', 'Buyers reported a problem: decide on a refund', t.refunds_to_decide, true, 'requested']);
@@ -511,7 +520,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  rowsOrEmpty($('tb-vehicles'), items, function (v) {
  var sold = v.is_sold ? '<span class="badge bad">Sold</span>' : '<span class="badge ok">Active</span>';
  return '<tr><td>' + v.id + '</td><td>' + esc(v.title || (v.year + ' ' + v.make + ' ' + v.model)) +
- '</td><td>' + (v.price_sll != null ? 'SLL ' + fmt(v.price_sll) : '—') +
+ '</td><td>' + (v.price_sll != null ? 'Le ' + fmt(v.price_sll) : '—') +
  '</td><td>' + esc(v.location || '—') + '</td><td>' + sold +
  '</td><td><a class="btn btn-ghost" href="/vehicle/' + v.id + '" target="_blank">Open</a></td></tr>';
  });
@@ -539,7 +548,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  rowsOrEmpty($('tb-parts'), items, function (p) {
  return '<tr><td>' + p.id + '</td><td>' + esc(p.name || p.title || '—') +
  '</td><td>' + esc(p.category || '—') +
- '</td><td>' + (p.price_sll != null ? 'SLL ' + fmt(p.price_sll) : '—') +
+ '</td><td>' + (p.price_sll != null ? 'Le ' + fmt(p.price_sll) : '—') +
  '</td><td><span class="badge off">' + esc(p.condition || '—') + '</span></td>' +
  '<td><a class="btn btn-ghost" href="/part/' + p.id + '" target="_blank">Open</a></td></tr>';
  });
@@ -572,7 +581,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
      var car = [i.car_year, i.car_make, i.car_model].filter(Boolean).join(' ');
      return '<tr><td class="who"><b>' + esc(i.customer_name || 'No name') + '</b><small>' + esc(i.customer_phone || '') + '</small></td>' +
       '<td>' + esc(i.part_name || '—') + '</td><td>' + esc(car || '—') + '</td>' +
-      '<td>' + (i.budget_sll ? 'SLL ' + Number(i.budget_sll).toLocaleString('en-GB') : '—') + '</td><td>' + day(i.created_at) + '</td>' +
+      '<td>' + (i.budget_sll ? 'Le ' + Number(i.budget_sll).toLocaleString('en-GB') : '—') + '</td><td>' + day(i.created_at) + '</td>' +
       '<td>' + statusSel('import', i.id, IMPORT_ST, i.status || 'pending') + '</td>' +
       '<td>' + contactBtns(i.customer_phone, 'Hello' + (i.customer_name ? ' ' + i.customer_name : '') + ', this is SalonAutoZone about your request for ' + (i.part_name || 'a part') + (car ? ' for your ' + car : '') + '.') + '</td></tr>';
     }).join('');
@@ -788,7 +797,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  '<td>' + (p.id || '—') + '</td>' +
  '<td><strong>' + esc(p.business_name || '—') + '</strong><br><small>' + esc(p.business_slug || '') + '</small></td>' +
  '<td>' + esc(p.plan_name || '—') + '</td>' +
- '<td>SLL ' + fmt(p.amount_sll) + '</td>' +
+ '<td>Le ' + fmt(p.amount_sll) + '</td>' +
  '<td>' + esc(p.reference || '—') + '</td>' +
  '<td><span class="badge ' + badgeClass + '">' + esc(p.status) + '</span></td>' +
  '<td>' + actions + '</td>' +
@@ -829,7 +838,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  : r.status === 'to_send' ? '<button class="btn btn-primary" data-ref-sent="' + r.id + '" data-amt="' + r.amount_sll + '">Sent</button>' : '';
  return '<tr><td><strong>' + esc(r.order_code) + '</strong><br><small>' + esc({ buyer_cancel: 'Buyer cancelled', buyer_problem: 'Problem reported', admin: 'By admin' }[r.source] || r.source) + '</small></td>' +
  '<td>' + esc(r.reason) + (r.note ? '<br><small>' + esc(r.note) + '</small>' : '') + (r.shop_already_paid && r.status !== 'declined' ? '<br><span class="badge bad">Shop already paid: recover from shop</span>' : '') + '</td>' +
- '<td><strong>SLL ' + fmt(r.amount_sll) + '</strong><br><small>of ' + fmt(r.order_total_sll) + '</small></td>' +
+ '<td><strong>Le ' + fmt(r.amount_sll) + '</strong><br><small>of ' + fmt(r.order_total_sll) + '</small></td>' +
  '<td>' + (ph ? '<a href="tel:' + esc(ph) + '">' + esc(r.refund_phone) + '</a>' : '—') + (r.sent_ref ? '<br><small>ref ' + esc(r.sent_ref) + '</small>' : '') + '</td>' +
  '<td><span class="badge ' + l[1] + '">' + esc(l[0]) + '</span></td><td>' + act + '</td></tr>';
  }).join('');
@@ -844,7 +853,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  .then(function () { toast(msg, true); loadRefunds(); loadTodo(); });
  }
  if (ok) {
- var amt = prompt('Refund how much (SLL)?', ok.dataset.amt);
+ var amt = prompt('Refund how much (Le)?', ok.dataset.amt);
  if (amt === null) return;
  amt = Number(String(amt).replace(/[^\d.]/g, ''));
  if (!amt) return;
@@ -858,7 +867,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  post('/api/refunds/admin/' + no.dataset.refNo + '/decline', { note: why.trim() }, 'Declined. The buyer has been told.').catch(function (err) { no.disabled = false; toast(err.message, false); });
  }
  if (sent) {
- var ref = prompt('Transaction ID of the refund (optional). Sending SLL ' + fmt(Number(sent.dataset.amt)), '');
+ var ref = prompt('Transaction ID of the refund (optional). Sending Le ' + fmt(Number(sent.dataset.amt)), '');
  if (ref === null) return;
  sent.disabled = true;
  post('/api/refunds/admin/' + sent.dataset.refSent + '/sent', { reference: ref.trim() || null }, 'Refund marked as sent.').catch(function (err) { sent.disabled = false; toast(err.message, false); });
@@ -896,8 +905,8 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  return '<tr><td><strong>' + esc(o.code) + '</strong><br><small>' + esc(String(o.created_at || '').slice(0, 16).replace('T', ' ')) + '</small></td>' +
  '<td>' + (phone ? '<a href="tel:' + esc(phone) + '">' + esc(o.buyer_phone) + '</a>' : '—') + '</td>' +
  '<td>' + esc(o.delivery_address || '') + '<br><small>' + esc(o.delivery_area || '') + ', ' + esc(o.vehicle_class || '') + '</small></td>' +
- '<td>SLL ' + fmt(o.parts_total_sll) + '</td><td>SLL ' + fmt(o.delivery_fee_sll) + '</td>' +
- '<td><strong>SLL ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + '</strong></td>' +
+ '<td>Le ' + fmt(o.parts_total_sll) + '</td><td>Le ' + fmt(o.delivery_fee_sll) + '</td>' +
+ '<td><strong>Le ' + fmt((o.parts_total_sll || 0) + (o.delivery_fee_sll || 0)) + '</strong></td>' +
  '<td><span class="badge ' + l[1] + '">' + esc(l[0]) + '</span>' + payInfo + '</td><td>' + act +
  '<div class="acts" style="margin-top:6px"><a class="btn btn-ghost" target="_blank" rel="noopener" href="/receipt?id=' + encodeURIComponent(o.id) + '&copy=customer">Receipt</a><a class="btn btn-ghost" target="_blank" rel="noopener" href="/receipt?id=' + encodeURIComponent(o.id) + '&copy=store">Store copy</a></div></td></tr>';
  }).join('');
@@ -911,10 +920,10 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  var total = Number(rf.dataset.total), before = rf.dataset.st !== 'delivered';
  var why = prompt((before ? 'This cancels the order and refunds the buyer. ' : 'The order stays delivered. ') + 'Why are you refunding?');
  if (!why || why.trim().length < 3) return;
- var amt = prompt('How much to refund (SLL)? Full amount is ' + fmt(total), String(total));
+ var amt = prompt('How much to refund (Le)? Full amount is ' + fmt(total), String(total));
  if (amt === null) return;
  amt = Number(String(amt).replace(/[^\d.]/g, ''));
- if (!amt || amt > total) { toast('Enter an amount up to SLL ' + fmt(total), false); return; }
+ if (!amt || amt > total) { toast('Enter an amount up to Le ' + fmt(total), false); return; }
  rf.disabled = true;
  fetch('/api/refunds/admin/orders/' + rf.dataset.orderRefund, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ reason: why.trim(), amount_sll: amt }) })
  .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.detail || 'Could not refund'); }); })
@@ -932,7 +941,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  .catch(function (err) { ok.disabled = false; toast(err.message, false); });
  }
  if (no) {
- var why = prompt('What should we tell the buyer? (e.g. "No payment with this ID", "Amount was short by SLL 10,000")', 'No payment with this transaction ID arrived.');
+ var why = prompt('What should we tell the buyer? (e.g. "No payment with this ID", "Amount was short by Le 10")', 'No payment with this transaction ID arrived.');
  if (!why || why.trim().length < 3) return;
  no.disabled = true;
  fetch('/api/pay/admin/payments/' + no.dataset.payNo + '/reject', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ reason: why.trim() }) })
@@ -1009,18 +1018,18 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  var tb = $('tb-shops');
  fetch('/api/shop/admin/shop-payouts', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
  if (!d) { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load.</td></tr>'; return; }
- $('shops-total').textContent = d.total_sll ? 'You owe SLL ' + fmt(d.total_sll) : '';
+ $('shops-total').textContent = d.total_sll ? 'You owe Le ' + fmt(d.total_sll) : '';
  tb.innerHTML = d.payouts.length ? d.payouts.map(function (p) {
  var to = [p.orange_money ? 'Orange Money ' + p.orange_money : '', p.afrimoney ? 'Afrimoney ' + p.afrimoney : ''].filter(Boolean).join('<br>');
  return '<tr><td><strong>' + esc(p.code) + '</strong></td><td>' + esc(p.shop) + (p.phone ? '<br><small>' + esc(p.phone) + '</small>' : '') + '</td>' +
- '<td>' + (to || '<span class="badge bad">No number yet</span>') + '</td><td><strong>SLL ' + fmt(p.amount_sll) + '</strong>' + (p.amount_sll !== p.parts_total_sll ? '<br><small>of ' + fmt(p.parts_total_sll) + '</small>' : '') + (p.refunded_sll ? '<br><span class="badge bad">Buyer refunded SLL ' + fmt(p.refunded_sll) + ': pay the shop less</span>' : '') + '</td>' +
+ '<td>' + (to || '<span class="badge bad">No number yet</span>') + '</td><td><strong>Le ' + fmt(p.amount_sll) + '</strong>' + (p.amount_sll !== p.parts_total_sll ? '<br><small>of ' + fmt(p.parts_total_sll) + '</small>' : '') + (p.refunded_sll ? '<br><span class="badge bad">Buyer refunded Le ' + fmt(p.refunded_sll) + ': pay the shop less</span>' : '') + '</td>' +
  '<td><button class="btn btn-primary" data-shop-paid="' + p.order_id + '" data-amt="' + p.amount_sll + '">Paid</button></td></tr>';
  }).join('') : '<tr><td colspan="5" class="empty">No shop is waiting to be paid.</td></tr>';
  }).catch(function () {});
  }
  $('tb-shops').addEventListener('click', function (e) {
  var b = e.target.closest('[data-shop-paid]'); if (!b) return;
- var ref = prompt('Transaction ID of the payment to the shop (optional). Paying SLL ' + fmt(Number(b.dataset.amt)), '');
+ var ref = prompt('Transaction ID of the payment to the shop (optional). Paying Le ' + fmt(Number(b.dataset.amt)), '');
  if (ref === null) return;
  b.disabled = true;
  fetch('/api/shop/admin/shop-payouts/' + b.dataset.shopPaid + '/paid', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ reference: ref.trim() || null }) })
@@ -1032,19 +1041,19 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  fetch('/api/shop/admin/rider-payouts', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
  if (!d) { tb.innerHTML = '<tr><td colspan="5" class="empty">Could not load.</td></tr>'; return; }
  var mine = d.payouts.filter(function (p) { return p.paid_by === 'platform'; }).reduce(function (a, p) { return a + p.amount_sll; }, 0);
- $('riders-total').textContent = mine ? 'You owe SLL ' + fmt(mine) : '';
+ $('riders-total').textContent = mine ? 'You owe Le ' + fmt(mine) : '';
  tb.innerHTML = d.payouts.length ? d.payouts.map(function (p) {
  var ph = String(p.rider_phone || '').replace(/[^\d+]/g, '');
  return '<tr><td><strong>' + esc(p.code) + '</strong><br><small>' + esc(String(p.delivered_at || '').slice(0, 16).replace('T', ' ')) + '</small></td>' +
  '<td>' + esc(p.rider_name || '') + (ph ? '<br><a href="tel:' + esc(ph) + '">' + esc(p.rider_phone) + '</a>' : '') + '</td>' +
- '<td><strong>SLL ' + fmt(p.amount_sll) + '</strong></td><td>' + (p.paid_by === 'platform' ? '<span class="badge warn">You pay</span>' : '<span class="badge off">The shop</span>') + '</td>' +
+ '<td><strong>Le ' + fmt(p.amount_sll) + '</strong></td><td>' + (p.paid_by === 'platform' ? '<span class="badge warn">You pay</span>' : '<span class="badge off">The shop</span>') + '</td>' +
  '<td><button class="btn' + (p.paid_by === 'platform' ? ' btn-primary' : '') + '" data-rider="' + p.job_id + '" data-amt="' + p.amount_sll + '">Paid</button></td></tr>';
  }).join('') : '<tr><td colspan="5" class="empty">No rider is waiting to be paid.</td></tr>';
  }).catch(function () {});
  }
  $('tb-riders').addEventListener('click', function (e) {
  var b = e.target.closest('[data-rider]'); if (!b) return;
- var ref = prompt('Transaction ID of the payment to the rider (optional). Paying SLL ' + fmt(Number(b.dataset.amt)), '');
+ var ref = prompt('Transaction ID of the payment to the rider (optional). Paying Le ' + fmt(Number(b.dataset.amt)), '');
  if (ref === null) return;
  b.disabled = true;
  fetch('/api/shop/admin/rider-payouts/' + b.dataset.rider + '/paid', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify({ reference: ref.trim() || null }) })
@@ -1055,39 +1064,53 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  var tb = $('tb-owed');
  fetch('/api/shop/admin/shop-fees', { headers: auth() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
  if (!d) { tb.innerHTML = '<tr><td colspan="4" class="empty">Could not load.</td></tr>'; return; }
- $('owed-total').textContent = d.total_owed_sll ? 'Total SLL ' + fmt(d.total_owed_sll) : '';
+ $('owed-total').textContent = d.total_owed_sll ? 'Total Le ' + fmt(d.total_owed_sll) : '';
  $('owed-panel').classList.toggle('hidden', !d.shops.length);
  tb.innerHTML = d.shops.length ? d.shops.map(function (s) {
  var ph = String(s.phone || '').replace(/[^\d+]/g, '');
- return '<tr><td><strong>' + esc(s.shop) + '</strong>' + (ph ? '<br><a href="tel:' + esc(ph) + '">' + esc(s.phone) + '</a>' : '') + '</td><td>' + esc(s.orders) + '</td><td><strong>SLL ' + fmt(s.owed_sll) + '</strong></td>' +
+ return '<tr><td><strong>' + esc(s.shop) + '</strong>' + (ph ? '<br><a href="tel:' + esc(ph) + '">' + esc(s.phone) + '</a>' : '') + '</td><td>' + esc(s.orders) + '</td><td><strong>Le ' + fmt(s.owed_sll) + '</strong></td>' +
  '<td><button class="btn btn-primary" data-settle="' + s.seller_id + '" data-amt="' + s.owed_sll + '">Paid</button></td></tr>';
  }).join('') : '<tr><td colspan="4" class="empty">No shop owes anything right now.</td></tr>';
  }).catch(function () {});
  }
  $('tb-owed').addEventListener('click', function (e) {
  var b = e.target.closest('[data-settle]'); if (!b) return;
- if (!confirm('Has this shop paid you SLL ' + fmt(Number(b.dataset.amt)) + '?')) return;
+ if (!confirm('Has this shop paid you Le ' + fmt(Number(b.dataset.amt)) + '?')) return;
  b.disabled = true;
  fetch('/api/shop/admin/shop-fees/' + b.dataset.settle + '/settle', { method: 'POST', headers: auth() })
  .then(function (r) { if (!r.ok) throw new Error('Could not update'); toast('Marked as paid', true); loadOwed(); })
  .catch(function (err) { b.disabled = false; toast(err.message, false); });
  });
- function loadFees() {
- loadOwed(); loadRiders(); loadShopPay();
- fetch('/api/shop/admin/settings', { headers: auth() }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+ function showExamples(list) {
+ $('rate-examples').innerHTML = '<b>What buyers pay</b><table style="width:100%;margin-top:4px"><tr><th style="text-align:left">Distance</th><th style="text-align:right">Okada</th><th style="text-align:right">Van</th></tr>' +
+ (list || []).map(function (x) { return '<tr><td>' + x.km + ' km' + (x.km === 20 ? ' (about Central to Mile 13)' : '') + '</td><td style="text-align:right">Le ' + fmt(x.okada_sll) + '</td><td style="text-align:right">Le ' + fmt(x.van_sll) + '</td></tr>'; }).join('') + '</table>';
+ }
+ function fillFees(d) {
+ $('rate-base').value = d.rate_base; $('rate-km').value = d.rate_per_km; $('rate-min').value = d.rate_min;
+ $('rate-van').value = d.van_multiplier; $('rate-max').value = d.max_km;
  $('fee-okada').value = d.okada_fee_sll != null ? d.okada_fee_sll : '';
  $('fee-van').value = d.van_fee_sll != null ? d.van_fee_sll : '';
  $('fee-pct').value = d.platform_pct != null ? d.platform_pct : '';
  $('fee-comm').value = d.commission_pct != null ? d.commission_pct : '';
- if (d.okada_fee_sll == null) toast('Delivery fees are not set yet, so buyers cannot check out.', false);
+ showExamples(d.examples);
+ }
+ function loadFees() {
+ loadOwed(); loadRiders(); loadShopPay();
+ fetch('/api/shop/admin/settings', { headers: auth() }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+ fillFees(d);
+ if (d.platform_pct == null) toast('Set the platform share and save, so buyers can check out.', false);
  });
  }
  $('fees-form').addEventListener('submit', function (e) {
  e.preventDefault();
- var body = { okada_fee_sll: Number($('fee-okada').value), van_fee_sll: Number($('fee-van').value), platform_pct: Number($('fee-pct').value), commission_pct: Number($('fee-comm').value || 0) };
+ var body = { rate_base: Number($('rate-base').value), rate_per_km: Number($('rate-km').value), rate_min: Number($('rate-min').value),
+ van_multiplier: Number($('rate-van').value), max_km: Number($('rate-max').value),
+ platform_pct: Number($('fee-pct').value), commission_pct: Number($('fee-comm').value || 0) };
+ if ($('fee-okada').value !== '') body.okada_fee_sll = Number($('fee-okada').value);
+ if ($('fee-van').value !== '') body.van_fee_sll = Number($('fee-van').value);
  fetch('/api/shop/admin/settings', { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify(body) })
  .then(function (r) { if (!r.ok) throw new Error('Could not save fees'); return r.json(); })
- .then(function () { toast('Delivery fees saved', true); })
+ .then(function (d) { fillFees(d); toast('Delivery fees saved', true); })
  .catch(function (err) { toast(err.message, false); });
  });
  function requireAdmin() {

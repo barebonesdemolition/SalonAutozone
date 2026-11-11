@@ -209,7 +209,7 @@ body.has-bar .saz-tabbar { display: none !important; }
    '<div class="meta">' + (d.confidence === 'low' ? '<span class="tag low">Check this one</span>' : '') + (d.part_number ? '<span class="tag">' + esc(d.part_number) + '</span>' : '') + (d.notes ? '<span class="hint" style="margin:0">' + esc(d.notes) + '</span>' : '') + '</div>' +
    '</div><label class="keep"><input type="checkbox" data-keep ' + (it.keep ? 'checked' : '') + '>Add</label></div>' +
    '<div class="fields">' +
-   '<label class="field wide"><span>Price, SLL</span><input class="input price-in' + (d.price_sll ? '' : ' miss') + '" data-f="price_sll" inputmode="numeric" placeholder="e.g. 150000" value="' + esc(d.price_sll) + '"></label>' +
+   '<label class="field wide"><span>Price, Le</span><input class="input price-in' + (d.price_sll ? '' : ' miss') + '" data-f="price_sll" inputmode="numeric" placeholder="e.g. 150000" value="' + esc(d.price_sll) + '"></label>' +
    '<label class="field"><span>Quantity</span><input class="input" data-f="stock_quantity" type="number" min="1" max="9999" value="' + esc(d.stock_quantity) + '"></label>' +
    '<label class="field"><span>Condition</span><select class="select" data-f="condition">' + [['new', 'New'], ['used', 'Used'], ['refurbished', 'Refurbished']].map(function (c) { return '<option value="' + c[0] + '"' + (c[0] === d.condition ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></label>' +
    '<label class="field"><span>Category</span><select class="select" data-f="category">' + opts(C.CATS, d.category) + '</select></label>' +
