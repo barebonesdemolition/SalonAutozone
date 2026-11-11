@@ -341,9 +341,10 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  <label style="display:block;margin-top:10px;font-weight:600">Okada, Le<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-okada"></label>
  <label style="display:block;margin-top:10px;font-weight:600">Van, Le<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" id="fee-van"></label>
  </details>
- <label style="display:block;margin-top:10px;font-weight:600">Platform share of the delivery fee, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="100" step="0.5" id="fee-pct" required></label>
- <label style="display:block;margin-top:10px;font-weight:600">Your commission on parts sold, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="50" step="0.5" id="fee-comm"></label>
- <p style="margin:8px 0 0;color:#64748b;font-size:13px">Buyers pay SalonAutoZone everything. After delivery you pay the rider (delivery fee less your share) and the shop (parts less your commission).</p>
+ <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600">Take a share of delivery fees too (normally 0)</summary>
+ <label style="display:block;margin-top:10px;font-weight:600">Platform share of the delivery fee, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="100" step="0.5" id="fee-pct"></label></details>
+ <label style="display:block;margin-top:10px;font-weight:600">Your commission on parts sold, %<input class="inp" style="display:block;width:100%;margin-top:6px" type="number" min="0" max="50" step="0.5" id="fee-comm" required></label>
+ <p style="margin:8px 0 0;color:#64748b;font-size:13px">This is how SalonAutoZone earns while you grow. Buyers pay SalonAutoZone everything; after delivery the rider gets the whole delivery fee and the shop gets the parts price less your commission. When you move to monthly shop fees, set this to 0.</p>
  <button class="btn btn-primary" style="margin-top:16px" type="submit">Save fees</button>
  </form>
  </div>
@@ -450,7 +451,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  var box = $('todo');
  if (!t) { box.innerHTML = '<p class="empty">Could not load the to-do list.</p>'; return; }
  var items = [];
- if (t.delivery_fees_missing) items.push(['delivery', 'Set your platform share in Delivery fees (it\'s 0% until you do).', '!', true]);
+ if (t.delivery_fees_missing) items.push(['delivery', 'Set your commission on parts in Delivery fees (it\'s 0% until you do).', '!', true]);
  if (t.order_payments_to_check) items.push(['orders', 'Buyers say they\'ve paid: check the transaction ID', t.order_payments_to_check, true, 'awaiting_payment']);
  if (t.orders_awaiting_payment) items.push(['orders', 'Parts orders waiting for payment', t.orders_awaiting_payment]);
  if (t.refunds_to_decide) items.push(['refunds', 'Buyers reported a problem: decide on a refund', t.refunds_to_decide, true, 'requested']);
@@ -1090,7 +1091,7 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  $('rate-van').value = d.van_multiplier; $('rate-max').value = d.max_km;
  $('fee-okada').value = d.okada_fee_sll != null ? d.okada_fee_sll : '';
  $('fee-van').value = d.van_fee_sll != null ? d.van_fee_sll : '';
- $('fee-pct').value = d.platform_pct != null ? d.platform_pct : '';
+ $('fee-pct').value = d.platform_pct != null ? d.platform_pct : 0;
  $('fee-comm').value = d.commission_pct != null ? d.commission_pct : '';
  showExamples(d.examples);
  }
@@ -1098,14 +1099,14 @@ h1,h2{font-variation-settings:"wdth" 82;letter-spacing:-.01em}
  loadOwed(); loadRiders(); loadShopPay();
  fetch('/api/shop/admin/settings', { headers: auth() }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
  fillFees(d);
- if (d.platform_pct == null) toast('Set the platform share and save, so buyers can check out.', false);
+ if (d.commission_pct == null) toast('Set your commission on parts and save.', false);
  });
  }
  $('fees-form').addEventListener('submit', function (e) {
  e.preventDefault();
  var body = { rate_base: Number($('rate-base').value), rate_per_km: Number($('rate-km').value), rate_min: Number($('rate-min').value),
  van_multiplier: Number($('rate-van').value), max_km: Number($('rate-max').value),
- platform_pct: Number($('fee-pct').value), commission_pct: Number($('fee-comm').value || 0) };
+ platform_pct: Number($('fee-pct').value || 0), commission_pct: Number($('fee-comm').value || 0) };
  if ($('fee-okada').value !== '') body.okada_fee_sll = Number($('fee-okada').value);
  if ($('fee-van').value !== '') body.van_fee_sll = Number($('fee-van').value);
  fetch('/api/shop/admin/settings', { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, auth()), body: JSON.stringify(body) })
