@@ -53,7 +53,8 @@
 <body>
 <div id="site-header"></div>
 <main class="wrap" id="root"></main>
-<script src="/static/site.js?v=9"></script>
+<script src="/static/site.js?v=10"></script>
+<script src="/static/trackmap.js?v=2"></script>
 <script>
 (function () {
  'use strict';
@@ -199,6 +200,7 @@
       driverBox(o.driver, o.status) +
       (o.status === 'delivered' ? '<section class="box" id="rate"></section>' : '') +
       '<section class="box"><h2>Progress</h2>' + timeline(o.status, o.events) + '</section>' +
+      (['driver_assigned', 'out_for_delivery'].indexOf(o.status) > -1 ? '<section class="box"><h2>Where are my parts?</h2><p id="trk-info" class="hint">Loading…</p><div id="trk-map" style="height:300px;border-radius:12px;margin-top:10px;display:none"></div></section>' : '') +
       '<section class="box"><h2>Items</h2>' + (o.items || []).map(function (it) {
         return '<div class="row"><span>' + esc(it.title) + ' <span style="color:var(--muted)">× ' + it.qty + '</span></span><b>Le ' + fmt(it.unit_price_sll * it.qty) + '</b></div>';
        }).join('') +
@@ -217,6 +219,7 @@
      '</aside></div>';
     if (o.status === 'delivered') rateBox(id);
     refundBox(id, o);
+    if (document.getElementById('trk-map') && window.SAZMap) SAZMap.track({ el: document.getElementById('trk-map'), info: document.getElementById('trk-info'), orderId: id, token: token() });
     var c = document.getElementById('cancel');
     if (c) c.addEventListener('click', function () {
      if (!confirm(o.status === 'confirmed' ? 'Cancel this order? You\'ve already paid, so we\'ll send your money back to the number you paid from.' : 'Cancel this order?')) return;

@@ -91,7 +91,7 @@
  <p class="lead">Deliver car parts with your okada or van and get paid for every drop.</p>
  <div id="app" class="stack"><div class="lcard skeleton" style="min-height:200px"></div></div>
 </main>
-<script src="/static/site.js?v=9"></script>
+<script src="/static/site.js?v=10"></script>
 <script>
 (function () {
  'use strict';
@@ -199,11 +199,37 @@
    '<a class="btn btn-ghost" href="tel:' + esc(d) + '">Call</a><a class="btn btn-wa" href="https://wa.me/' + esc(d.replace(/^\+/, '')) + '" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>';
  }
 
+ // ---- share the rider's location while they have a job (the buyer and shop see it on a map) ----
+ var geo = { watch: null, job: null, last: 0, pos: null };
+ function shareLocation(jobId) {
+  if (geo.job === jobId && geo.watch != null) return;
+  stopSharing();
+  if (!navigator.geolocation) { geoNote('Your phone can\'t share its location, so the buyer won\'t see you on the map.'); return; }
+  geo.job = jobId;
+  geo.watch = navigator.geolocation.watchPosition(function (p) {
+   geo.pos = { lat: Math.round(p.coords.latitude * 1e6) / 1e6, lng: Math.round(p.coords.longitude * 1e6) / 1e6 };
+   if (Date.now() - geo.last < 20000) return;   // at most every 20 seconds, to save data
+   geo.last = Date.now();
+   api('/api/shop/driver/jobs/' + jobId + '/location', { method: 'POST', body: JSON.stringify(geo.pos) })
+    .then(function () { geoNote('📍 Sharing your location with the buyer while you deliver. Keep this page open.', true); })
+    .catch(function () { stopSharing(); });
+  }, function () { geoNote('Allow location for this site so the buyer can follow the delivery.'); }, { enableHighAccuracy: true, maximumAge: 15000, timeout: 30000 });
+ }
+ function stopSharing() {
+  if (geo.watch != null && navigator.geolocation) navigator.geolocation.clearWatch(geo.watch);
+  geo.watch = null; geo.job = null;
+ }
+ function geoNote(text, ok) {
+  var n = document.getElementById('geonote'); if (!n) return;
+  n.className = 'notice ' + (ok ? 'notice-ok' : 'notice-warn'); n.style.margin = '0 0 10px'; n.textContent = text;
+ }
+
  function loadMine() {
   var el = document.getElementById('mine'); if (!el) return;
   api('/api/shop/driver/jobs?scope=mine').then(function (d) {
    if (!d.jobs || !d.jobs.length) {
-    el.innerHTML = (flash ? '<div class="notice notice-ok" style="margin-bottom:10px">' + esc(flash) + '</div>' : '') + '<div class="box empty">No delivery yet. Accept a job below.</div>';
+    stopSharing();
+    el.innerHTML = (flash ? '<div class="notice notice-ok" style="margin-bottom:10px">' + esc(flash) + '</div>' : '') + '<div class="box empty">' + (flash ? 'Ready for the next one? Accept a job below.' : 'No delivery yet. Accept a job below.') + '</div>';
     flash = '';
     return;
    }
@@ -211,7 +237,7 @@
    var hasPin = j.delivery_lat != null && j.delivery_lng != null;
    var dest = hasPin ? j.delivery_lat + ',' + j.delivery_lng : [j.delivery_address, j.delivery_area, 'Sierra Leone'].filter(Boolean).join(', ');
    var items = (j.items || []).map(function (i) { return '<li>' + esc(i.qty > 1 ? i.qty + ' × ' + i.title : i.title) + '</li>'; }).join('');
-   el.innerHTML = '<div class="job"><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">Le ' + fmt(j.payout_sll) + '</span></div>' +
+   el.innerHTML = '<div class="job"><div id="geonote" class="notice notice-info" style="margin:0 0 10px">📍 Turning on location so the buyer can follow the delivery…</div><div class="top"><span class="code">' + esc(j.code) + '</span><span class="pay">Le ' + fmt(j.payout_sll) + '</span></div>' +
     '<div class="notice notice-info" style="margin:6px 0 10px">You get Le ' + fmt(j.payout_sll) + ' once the buyer gives you their delivery code. ' + (j.paid_by_shop ? 'The shop' : 'SalonAutoZone') + ' sends it to your phone.</div>' +
     '<div class="leg' + (picked ? '' : ' go') + '"><small>1. Collect' + (picked ? 'ed' : '') + '</small><b>' + esc(j.pickup_area || '-') + '</b>' + (items ? '<ul class="items">' + items + '</ul>' : '') + (picked ? '' : person('Seller', j.seller_name, j.seller_phone)) + '</div>' +
     '<div class="leg' + (picked ? ' go' : '') + '"><small>2. Deliver to</small><b>' + esc(j.delivery_address || '-') + '</b>' + (j.delivery_area ? ', ' + esc(j.delivery_area) : '') + (hasPin ? ' <span class="pin">Pin on map</span>' : '') +
@@ -222,6 +248,8 @@
      : '<div class="acts"><button class="btn btn-primary btn-lg" id="pickup" type="button">I\'ve collected the parts</button><button class="btn btn-ghost" id="release" type="button">I can\'t do this job</button></div>') +
     '<div id="jobmsg"></div></div>';
    var msg = document.getElementById('jobmsg');
+   shareLocation(j.id);
+   if (geo.watch != null && geo.last) geoNote('📍 Sharing your location with the buyer while you deliver. Keep this page open.', true);
    function step(path, body) {
     return api('/api/shop/driver/jobs/' + j.id + '/' + path, { method: 'POST', body: body ? JSON.stringify(body) : undefined }).then(refresh).catch(function (e) { say(msg, e.message); throw e; });
    }
@@ -238,7 +266,7 @@
     if (code.length !== 6) { say(msg, 'Ask the buyer for their 6-digit code.'); return; }
     del.disabled = true;
     flash = 'Delivered. Well done! Le ' + fmt(j.payout_sll) + ' is now due to you' + (j.paid_by_shop ? ' from the shop.' : ' from SalonAutoZone.');
-    step('deliver', { code: code }).catch(function () { flash = ''; del.disabled = false; });
+    step('deliver', Object.assign({ code: code }, geo.pos || {})).catch(function () { flash = ''; del.disabled = false; });
    });
   }).catch(function () { el.innerHTML = '<div class="box empty">We couldn\'t load your delivery.</div>'; });
  }
